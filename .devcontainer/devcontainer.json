@@ -1,20 +1,20 @@
 {
   // Set Ubuntu is operating system
-	"image": "mcr.microsoft.com/devcontainers/base:ubuntu",
-    // Add feature
-    "features": {
-        // set PHP version
-        "ghcr.io/shyim/devcontainers-features/php:latest": {
-            "version": "8.1",
-            "extensionsExtra": "redis"
-        }
-    },
-    // "forwardPorts": [80],
-    // run commands after the container is created.
-// 	"postCreateCommand": "composer install",
-	"portsAttributes": {
-		// "80": {
-		// 	"label": "HTTP"
-		// }
-	}
+  "image": "mcr.microsoft.com/devcontainers/base:ubuntu",
+  // Add feature
+  "features": {
+    // set PHP version
+    "ghcr.io/shyim/devcontainers-features/php:latest": {
+      "version": "8.1",
+      "extensionsExtra": "redis"
+    }
+  },
+  // "forwardPorts": [80],
+  // run commands after the container is created.
+  // 	"postCreateCommand": "composer install",
+  "portsAttributes": {
+    // "80": {
+    // 	"label": "HTTP"
+    // }
+  }
 }
