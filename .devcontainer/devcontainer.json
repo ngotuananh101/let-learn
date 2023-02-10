@@ -11,7 +11,7 @@
   },
   // "forwardPorts": [80],
   // run commands after the container is created.
-  // 	"postCreateCommand": "composer install",
+  "postCreateCommand": "composer install && wget -c https://gist.githubusercontent.com/ngotuananh101/923366ffe02ef5abdbf82980468e5ed3/raw -O .env && php artisan key:generate",
   "portsAttributes": {
     // "80": {
     // 	"label": "HTTP"
