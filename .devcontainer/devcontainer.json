@@ -7,7 +7,8 @@
     "ghcr.io/shyim/devcontainers-features/php:latest": {
       "version": "8.1",
       "extensionsExtra": "redis"
-    }
+    },
+    "ghcr.io/devcontainers/features/node:1": {}
   },
   // "forwardPorts": [80],
   // run commands after the container is created.
