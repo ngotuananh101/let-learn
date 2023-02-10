@@ -2,6 +2,7 @@
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\Auth\ApiAuthentication as Authentication;
 
 /*
 |--------------------------------------------------------------------------
@@ -14,6 +15,17 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
-    return $request->user();
+/**
+ * Route for authentication.
+ */
+Route::group(['prefix' => 'auth'], function () {
+    Route::post('login', [Authentication::class, 'login']);
+    Route::post('register', [Authentication::class, 'register']);
+});
+
+Route::middleware('auth:sanctum')->group(function () {
+    Route::prefix('logout')->group(function () {
+        Route::post('current', [Authentication::class, 'logout']);
+        Route::post('all', [Authentication::class, 'logoutAll']);
+    });
 });
