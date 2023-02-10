@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Carbon\Carbon;
 use App\Models\User;
+use Illuminate\Support\Facades\Password;
 
 class ApiAuthentication extends Controller
 {
@@ -29,7 +30,7 @@ class ApiAuthentication extends Controller
     {
         try {
             $request->validate([
-                'email' => 'required|string',
+                'email' => 'required|string|email',
                 'password' => 'required|string',
             ]);
             $credentials = request(['email', 'password']);
@@ -160,6 +161,90 @@ class ApiAuthentication extends Controller
                 'message' => 'User created successfully',
                 'data' => $user
             ], 200);
+        } catch (\Throwable $th) {
+            return response()->json([
+                'status' => 'error',
+                'status_code' => 500,
+                'message' => $th->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * Forgot password.
+     * @param Request $request
+     * @return json
+     */
+    public function forgotPassword(Request $request)
+    {
+        try {
+            $request->validate([
+                'email' => 'required|string|email',
+            ]);
+            $user = User::where('email', $request->email)->first();
+            if (!$user) {
+                return response()->json([
+                    'status' => 'error',
+                    'status_code' => 404,
+                    'message' => 'User not found'
+                ], 404);
+            }
+            $status = Password::sendResetLink(
+                $request->only('email')
+            );
+            if ($status == Password::RESET_LINK_SENT) {
+                return response()->json([
+                    'status' => 'success',
+                    'status_code' => 200,
+                    'message' => 'Reset password link sent to your email'
+                ], 200);
+            }
+            return response()->json([
+                'status' => 'error',
+                'status_code' => 500,
+                'message' => 'Unable to send reset password link'
+            ], 500);
+        } catch (\Throwable $th) {
+            return response()->json([
+                'status' => 'error',
+                'status_code' => 500,
+                'message' => $th->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * Reset password.
+     * @param Request $request
+     * @return json
+     */
+    public function resetPassword(Request $request)
+    {
+        try {
+            $request->validate([
+                'email' => 'required|string|email',
+                'password' => 'required|string|confirmed',
+                'token' => 'required|string'
+            ]);
+            $status = Password::reset(
+                $request->only('email', 'password', 'password_confirmation', 'token'),
+                function ($user, $password) {
+                    $user->password = bcrypt($password);
+                    $user->save();
+                }
+            );
+            if ($status == Password::PASSWORD_RESET) {
+                return response()->json([
+                    'status' => 'success',
+                    'status_code' => 200,
+                    'message' => 'Password reset successfully'
+                ], 200);
+            }
+            return response()->json([
+                'status' => 'error',
+                'status_code' => 500,
+                'message' => 'Unable to reset password'
+            ], 500);
         } catch (\Throwable $th) {
             return response()->json([
                 'status' => 'error',
