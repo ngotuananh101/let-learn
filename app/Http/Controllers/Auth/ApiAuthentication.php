@@ -143,13 +143,12 @@ class ApiAuthentication extends Controller
     {
         try {
             $request->validate([
-                'username' => 'required|string|unique:users',
                 'email' => 'required|string|email|unique:users',
                 'date_of_birth' => 'required|date|before:today',
                 'password' => 'required|string|confirmed'
             ]);
             $user = new User([
-                'username' => $request->username,
+                'username' => uniqid(),
                 'email' => $request->email,
                 'date_of_birth' => $request->date_of_birth,
                 'password' => bcrypt($request->password)
