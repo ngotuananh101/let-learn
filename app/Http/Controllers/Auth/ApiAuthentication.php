@@ -148,10 +148,11 @@ class ApiAuthentication extends Controller
                 'password' => 'required|string|confirmed'
             ]);
             $user = new User([
-                'username' => uniqid(),
+                'username' => uniqid('llu_'),
                 'email' => $request->email,
                 'date_of_birth' => $request->date_of_birth,
-                'password' => bcrypt($request->password)
+                'password' => bcrypt($request->password),
+                'role_id' => 1,
             ]);
             $user->save();
             return response()->json([
