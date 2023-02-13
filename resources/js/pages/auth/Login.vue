@@ -16,19 +16,18 @@
         <div class="text-center text-muted mb-4">
             <small>Or sign in with credentials</small>
         </div>
-        <form role="form" class="text-start">
+        <form role="form" class="text-start" @submit.prevent="handleSubmit">
             <div class="mb-3">
-                <argon-input id="email" type="email" placeholder="Email" aria-label="Email" />
+                <argon-input id="email" type="text" name="email" placeholder="Email" aria-label="Email"/>
             </div>
             <div class="mb-3">
-                <argon-input id="password" type="password" placeholder="Password" aria-label="Password" />
+                <argon-input id="password" type="password" name="password" placeholder="Password" aria-label="Password"/>
             </div>
-            <argon-switch id="rememberMe" name="rememberMe">
+            <argon-switch id="rememberMe" name="rememberMe" v-model="rememberMe">
                 Remember me
             </argon-switch>
-
             <div class="text-center">
-                <argon-button color="success" variant="gradient" full-width class="my-4 mb-2" >Sign in</argon-button>
+                <argon-button color="success" variant="gradient" full-width class="my-4 mb-2">Sign in</argon-button>
             </div>
             <div class="mb-2 position-relative text-center">
                 <p class="text-sm font-weight-bold mb-2 text-secondary text-border d-inline z-index-2 bg-white px-3">
@@ -44,27 +43,52 @@
     </div>
 </template>
 <script lang="js">
-import { mapMutations } from "vuex";
+import { mapMutations, mapActions, mapState } from "vuex";
 import ArgonInput from "@/components/ArgonInput.vue";
 import ArgonSwitch from "@/components/ArgonSwitch.vue";
 import ArgonButton from "@/components/ArgonButton.vue";
 export default {
     name: "Auth",
+    data() {
+        return {
+            email: '',
+            password: '',
+            rememberMe: false,
+            submitted: false,
+        }
+    },
+    computed: {
+        ...mapState(['account', 'app'])
+    },
     components: {
         ArgonInput,
         ArgonSwitch,
         ArgonButton,
     },
     created() {
-        this.$store.state.hideConfigButton = true;
+        this.$store.state.app.hideConfigButton = true;
         this.toggleDefaultLayout();
     },
     beforeUnmount() {
-        this.$store.state.hideConfigButton = false;
+        this.$store.state.app.hideConfigButton = false;
         this.toggleDefaultLayout();
     },
     methods: {
         ...mapMutations(["toggleDefaultLayout"]),
+        ...mapActions('account', ['login']),
+        handleSubmit(e) {
+            this.submitted = true;
+            this.email = e.target.email.value;
+            this.password = e.target.password.value;
+            this.rememberMe = e.target.rememberMe.checked;
+            if (this.email && this.password) {
+                this.login({
+                    email: this.email,
+                    password: this.password,
+                    rememberMe: this.rememberMe,
+                });
+            }
+        }
     },
 };
 </script>
