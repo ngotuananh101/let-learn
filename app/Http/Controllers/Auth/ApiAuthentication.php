@@ -155,11 +155,26 @@ class ApiAuthentication extends Controller
                 'role_id' => 1,
             ]);
             $user->save();
+            // Login user after registration
+            $credentials = request(['email', 'password']);
+            if (!Auth::attempt($credentials)) {
+                return response()->json([
+                    'status' => 'error',
+                    'status_code' => 401,
+                    'message' => 'Unauthorized'
+                ], 401);
+            }
+            $user = $request->user();
+            $token = $user->createToken('Personal Access Token');
             return response()->json([
                 'status' => 'success',
                 'status_code' => 200,
-                'message' => 'User created successfully',
-                'data' => $user
+                'message' => 'Registration successful',
+                'data' => [
+                    'user' => $user,
+                    'access_token' => $token->plainTextToken,
+                    'token_type' => 'Bearer',
+                ]
             ], 200);
         } catch (\Throwable $th) {
             return response()->json([
