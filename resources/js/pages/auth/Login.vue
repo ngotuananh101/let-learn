@@ -51,11 +51,11 @@
 </template>
 <script lang="js">
 import { mapMutations, mapActions, mapState } from "vuex";
-import ArgonInput from "@/components/ArgonInput.vue";
-import ArgonSwitch from "@/components/ArgonSwitch.vue";
-import ArgonButton from "@/components/ArgonButton.vue";
+import ArgonInput from "@/components/Argons/ArgonInput.vue";
+import ArgonSwitch from "@/components/Argons/ArgonSwitch.vue";
+import ArgonButton from "@/components/Argons/ArgonButton.vue";
 export default {
-    name: "Auth",
+    name: "Auth Login",
     data() {
         return {
             email: '',

@@ -59,4 +59,14 @@ class User extends Authenticatable
         return $this->hasMany(Set::class);
     }
 
+    // get role name of user
+    public function getRoleName(){
+        return $this->role->name;
+    }
+
+    // get all permissions of user
+    public function getAllPermissions(){
+        return $this->role()->with('permissions')->first()->permissions;
+    }
+
 }

@@ -14,8 +14,12 @@ const auth = [
                 name: 'auth.register',
                 component: () => import('../../pages/auth/Register.vue'),
             },
+            {
+                path: 'logout',
+                name: 'auth.logout',
+                component: () => import('../../pages/auth/Logout.vue'),
+            }
         ],
     },
 ];
-
 export default auth;
