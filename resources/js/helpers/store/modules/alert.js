@@ -1,5 +1,3 @@
-import { createStore } from "vuex";
-
 const state = {
     type: null,
     message: null

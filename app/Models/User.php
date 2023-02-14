@@ -44,4 +44,19 @@ class User extends Authenticatable
     protected $casts = [
         'email_verified_at' => 'datetime',
     ];
+
+    /**
+     * 1 user can have 1 role
+     */
+    public function role(){
+        return $this->belongsTo(Role::class);
+    }
+
+    /**
+     * 1 user can have many sets
+     */
+    public function sets(){
+        return $this->hasMany(Set::class);
+    }
+
 }
