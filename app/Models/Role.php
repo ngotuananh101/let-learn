@@ -16,5 +16,22 @@ class Role extends Model
      */
     protected $fillable = [
         'name',
+        'description'
     ];
+
+    /**
+     * Get the permissions for the role.
+     */
+    public function permissions()
+    {
+        return $this->belongsToMany(Permission::class);
+    }
+
+    /**
+     * 1 role can have many users
+     */
+    public function users()
+    {
+        return $this->hasMany(User::class);
+    }
 }

@@ -1,4 +1,6 @@
 import { userService } from '../../services/user.service';
+import router from "../../router";
+import overlay from "@/helpers/overlay.js";
 
 const user = JSON.parse(localStorage.getItem('user'));
 const state = user
@@ -25,16 +27,27 @@ export default {
             state.status = {};
             state.user = null;
         },
+        registerRequest(state, user) {
+            state.status = { registering: true };
+        },
+        registerSuccess(state, user) {
+            state.status = {};
+        },
+        registerFailure(state, error) {
+            state.status = {};
+        }
     },
     actions: {
         login({ dispatch, commit }, { email, password, rememberMe }) {
             commit('loginRequest', { email });
+            overlay();
             userService.login(email, password, rememberMe)
+                .then(overlay())
                 .then(
                     user => {
                         commit('loginSuccess', user);
                         dispatch('alert/success', user.message, { root: true });
-                        router.push('/');
+                        router.push({ name: 'home' })
                     },
                     error => {
                         commit('loginFailure', error);
@@ -46,6 +59,24 @@ export default {
             userService.logout();
             commit('logout');
         },
-
+        register({ dispatch, commit }, user) {
+            commit('registerRequest', user);
+            overlay();
+            userService.register(user)
+                .then(overlay())
+                .then(
+                    user => {
+                        commit('registerSuccess', user);
+                        dispatch('alert/success', 'Registration successful', { root: true });
+                        setTimeout(() => {
+                            router.push({ name: 'home' })
+                        }, 1000)
+                    },
+                    error => {
+                        commit('registerFailure', error);
+                        dispatch('alert/error', error, { root: true });
+                    }
+                );
+        }
     }
 };

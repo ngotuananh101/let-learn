@@ -18,16 +18,23 @@
         </div>
         <form role="form" class="text-start" @submit.prevent="handleSubmit">
             <div class="mb-3">
-                <argon-input id="email" type="text" name="email" placeholder="Email" aria-label="Email"/>
+                <argon-input id="email" type="text" name="email" placeholder="Email" aria-label="Email"
+                    isRequired />
             </div>
             <div class="mb-3">
-                <argon-input id="password" type="password" name="password" placeholder="Password" aria-label="Password"/>
+                <argon-input id="password" type="password" name="password" placeholder="Password" aria-label="Password"
+                    isRequired />
             </div>
-            <argon-switch id="rememberMe" name="rememberMe" v-model="rememberMe">
+            <argon-switch id="rememberMe" name="rememberMe">
                 Remember me
             </argon-switch>
             <div class="text-center">
                 <argon-button color="success" variant="gradient" full-width class="my-4 mb-2">Sign in</argon-button>
+            </div>
+            <div class="text-center">
+                <div class="text-center text-muted my-1">
+                    <small><strong>Forgot your password?</strong></small>
+                </div>
             </div>
             <div class="mb-2 position-relative text-center">
                 <p class="text-sm font-weight-bold mb-2 text-secondary text-border d-inline z-index-2 bg-white px-3">
@@ -68,14 +75,15 @@ export default {
     created() {
         this.$store.state.app.hideConfigButton = true;
         this.toggleDefaultLayout();
+        this.logout();
     },
     beforeUnmount() {
         this.$store.state.app.hideConfigButton = false;
         this.toggleDefaultLayout();
     },
     methods: {
-        ...mapMutations(["toggleDefaultLayout"]),
-        ...mapActions('account', ['login']),
+        ...mapMutations(["toggleDefaultLayout", 'loginFailure']),
+        ...mapActions('account', ['login', 'logout']),
         handleSubmit(e) {
             this.submitted = true;
             this.email = e.target.email.value;
@@ -87,6 +95,14 @@ export default {
                     password: this.password,
                     rememberMe: this.rememberMe,
                 });
+            } else {
+                this.$swal({
+                    title: 'Oops!',
+                    text: 'Please enter your email and password!',
+                    icon: 'error',
+                    confirmButtonText: 'OK'
+                });
+                this.submitted = false;
             }
         }
     },
