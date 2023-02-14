@@ -32,8 +32,9 @@ class ApiAuthentication extends Controller
             $request->validate([
                 'email' => 'required|string|email',
                 'password' => 'required|string',
+                'remember_me' => 'boolean'
             ]);
-            $credentials = request(['email', 'password']);
+            $credentials = request(['email', 'password', 'remember_me']);
             if (!Auth::attempt($credentials)) {
                 return response()->json([
                     'status' => 'error',
@@ -42,6 +43,8 @@ class ApiAuthentication extends Controller
                 ], 401);
             }
             $user = $request->user();
+            // set role name in user object
+            $user->role;
             $token = $user->createToken('Personal Access Token');
             return response()->json([
                 'status' => 'success',
@@ -152,7 +155,6 @@ class ApiAuthentication extends Controller
                 'email' => $request->email,
                 'date_of_birth' => $request->date_of_birth,
                 'password' => bcrypt($request->password),
-                'role_id' => 1,
             ]);
             $user->save();
             // Login user after registration
@@ -165,6 +167,8 @@ class ApiAuthentication extends Controller
                 ], 401);
             }
             $user = $request->user();
+            // set role name in user object
+            $user->role;
             $token = $user->createToken('Personal Access Token');
             return response()->json([
                 'status' => 'success',
@@ -260,6 +264,37 @@ class ApiAuthentication extends Controller
                 'status_code' => 500,
                 'message' => 'Unable to reset password'
             ], 500);
+        } catch (\Throwable $th) {
+            return response()->json([
+                'status' => 'error',
+                'status_code' => 500,
+                'message' => $th->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * Generate new access token.
+     * @param Request $request
+     * @return json
+     */
+    public function refreshToken(Request $request)
+    {
+        try {
+            $request->validate([
+                'refresh_token' => 'required|string'
+            ]);
+            $user = $request->user();
+            $token = $user->createToken('Personal Access Token');
+            return response()->json([
+                'status' => 'success',
+                'status_code' => 200,
+                'message' => 'Refresh token successful',
+                'data' => [
+                    'access_token' => $token->plainTextToken,
+                    'token_type' => 'Bearer',
+                ]
+            ], 200);
         } catch (\Throwable $th) {
             return response()->json([
                 'status' => 'error',

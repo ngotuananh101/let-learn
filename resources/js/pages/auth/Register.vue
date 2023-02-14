@@ -44,9 +44,9 @@
     </div>
 </template>
 <script lang="js">
-import ArgonInput from "@/components/ArgonInput.vue";
-import ArgonCheckbox from "@/components/ArgonCheckbox.vue";
-import ArgonButton from "@/components/ArgonButton.vue";
+import ArgonInput from "@/components/Argons/ArgonInput.vue";
+import ArgonCheckbox from "@/components/Argons/ArgonCheckbox.vue";
+import ArgonButton from "@/components/Argons/ArgonButton.vue";
 import { mapMutations, mapActions, mapState } from "vuex";
 
 export default {

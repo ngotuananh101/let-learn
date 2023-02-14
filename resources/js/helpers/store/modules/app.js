@@ -5,7 +5,6 @@ export default {
         hideConfigButton: false,
         isPinned: true,
         showConfig: false,
-        isRTL: false,
         color: "",
         sidebarType: "bg-white",
         darkMode: false,
@@ -25,7 +24,6 @@ export default {
         },
         navbarMinimize(state) {
             const sidenav_show = document.querySelector("#app");
-
             if (sidenav_show.classList.contains("g-sidenav-show") && sidenav_show.classList.contains("g-sidenav-hidden")) {
                 sidenav_show.classList.add("g-sidenav-pinned");
                 sidenav_show.classList.remove("g-sidenav-hidden");

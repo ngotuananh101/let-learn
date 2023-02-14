@@ -2,12 +2,13 @@ const admin = [
     {
         path: '/admin',
         name: 'admin',
+        redirect: {name: 'admin.dashboard'},
         component: () => import('../../layouts/Admin.vue'),
         children: [
             {
-                path: 'users',
-                name: 'admin.users',
-                component: () => import('../../pages/admin/users/Index.vue'),
+                path: 'dashboard',
+                name: 'admin.dashboard',
+                component: () => import('../../pages/admin/Dashboard.vue'),
             },
         ],
     },
