@@ -4,6 +4,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Auth\ApiAuthentication as Authentication;
 use App\Http\Controllers\Admin\AnalyticsController;
+use App\Http\Controllers\SetController;
 
 /*
 |--------------------------------------------------------------------------
@@ -35,4 +36,5 @@ Route::group(['prefix' => 'auth'], function () {
 Route::get('analytics', [AnalyticsController::class, 'getAnalytics']);
 
 Route::middleware('auth:sanctum')->group(function () {
+    Route::resource('set', SetController::class);
 });

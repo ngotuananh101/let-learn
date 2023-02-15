@@ -51,7 +51,7 @@ class AnalyticsController extends Controller
                 $browsers[$value['browser']] += $value['sessions'];
                 $countrys[$value['country']] += $value['sessions'];
             }
-
+            // return
             return response()->json([
                 'averageSessionDuration' => $averageSessionDuration,
                 'browser' => $browsers,
