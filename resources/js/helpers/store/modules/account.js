@@ -44,9 +44,7 @@ export default {
     actions: {
         login({ dispatch, commit }, { email, password, rememberMe }) {
             commit('loginRequest');
-            overlay();
             userService.login(email, password, rememberMe)
-                .then(overlay())
                 .then(
                     user => {
                         commit('loginSuccess', user.data.user, user.data.access_token);
@@ -74,9 +72,7 @@ export default {
         },
         register({ dispatch, commit }, user) {
             commit('registerRequest', user);
-            overlay();
             userService.register(user)
-                .then(overlay())
                 .then(
                     user => {
                         console.log(user);
