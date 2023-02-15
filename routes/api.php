@@ -3,6 +3,7 @@
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Auth\ApiAuthentication as Authentication;
+use App\Http\Controllers\Admin\AnalyticsController;
 
 /*
 |--------------------------------------------------------------------------
@@ -30,6 +31,8 @@ Route::group(['prefix' => 'auth'], function () {
     Route::post('forgot-password', [Authentication::class, 'forgotPassword']);
     Route::post('reset-password', [Authentication::class, 'resetPassword']);
 });
+
+Route::get('analytics', [AnalyticsController::class, 'getAnalytics']);
 
 Route::middleware('auth:sanctum')->group(function () {
 });

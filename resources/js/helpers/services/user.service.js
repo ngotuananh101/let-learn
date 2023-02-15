@@ -1,4 +1,5 @@
 import config from '../config';
+import handleResponse from './handle-response';
 
 export const userService = {
     login,
@@ -50,15 +51,4 @@ function register(user) {
 
             return user;
         });
-}
-
-function handleResponse(response) {
-    return response.text().then(text => {
-        const data = text && JSON.parse(text);
-        if (!response.ok) {
-            const error = (data && data.message) || response.statusText;
-            return Promise.reject(error);
-        }
-        return data;
-    });
 }

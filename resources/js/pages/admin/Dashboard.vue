@@ -95,21 +95,101 @@
                         ]" />
                     </div>
                 </div>
+                <div class="row mt-4">
+                    <div class="col-lg-7 col-md-12">
+                        <div class="card">
+                            <div class="p-3 pb-0 card-header">
+                                <h6 class="mb-0">Traffic channels</h6>
+                                <div class="d-flex align-items-center">
+                                    <span class="badge badge-md badge-dot me-4">
+                                        <i class="bg-primary"></i>
+                                        <span class="text-xs text-dark">Organic search</span>
+                                    </span>
+                                    <span class="badge badge-md badge-dot me-4">
+                                        <i class="bg-dark"></i>
+                                        <span class="text-xs text-dark">Referral</span>
+                                    </span>
+                                    <span class="badge badge-md badge-dot me-4">
+                                        <i class="bg-info"></i>
+                                        <span class="text-xs text-dark">Social media</span>
+                                    </span>
+                                </div>
+                            </div>
+                            <div class="p-3 card-body">
+                                <div class="chart">
+                                    <traffic-chart id="chart-line-3" />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mt-4 col-lg-5 col-md-12 mt-lg-0">
+                        <default-doughnut-chart title="Refferals" :chart="{
+                            labels: ['Adobe', 'Atlassian', 'Slack', 'Spotify', 'Jira'],
+                            datasets: [{ label: 'Referrals', data: [25, 3, 12, 7, 10] }],
+                        }" :actions="{
+    route: 'https://creative-tim.com',
+    label: 'See all referrals',
+    color: 'secondary',
+}" />
+                    </div>
+                </div>
+                <div class="row mt-4">
+                    <div class="col-lg-7 col-md-12">
+                        <div class="card">
+                            <div class="p-3 pb-0 card-header">
+                                <h6 class="mb-0">Traffic channels</h6>
+                                <div class="d-flex align-items-center">
+                                    <span class="badge badge-md badge-dot me-4">
+                                        <i class="bg-primary"></i>
+                                        <span class="text-xs text-dark">Organic search</span>
+                                    </span>
+                                    <span class="badge badge-md badge-dot me-4">
+                                        <i class="bg-dark"></i>
+                                        <span class="text-xs text-dark">Referral</span>
+                                    </span>
+                                    <span class="badge badge-md badge-dot me-4">
+                                        <i class="bg-info"></i>
+                                        <span class="text-xs text-dark">Social media</span>
+                                    </span>
+                                </div>
+                            </div>
+                            <div class="p-3 card-body">
+                                <div class="chart">
+                                    <traffic-chart id="chart-line-4" />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mt-4 col-lg-5 col-md-12 mt-lg-0">
+                        <default-doughnut-chart title="Refferals" id="dddddd" :chart="{
+                            labels: ['Adobe', 'Atlassian', 'Slack', 'Spotify', 'Jira'],
+                            datasets: [{ label: 'Referrals', data: [25, 3, 12, 7, 10] }],
+                        }" :actions="{
+    route: 'https://creative-tim.com',
+    label: 'See all referrals',
+    color: 'secondary',
+}" />
+                    </div>
+                </div>
             </div>
         </div>
     </div>
 </template>
 <script>
 import MiniStatisticsCard from "@/components/Cards/MiniStatisticsCard.vue";
-import GradientLineChart from "@/components/GradientLineChart.vue";
+import GradientLineChart from "@/components/Charts/GradientLineChart.vue";
 import Carousel from "@/components/Carousel.vue";
-import { mapActions , mapState} from "vuex";
+import TrafficChart from "@/components/Charts/TrafficChart.vue";
+import DefaultDoughnutChart from "@/components/Charts/DefaultDoughnutChart.vue";
+import { mapActions, mapState } from "vuex";
 export default {
     name: "AdminDashboard",
     components: {
         MiniStatisticsCard,
         GradientLineChart,
         Carousel,
+        TrafficChart,
+        DefaultDoughnutChart,
     },
     data() {
         return {
@@ -117,9 +197,10 @@ export default {
     },
     created() {
         this.getQuotes();
+        this.getAnalytics();
     },
     methods: {
-        ...mapActions('dashboard', ['getQuotes']),
+        ...mapActions('dashboard', ['getQuotes', 'getAnalytics']),
     },
     computed: {
         ...mapState({
