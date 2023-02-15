@@ -59,6 +59,7 @@ class AnalyticsController extends Controller
             ]);
         } catch (\Throwable $th) {
             dd($th);
+            dd($th->getMessage());
         }
     }
 }
