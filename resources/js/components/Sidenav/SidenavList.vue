@@ -1,16 +1,11 @@
 <template>
-    <div id="sidenav-collapse-main" class="collapse navbar-collapse w-auto h-auto h-100">
+    <div id="sidenav-collapse-main" class="collapse navbar-collapse w-auto h-auto h-100 overflow-hidden">
         <ul class="navbar-nav">
             <li class="nav-item">
                 <sidenav-collapse collapse-ref="dashboardsExamples" nav-text="Dashboards"
                     :class="getRoute() === 'dashboard' ? 'active' : ''">
                     <template #icon>
                         <i class="fa-solid fa-chart-line text-primary text-sm opacity-10"></i>
-                    </template>
-                    <template #list>
-                        <ul class="nav ms-4">
-                            <sidenav-item :to="{ name: 'auth.login' }" mini-icon="L" text="Landing" />
-                        </ul>
                     </template>
                 </sidenav-collapse>
             </li>

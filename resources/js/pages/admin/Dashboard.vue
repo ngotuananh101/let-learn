@@ -42,23 +42,14 @@
                 </div>
                 <div class="row">
                     <div class="col-lg-7 mb-lg">
-                        <gradient-line-chart id="chart-line" title="Sales Overview" description="<i class='fa fa-arrow-up text-success'></i>
-        <span class='font-weight-bold'>4% more</span> in 2021" :chart="{
-            labels: [
-                'Apr',
-                'May',
-                'Jun',
-                'Jul',
-                'Aug',
-                'Sep',
-                'Oct',
-                'Nov',
-                'Dec'
-            ],
+                        <gradient-line-chart v-if="this.analytics.averageSessionDuration" id="chart-line"
+                            title="Average Duration" description="<i class='fa-solid fa-timer text-success'></i>
+        <span class='font-weight-bold'>average session duration</span> of last 30 days" :chart="{
+            labels: this.analytics.averageSessionDuration.date,
             datasets: [
                 {
-                    label: 'Mobile Apps',
-                    data: [50, 40, 300, 220, 500, 250, 400, 230, 500]
+                    label: 'Duration (min)',
+                    data: this.analytics.averageSessionDuration.value,
                 }
             ]
         }" />
@@ -99,76 +90,70 @@
                     <div class="col-lg-7 col-md-12">
                         <div class="card">
                             <div class="p-3 pb-0 card-header">
-                                <h6 class="mb-0">Traffic channels</h6>
+                                <h6 class="mb-0">This Week vs Last Week</h6>
+                                <span class="fs-6">by page views</span>
                                 <div class="d-flex align-items-center">
                                     <span class="badge badge-md badge-dot me-4">
-                                        <i class="bg-primary"></i>
-                                        <span class="text-xs text-dark">Organic search</span>
+                                        <i class="bg-success"></i>
+                                        <span class="text-xs text-dark">This Week</span>
                                     </span>
                                     <span class="badge badge-md badge-dot me-4">
-                                        <i class="bg-dark"></i>
-                                        <span class="text-xs text-dark">Referral</span>
-                                    </span>
-                                    <span class="badge badge-md badge-dot me-4">
-                                        <i class="bg-info"></i>
-                                        <span class="text-xs text-dark">Social media</span>
+                                        <i class="bg-danger"></i>
+                                        <span class="text-xs text-dark">Last Week</span>
                                     </span>
                                 </div>
                             </div>
                             <div class="p-3 card-body">
                                 <div class="chart">
-                                    <traffic-chart id="chart-line-3" />
+                                    <!-- <StatsChart id="page-views-week" /> -->
                                 </div>
                             </div>
                         </div>
                     </div>
                     <div class="mt-4 col-lg-5 col-md-12 mt-lg-0">
-                        <default-doughnut-chart title="Refferals" :chart="{
-                            labels: ['Adobe', 'Atlassian', 'Slack', 'Spotify', 'Jira'],
-                            datasets: [{ label: 'Referrals', data: [25, 3, 12, 7, 10] }],
-                        }" :actions="{
-    route: 'https://creative-tim.com',
-    label: 'See all referrals',
-    color: 'secondary',
-}" />
+                        <default-doughnut-chart
+                            v-if="this.analytics.browser"
+                            id="top-browsers"
+                            title="Top Browsers"
+                            subtitle="by sessions"
+                            description="This is top browsers by sessions"
+                            type="browsers"
+                            :chart="{ data: this.analytics.browser }" />
                     </div>
                 </div>
                 <div class="row mt-4">
                     <div class="col-lg-7 col-md-12">
                         <div class="card">
                             <div class="p-3 pb-0 card-header">
-                                <h6 class="mb-0">Traffic channels</h6>
+                                <h6 class="mb-0">This Week vs Last Week</h6>
+                                <span class="fs-6">by page views</span>
                                 <div class="d-flex align-items-center">
                                     <span class="badge badge-md badge-dot me-4">
-                                        <i class="bg-primary"></i>
-                                        <span class="text-xs text-dark">Organic search</span>
+                                        <i class="bg-success"></i>
+                                        <span class="text-xs text-dark">This Week</span>
                                     </span>
                                     <span class="badge badge-md badge-dot me-4">
-                                        <i class="bg-dark"></i>
-                                        <span class="text-xs text-dark">Referral</span>
-                                    </span>
-                                    <span class="badge badge-md badge-dot me-4">
-                                        <i class="bg-info"></i>
-                                        <span class="text-xs text-dark">Social media</span>
+                                        <i class="bg-danger"></i>
+                                        <span class="text-xs text-dark">Last Week</span>
                                     </span>
                                 </div>
                             </div>
                             <div class="p-3 card-body">
                                 <div class="chart">
-                                    <traffic-chart id="chart-line-4" />
+                                    <!-- <StatsChart id="page-views-week" /> -->
                                 </div>
                             </div>
                         </div>
                     </div>
                     <div class="mt-4 col-lg-5 col-md-12 mt-lg-0">
-                        <default-doughnut-chart title="Refferals" id="dddddd" :chart="{
-                            labels: ['Adobe', 'Atlassian', 'Slack', 'Spotify', 'Jira'],
-                            datasets: [{ label: 'Referrals', data: [25, 3, 12, 7, 10] }],
-                        }" :actions="{
-    route: 'https://creative-tim.com',
-    label: 'See all referrals',
-    color: 'secondary',
-}" />
+                        <default-doughnut-chart
+                            v-if="this.analytics.country"
+                            id="top-countries"
+                            title="Top Countries"
+                            subtitle="by sessions"
+                            description="This is top countries by sessions"
+                            type="countries"
+                            :chart="{ data: this.analytics.country }" />
                     </div>
                 </div>
             </div>
@@ -179,7 +164,7 @@
 import MiniStatisticsCard from "@/components/Cards/MiniStatisticsCard.vue";
 import GradientLineChart from "@/components/Charts/GradientLineChart.vue";
 import Carousel from "@/components/Carousel.vue";
-import TrafficChart from "@/components/Charts/TrafficChart.vue";
+import StatsChart from "@/components/Charts/StatsChart.vue";
 import DefaultDoughnutChart from "@/components/Charts/DefaultDoughnutChart.vue";
 import { mapActions, mapState } from "vuex";
 export default {
@@ -188,7 +173,7 @@ export default {
         MiniStatisticsCard,
         GradientLineChart,
         Carousel,
-        TrafficChart,
+        StatsChart,
         DefaultDoughnutChart,
     },
     data() {
@@ -205,6 +190,7 @@ export default {
     computed: {
         ...mapState({
             quotes: state => state.dashboard.quotes,
+            analytics: state => state.dashboard.analytics,
         }),
     },
 };

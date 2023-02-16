@@ -5,16 +5,28 @@
 <script>
 import Chart from "chart.js/auto";
 export default {
-    name: "TrafficChart",
+    name: "StatsChart",
     props: {
         id: {
             type: String,
-            default: "chart-linee",
+            default: "stats-chart",
+        },
+        chart: {
+            type: Object,
+            required: true,
+            labels: String,
+            datasets: {
+                type: Array,
+                label: Array,
+                data: Array,
+            },
         },
     },
     mounted() {
         var chart = document.getElementById(this.id).getContext("2d");
+
         var gradientStroke1 = chart.createLinearGradient(0, 230, 0, 50);
+
         gradientStroke1.addColorStop(1, "rgba(203,12,159,0.2)");
         gradientStroke1.addColorStop(0.2, "rgba(72,72,176,0.0)");
         gradientStroke1.addColorStop(0, "rgba(203,12,159,0)"); //purple colors
@@ -29,10 +41,10 @@ export default {
         new Chart(chart, {
             type: "line",
             data: {
-                labels: ["Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"],
+                labels: this.chart.labels,
                 datasets: [
                     {
-                        label: "Organic Search",
+                        label: this.chart.datasets[0].label,
                         tension: 0.4,
                         borderWidth: 0,
                         pointRadius: 2,
@@ -41,33 +53,20 @@ export default {
                         // eslint-disable-next-line no-dupe-keys
                         borderWidth: 3,
                         backgroundColor: gradientStroke1,
-                        data: [50, 40, 300, 220, 500, 250, 400, 230, 500],
+                        data: this.chart.datasets[0].data,
                         maxBarThickness: 6,
                     },
                     {
-                        label: "Referral",
+                        label: this.chart.datasets[1].label,
                         tension: 0.4,
                         borderWidth: 0,
                         pointRadius: 2,
-                        pointBackgroundColor: "#3A416F",
-                        borderColor: "#3A416F",
+                        pointBackgroundColor: "#f5365c",
+                        borderColor: "#f5365c",
                         // eslint-disable-next-line no-dupe-keys
                         borderWidth: 3,
                         backgroundColor: gradientStroke2,
-                        data: [30, 90, 40, 140, 290, 290, 340, 230, 400],
-                        maxBarThickness: 6,
-                    },
-                    {
-                        label: "Direct",
-                        tension: 0.4,
-                        borderWidth: 0,
-                        pointRadius: 2,
-                        pointBackgroundColor: "#17c1e8",
-                        borderColor: "#17c1e8",
-                        // eslint-disable-next-line no-dupe-keys
-                        borderWidth: 3,
-                        backgroundColor: gradientStroke2,
-                        data: [40, 80, 70, 90, 30, 90, 140, 130, 200],
+                        data: this.chart.datasets[1].data,
                         maxBarThickness: 6,
                     },
                 ],

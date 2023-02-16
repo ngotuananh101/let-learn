@@ -3,7 +3,12 @@ import { dashboardService } from "../../services/dashboard.service";
 
 const state = {
     quotes: null,
-    analytics: null,
+    analytics: {
+        basic: null,
+        averageSessionDuration: null,
+        browser: null,
+        country: null
+    }
 };
 
 export default {
@@ -20,13 +25,32 @@ export default {
             state.quotes = null;
         },
         analyticsRequest(state) {
-            state.analytics = null;
+            state.analytics.basic = null;
+            state.analytics.averageSessionDuration = null;
+            state.analytics.browser = null;
+            state.analytics.country = null;
         },
         setAnalytics(state, analytics) {
-            state.analytics = analytics;
+            state.analytics.basic = null;
+            state.analytics.averageSessionDuration = {
+                date: [],
+                value: []
+            };
+            for (let index = 0; index < analytics.averageSessionDuration.length; index++) {
+                const element = analytics.averageSessionDuration[index];
+                let date = element.day + '/' + element.month + '/' + element.year;
+                let value = element.averageSessionDuration;
+                state.analytics.averageSessionDuration.date.push(date);
+                state.analytics.averageSessionDuration.value.push(value);
+            }
+            state.analytics.browser = analytics.browser;
+            state.analytics.country = analytics.country;
         },
         analyticsFailure(state) {
-            state.analytics = null;
+            state.analytics.basic = null;
+            state.analytics.averageSessionDuration = null;
+            state.analytics.browser = null;
+            state.analytics.country = null;
         }
     },
     actions: {
@@ -39,7 +63,6 @@ export default {
                     },
                     error => {
                         commit('quotesFailure');
-                        dispatch('alert/success', user.message, { root: true });
                         dispatch('alert/error', error, { root: true });
                     }
                 );
@@ -49,11 +72,10 @@ export default {
             dashboardService.analytics()
                 .then(
                     analytics => {
-                        commit('setAnalytics', analytics.data);
+                        commit('setAnalytics', analytics);
                     },
                     error => {
                         commit('analyticsFailure');
-                        dispatch('alert/success', user.message, { root: true });
                         dispatch('alert/error', error, { root: true });
                     }
                 );
@@ -62,6 +84,9 @@ export default {
     getters: {
         quotes(state) {
             return state.quotes;
+        },
+        analytics(state) {
+            return state.analytics;
         }
     }
 };

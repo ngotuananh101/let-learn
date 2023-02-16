@@ -4,7 +4,6 @@ import handleResponse from './handle-response';
 
 export const dashboardService = {
     quotes,
-    basicInfo,
     analytics,
 };
 
@@ -15,14 +14,6 @@ function quotes() {
             return quotes;
         }
     );
-}
-
-function basicInfo() {
-    return fetch(`${config.apiUrl}/dashboard/basic-info`, authHeader)
-        .then(handleResponse)
-        .then(data => {
-            return data;
-        });
 }
 
 function analytics() {

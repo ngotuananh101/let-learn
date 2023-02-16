@@ -6,10 +6,11 @@
                 <button type="button"
                     class="mb-0 btn btn-icon-only btn-rounded btn-outline-secondary ms-2 btn-sm d-flex align-items-center justify-content-center ms-auto"
                     data-bs-toggle="tooltip" data-bs-placement="bottom"
-                    title="See which websites are sending traffic to your website">
+                    :title="`${description}`">
                     <i class="fas fa-info"></i>
                 </button>
             </div>
+            <span class="fs-6">{{ subtitle }}</span>
         </div>
         <div class="p-3 card-body">
             <div class="row">
@@ -17,92 +18,25 @@
                     <div class="mt-5 chart">
                         <canvas :id="id" class="chart-canvas" :height="height"></canvas>
                     </div>
-                    <a class="mt-4 btn btn-sm" :href="actions.route" :class="`bg-gradient-${actions.color}`">
-                        {{ actions.label }}
-                    </a>
                 </div>
                 <div class="col-lg-7 col-12">
                     <div class="table-responsive">
                         <table class="table mb-0 align-items-center">
                             <tbody>
-                                <tr>
+                                <tr v-for="(value, name) in this.chart.data">
                                     <td>
                                         <div class="px-2 py-1 d-flex">
                                             <div>
-                                                <img src="@/assets/img/small-logos/logo-xd.svg"
-                                                    class="avatar avatar-sm me-2" alt="logo_xd" />
+                                                <img v-if="type == 'browsers' " :src="`https://raw.githubusercontent.com/alrra/browser-logos/main/src/${name.toLowerCase()}/${name.toLowerCase()}_32x32.png`" class="avatar avatar-sm me-2" alt="logo" />
+                                                <img v-else-if="type == 'countries' " :src="`https://countryflagsapi.com/svg/${name.toLowerCase()}`" class="avatar avatar-sm me-2" alt="logo" />
                                             </div>
                                             <div class="d-flex flex-column justify-content-center">
-                                                <h6 class="mb-0 text-sm">Adobe</h6>
+                                                <h6 class="mb-0 text-sm">{{ name }}</h6>
                                             </div>
                                         </div>
                                     </td>
                                     <td class="text-sm text-center align-middle">
-                                        <span class="text-xs font-weight-bold"> 25% </span>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>
-                                        <div class="px-2 py-1 d-flex">
-                                            <div>
-                                                <img src="@/assets/img/small-logos/logo-atlassian.svg"
-                                                    class="avatar avatar-sm me-2" alt="logo_atlassian" />
-                                            </div>
-                                            <div class="d-flex flex-column justify-content-center">
-                                                <h6 class="mb-0 text-sm">Atlassian</h6>
-                                            </div>
-                                        </div>
-                                    </td>
-                                    <td class="text-sm text-center align-middle">
-                                        <span class="text-xs font-weight-bold"> 3% </span>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>
-                                        <div class="px-2 py-1 d-flex">
-                                            <div>
-                                                <img src="@/assets/img/small-logos/logo-slack.svg"
-                                                    class="avatar avatar-sm me-2" alt="logo_slack" />
-                                            </div>
-                                            <div class="d-flex flex-column justify-content-center">
-                                                <h6 class="mb-0 text-sm">Slack</h6>
-                                            </div>
-                                        </div>
-                                    </td>
-                                    <td class="text-sm text-center align-middle">
-                                        <span class="text-xs font-weight-bold"> 12% </span>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>
-                                        <div class="px-2 py-1 d-flex">
-                                            <div>
-                                                <img src="@/assets/img/small-logos/logo-spotify.svg"
-                                                    class="avatar avatar-sm me-2" alt="logo_spotify" />
-                                            </div>
-                                            <div class="d-flex flex-column justify-content-center">
-                                                <h6 class="mb-0 text-sm">Spotify</h6>
-                                            </div>
-                                        </div>
-                                    </td>
-                                    <td class="text-sm text-center align-middle">
-                                        <span class="text-xs font-weight-bold"> 7% </span>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>
-                                        <div class="px-2 py-1 d-flex">
-                                            <div>
-                                                <img src="@/assets/img/small-logos/logo-jira.svg"
-                                                    class="avatar avatar-sm me-2" alt="logo_jira" />
-                                            </div>
-                                            <div class="d-flex flex-column justify-content-center">
-                                                <h6 class="mb-0 text-sm">Jira</h6>
-                                            </div>
-                                        </div>
-                                    </td>
-                                    <td class="text-sm text-center align-middle">
-                                        <span class="text-xs font-weight-bold"> 10% </span>
+                                        <span class="text-xs font-weight-bold"> {{ value }} </span>
                                     </td>
                                 </tr>
                             </tbody>
@@ -131,25 +65,22 @@ export default {
             type: String,
             default: "Default Doughnut Chart",
         },
+        subtitle: {
+            type: String,
+            default: "Default Doughnut Chart",
+        },
+        description: {
+            type: String,
+            default: "Default Doughnut Chart",
+        },
+        type: {
+            type: String,
+            default: "doughnut",
+        },
         chart: {
             type: Object,
             required: true,
-            labels: String,
-            datasets: {
-                type: Array,
-                label: String,
-                data: Array,
-            },
-        },
-        actions: {
-            type: Object,
-            route: String,
-            color: String,
-            label: String,
-            default: () => ({
-                color: "secondary",
-                label: "See all refferals",
-            }),
+            data: Array,
         },
     },
     mounted() {
@@ -159,14 +90,21 @@ export default {
         if (chartStatus != undefined) {
             chartStatus.destroy();
         }
+        let dataa = this.chart.data;
+        let labels = [];
+        let data = [];
+        for (const property in dataa) {
+            labels.push(property);
+            data.push(dataa[property]);
+        }
 
         new Chart(chart, {
             type: "doughnut",
             data: {
-                labels: this.chart.labels,
+                labels: labels,
                 datasets: [
                     {
-                        label: this.chart.datasets[0].label,
+                        label: labels,
                         weight: 9,
                         cutout: 60,
                         tension: 0.9,
@@ -179,7 +117,7 @@ export default {
                             "#a8b8d8",
                             "#4BB543 ",
                         ],
-                        data: this.chart.datasets[0].data,
+                        data: data,
                         fill: false,
                     },
                 ],
