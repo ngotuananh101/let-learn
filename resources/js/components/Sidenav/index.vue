@@ -2,7 +2,8 @@
     <div v-show="app.layout === 'default'" class="min-height-300 position-absolute w-100"
         :class="`${app.darkMode ? 'bg-trasnparent' : 'bg-success'}`" />
 
-    <aside id="sidenav-main" class="sidenav navbar navbar-vertical navbar-expand-xs border-0 border-radius-xl my-3 ms-4"
+    <aside id="sidenav-main"
+        class="sidenav navbar navbar-vertical navbar-expand-xs border-0 border-radius-xl my-3 ms-4 overflow-hidden"
         :class="` ${app.sidebarType} fixed-start ms-3 ${app.layout === 'landing' ? 'bg-transparent shadow-none' : ''}`">
         <div class="sidenav-header">
             <i id="iconSidenav"

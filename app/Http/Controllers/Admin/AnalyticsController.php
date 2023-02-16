@@ -26,10 +26,13 @@ class AnalyticsController extends Controller
     public function getAnalytics(Request $request)
     {
         try {
-            // get average session duration of last 12 months
-            $averageSessionDuration = LaravelGoogleAnalytics::dateRanges(Period::create(Carbon::today()->subMonth(12), Carbon::today()))
+            // get average session duration of last 30 days
+            $averageSessionDuration = LaravelGoogleAnalytics::dateRanges(Period::create(Carbon::today()->subDays(30), Carbon::today()))
                 ->metrics('averageSessionDuration')
-                ->dimensions('year', 'month')
+                ->dimensions('year', 'month', 'day')
+                ->orderByDimension('year', 'ASC')
+                ->orderByDimension('month', 'ASC')
+                ->orderByDimension('day', 'ASC')
                 ->get();
             // get browser and country by sessions
             $dataOfSession = LaravelGoogleAnalytics::dateRanges(Period::create(new Carbon('2020-01-21'), Carbon::today()))
@@ -53,13 +56,16 @@ class AnalyticsController extends Controller
             }
             // return
             return response()->json([
-                'averageSessionDuration' => $averageSessionDuration,
+                'averageSessionDuration' => $averageSessionDuration->table,
                 'browser' => $browsers,
                 'country' => $countrys
             ]);
         } catch (\Throwable $th) {
-            dd($th);
-            dd($th->getMessage());
+            return response()->json([
+                'status' => 'error',
+                'status_code' => 500,
+                'message' => $th->getMessage()
+            ], 500);
         }
     }
 }

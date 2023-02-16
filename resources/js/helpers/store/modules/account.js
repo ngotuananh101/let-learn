@@ -94,6 +94,9 @@ export default {
             if (state.user) {
                 return state.user.role.name === 'admin' || state.user.role.name === 'super';
             }
+        },
+        getUser: state => {
+            return state.user;
         }
     }
 };
