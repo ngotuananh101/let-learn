@@ -35,6 +35,12 @@ Route::group(['prefix' => 'auth'], function () {
 Route::get('analytics', [AnalyticsController::class, 'getAnalytics']);
 
 Route::middleware('auth:sanctum')->group(function () {
+    // Route::resource('set', SetController::class) ->group(function(){
+    //     Route::post('add-new-set', [SetController::class, 'store']);
+    //     Route::post('show-set', [SetController::class, 'show']);
+    //     Route::post('update-set', [SetController::class, 'update']);
+    //     Route::post('delete-set', [SetController::class, 'destroy']);
+    // });
     Route::resource('set', SetController::class);
     Route::post('flashcard/import', [SetController::class, 'importSets']);
     Route::get('flashcard/export', [SetController::class, 'exportSets']);
