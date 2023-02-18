@@ -42,7 +42,5 @@ Route::middleware('auth:sanctum')->group(function () {
     //     Route::post('update-set', [SetController::class, 'update']);
     //     Route::post('delete-set', [SetController::class, 'destroy']);
     // });
-    Route::resource('set', SetController::class)->except([
-        'store', 'show', 'update', 'destroy'
-    ]);
+    Route::resource('set', SetController::class);
 });
