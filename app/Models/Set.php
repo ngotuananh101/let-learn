@@ -49,4 +49,12 @@ class Set extends Model
     {
         return $this->belongsTo(User::class);
     }
+
+    /**
+     * Get set details
+     */
+    public function setDetails()
+    {
+        return $this->hasMany(SetDetail::class);
+    }
 }
