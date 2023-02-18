@@ -1,17 +1,22 @@
 import config from '../config';
 import handleResponse from './handle-response';
+import { authHeader } from '../auth-header';
 
 export const userService = {
     login,
     logout,
-    register
+    register,
+    forgotPassword,
+    resetPassword,
+    verifyEmail,
+    resendVerificationEmail
 };
 
 function login(email, password, rememberMe) {
     const requestOptions = {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password, rememberMe })
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({email, password, rememberMe})
     };
     return fetch(`${config.apiUrl}/auth/login`, requestOptions)
         .then(handleResponse)
@@ -35,7 +40,7 @@ function logout() {
 function register(user) {
     const requestOptions = {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {'Content-Type': 'application/json'},
         body: JSON.stringify(user)
     };
 
@@ -51,4 +56,63 @@ function register(user) {
 
             return user;
         });
+}
+
+function forgotPassword(email) {
+    const requestOptions = {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({email: email})
+    };
+
+    return fetch(`${config.apiUrl}/auth/forgot-password`, requestOptions)
+        .then(handleResponse)
+        .then(response => {
+                return response;
+            }
+        );
+}
+
+function resetPassword(email, password, password_confirmation, token) {
+    const requestOptions = {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({
+            email: email,
+            password: password,
+            password_confirmation: password_confirmation,
+            token: token
+        })
+    };
+
+    return fetch(`${config.apiUrl}/auth/reset-password`, requestOptions)
+        .then(handleResponse)
+        .then(response => {
+                return response;
+            }
+        );
+}
+
+function verifyEmail(token) {
+    const requestOptions = {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({token: token})
+    };
+
+    return fetch(`${config.apiUrl}/auth/verify-email`, requestOptions)
+        .then(handleResponse)
+        .then(response => {
+                return response;
+            }
+        );
+}
+
+function resendVerificationEmail() {
+    return fetch(`${config.apiUrl}/auth/resend`, {method: 'POST', headers: authHeader()})
+        .then(handleResponse)
+        .then(response => {
+                return response;
+            }
+        );
 }

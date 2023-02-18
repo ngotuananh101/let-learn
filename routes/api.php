@@ -2,7 +2,8 @@
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\Auth\ApiAuthentication as Authentication;
+use App\Http\Controllers\Auth\Authentication as Authentication;
+use App\Http\Controllers\Auth\VerificationController;
 use App\Http\Controllers\Admin\AnalyticsController;
 use App\Http\Controllers\SetController;
 
@@ -22,12 +23,14 @@ use App\Http\Controllers\SetController;
  */
 Route::group(['prefix' => 'auth'], function () {
     Route::post('login', [Authentication::class, 'login']);
-    Route::post('register', [Authentication::class, 'register']);
+    Route::post('forgot-password', [Authentication::class, 'verify']);
     Route::middleware('auth:sanctum')->group(function () {
         Route::prefix('logout')->group(function () {
             Route::post('current', [Authentication::class, 'logout']);
             Route::post('all', [Authentication::class, 'logoutAll']);
         });
+        Route::post('verify', [VerificationController::class, 'handleVerifyEmail']);
+        Route::post('resend', [VerificationController::class, 'resendVerifyEmail']);
     });
     Route::post('forgot-password', [Authentication::class, 'forgotPassword']);
     Route::post('reset-password', [Authentication::class, 'resetPassword']);
