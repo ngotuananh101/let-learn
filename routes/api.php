@@ -23,6 +23,7 @@ use App\Http\Controllers\SetController;
  */
 Route::group(['prefix' => 'auth'], function () {
     Route::post('login', [Authentication::class, 'login']);
+    Route::post('register', [Authentication::class, 'register']);
     Route::post('forgot-password', [Authentication::class, 'verify']);
     Route::prefix('logout')->middleware('auth:sanctum')->group(function () {
         Route::post('current', [Authentication::class, 'logout']);
