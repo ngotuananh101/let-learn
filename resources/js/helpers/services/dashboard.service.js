@@ -17,7 +17,7 @@ function quotes() {
 }
 
 function analytics() {
-    return fetch(`${config.apiUrl}/analytics`, authHeader)
+    return fetch(`${config.apiUrl}/admin/analytics/google`, { method: 'GET', headers: authHeader() })
         .then(handleResponse)
         .then(data => {
             return data;

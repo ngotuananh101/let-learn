@@ -1,6 +1,6 @@
 <template>
     <nav aria-label="breadcrumb">
-        <ol :class="`px-0 pt-1 pb-0 mb-0 bg-transparent breadcrumb`">
+        <ol :class="`px-0 pt-1 pb-0 mb-0 bg-transparent breadcrumb me-sm-6`">
             <li :class="`text-sm breadcrumb-item`">
                 <a :class="app.isNavFixed ? 'text-dark' : 'text-white'">
                     <i class="ni ni-box-2"></i>

@@ -130,7 +130,8 @@ export default {
         ...mapState(['app']),
         ...mapGetters('account', ['getUser']),
         currentRouteName() {
-            return this.$route.name;
+            let name = this.$route.name.split(".")[1];
+            return name.charAt(0).toUpperCase() + name.slice(1);
         },
         currentDirectory() {
             let dir = this.$route.path.split("/")[1];
