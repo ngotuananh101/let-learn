@@ -6,6 +6,7 @@ use Illuminate\Database\Seeder;
 use App\Models\User;
 use App\Models\Role;
 use App\Models\Permission;
+use Illuminate\Support\Facades\Hash;
 
 class DatabaseSeeder extends Seeder
 {
@@ -112,7 +113,7 @@ class DatabaseSeeder extends Seeder
                 'email' => 'superadmin@pontas.dev',
                 'date_of_birth' => '1990-01-01',
                 'status' => 'active',
-                'password' => bcrypt('1234568'),
+                'password' => Hash::make('1234567890'),
             ],
             [
                 'role_id' => 2, // 'admin
@@ -120,7 +121,7 @@ class DatabaseSeeder extends Seeder
                 'email' => 'admin@pontas.dev',
                 'date_of_birth' => '1990-01-01',
                 'status' => 'active',
-                'password' => bcrypt('1234568'),
+                'password' => Hash::make('1234567890'),
             ],
             [
                 'role_id' => 3, // 'user
@@ -128,7 +129,7 @@ class DatabaseSeeder extends Seeder
                 'email' => 'user@pontas.dev',
                 'date_of_birth' => '1990-01-01',
                 'status' => 'active',
-                'password' => bcrypt('1234568'),
+                'password' => Hash::make('1234567890'),
             ],
         ];
         foreach ($users as $user) {
