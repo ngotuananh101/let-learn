@@ -3,7 +3,7 @@ import router from "../../router";
 import overlay from "@/helpers/overlay.js";
 
 const user = JSON.parse(localStorage.getItem('user'));
-const token = JSON.parse(localStorage.getItem('token'));
+const token = localStorage.getItem('token');
 const state = user
     ? {status: {loggedIn: true}, user, token}
     : {status: {}, user: null, token: null};
@@ -113,8 +113,8 @@ export default {
                     }
                 );
         },
-        verifyEmail({dispatch, commit}, token) {
-            userService.verifyEmail(token)
+        verifyEmail({dispatch, commit}, {id, hash, expires, signature}) {
+            userService.verifyEmail(id, hash, expires, signature)
                 .then(
                     user => {
                         dispatch('alert/success', user.message, {root: true});
@@ -149,7 +149,7 @@ export default {
             return state.user;
         },
         isEmailVerified: state => {
-            return !!state.user.email_verified_at;
+            return state.user.email_verified_at;
         }
     }
 };

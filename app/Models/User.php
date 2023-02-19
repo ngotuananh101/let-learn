@@ -7,8 +7,9 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
+use Illuminate\Contracts\Auth\MustVerifyEmail;
 
-class User extends Authenticatable
+class User extends Authenticatable implements MustVerifyEmail
 {
     use HasApiTokens, HasFactory, Notifiable;
 
@@ -24,6 +25,7 @@ class User extends Authenticatable
         'date_of_birth',
         'status',
         'password',
+        'email_verified_at'
     ];
 
     /**
@@ -48,14 +50,16 @@ class User extends Authenticatable
     /**
      * 1 user can have 1 role
      */
-    public function role(){
+    public function role(): \Illuminate\Database\Eloquent\Relations\BelongsTo
+    {
         return $this->belongsTo(Role::class);
     }
 
     /**
      * 1 user can have many sets
      */
-    public function sets(){
+    public function sets(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
         return $this->hasMany(Set::class);
     }
 
@@ -69,4 +73,13 @@ class User extends Authenticatable
         return $this->role()->with('permissions')->first()->permissions;
     }
 
+    // check if user has permission
+    public function hasPermission($permission){
+        return $this->getAllPermissions()->contains('name', $permission);
+    }
+
+    // check user is super admin
+    public function isSuperAdmin(){
+        return $this->role->name == 'super';
+    }
 }

@@ -24,20 +24,28 @@ use App\Http\Controllers\SetController;
 Route::group(['prefix' => 'auth'], function () {
     Route::post('login', [Authentication::class, 'login']);
     Route::post('forgot-password', [Authentication::class, 'verify']);
-    Route::middleware('auth:sanctum')->group(function () {
-        Route::prefix('logout')->group(function () {
-            Route::post('current', [Authentication::class, 'logout']);
-            Route::post('all', [Authentication::class, 'logoutAll']);
-        });
-        Route::post('verify', [VerificationController::class, 'handleVerifyEmail']);
-        Route::post('resend', [VerificationController::class, 'resendVerifyEmail']);
+    Route::prefix('logout')->middleware('auth:sanctum')->group(function () {
+        Route::post('current', [Authentication::class, 'logout']);
+        Route::post('all', [Authentication::class, 'logoutAll']);
+    });
+    Route::prefix('email')->group(function () {
+        Route::get('verify/{id}/{hash}', [VerificationController::class, 'verifyEmail'])->middleware(['signed'])->name('verification.verify');
+        Route::post('handle-verify/{id}/{hash}', [VerificationController::class, 'handleVerifyEmail'])->middleware(['auth:sanctum']);
+        Route::post('resend', [VerificationController::class, 'resendVerifyEmail'])->middleware(['auth:sanctum', 'throttle:6,1'])->name('verification.send');
     });
     Route::post('forgot-password', [Authentication::class, 'forgotPassword']);
     Route::post('reset-password', [Authentication::class, 'resetPassword']);
 });
-
-Route::get('analytics', [AnalyticsController::class, 'getAnalytics']);
-
 Route::middleware('auth:sanctum')->group(function () {
+    Route::prefix('admin')->group(function () {
+        Route::prefix('analytics')->group(function () {
+            Route::get('google', [AnalyticsController::class, 'getAnalytics']);
+            Route::get('local', function (){
+                return response()->json([
+                    'message' => 'Hello World'
+                ]);
+            })->middleware(['permissions:admin.analytics']);
+        });
+    })->middleware(['permissions:admin.access']);
     Route::resource('set', SetController::class);
 });

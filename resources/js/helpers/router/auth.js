@@ -32,6 +32,11 @@ const auth = [
             {
                 path: 'verify',
                 name: 'auth.verify',
+                component: () => import('../../pages/auth/VerifyEmailNotice.vue'),
+            },
+            {
+                path: 'handle-verify/:id/:hash',
+                name: 'auth.verify.token',
                 component: () => import('../../pages/auth/VerifyEmail.vue'),
             }
         ],

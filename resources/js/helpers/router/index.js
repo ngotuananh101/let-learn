@@ -22,7 +22,7 @@ router.beforeEach((to, from, next) => {
         "/auth/forgot-password",
         "/auth/reset-password",
     ];
-    // check if current page is a public page and if user is logged in
+    // check if current page is a public page
     const authRequired = !publicPages.includes(to.path);
     if (authRequired) {
         const loggedIn = localStorage.getItem("user");
@@ -32,8 +32,7 @@ router.beforeEach((to, from, next) => {
             });
         } else {
             // check email verification
-            console.log(store.getters['account/isEmailVerified']);
-            if (store.getters['account/isEmailVerified']) {
+            if (!store.getters['account/isEmailVerified'] && !to.path.includes('auth')) {
                 return next({
                     path: "/auth/verify",
                 });
