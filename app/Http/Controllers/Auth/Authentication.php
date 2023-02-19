@@ -11,8 +11,8 @@ use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
 use App\Models\User;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Password;
 use Illuminate\Support\Str;
+use Illuminate\Auth\Events\Registered;
 
 
 class Authentication extends Controller
@@ -177,6 +177,7 @@ class Authentication extends Controller
             // set role name in user object
             $user->role;
             $token = $user->createToken('Personal Access Token');
+            event(new Registered($user));
             return response()->json([
                 'status' => 'success',
                 'status_code' => 200,

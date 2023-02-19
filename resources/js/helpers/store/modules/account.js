@@ -123,7 +123,13 @@ export default {
                         }, 1000)
                     },
                     error => {
-                        dispatch('alert/error', error, {root: true});
+                        dispatch('alert/error', error, {root: true}).then(() => {
+                            dispatch('alert/error', "You must login to verify email", {root: true}).then(() => {
+                                setTimeout(() => {
+                                    router.push({name: 'auth.login'})
+                                }, 1000)
+                            });
+                        });
                     }
                 );
         },
