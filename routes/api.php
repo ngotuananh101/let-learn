@@ -48,7 +48,6 @@ Route::middleware('auth:sanctum')->group(function () {
             })->middleware(['permissions:admin.analytics']);
         });
     })->middleware(['permissions:admin.access']);
-
     Route::prefix('set')->group(function () {
         Route::post('/', [SetController::class, 'store']);
         Route::get('/{id}', [SetController::class, 'show']);
