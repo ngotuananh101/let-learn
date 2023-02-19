@@ -177,31 +177,38 @@ class SetController extends Controller
             $request->validate([
                 'name' => 'required|string|unique:sets',
                 'description' => 'string',
-                'is_public' => 'required|boolean',
                 'password' => 'required|string',
-                'data' => 'required'
+                'data' => 'required',
+                'term' => 'required',
+                'definition' => 'required'
             ]);
-            $set = new Set([
-                'user_id' => auth() -> user_id,
-                'name' => $request -> uniqid('newSet_'),
-                'is_public' => $request -> boolval(1),
-                'description' => $request -> description
-            ]);
+            $set = new Set();
+            $set->name = $request->name;
+            $set->description = $request->description;
+            $set->password = $request->password;
+            $set->user_id = auth()->user()->id;
             $set->save();
+
+            $setdetail = new SetDetail();
+            $setdetail->term = $request->term;
+            $setdetail->definition = $request->definition;
+            $setdetail->set_id = $set->id;
+            $setdetail->save();
 
             return response()->json([
                 'status' => 'success',
                 'status_code' => 200,
                 'message' => 'Add new set successfully!',
-                'data' => $set
+                'data' => $set,
+                'data' => $setdetail
             ], 200);
-            $user = auth()->user();
-            dd($user);
+            // $user = auth()->user();
+            // dd($user);
         } catch (\Throwable $th) {
             return response()->json([
                 'status' => 'error',
                 'status_code' => 500,
-                'message' => $th->getMessage('Add new set fail!')
+                'message' => $th->getMessage()
             ], 500);
         }
     }
@@ -216,6 +223,7 @@ class SetController extends Controller
     {
         try {
             $set = Set::findOrFail($id);
+
             return response()->json([
                 'status' => 'success',
                 'status_code' => 200,
@@ -253,6 +261,7 @@ class SetController extends Controller
     {
         try {
             $set = Set::findOrFail($id);
+
         } catch (\Throwable $th) {
             return response()->json([
                 'status' => 'error',
@@ -272,7 +281,8 @@ class SetController extends Controller
     {
         try {
             $set = Set::findOrFail($id);
-            $set -> update('status' => 'inactive');
+            // $set -> update('status' => 'inactive');
+
             return response()->json([
                 'status' => 'success',
                 'status_code' => 200,
