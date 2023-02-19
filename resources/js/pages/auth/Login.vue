@@ -2,12 +2,12 @@
     <div class="card-header bg-transparent">
         <h5 class="text-dark text-center mt-2 mb-3">Sign in</h5>
         <div class="btn-wrapper text-center">
-            <a href="javascript:;" class="btn btn-neutral btn-icon btn-sm mb-0 me-1">
-                <img class="w-30" src="https://s3-hcm-r1.longvan.net/19403879-letlearn/images/github.svg" />
-                Github
+            <a href="javascript:;" class="btn btn-neutral btn-icon btn-sm mb-0 me-2 my-2">
+                <img class="w-25" src="https://19403879-letlearn.s3-hcm-r1.longvan.net/images/facebook.svg" />
+                Facebook
             </a>
-            <a href="javascript:;" class="btn btn-neutral btn-icon btn-sm mb-0">
-                <img class="w-30" src="https://s3-hcm-r1.longvan.net/19403879-letlearn/images/google.svg" />
+            <a href="javascript:;" class="btn btn-neutral btn-icon btn-sm mb-0 my-2">
+                <img class="w-30" src="https://19403879-letlearn.s3-hcm-r1.longvan.net/images/google.svg" />
                 Google
             </a>
         </div>

@@ -2,10 +2,18 @@
     <div id="sidenav-collapse-main" class="collapse navbar-collapse w-auto h-auto h-100 overflow-hidden">
         <ul class="navbar-nav">
             <li class="nav-item">
-                <sidenav-collapse collapse-ref="dashboardsExamples" nav-text="Dashboards"
+                <sidenav-collapse @click="$router.push({ name: 'admin.dashboard' })" collapse-ref="" nav-text="Dashboards"
                     :class="getRoute() === 'dashboard' ? 'active' : ''">
                     <template #icon>
                         <i class="fa-solid fa-chart-line text-primary text-sm opacity-10"></i>
+                    </template>
+                </sidenav-collapse>
+            </li>
+            <li class="nav-item">
+                <sidenav-collapse @click="$router.push({ name: 'admin.setting' })" collapse-ref="" nav-text="Settings"
+                                  :class="getRoute() === 'setting' ? 'active' : ''">
+                    <template #icon>
+                        <i class="fa-regular fa-gear text-primary text-sm opacity-10"></i>
                     </template>
                 </sidenav-collapse>
             </li>

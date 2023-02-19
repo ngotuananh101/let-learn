@@ -3,13 +3,19 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
+use App\Models\PasswordReset;
+use App\Notifications\ResetPasswordRequest;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
-use Carbon\Carbon;
 use App\Models\User;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Password;
+use Illuminate\Support\Str;
 
-class ApiAuthentication extends Controller
+
+class Authentication extends Controller
 {
     /**
      * Create a new controller instance.
@@ -24,9 +30,9 @@ class ApiAuthentication extends Controller
      * Login with username and password.
      *
      * @param Request $request
-     * @return json
+     * @return JsonResponse
      */
-    public function login(Request $request)
+    public function login(Request $request): JsonResponse
     {
         try {
             $request->validate([
@@ -69,9 +75,9 @@ class ApiAuthentication extends Controller
      * Logout.
      *
      * @param Request $request
-     * @return json
+     * @return JsonResponse
      */
-    public function logout(Request $request)
+    public function logout(Request $request): JsonResponse
     {
         try {
             $request->user()->currentAccessToken()->delete();
@@ -91,9 +97,9 @@ class ApiAuthentication extends Controller
 
     /**
      * Logout from all devices.
-     * @return json
+     * @return JsonResponse
      */
-    public function logoutAll()
+    public function logoutAll(): JsonResponse
     {
         try {
             $user = Auth::user();
@@ -116,9 +122,9 @@ class ApiAuthentication extends Controller
      * Get the authenticated User.
      *
      * @param Request $request
-     * @return json
+     * @return JsonResponse
      */
-    public function user(Request $request)
+    public function user(Request $request): JsonResponse
     {
         try {
             return response()->json([
@@ -140,9 +146,9 @@ class ApiAuthentication extends Controller
      * Register a new user.
      *
      * @param Request $request
-     * @return json
+     * @return JsonResponse
      */
-    public function register(Request $request)
+    public function register(Request $request): JsonResponse
     {
         try {
             $request->validate([
@@ -192,37 +198,28 @@ class ApiAuthentication extends Controller
     /**
      * Forgot password.
      * @param Request $request
-     * @return json
+     * @return JsonResponse
      */
-    public function forgotPassword(Request $request)
+    public function forgotPassword(Request $request): JsonResponse
     {
         try {
             $request->validate([
                 'email' => 'required|string|email',
             ]);
-            $user = User::where('email', $request->email)->first();
-            if (!$user) {
-                return response()->json([
-                    'status' => 'error',
-                    'status_code' => 404,
-                    'message' => 'User not found'
-                ], 404);
-            }
-            $status = Password::sendResetLink(
-                $request->only('email')
-            );
-            if ($status == Password::RESET_LINK_SENT) {
-                return response()->json([
-                    'status' => 'success',
-                    'status_code' => 200,
-                    'message' => 'Reset password link sent to your email'
-                ], 200);
+            $user = User::where('email', $request->email)->firstOrFail();
+            $passwordReset = PasswordReset::updateOrCreate([
+                'email' => $user->email,
+            ], [
+                'token' => Str::random(60),
+            ]);
+            if ($passwordReset) {
+                $user->notify(new ResetPasswordRequest($passwordReset->token));
             }
             return response()->json([
-                'status' => 'error',
-                'status_code' => 500,
-                'message' => 'Unable to send reset password link'
-            ], 500);
+                'status' => 'success',
+                'status_code' => 200,
+                'message' => 'We have e-mailed your password reset link!'
+            ], 200);
         } catch (\Throwable $th) {
             return response()->json([
                 'status' => 'error',
@@ -235,9 +232,9 @@ class ApiAuthentication extends Controller
     /**
      * Reset password.
      * @param Request $request
-     * @return json
+     * @return JsonResponse
      */
-    public function resetPassword(Request $request)
+    public function resetPassword(Request $request): JsonResponse
     {
         try {
             $request->validate([
@@ -245,55 +242,24 @@ class ApiAuthentication extends Controller
                 'password' => 'required|string|confirmed',
                 'token' => 'required|string'
             ]);
-            $status = Password::reset(
-                $request->only('email', 'password', 'password_confirmation', 'token'),
-                function ($user, $password) {
-                    $user->password = bcrypt($password);
-                    $user->save();
-                }
-            );
-            if ($status == Password::PASSWORD_RESET) {
+            $passwordReset = PasswordReset::where('token', $request->token)->firstOrFail();
+            if (Carbon::parse($passwordReset->updated_at)->addMinutes(60)->isPast()) {
+                $passwordReset->delete();
                 return response()->json([
-                    'status' => 'success',
-                    'status_code' => 200,
-                    'message' => 'Password reset successfully'
-                ], 200);
+                    'status' => 'error',
+                    'status_code' => 422,
+                    'message' => 'This password reset token is invalid.'
+                ], 422);
             }
-            return response()->json([
-                'status' => 'error',
-                'status_code' => 500,
-                'message' => 'Unable to reset password'
-            ], 500);
-        } catch (\Throwable $th) {
-            return response()->json([
-                'status' => 'error',
-                'status_code' => 500,
-                'message' => $th->getMessage()
-            ], 500);
-        }
-    }
-
-    /**
-     * Generate new access token.
-     * @param Request $request
-     * @return json
-     */
-    public function refreshToken(Request $request)
-    {
-        try {
-            $request->validate([
-                'refresh_token' => 'required|string'
-            ]);
-            $user = $request->user();
-            $token = $user->createToken('Personal Access Token');
+            $user = User::where('email', $passwordReset->email)->firstOrFail();
+            $user->forceFill([
+                'password' => Hash::make($request->password)
+            ])->save();
+            $passwordReset->delete();
             return response()->json([
                 'status' => 'success',
                 'status_code' => 200,
-                'message' => 'Refresh token successful',
-                'data' => [
-                    'access_token' => $token->plainTextToken,
-                    'token_type' => 'Bearer',
-                ]
+                'message' => 'Password reset successfully'
             ], 200);
         } catch (\Throwable $th) {
             return response()->json([
