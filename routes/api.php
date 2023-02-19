@@ -36,6 +36,6 @@ Route::get('analytics', [AnalyticsController::class, 'getAnalytics']);
 
 Route::middleware('auth:sanctum')->group(function () {
     Route::resource('set', SetController::class);
-    Route::post('flashcard/import', [SetController::class, 'importSets']);
-    Route::get('flashcard/export', [SetController::class, 'exportSets']);
+    Route::post('set/import', [SetController::class, 'importSets']);
+    Route::get('set/file/export', [SetController::class, 'exportSets']);
 });

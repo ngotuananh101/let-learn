@@ -8,6 +8,7 @@ use App\Models\SetDetail;
 use App\Exports\SetDetailsExport;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 use Maatwebsite\Excel\Facades\Excel;
 
 class SetController extends Controller
@@ -61,10 +62,12 @@ class SetController extends Controller
                     foreach ($rows as $row) {
                         $term = $row[0];
                         $definition = $row[1];
-                        $set->setDetails()->create([
-                            'term' => $term,
-                            'definition' => $definition,
-                        ]);
+                        if(isset($row[0]) && isset($row[1])){
+                            $set->setDetails()->create([
+                                'term' => $term,
+                                'definition' => $definition,
+                            ]);
+                        }
                     }
                 } else {
                     $rows = Excel::toArray([], $file);
@@ -117,7 +120,7 @@ class SetController extends Controller
             }
 
             $fileName = 'set_' . $setId . '_' . date('Ymd_His') . '.csv';
-            $filePath = storage_path('app/' . $fileName);
+            $filePath = storage_path('app/export/set/' . $fileName);
 
             $file = fopen($filePath, 'w');
 
@@ -134,7 +137,16 @@ class SetController extends Controller
                 'Content-Disposition' => 'attachment; filename=' . $fileName,
             ];
 
-            return response()->download($filePath, $fileName, $headers);
+            $url = Storage::url('export/set/' . $fileName);
+
+            return response()->json([
+                'url' => $url,
+                'message' => 'Export successful'
+            ]);
+            // return response()->streamDownload(function () use ($filePath) {
+            //     echo file_get_contents($filePath);
+            // }, $fileName, $headers);
+            //return response()->download($filePath, $fileName, $headers);
         } catch (\Throwable $th) {
             return response()->json([
                 'status' => 'error',
