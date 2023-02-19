@@ -37,4 +37,23 @@ Route::group(['prefix' => 'auth'], function () {
     Route::post('reset-password', [Authentication::class, 'resetPassword']);
 });
 Route::middleware('auth:sanctum')->group(function () {
+    Route::prefix('admin')->group(function () {
+        Route::prefix('analytics')->group(function () {
+            Route::get('google', [AnalyticsController::class, 'getAnalytics']);
+            Route::get('local', function () {
+                return response()->json([
+                    'message' => 'Hello World'
+                ]);
+            })->middleware(['permissions:admin.analytics']);
+        });
+    })->middleware(['permissions:admin.access']);
+
+    Route::prefix('set')->group(function () {
+        Route::post('/', [SetController::class, 'store']);
+        Route::get('/{id}', [SetController::class, 'show']);
+        Route::put('/{id}', [SetController::class, 'update']);
+        Route::delete('/{id}', [SetController::class, 'destroy']);
+        Route::post('/import', [SetController::class, 'importSets']);
+        Route::get('/export', [SetController::class, 'exportSets']);
+    });
 });
