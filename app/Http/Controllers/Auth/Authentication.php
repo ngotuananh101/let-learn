@@ -161,6 +161,7 @@ class Authentication extends Controller
                 'email' => $request->email,
                 'date_of_birth' => $request->date_of_birth,
                 'password' => bcrypt($request->password),
+                'role_id' => 3
             ]);
             $user->save();
             // Login user after registration
