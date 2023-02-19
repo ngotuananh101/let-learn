@@ -37,15 +37,4 @@ Route::group(['prefix' => 'auth'], function () {
     Route::post('reset-password', [Authentication::class, 'resetPassword']);
 });
 Route::middleware('auth:sanctum')->group(function () {
-    Route::prefix('admin')->group(function () {
-        Route::prefix('analytics')->group(function () {
-            Route::get('google', [AnalyticsController::class, 'getAnalytics']);
-            Route::get('local', function (){
-                return response()->json([
-                    'message' => 'Hello World'
-                ]);
-            })->middleware(['permissions:admin.analytics']);
-        });
-    })->middleware(['permissions:admin.access']);
-    Route::resource('set', SetController::class);
 });

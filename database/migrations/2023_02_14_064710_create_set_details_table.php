@@ -15,9 +15,17 @@ return new class extends Migration
     {
         Schema::create('set_details', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('set_id')->constrained()->default(1)->onDelete('cascade')->onUpdate('cascade');
+            $table->text('term');
+            $table->text('definition');
+            $table->text('image')->nullable();
+            $table->text('audio')->nullable();
+            $table->text('video')->nullable();
+            $table->enum('status', ['active', 'inactive'])->default('active');
             $table->timestamps();
         });
     }
+
     /**
      * Reverse the migrations.
      *
