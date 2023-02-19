@@ -10,7 +10,7 @@
                       component: 'fa-regular fa-users',
                       background: 'bg-gradient-primary',
                       shape: 'rounded-circle'
-                  }" />
+                  }"/>
                     </div>
                     <div class="col-lg-3 col-md-6 col-12">
                         <mini-statistics-card title="Total Sets" value="2,300" description="<span
@@ -19,7 +19,7 @@
                       component: 'fa-sharp fa-solid fa-books',
                       background: 'bg-gradient-danger',
                       shape: 'rounded-circle'
-                  }" />
+                  }"/>
                     </div>
                     <div class="col-lg-3 col-md-6 col-12">
                         <mini-statistics-card title="Total Folders" value="+3,462" description="<span
@@ -28,7 +28,7 @@
                       component: 'fa-solid fa-folders',
                       background: 'bg-gradient-success',
                       shape: 'rounded-circle'
-                  }" />
+                  }"/>
                     </div>
                     <div class="col-lg-3 col-md-6 col-12">
                         <mini-statistics-card title="Total Classes" value="$103,430" description="<span
@@ -37,13 +37,13 @@
                       component: 'fa-duotone fa-screen-users',
                       background: 'bg-gradient-warning',
                       shape: 'rounded-circle'
-                  }" />
+                  }"/>
                     </div>
                 </div>
                 <div class="row">
                     <div class="col-lg-7 mb-lg">
                         <gradient-line-chart v-if="this.analytics.averageSessionDuration" id="chart-line"
-                            title="Average Duration" description="<i class='fa-solid fa-timer text-success'></i>
+                                             title="Average Duration" description="<i class='fa-solid fa-timer text-success'></i>
         <span class='font-weight-bold'>average session duration</span> of last 30 days" :chart="{
             labels: this.analytics.averageSessionDuration.date,
             datasets: [
@@ -52,7 +52,7 @@
                     data: this.analytics.averageSessionDuration.value,
                 }
             ]
-        }" />
+        }"/>
                     </div>
                     <div class="col-lg-5">
                         <carousel v-if="quotes" :items="[
@@ -83,7 +83,7 @@
                                     background: 'bg-white'
                                 }
                             }
-                        ]" />
+                        ]"/>
                     </div>
                 </div>
                 <div class="row mt-4">
@@ -118,7 +118,7 @@
                             subtitle="by sessions"
                             description="This is top browsers by sessions"
                             type="browsers"
-                            :chart="{ data: this.analytics.browser }" />
+                            :chart="{ data: this.analytics.browser }"/>
                     </div>
                 </div>
                 <div class="row mt-4">
@@ -153,7 +153,7 @@
                             subtitle="by sessions"
                             description="This is top countries by sessions"
                             type="countries"
-                            :chart="{ data: this.analytics.country }" />
+                            :chart="{ data: this.analytics.country }"/>
                     </div>
                 </div>
             </div>
@@ -166,7 +166,8 @@ import GradientLineChart from "@/components/Charts/GradientLineChart.vue";
 import Carousel from "@/components/Carousel.vue";
 import StatsChart from "@/components/Charts/StatsChart.vue";
 import DefaultDoughnutChart from "@/components/Charts/DefaultDoughnutChart.vue";
-import { mapActions, mapState } from "vuex";
+import {mapActions, mapState} from "vuex";
+
 export default {
     name: "AdminDashboard",
     components: {
@@ -177,8 +178,7 @@ export default {
         DefaultDoughnutChart,
     },
     data() {
-        return {
-        };
+        return {};
     },
     created() {
         this.getQuotes();

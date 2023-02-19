@@ -56,9 +56,9 @@ class SetController extends Controller
                     $rows = array_map('str_getcsv', file($file));
                     $headerRow = array_shift($rows);
 
-                if (count($headerRow) < 2 || $headerRow[0] != 'Term' || $headerRow[1] != 'Definition') {
-                    return response()->json(['error' => 'File must have "Term" and "Definition" headers'], 400);
-                }
+                    if (count($headerRow) < 2 || $headerRow[0] != 'Term' || $headerRow[1] != 'Definition') {
+                        return response()->json(['error' => 'File must have "Term" and "Definition" headers'], 400);
+                    }
                     foreach ($rows as $row) {
                         $term = $row[0];
                         $definition = $row[1];
@@ -81,7 +81,7 @@ class SetController extends Controller
                     foreach ($rows[0] as $row) {
                         $term = $row[0];
                         $definition = $row[1];
-                        if(isset($row[0]) && isset($row[1])){
+                        if (isset($row[0]) && isset($row[1])) {
                             $set->setDetails()->create([
                                 'term' => $term,
                                 'definition' => $definition,
@@ -156,27 +156,6 @@ class SetController extends Controller
         }
     }
 
-
-    /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function index()
-    {
-        //
-    }
-
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create()
-    {
-        //
-    }
-
     /**
      * Store a newly created resource in storage.
      *
@@ -186,17 +165,38 @@ class SetController extends Controller
     public function store(Request $request)
     {
         try {
-            // $request -> validate([
-            //         'name',
-            //         'description',
-            //         'is_public',
-            //         'password',
-            //         'data'
-            // ]);
-            $user = auth()->user();
-            dd($user);
+            $request->validate([
+                'name' => 'required|string',
+                'description' => 'required|string',
+                'password' => 'nullable|string',
+                'data' => 'required|array',
+            ]);
+
+            // add new set to user
+            $set = auth()->user()->sets()->create([
+                'name' => $request->name,
+                'description' => $request->description,
+                'password' => $request->password,
+            ]);
+            // add set details
+            foreach ($request->data as $detail) {
+                $set->setDetails()->create([
+                    'term' => $detail['term'],
+                    'definition' => $detail['definition'],
+                ]);
+            }
+            // return json response
+            return response()->json([
+                'status' => 'success',
+                'status_code' => 200,
+                'message' => 'Create set successfully!',
+            ], 200);
         } catch (\Throwable $th) {
-            //throw $th;
+            return response()->json([
+                'status' => 'error',
+                'status_code' => 500,
+                'message' => $th->getMessage()
+            ], 500);
         }
     }
 
@@ -209,21 +209,32 @@ class SetController extends Controller
     public function show($id)
     {
         try {
-            //code...
+            $set = Set::findOrFail($id);
+            // check set is deleted
+            if ($set->status == 'inactive') {
+                return response()->json([
+                    'status' => 'error',
+                    'status_code' => 404,
+                    'message' => 'Set not found!'
+                ], 404);
+            }
+            $setdetail = $set->setDetails()->get();
+            return response()->json([
+                'status' => 'success',
+                'status_code' => 200,
+                'message' => 'Get set successfully!',
+                'data' => [
+                    'set' => $set,
+                    'detail' => $setdetail
+                ]
+            ], 200);
         } catch (\Throwable $th) {
-            //throw $th;
+            return response()->json([
+                'status' => 'error',
+                'status_code' => 500,
+                'message' => $th->getMessage()
+            ], 500);
         }
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function edit($id)
-    {
-        //
     }
 
     /**
@@ -236,9 +247,46 @@ class SetController extends Controller
     public function update(Request $request, $id)
     {
         try {
+            $request->validate([
+                'name' => 'required|string|unique:sets',
+                'description' => 'string',
+                'status' => 'required|in:active,inactive',
+                'is_public' => 'required|in:1,0',
+                'password' => 'nullable|string',
+                'data' => 'required|array',
+            ]);
             $set = Set::findOrFail($id);
+            $set->name = $request->name;
+            $set->description = $request->description;
+            $set->status = $request->status;
+            $set->is_public = $request->is_public;
+            $set->password = $request->password;
+            $set->save();
+
+            $setdetail = $set->setDetails()->get();
+            foreach ($setdetail as $detail) {
+                // remove all set details
+                $detail->delete();
+            }
+
+            foreach ($request->data as $detail) {
+                $set->setDetails()->create([
+                    'term' => $detail['term'],
+                    'definition' => $detail['definition'],
+                ]);
+            }
+
+            return response()->json([
+                'status' => 'success',
+                'status_code' => 200,
+                'message' => 'Update set successfully!',
+            ], 200);
         } catch (\Throwable $th) {
-            //throw $th;
+            return response()->json([
+                'status' => 'error',
+                'status_code' => 500,
+                'message' => $th->getMessage()
+            ], 500);
         }
     }
 
@@ -251,9 +299,22 @@ class SetController extends Controller
     public function destroy($id)
     {
         try {
-            //code...
+            $set = Set::findOrFail($id);
+            // Soft delete
+            $set->update([
+                'status' => 'inactive'
+            ]);
+            return response()->json([
+                'status' => 'success',
+                'status_code' => 200,
+                'message' => 'Delete set successfully!',
+            ], 200);
         } catch (\Throwable $th) {
-            //throw $th;
+            return response()->json([
+                'status' => 'error',
+                'status_code' => 500,
+                'message' => $th->getMessage()
+            ], 500);
         }
     }
 }

@@ -1,5 +1,7 @@
+import Swal from "sweetalert2";
+
 const state = {
-    type: null,
+    icon: null,
     message: null
 };
 
@@ -17,18 +19,31 @@ const actions = {
 
 const mutations = {
     success(state, message) {
-        state.type = 'alert-success';
+        state.icon = 'success';
         state.message = message;
+        alert(state.icon, state.message);
     },
     error(state, message) {
-        state.type = 'alert-danger';
+        state.icon = 'error';
         state.message = message;
+        alert(state.icon, state.message);
     },
     clear(state) {
-        state.type = null;
+        state.icon = null;
         state.message = null;
     }
 };
+
+function alert(icon, message) {
+    Swal.fire({
+        icon: icon,
+        title: message,
+        showConfirmButton: false,
+        timer: 1000
+    }).then(r => {
+        // console.log(r);
+    });
+}
 
 export default {
     namespaced: true,

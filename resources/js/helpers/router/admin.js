@@ -10,6 +10,11 @@ const admin = [
                 name: 'admin.dashboard',
                 component: () => import('../../pages/admin/Dashboard.vue'),
             },
+            {
+                path: 'setting',
+                name: 'admin.setting',
+                component: () => import('../../pages/admin/Setting.vue'),
+            }
         ],
     },
 ];
