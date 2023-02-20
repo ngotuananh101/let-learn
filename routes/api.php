@@ -5,7 +5,7 @@ use App\Http\Controllers\Auth\Authentication as Authentication;
 use App\Http\Controllers\Auth\VerificationController;
 use App\Http\Controllers\Public\SetController;
 use Illuminate\Support\Facades\Route;
-
+use App\Http\Controllers\Public\ClassController;
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -54,5 +54,12 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::delete('/{id}', [SetController::class, 'destroy']);
         Route::post('/import', [SetController::class, 'import']);
         Route::get('/export/{id}', [SetController::class, 'export']);
+    });
+    Route::prefix('class')->group(function () {
+        Route::post('/', [ClassController::class, 'store']);
+        Route::put('/{id}', [ClassController::class, 'update']);
+        Route::delete('/{id}', [ClassController::class, 'destroy']);
+        Route::get('/', [ClassController::class, 'index']);
+        Route::get('/{id}', [ClassController::class, 'show']);
     });
 });
