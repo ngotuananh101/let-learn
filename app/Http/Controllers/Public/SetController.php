@@ -13,10 +13,10 @@ use Maatwebsite\Excel\Facades\Excel;
 
 class SetController extends Controller
 {
-    public function importSets(Request $request)
+    public function import(Request $request)
     {
         try {
-            $validator = Validator::make($request->all(), [
+            $request->validate([
                 'type' => 'required|in:text,file',
                 'name' => 'required|string',
                 'description' => 'required|string',
@@ -26,8 +26,6 @@ class SetController extends Controller
                 'file' => 'required_if:type,file|mimes:xls,xlsx,csv|nullable',
             ]);
             $type = $request->input('type');
-            $setId = $request->input('set_id');
-
             // Tao set moi
             $set = new Set();
             $set->name = $request->name;
@@ -41,28 +39,30 @@ class SetController extends Controller
                 $setSeparator = $request->set_separator;
                 $details = explode($setSeparator, $text);
                 foreach ($details as $detail) {
-                    $detail = explode($termSeparator, $detail);
-                    $term = $detail[0];
-                    $definition = $detail[1];
-                    $set->setDetails()->create([
-                        'term' => $term,
-                        'definition' => $definition,
-                    ]);
+                    try {
+                        $detail = explode($termSeparator, $detail);
+                        $term = $detail[0];
+                        $definition = $detail[1];
+                        $set->setDetails()->create([
+                            'term' => $term,
+                            'definition' => $definition,
+                        ]);
+                    } catch (\Throwable $th) {
+                        continue;
+                    }
                 }
             } else if ($type == 'file') {
                 $file = $request->file('file');
-
                 if ($file->getClientOriginalExtension() == 'csv') {
                     $rows = array_map('str_getcsv', file($file));
                     $headerRow = array_shift($rows);
-
                     if (count($headerRow) < 2 || $headerRow[0] != 'Term' || $headerRow[1] != 'Definition') {
                         return response()->json(['error' => 'File must have "Term" and "Definition" headers'], 400);
                     }
                     foreach ($rows as $row) {
                         $term = $row[0];
                         $definition = $row[1];
-                        if(isset($row[0]) && isset($row[1])){
+                        if (isset($row[0]) && isset($row[1])) {
                             $set->setDetails()->create([
                                 'term' => $term,
                                 'definition' => $definition,
@@ -71,13 +71,9 @@ class SetController extends Controller
                     }
                 } else {
                     $rows = Excel::toArray([], $file);
-                    //array_shift($rows);
-                    // Check if the first row contains headers
                     if (count($rows[0][0]) > 1 && $rows[0][0][0] == 'Term' && $rows[0][0][1] == 'Definition') {
-                        // Skip the first row if it contains headers
                         $rows[0] = array_slice($rows[0], 1);
                     }
-
                     foreach ($rows[0] as $row) {
                         $term = $row[0];
                         $definition = $row[1];
@@ -90,7 +86,11 @@ class SetController extends Controller
                     }
                 }
             }
-            return response()->json(['message' => 'Sets imported successfully']);
+            return response()->json([
+                'status' => 'success',
+                'status_code' => 200,
+                'message' => 'Set created successfully',
+            ]);
         } catch (\Throwable $th) {
             return response()->json([
                 'status' => 'error',
@@ -100,53 +100,23 @@ class SetController extends Controller
         }
     }
 
-    public function exportSets(Request $request)
+    public function export(Request $request, $id)
     {
         try {
-            $validator = Validator::make($request->all(), [
-                'set_id' => 'required|integer',
-            ]);
-
-            if ($validator->fails()) {
-                return response()->json(['error' => $validator->errors()], 400);
-            }
-
-            $setId = $request->input('set_id');
-
-            $setData = SetDetail::select('term', 'definition', 'image')->where('set_id', $setId)->get()->toArray();
-
+            $set = Set::findOrfail($id);
+            $setData = $set->setDetails()->get()->toArray();
             if (empty($setData)) {
                 return response()->json(['message' => 'No data found for this set']);
             }
-
-            $fileName = 'set_' . $setId . '_' . date('Ymd_His') . '.csv';
+            $fileName = 'set_' . $id . '_' . date('Ymd_His') . '.csv';
             $filePath = storage_path('app/export/set/' . $fileName);
-
             $file = fopen($filePath, 'w');
-
             fputcsv($file, ['Term', 'Definition', 'Image']);
-
             foreach ($setData as $row) {
                 fputcsv($file, $row);
             }
-
             fclose($file);
-
-            $headers = [
-                'Content-Type' => 'text/csv',
-                'Content-Disposition' => 'attachment; filename=' . $fileName,
-            ];
-
-            $url = Storage::url('export/set/' . $fileName);
-
-            return response()->json([
-                'url' => $url,
-                'message' => 'Export successful'
-            ]);
-            // return response()->streamDownload(function () use ($filePath) {
-            //     echo file_get_contents($filePath);
-            // }, $fileName, $headers);
-            //return response()->download($filePath, $fileName, $headers);
+            return response()->download($filePath, $fileName, ['Content-Type' => 'text/csv'])->deleteFileAfterSend(true);
         } catch (\Throwable $th) {
             return response()->json([
                 'status' => 'error',
@@ -171,7 +141,6 @@ class SetController extends Controller
                 'password' => 'nullable|string',
                 'data' => 'required|array',
             ]);
-
             // add new set to user
             $set = auth()->user()->sets()->create([
                 'name' => $request->name,
@@ -248,7 +217,7 @@ class SetController extends Controller
     {
         try {
             $request->validate([
-                'name' => 'required|string|unique:sets',
+                'name' => 'required|string',
                 'description' => 'string',
                 'status' => 'required|in:active,inactive',
                 'is_public' => 'required|in:1,0',
