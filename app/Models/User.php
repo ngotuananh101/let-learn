@@ -2,14 +2,16 @@
 
 namespace App\Models;
 
-// use Illuminate\Contracts\Auth\MustVerifyEmail;
+ use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Foundation\Auth\User as Authenticatable;
+ use Illuminate\Database\Eloquent\Relations\BelongsTo;
+ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+ use Illuminate\Database\Eloquent\Relations\HasMany;
+ use Illuminate\Foundation\Auth\User as Authenticate;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
-use Illuminate\Contracts\Auth\MustVerifyEmail;
 
-class User extends Authenticatable implements MustVerifyEmail
+class User extends Authenticate implements MustVerifyEmail
 {
     use HasApiTokens, HasFactory, Notifiable;
 
@@ -50,7 +52,7 @@ class User extends Authenticatable implements MustVerifyEmail
     /**
      * 1 user can have 1 role
      */
-    public function role(): \Illuminate\Database\Eloquent\Relations\BelongsTo
+    public function role(): BelongsTo
     {
         return $this->belongsTo(Role::class);
     }
@@ -58,14 +60,9 @@ class User extends Authenticatable implements MustVerifyEmail
     /**
      * 1 user can have many sets
      */
-    public function sets(): \Illuminate\Database\Eloquent\Relations\HasMany
+    public function sets(): HasMany
     {
         return $this->hasMany(Set::class);
-    }
-
-    // get role name of user
-    public function getRoleName(){
-        return $this->role->name;
     }
 
     // get all permissions of user
@@ -79,7 +76,26 @@ class User extends Authenticatable implements MustVerifyEmail
     }
 
     // check user is super admin
-    public function isSuperAdmin(){
+    public function isSuperAdmin(): bool
+    {
         return $this->role->name == 'super';
+    }
+
+    // Folder belong to user
+    public function folders(): HasMany
+    {
+        return $this->hasMany(Folder::class);
+    }
+
+    // Get all classes of a student
+    public function studentClasses(): BelongsToMany
+    {
+        return $this->belongsToMany(Classes::class, 'class_student', 'student_id', 'class_id');
+    }
+
+    // Get all classes of a teacher
+    public function teacherClasses(): BelongsToMany
+    {
+        return $this->belongsToMany(Classes::class, 'class_teacher', 'teacher_id', 'class_id');
     }
 }

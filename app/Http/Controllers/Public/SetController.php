@@ -1,19 +1,18 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Public;
 
-use Illuminate\Http\Request;
+use App\Http\Controllers\Controller;
 use App\Models\Set;
-use App\Models\SetDetail;
-use App\Exports\SetDetailsExport;
-use Illuminate\Support\Facades\Validator;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Storage;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 use Maatwebsite\Excel\Facades\Excel;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
 class SetController extends Controller
 {
-    public function import(Request $request)
+    public function import(Request $request): JsonResponse
     {
         try {
             $request->validate([
@@ -100,7 +99,7 @@ class SetController extends Controller
         }
     }
 
-    public function export(Request $request, $id)
+    public function export(Request $request, $id): BinaryFileResponse|JsonResponse
     {
         try {
             $set = Set::findOrfail($id);
@@ -129,10 +128,10 @@ class SetController extends Controller
     /**
      * Store a newly created resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
+     * @param Request $request
+     * @return JsonResponse
      */
-    public function store(Request $request)
+    public function store(Request $request): JsonResponse
     {
         try {
             $request->validate([
@@ -173,9 +172,9 @@ class SetController extends Controller
      * Display the specified resource.
      *
      * @param  int  $id
-     * @return \Illuminate\Http\Response
+     * @return JsonResponse
      */
-    public function show($id)
+    public function show($id): JsonResponse
     {
         try {
             $set = Set::findOrFail($id);
@@ -209,11 +208,11 @@ class SetController extends Controller
     /**
      * Update the specified resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
+     * @param Request $request
      * @param  int  $id
-     * @return \Illuminate\Http\Response
+     * @return JsonResponse
      */
-    public function update(Request $request, $id)
+    public function update(Request $request, $id): JsonResponse
     {
         try {
             $request->validate([
@@ -263,9 +262,9 @@ class SetController extends Controller
      * Remove the specified resource from storage.
      *
      * @param  int  $id
-     * @return \Illuminate\Http\Response
+     * @return JsonResponse
      */
-    public function destroy($id)
+    public function destroy($id): JsonResponse
     {
         try {
             $set = Set::findOrFail($id);

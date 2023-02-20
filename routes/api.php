@@ -1,11 +1,10 @@
 <?php
 
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\Admin\AnalyticsController;
 use App\Http\Controllers\Auth\Authentication as Authentication;
 use App\Http\Controllers\Auth\VerificationController;
-use App\Http\Controllers\Admin\AnalyticsController;
-use App\Http\Controllers\SetController;
+use App\Http\Controllers\Public\SetController;
+use Illuminate\Support\Facades\Route;
 
 /*
 |--------------------------------------------------------------------------
@@ -53,7 +52,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/{id}', [SetController::class, 'show']);
         Route::put('/{id}', [SetController::class, 'update']);
         Route::delete('/{id}', [SetController::class, 'destroy']);
-        Route::post('/import', [SetController::class, 'importSets']);
-        Route::get('/export', [SetController::class, 'exportSets']);
+        Route::post('/import', [SetController::class, 'import']);
+        Route::get('/export/{id}', [SetController::class, 'export']);
     });
 });
