@@ -13,15 +13,10 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('set_details', function (Blueprint $table) {
+        Schema::create('folder_set', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('folder_id')->constrained()->onDelete('cascade');
             $table->foreignId('set_id')->constrained()->onDelete('cascade');
-            $table->text('term');
-            $table->text('definition');
-            $table->text('image')->nullable();
-            $table->text('audio')->nullable();
-            $table->text('video')->nullable();
-            $table->enum('status', ['active', 'inactive'])->default('active');
             $table->timestamps();
         });
     }
@@ -33,6 +28,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('set_details');
+        Schema::dropIfExists('folder_set');
     }
 };

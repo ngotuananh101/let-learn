@@ -4,6 +4,9 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Set extends Model
 {
@@ -45,7 +48,7 @@ class Set extends Model
     /**
      * Get the user that owns the set.
      */
-    public function user()
+    public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
     }
@@ -53,8 +56,24 @@ class Set extends Model
     /**
      * Get set details
      */
-    public function setDetails()
+    public function setDetails(): HasMany
     {
         return $this->hasMany(SetDetail::class);
+    }
+
+    /**
+     * Get the folder that owns the set.
+     */
+    public function folder(): BelongsToMany
+    {
+        return $this->belongsToMany(Folder::class, 'folder_set', 'set_id', 'folder_id');
+    }
+
+    /**
+     * Get the class that owns the set.
+     */
+    public function classes(): BelongsToMany
+    {
+        return $this->belongsToMany(Classes::class, 'class_set', 'set_id', 'class_id');
     }
 }
