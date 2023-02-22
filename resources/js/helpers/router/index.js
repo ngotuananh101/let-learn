@@ -10,19 +10,17 @@ const router = createRouter({
     history: createWebHistory(),
     routes,
 });
-
 export default router;
-
 // redirect to log in if not logged in and trying to access a restricted page
 router.beforeEach((to, from, next) => {
-    // public pages that don't require auth
+    // home pages that don't require auth
     const publicPages = [
         "/auth/login",
         "/auth/register",
         "/auth/forgot-password",
         "/auth/reset-password",
     ];
-    // check if current page is a public page
+    // check if current page is a home page
     const authRequired = !publicPages.includes(to.path);
     if (authRequired) {
         const loggedIn = localStorage.getItem("user");

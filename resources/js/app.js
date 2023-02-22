@@ -1,5 +1,5 @@
 import './bootstrap';
-import { createApp } from "vue";
+import {createApp} from "vue";
 import VueTilt from "vue-tilt.js";
 import VueSweetalert2 from "vue-sweetalert2";
 import VueGtag from "vue-gtag";
@@ -8,6 +8,7 @@ import store from "./helpers/store/index.js";
 import router from "./helpers/router/index.js";
 import "../css/app.css";
 import ArgonDashboard from "./argon-dashboard";
+import {pageTitle} from 'vue-page-title';
 
 const appInstance = createApp(App);
 appInstance.use(store);
@@ -16,6 +17,11 @@ appInstance.use(VueTilt);
 appInstance.use(VueSweetalert2);
 appInstance.use(ArgonDashboard);
 appInstance.use(VueGtag, {
-    config: { id: "G-8T9RFMHSRP" },
+    config: {id: "G-8T9RFMHSRP"},
 });
+appInstance.use(
+    pageTitle({
+        mixin: true,
+    })
+);
 appInstance.mount("#app");

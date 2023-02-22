@@ -2,7 +2,7 @@ const home = [
     {
         path: '/',
         name: 'home',
-        component: () => import('../../layouts/Admin.vue'),
+        component: () => import('../../layouts/Home.vue'),
     },
 ];
 export default home;

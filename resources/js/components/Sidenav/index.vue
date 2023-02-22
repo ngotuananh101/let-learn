@@ -32,9 +32,9 @@ export default {
     },
     data() {
         return {
-            logo: 'https://avatars.githubusercontent.com/u/6128107?s=200&v=4',
-            logoWhite: 'https://demos.creative-tim.com/argon-dashboard-pro/assets/img/brand/argon-react-white.png',
-            image: 'https://demos.creative-tim.com/argon-dashboard-pro/assets/img/theme/img-1-1000x600.jpg',
+            logo: '',
+            logoWhite: '',
+            image: '',
         };
     },
     computed: {

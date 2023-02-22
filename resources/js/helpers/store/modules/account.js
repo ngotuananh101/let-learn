@@ -1,6 +1,5 @@
-import {userService} from '../../services/user.service';
+import {userService} from '../../services';
 import router from "../../router";
-import overlay from "@/helpers/overlay.js";
 
 const user = JSON.parse(localStorage.getItem('user'));
 const token = localStorage.getItem('token');

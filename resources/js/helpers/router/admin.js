@@ -1,3 +1,4 @@
+let meta = JSON.parse(localStorage.getItem('meta_data'));
 const admin = [
     {
         path: '/admin',
@@ -13,7 +14,7 @@ const admin = [
             {
                 path: 'setting',
                 name: 'admin.setting',
-                component: () => import('../../pages/admin/Setting.vue'),
+                component: () => import('../../pages/admin/setting/Setting.vue'),
             }
         ],
     },

@@ -1,3 +1,4 @@
+let meta = JSON.parse(localStorage.getItem('meta_data'));
 const auth = [
     {
         path: '/auth',

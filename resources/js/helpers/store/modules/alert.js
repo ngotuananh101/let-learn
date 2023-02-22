@@ -1,8 +1,8 @@
 import Swal from "sweetalert2";
 
-const state = {
+let state = {
     icon: null,
-    message: null
+    message: null,
 };
 
 const actions = {
@@ -14,7 +14,7 @@ const actions = {
     },
     clear({ commit }, message) {
         commit('success', message);
-    }
+    },
 };
 
 const mutations = {
@@ -31,7 +31,7 @@ const mutations = {
     clear(state) {
         state.icon = null;
         state.message = null;
-    }
+    },
 };
 
 function alert(icon, message) {
