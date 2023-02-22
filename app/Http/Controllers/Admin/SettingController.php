@@ -102,7 +102,7 @@ class SettingController extends Controller
                 $meta = cache()->get('meta_data');
             } else {
                 // get title, description, keywords
-                $meta_data = Setting::whereIn('key', ['name', 'description', 'keywords', 'header'])->get();
+                $meta_data = Setting::whereIn('key', ['name', 'description', 'keywords', 'header', 'onesignal_app_id'])->get();
                 // convert to key value pair
                 $meta_data = $meta_data->mapWithKeys(function ($item) {
                     return [$item['key'] => $item['value']];

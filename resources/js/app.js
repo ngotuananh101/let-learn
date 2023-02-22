@@ -1,5 +1,6 @@
 import './bootstrap';
 import {createApp} from "vue";
+import OneSignalVuePlugin from '@onesignal/onesignal-vue3'
 import VueTilt from "vue-tilt.js";
 import VueSweetalert2 from "vue-sweetalert2";
 import VueGtag from "vue-gtag";
@@ -11,6 +12,7 @@ import ArgonDashboard from "./argon-dashboard";
 import {pageTitle} from 'vue-page-title';
 
 const appInstance = createApp(App);
+appInstance.use(OneSignalVuePlugin)
 appInstance.use(store);
 appInstance.use(router);
 appInstance.use(VueTilt);

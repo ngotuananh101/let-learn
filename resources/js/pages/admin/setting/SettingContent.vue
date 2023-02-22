@@ -73,7 +73,7 @@
                         <div class="col-9">
                             <label class="form-label mt-2">Logo</label>
                             <div class="d-flex flex-column justify-content-center align-items-center">
-                                <img class="rounded img-fluid" :src="this.setting.logo"
+                                <img class="rounded img-fluid w-25" :src="this.setting.logo"
                                      alt="logo" id="logo-preview">
                                 <input
                                     type="file"

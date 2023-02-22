@@ -31,8 +31,16 @@ export default {
             snackbar: "",
         };
     },
-    created() {
+    beforeMount() {
         this.index();
+        if(this.meta) {
+            // Init onesignal
+            this.$OneSignal.init({
+                appId: this.meta.onesignal_app_id,
+            });
+        }
+    },
+    mounted() {
         if (this.meta) {
             // set meta title
             document.querySelector('meta[name="title"]').setAttribute('content', this.meta.name);
@@ -43,6 +51,8 @@ export default {
             // add html code to head
             document.querySelector('head').insertAdjacentHTML('beforeend', this.meta.header);
         }
+    },
+    created() {
     },
     title() {
         return this.meta.name;
