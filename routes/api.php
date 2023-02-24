@@ -4,7 +4,9 @@ use App\Http\Controllers\Admin\AnalyticsController;
 use App\Http\Controllers\Auth\Authentication as Authentication;
 use App\Http\Controllers\Auth\VerificationController;
 use App\Http\Controllers\Public\SetController;
+use App\Http\Controllers\Public\FolderController;
 use Illuminate\Support\Facades\Route;
+
 
 /*
 |--------------------------------------------------------------------------
@@ -54,5 +56,21 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::delete('/{id}', [SetController::class, 'destroy']);
         Route::post('/import', [SetController::class, 'import']);
         Route::get('/export/{id}', [SetController::class, 'export']);
+        Route::get('user/{id}', [SetController::class, 'showAllSetByUserId']);
+        Route::get('folder/{id}', [SetController::class, 'showAllSetByFolderId']);
+    });
+    // Route folder
+    Route::prefix('folder')->group(function () {
+        Route::post('/', [FolderController::class, 'store']);
+        Route::get('/{id}', [FolderController::class, 'show']);
+        Route::put('/{id}', [FolderController::class, 'update']);
+        Route::delete('/{id}', [FolderController::class, 'destroy']);
+        Route::get('/{id}/set', [SetController::class, 'showAllSetByFolderId']);
+        Route::post('/add/{folder_id}/{set_id}', [FolderController::class, 'addSetToFolder']);
+    });
+    // Route user
+    Route::prefix('user')->group(function () {
+        Route::get('folder', [FolderController::class, 'showAllFolderByUserId']);
+        Route::get('set', [SetController::class, 'showAllSetByUserId']);
     });
 });
