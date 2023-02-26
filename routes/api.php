@@ -56,6 +56,10 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/export/{id}', [SetController::class, 'export']);
     });
     Route::prefix('class')->group(function () {
+        Route::post('/addSet/{id}', [ClassController::class, 'addSet']);
+        Route::post('/addTeacher/{id}', [ClassController::class, 'addTeacher']);
+        Route::post('/addStudent/{id}', [ClassController::class, 'addStudent']);
+        Route::post('/addFolder/{id}', [ClassController::class, 'addFolder']);
         Route::post('/', [ClassController::class, 'store']);
         Route::put('/{id}', [ClassController::class, 'update']);
         Route::delete('/{id}', [ClassController::class, 'destroy']);
