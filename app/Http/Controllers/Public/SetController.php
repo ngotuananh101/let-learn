@@ -329,4 +329,34 @@ class SetController extends Controller
             ], 500);
         }
     }
+
+    // show progress by set id
+    public function showProgressBySetId($id): JsonResponse
+    {
+        try {
+            $set = Set::findOrFail($id);
+            $setdetail = $set->setDetails()->get();
+            $progress = 0;
+            foreach ($setdetail as $detail) {
+                if ($detail->progress == 'done') {
+                    $progress++;
+                }
+            }
+            return response()->json([
+                'status' => 'success',
+                'status_code' => 200,
+                'message' => 'Get progress successfully!',
+                'data' => [
+                    'progress' => $progress,
+                    'total' => count($setdetail)
+                ]
+            ], 200);
+        } catch (\Throwable $th) {
+            return response()->json([
+                'status' => 'error',
+                'status_code' => 500,
+                'message' => $th->getMessage()
+            ], 500);
+        }
+    }
 }

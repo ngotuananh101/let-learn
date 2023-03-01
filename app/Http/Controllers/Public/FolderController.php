@@ -273,4 +273,68 @@ class FolderController extends Controller
             ], 500);
         }
     }
+
+    // remove set from folder by set id and folder id
+    public function removeSetFromFolder(Request $request, $id, $set_id): JsonResponse
+    {
+        try {
+            $folder = Folder::findOrFail($id);
+            // check folder is deleted
+            if ($folder->status == 'inactive') {
+                return response()->json([
+                    'status' => 'error',
+                    'status_code' => 404,
+                    'message' => 'Folder not found'
+                ], 404);
+            }
+            // check folder is public
+            if ($folder->is_public == false && auth()->user()->id != $folder->user_id) {
+                return response()->json([
+                    'status' => 'error',
+                    'status_code' => 403,
+                    'message' => 'You don\'t have permission to access this folder'
+                ], 403);
+            }
+            // check set is deleted
+            $set = Set::findOrFail($set_id);
+            if ($set->status == 'inactive') {
+                return response()->json([
+                    'status' => 'error',
+                    'status_code' => 404,
+                    'message' => 'Set not found'
+                ], 404);
+            }
+            // check set is public
+            if ($set->is_public == false && auth()->user()->id != $set->user_id) {
+                return response()->json([
+                    'status' => 'error',
+                    'status_code' => 403,
+                    'message' => 'You don\'t have permission to access this set'
+                ], 403);
+            }
+            // check set is exist in folder
+            $checkSet = $folder->sets()->where('set_id', $set_id)->first();
+            if (!$checkSet) {
+                return response()->json([
+                    'status' => 'error',
+                    'status_code' => 400,
+                    'message' => 'Set is not exist in folder'
+                ], 400);
+            }
+            // remove set from folder
+            $folder->sets()->detach($set_id);
+            return response()->json([
+                'status' => 'success',
+                'status_code' => 200,
+                'message' => 'Remove set from folder successfully!',
+            ], 200);
+        } catch (\Throwable $th) {
+            return response()->json([
+                'status' => 'error',
+                'status_code' => 500,
+                'message' => $th->getMessage(),
+            ],
+                500);
+        }
+    }
 }
