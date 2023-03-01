@@ -1,10 +1,10 @@
 <template>
-
+    <router-view></router-view>
 </template>
 
 <script>
 export default {
-    name: "Admin Setting"
+    name: "Home"
 }
 </script>
 

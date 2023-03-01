@@ -64,8 +64,11 @@ export default {
             submitted: false,
         }
     },
+    title() {
+        return 'Login' + ' | ' +this.meta.meta.name;
+    },
     computed: {
-        ...mapState(['account', 'app'])
+        ...mapState(['account', 'app', 'meta'])
     },
     components: {
         ArgonInput,

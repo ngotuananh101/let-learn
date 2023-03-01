@@ -1,7 +1,9 @@
 <template>
-    <div>
-        <h1>Logout</h1>
-        <p>Logging out...</p>
+    <div class="card-header text-center pt-4 pb-1">
+        <h4 class="font-weight-bolder mb-1">Loging Out</h4>
+        <p class="mb-0">
+            You are being logged out. Please wait...
+        </p>
     </div>
 </template>
 <script lang="js">
@@ -10,7 +12,7 @@ export default {
     name: "Auth Logout",
     created() {
         this.logout().then(() => {
-            this.$router.push({ name: 'login' });
+            location.href = '/auth/login';
         });
     },
     methods: {

@@ -38,6 +38,14 @@
                             <span v-if="this.getUser" class="d-sm-inline d-none">{{ this.getUser.email }}</span>
                         </span>
                     </li>
+                    <li class="nav-item d-flex ps-3 align-items-center">
+                        <span class="px-0 nav-link font-weight-bold" :class="
+                            app.isNavFixed && !app.darkMode ? ' opacity-8 text-dark' : 'text-white'
+                        " target="_blank">
+                            <i class="fa-solid fa-power-off me-sm-1"></i>
+                            <router-link :to="{ name: 'auth.logout' }" class="d-sm-inline d-none">Logout</router-link>
+                        </span>
+                    </li>
                     <li class="nav-item d-xl-none ps-3 d-flex align-items-center">
                         <a id="iconNavbarSidenav" href="#" class="p-0 nav-link text-white"
                             @click.prevent="navbarMinimize">

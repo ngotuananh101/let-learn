@@ -180,6 +180,9 @@ export default {
     data() {
         return {};
     },
+    title() {
+        return 'Admin Dashboard' + ' - ' + document.querySelector('meta[name="title"]').getAttribute('content');
+    },
     created() {
         this.getQuotes();
         this.getAnalytics();

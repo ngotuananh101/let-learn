@@ -110,13 +110,12 @@ export default {
             this.setSidebarType(type);
         },
         darkMode() {
-            if (this.$store.state.darkMode) {
-                this.$store.state.darkMode = false;
+            if (this.app.darkMode) {
+                this.app.darkMode = false;
                 this.sidebar("bg-white");
                 deactivateDarkMode();
-                return;
             } else {
-                this.$store.state.darkMode = true;
+                this.app.darkMode = true;
                 this.sidebar("bg-default");
                 activateDarkMode();
             }

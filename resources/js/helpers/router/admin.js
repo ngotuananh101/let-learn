@@ -13,7 +13,46 @@ const admin = [
             {
                 path: 'setting',
                 name: 'admin.setting',
-                component: () => import('../../pages/admin/Setting.vue'),
+                component: () => import('../../pages/admin/setting/Setting.vue'),
+            },
+            {
+                path: 'set',
+                name: 'admin.set',
+                redirect: {name: 'admin.set.list'},
+                children: [
+                    {
+                        path: 'list',
+                        name: 'admin.set.list',
+                        component: () => import('../../pages/admin/set/List.vue'),
+                    },
+                    {
+                        path: 'add',
+                        name: 'admin.set.add',
+                        component: () => import('../../pages/admin/set/Add.vue'),
+                    },
+                    {
+                        path: 'edit/:id',
+                        name: 'admin.set.edit',
+                        component: () => import('../../pages/admin/set/Edit.vue'),
+                    }
+                ]
+            },
+            {
+                path: 'folder',
+                name: 'admin.folder',
+                redirect: {name: 'admin.folder.list'},
+                children: [
+                    {
+                        path: 'list',
+                        name: 'admin.folder.list',
+                        component: () => import('../../pages/admin/folder/List.vue'),
+                    },
+                    {
+                        path: 'edit/:id',
+                        name: 'admin.folder.edit',
+                        component: () => import('../../pages/admin/folder/Edit.vue'),
+                    }
+                ]
             }
         ],
     },
