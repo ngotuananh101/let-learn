@@ -31,18 +31,19 @@ class CheckUserInClass
                         if($request->user()->isStudentInClass($request->route('id'))){
                             return $next($request);
                         } else {
-                            return response()->json(['message' => 'You are not in this class'], 403);
+                            return response()->json(['message' => 'You are not student in this class'], 403);
                         }
                         break;
                     case 'teacher':
                         if($request->user()->isTeacherInClass($request->route('id'))){
                             return $next($request);
                         } else {
-                            return response()->json(['message' => 'You are not in this class'], 403);
+                            return response()->json(['message' => 'You are not teacher in this class'], 403);
                         }
                         break;
                     default:
                         return response()->json(['message' => 'You are not logged in'], 403);
+                        break;
                 }
             } else {
                 return response()->json(['message' => 'You are not logged in'], 403);
