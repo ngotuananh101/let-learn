@@ -84,19 +84,22 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('set', [SetController::class, 'showAllSetByUserId']);
     });
     Route::prefix('class')->group(function () {
-        Route::middleware(['checkUserInClass:all'])->group(function () {
-            Route::post('/addSet/{id}', [ClassController::class, 'addSet']);
-            Route::post('/addTeacher/{id}', [ClassController::class, 'addTeacher'])->middleware(['checkUserInClass:teacher']);
-            Route::post('/addStudent/{id}', [ClassController::class, 'addStudent'])->middleware(['checkUserInClass:teacher']);
+        Route::middleware(['checkUserInClass:all'])->group(function () {           
             Route::post('/addFolder/{id}', [ClassController::class, 'addFolder']);
-            Route::delete('/{class_id}/teacher/{teacher_id}', [ClassController::class, 'deleteTeacher'])->middleware(['checkUserInClass:teacher']);
-            Route::delete('/{class_id}/student/{student_id}', [ClassController::class, 'deleteStudent'])->middleware(['checkUserInClass:teacher']);
-            Route::delete('/{class_id}/set/{set_id}', [ClassController::class, 'deleteSet'])->middleware(['checkUserInClass:teacher']);
-            Route::delete('/{class_id}/folder/{folder_id}', [ClassController::class, 'deleteFolder'])->middleware(['checkUserInClass:teacher']);
-            Route::put('/{id}', [ClassController::class, 'update'])->middleware(['checkUserInClass:teacher']);
-            Route::delete('/{id}', [ClassController::class, 'destroy'])->middleware(['checkUserInClass:teacher']);
             Route::get('/{id}', [ClassController::class, 'show']);
         });
+        Route::middleware(['checkUserInClass:teacher'])->group(function () {
+            Route::post('/addSet/{id}', [ClassController::class, 'addSet']);
+            Route::post('/addTeacher/{id}', [ClassController::class, 'addTeacher']);
+            Route::post('/addStudent/{id}', [ClassController::class, 'addStudent']);
+                                  
+            Route::put('/{id}', [ClassController::class, 'update']);
+            Route::delete('/{id}', [ClassController::class, 'destroy']);
+        });
+        Route::delete('/{class_id}/teacher/{teacher_id}', [ClassController::class, 'deleteTeacher']);
+        Route::delete('/{class_id}/student/{student_id}', [ClassController::class, 'deleteStudent']);
+        Route::delete('/{class_id}/set/{set_id}', [ClassController::class, 'deleteSet']);
+        Route::delete('/{class_id}/folder/{folder_id}', [ClassController::class, 'deleteFolder']);
         Route::post('/', [ClassController::class, 'store']);
         Route::get('/', [ClassController::class, 'index']);
     });
