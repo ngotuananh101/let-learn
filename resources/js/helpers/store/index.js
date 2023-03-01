@@ -6,6 +6,7 @@ import alert from "./modules/alert.js";
 import dashboard from "./modules/dashboard.js";
 import adminSetting from "./modules/admin/setting.js";
 import adminSet from "./modules/admin/set.js";
+import adminFolder from "./modules/admin/folder.js";
 
 export default createStore({
     namespaced: true,
@@ -17,5 +18,6 @@ export default createStore({
         dashboard,
         adminSetting,
         adminSet,
+        adminFolder,
     },
 });

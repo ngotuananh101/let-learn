@@ -19,7 +19,6 @@ const admin = [
                 path: 'set',
                 name: 'admin.set',
                 redirect: {name: 'admin.set.list'},
-                component: () => import('../../pages/admin/set/Set.vue'),
                 children: [
                     {
                         path: 'list',
@@ -35,6 +34,23 @@ const admin = [
                         path: 'edit/:id',
                         name: 'admin.set.edit',
                         component: () => import('../../pages/admin/set/Edit.vue'),
+                    }
+                ]
+            },
+            {
+                path: 'folder',
+                name: 'admin.folder',
+                redirect: {name: 'admin.folder.list'},
+                children: [
+                    {
+                        path: 'list',
+                        name: 'admin.folder.list',
+                        component: () => import('../../pages/admin/folder/List.vue'),
+                    },
+                    {
+                        path: 'edit/:id',
+                        name: 'admin.folder.edit',
+                        component: () => import('../../pages/admin/folder/Edit.vue'),
                     }
                 ]
             }

@@ -6,6 +6,7 @@ use App\Http\Controllers\Auth\Authentication as Authentication;
 use App\Http\Controllers\Auth\VerificationController;
 use App\Http\Controllers\Public\SetController;
 use App\Http\Controllers\Admin\SetController as AdminSetController;
+use App\Http\Controllers\Admin\FolderController as AdminFolderController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -54,6 +55,7 @@ Route::middleware('auth:sanctum')->group(function () {
             Route::post('/{key}', [SettingController::class, 'update']);
         })->middleware(['permissions:admin.settings']);
         Route::resource('set', AdminSetController::class)->middleware(['permissions:admin.sets']);
+        Route::resource('folder', AdminFolderController::class)->middleware(['permissions:admin.folders']);
     })->middleware(['permissions:admin.access']);
     Route::prefix('set')->group(function () {
         Route::post('/', [SetController::class, 'store']);
