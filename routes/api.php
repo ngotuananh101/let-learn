@@ -60,6 +60,10 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('/addTeacher/{id}', [ClassController::class, 'addTeacher']);
         Route::post('/addStudent/{id}', [ClassController::class, 'addStudent']);
         Route::post('/addFolder/{id}', [ClassController::class, 'addFolder']);
+        Route::delete('/{class_id}/teacher/{teacher_id}', [ClassController::class, 'deleteTeacher']);
+        Route::delete('/{class_id}/student/{student_id}', [ClassController::class, 'deleteStudent']);
+        Route::delete('/{class_id}/set/{set_id}', [ClassController::class, 'deleteSet']);
+        Route::delete('/{class_id}/folder/{folder_id}', [ClassController::class, 'deleteFolder']);
         Route::post('/', [ClassController::class, 'store']);
         Route::put('/{id}', [ClassController::class, 'update']);
         Route::delete('/{id}', [ClassController::class, 'destroy']);
