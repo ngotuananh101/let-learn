@@ -1,10 +1,10 @@
 <template>
-<router-view></router-view>
+$END$
 </template>
 
 <script>
 export default {
-    name: "Set"
+name: "edit"
 }
 </script>
 
