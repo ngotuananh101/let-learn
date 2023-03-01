@@ -19,8 +19,32 @@
             </li>
             <li class="mt-3 nav-item">
                 <h6 class="text-xs ps-4 text-uppercase font-weight-bolder opacity-6 ms-2">
-                    PAGES
+                    Content
                 </h6>
+            </li>
+            <li class="nav-item">
+                <sidenav-collapse @click="$router.push({ name: 'admin.set.list' })" collapse-ref="" nav-text="Set"
+                                  :class="getRoute() === 'set' ? 'active' : ''">
+                    <template #icon>
+                        <i class="fa-regular fa-book text-primary text-sm opacity-10"></i>
+                    </template>
+                </sidenav-collapse>
+            </li>
+            <li class="nav-item">
+                <sidenav-collapse @click="$router.push({ name: 'admin.setting' })" collapse-ref="" nav-text="Folder"
+                                  :class="getRoute() === 'folder' ? 'active' : ''">
+                    <template #icon>
+                        <i class="fa-regular fa-folder text-primary text-sm opacity-10"></i>
+                    </template>
+                </sidenav-collapse>
+            </li>
+            <li class="nav-item">
+                <sidenav-collapse @click="$router.push({ name: 'admin.setting' })" collapse-ref="" nav-text="Class"
+                                  :class="getRoute() === 'class' ? 'active' : ''">
+                    <template #icon>
+                        <i class="fa-regular fa-screen-users text-primary text-sm opacity-10"></i>
+                    </template>
+                </sidenav-collapse>
             </li>
         </ul>
     </div>

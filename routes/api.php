@@ -5,6 +5,7 @@ use App\Http\Controllers\Admin\SettingController;
 use App\Http\Controllers\Auth\Authentication as Authentication;
 use App\Http\Controllers\Auth\VerificationController;
 use App\Http\Controllers\Public\SetController;
+use App\Http\Controllers\Admin\SetController as AdminSetController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -52,6 +53,7 @@ Route::middleware('auth:sanctum')->group(function () {
             Route::get('/', [SettingController::class, 'index']);
             Route::post('/{key}', [SettingController::class, 'update']);
         })->middleware(['permissions:admin.settings']);
+        Route::resource('set', AdminSetController::class)->middleware(['permissions:admin.sets']);
     })->middleware(['permissions:admin.access']);
     Route::prefix('set')->group(function () {
         Route::post('/', [SetController::class, 'store']);

@@ -4,7 +4,15 @@ import auth from "./auth";
 import home from "./home";
 import store from "../store";
 
-const routes = [...home, ...admin, ...auth];
+const error = [
+    {
+        path: "/:pathMatch(.*)*",
+        name: "error",
+        component: () => import("../../pages/error/404.vue"),
+    }
+];
+
+const routes = [...home, ...admin, ...auth, ...error];
 
 const router = createRouter({
     history: createWebHistory(),

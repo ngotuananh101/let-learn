@@ -33,12 +33,6 @@ export default {
     },
     beforeMount() {
         this.index();
-        if(this.meta) {
-            // Init onesignal
-            this.$OneSignal.init({
-                appId: this.meta.onesignal_app_id,
-            });
-        }
     },
     mounted() {
         if (this.meta) {
@@ -52,7 +46,7 @@ export default {
             document.querySelector('head').insertAdjacentHTML('beforeend', this.meta.header);
         }
     },
-    created() {
+    created(){
     },
     title() {
         return this.meta.name;

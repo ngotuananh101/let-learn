@@ -22,7 +22,7 @@ class SetController extends Controller
                 'text' => 'required_if:type,text|nullable',
                 'term_separator' => 'required_if:type,text',
                 'set_separator' => 'required_if:type,text',
-                'file' => 'required_if:type,file|mimes:xls,xlsx,csv|nullable',
+                'file' => 'required_if:type,file|mimes:xls,xlsx,csv',
             ]);
             $type = $request->input('type');
             // Tao set moi
@@ -69,7 +69,7 @@ class SetController extends Controller
                         }
                     }
                 } else {
-                    $rows = Excel::toArray([], $file);
+                    $rows = Excel::toArray((object)[], $file);
                     if (count($rows[0][0]) > 1 && $rows[0][0][0] == 'Term' && $rows[0][0][1] == 'Definition') {
                         $rows[0] = array_slice($rows[0], 1);
                     }
@@ -231,11 +231,7 @@ class SetController extends Controller
             $set->password = $request->password;
             $set->save();
 
-            $setdetail = $set->setDetails()->get();
-            foreach ($setdetail as $detail) {
-                // remove all set details
-                $detail->delete();
-            }
+            $set->setDetails()->delete();
 
             foreach ($request->data as $detail) {
                 $set->setDetails()->create([

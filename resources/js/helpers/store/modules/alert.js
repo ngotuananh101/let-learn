@@ -12,6 +12,9 @@ const actions = {
     error({ commit }, message) {
         commit('error', message);
     },
+    info({ commit }, message) {
+        commit('info', message);
+    },
     clear({ commit }, message) {
         commit('success', message);
     },
@@ -28,6 +31,11 @@ const mutations = {
         state.message = message;
         alert(state.icon, state.message);
     },
+    info(state, message) {
+        state.icon = 'info';
+        state.message = message;
+        alert(state.icon, state.message);
+    },
     clear(state) {
         state.icon = null;
         state.message = null;
@@ -39,7 +47,7 @@ function alert(icon, message) {
         icon: icon,
         title: message,
         showConfirmButton: false,
-        timer: 1000
+        timer: 1200
     }).then(r => {
         // console.log(r);
     });

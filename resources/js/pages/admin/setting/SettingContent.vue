@@ -90,6 +90,20 @@
             </div>
         </div>
     </div>
+    <div id="notification" class="card mt-4">
+        <div class="card-header">
+            <h5>Notification</h5>
+        </div>
+        <div class="card-body pt-0">
+            <div class="row">
+                <div class="col-12">
+                    <label class="form-label mt-2">Onesignal appId</label>
+                    <argon-input id="onesignal_app_id" type="text" name="onesignal_app_id" placeholder="Onesignal App Id" :value="this.setting.onesignal_app_id"
+                                 @keyup.enter="this.update"/>
+                </div>
+            </div>
+        </div>
+    </div>
 </template>
 
 <script>
