@@ -59,6 +59,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::resource('set', AdminSetController::class)->middleware(['permissions:admin.sets']);
         Route::resource('folder', AdminFolderController::class)->middleware(['permissions:admin.folders']);
     })->middleware(['permissions:admin.access']);
+    // Route set
     Route::prefix('set')->group(function () {
         Route::post('/', [SetController::class, 'store']);
         Route::get('/{id}', [SetController::class, 'show']);
@@ -68,6 +69,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/export/{id}', [SetController::class, 'export']);
         Route::get('user/{id}', [SetController::class, 'showAllSetByUserId']);
         Route::get('folder/{id}', [SetController::class, 'showAllSetByFolderId']);
+        Route::get('progress/{id}', [SetController::class, 'showProgressBySetId']);
     });
     // Route folder
     Route::prefix('folder')->group(function () {
@@ -77,6 +79,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::delete('/{id}', [FolderController::class, 'destroy']);
         Route::get('/{id}/set', [SetController::class, 'showAllSetByFolderId']);
         Route::post('/add/{folder_id}/{set_id}', [FolderController::class, 'addSetToFolder']);
+        Route::delete('/remove/{folder_id}/{set_id}', [FolderController::class, 'removeSetFromFolder']);
     });
     // Route user
     Route::prefix('user')->group(function () {
