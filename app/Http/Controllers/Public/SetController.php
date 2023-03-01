@@ -4,6 +4,8 @@ namespace App\Http\Controllers\Public;
 
 use App\Http\Controllers\Controller;
 use App\Models\Set;
+use App\Models\User;
+use App\Models\Folder;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
@@ -264,7 +266,7 @@ class SetController extends Controller
     {
         try {
             $set = Set::findOrFail($id);
-            // Soft delete
+            // Soft delete set
             $set->update([
                 'status' => 'inactive'
             ]);
@@ -272,6 +274,48 @@ class SetController extends Controller
                 'status' => 'success',
                 'status_code' => 200,
                 'message' => 'Delete set successfully!',
+            ], 200);
+        } catch (\Throwable $th) {
+            return response()->json([
+                'status' => 'error',
+                'status_code' => 500,
+                'message' => $th->getMessage()
+            ], 500);
+        }
+    }
+
+    //show all set by user id
+    public function showAllSetByUserId(): JsonResponse
+    {
+        try {
+            $user = auth()->user();
+            $set = $user->sets()->where('status', 'active')->get();
+            return response()->json([
+                'status' => 'success',
+                'status_code' => 200,
+                'message' => 'Get set successfully!',
+                'data' => $set
+            ], 200);
+        } catch (\Throwable $th) {
+            return response()->json([
+                'status' => 'error',
+                'status_code' => 500,
+                'message' => $th->getMessage()
+            ], 500);
+        }
+    }
+
+    // show all set by folder id
+    public function showAllSetByFolderId($id): JsonResponse
+    {
+        try {
+            $folder = Folder::findOrFail($id);
+            $set = $folder->sets()->where('status', 'active')->get();
+            return response()->json([
+                'status' => 'success',
+                'status_code' => 200,
+                'message' => 'Get set successfully!',
+                'data' => $set
             ], 200);
         } catch (\Throwable $th) {
             return response()->json([

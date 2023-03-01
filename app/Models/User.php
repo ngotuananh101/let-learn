@@ -98,4 +98,26 @@ class User extends Authenticate implements MustVerifyEmail
     {
         return $this->belongsToMany(Classes::class, 'class_teacher', 'teacher_id', 'class_id');
     }
+
+    //check user is in class
+    public function isInClass($class_id): bool
+    {
+        $class= $this->studentClasses()->where('class_id', $class_id)->exists();
+        if($class){
+            return true;
+        }else {
+            return $this->teacherClasses()->where('class_id', $class_id)->exists();
+        }
+    }
+    //check user is student in class
+    public function isStudentInClass($class_id): bool
+    {
+        return $this->studentClasses()->where('class_id', $class_id)->exists();
+    }
+
+    //check user is teacher in class
+    public function isTeacherInClass($class_id): bool
+    {
+        return $this->teacherClasses()->where('class_id', $class_id)->exists();
+    }
 }

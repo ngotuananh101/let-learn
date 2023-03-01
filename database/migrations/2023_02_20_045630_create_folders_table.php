@@ -19,7 +19,7 @@ return new class extends Migration {
             $table->string('description');
             $table->enum('status', ['active', 'inactive'])->default('active');
             $table->boolean('is_public')->default(false);
-            $table->string('password');
+            $table->string('password')->nullable();
             $table->timestamps();
         });
     }
