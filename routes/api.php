@@ -56,18 +56,20 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/export/{id}', [SetController::class, 'export']);
     });
     Route::prefix('class')->group(function () {
-        Route::post('/addSet/{id}', [ClassController::class, 'addSet']);
-        Route::post('/addTeacher/{id}', [ClassController::class, 'addTeacher']);
-        Route::post('/addStudent/{id}', [ClassController::class, 'addStudent']);
-        Route::post('/addFolder/{id}', [ClassController::class, 'addFolder']);
-        Route::delete('/{class_id}/teacher/{teacher_id}', [ClassController::class, 'deleteTeacher']);
-        Route::delete('/{class_id}/student/{student_id}', [ClassController::class, 'deleteStudent']);
-        Route::delete('/{class_id}/set/{set_id}', [ClassController::class, 'deleteSet']);
-        Route::delete('/{class_id}/folder/{folder_id}', [ClassController::class, 'deleteFolder']);
+        Route::middleware(['checkUserInClass:all'])->group(function () {
+            Route::post('/addSet/{id}', [ClassController::class, 'addSet']);
+            Route::post('/addTeacher/{id}', [ClassController::class, 'addTeacher'])->middleware(['checkUserInClass:teacher']);
+            Route::post('/addStudent/{id}', [ClassController::class, 'addStudent'])->middleware(['checkUserInClass:teacher']);
+            Route::post('/addFolder/{id}', [ClassController::class, 'addFolder']);
+            Route::delete('/{class_id}/teacher/{teacher_id}', [ClassController::class, 'deleteTeacher'])->middleware(['checkUserInClass:teacher']);
+            Route::delete('/{class_id}/student/{student_id}', [ClassController::class, 'deleteStudent'])->middleware(['checkUserInClass:teacher']);
+            Route::delete('/{class_id}/set/{set_id}', [ClassController::class, 'deleteSet'])->middleware(['checkUserInClass:teacher']);
+            Route::delete('/{class_id}/folder/{folder_id}', [ClassController::class, 'deleteFolder'])->middleware(['checkUserInClass:teacher']);
+            Route::put('/{id}', [ClassController::class, 'update'])->middleware(['checkUserInClass:teacher']);
+            Route::delete('/{id}', [ClassController::class, 'destroy'])->middleware(['checkUserInClass:teacher']);
+            Route::get('/{id}', [ClassController::class, 'show']);
+        });
         Route::post('/', [ClassController::class, 'store']);
-        Route::put('/{id}', [ClassController::class, 'update']);
-        Route::delete('/{id}', [ClassController::class, 'destroy']);
         Route::get('/', [ClassController::class, 'index']);
-        Route::get('/{id}', [ClassController::class, 'show']);
     });
 });

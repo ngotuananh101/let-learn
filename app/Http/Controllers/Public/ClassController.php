@@ -16,15 +16,6 @@ class ClassController extends Controller
     {
         try {
             $class = Classes::findOrFail($class_id);
-            // Check if user is the owner of the class by get the user id from the token
-            if ($class->owner !== auth()->user()) {
-                return response()->json([
-                    'status' => 'error',
-                    'status_code' => 403,
-                    'message' => 'You are not the owner of this class!',
-                ], 403);
-            }
-
             // Check if user is already assigned as a student
             if ($class->teachers->contains($request->user_id)) {
                 return response()->json([
