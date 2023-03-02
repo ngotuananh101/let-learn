@@ -59,6 +59,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::resource('set', AdminSetController::class)->middleware(['permissions:admin.sets']);
         Route::resource('folder', AdminFolderController::class)->middleware(['permissions:admin.folders']);
     })->middleware(['permissions:admin.access']);
+    // Route set
     Route::prefix('set')->group(function () {
         Route::post('/', [SetController::class, 'store']);
         Route::get('/{id}', [SetController::class, 'show']);
@@ -68,6 +69,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/export/{id}', [SetController::class, 'export']);
         Route::get('user/{id}', [SetController::class, 'showAllSetByUserId']);
         Route::get('folder/{id}', [SetController::class, 'showAllSetByFolderId']);
+        Route::get('progress/{id}', [SetController::class, 'showProgressBySetId']);
     });
     // Route folder
     Route::prefix('folder')->group(function () {
@@ -77,6 +79,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::delete('/{id}', [FolderController::class, 'destroy']);
         Route::get('/{id}/set', [SetController::class, 'showAllSetByFolderId']);
         Route::post('/add/{folder_id}/{set_id}', [FolderController::class, 'addSetToFolder']);
+        Route::delete('/remove/{folder_id}/{set_id}', [FolderController::class, 'removeSetFromFolder']);
     });
     // Route user
     Route::prefix('user')->group(function () {
@@ -84,22 +87,21 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('set', [SetController::class, 'showAllSetByUserId']);
     });
     Route::prefix('class')->group(function () {
-        Route::middleware(['checkUserInClass:all'])->group(function () {           
-            Route::post('/addFolder/{id}', [ClassController::class, 'addFolder']);
+        Route::middleware(['checkUserInClass:all'])->group(function () {
+            Route::post('/addFolder/{id}', [ClassController::class, 'addFolder']);               
             Route::get('/{id}', [ClassController::class, 'show']);
-        });
+        });       
         Route::middleware(['checkUserInClass:teacher'])->group(function () {
-            Route::post('/addSet/{id}', [ClassController::class, 'addSet']);
             Route::post('/addTeacher/{id}', [ClassController::class, 'addTeacher']);
             Route::post('/addStudent/{id}', [ClassController::class, 'addStudent']);
-                                  
+            Route::post('/addSet/{id}', [ClassController::class, 'addSet']);
+            Route::delete('/{id}/teacher/{teacher_id}', [ClassController::class, 'deleteTeacher']);
+            Route::delete('/{id}/student/{student_id}', [ClassController::class, 'deleteStudent']);
+            Route::delete('/{id}/set/{set_id}', [ClassController::class, 'deleteSet']);
+            Route::delete('/{id}/folder/{folder_id}', [ClassController::class, 'deleteFolder']);
             Route::put('/{id}', [ClassController::class, 'update']);
             Route::delete('/{id}', [ClassController::class, 'destroy']);
         });
-        Route::delete('/{class_id}/teacher/{teacher_id}', [ClassController::class, 'deleteTeacher']);
-        Route::delete('/{class_id}/student/{student_id}', [ClassController::class, 'deleteStudent']);
-        Route::delete('/{class_id}/set/{set_id}', [ClassController::class, 'deleteSet']);
-        Route::delete('/{class_id}/folder/{folder_id}', [ClassController::class, 'deleteFolder']);
         Route::post('/', [ClassController::class, 'store']);
         Route::get('/', [ClassController::class, 'index']);
     });
