@@ -4,13 +4,13 @@
             <li class="nav-item pt-2">
                 <a class="nav-link text-body d-flex align-items-center" data-scroll href="#info">
                     <i class="fa-regular fa-folder me-2 text-dark opacity-6"></i>
-                    <span class="text-sm">Folder Information</span>
+                    <span class="text-sm">Course Information</span>
                 </a>
             </li>
             <li class="nav-item pt-2">
                 <a class="nav-link text-body d-flex align-items-center" data-scroll href="#set">
                     <i class="fa-regular fa-book me-2 text-dark opacity-6"></i>
-                    <span class="text-sm">Folder Set</span>
+                    <span class="text-sm">Course lesson</span>
                 </a>
             </li>
         </ul>

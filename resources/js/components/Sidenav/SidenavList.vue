@@ -23,7 +23,7 @@
                 </h6>
             </li>
             <li class="nav-item">
-                <sidenav-collapse @click="$router.push({ name: 'admin.set.list' })" collapse-ref="" nav-text="Set"
+                <sidenav-collapse @click="$router.push({ name: 'admin.set.list' })" collapse-ref="" nav-text="Lessons"
                                   :class="getRoute() === 'set' ? 'active' : ''">
                     <template #icon>
                         <i class="fa-regular fa-book text-primary text-sm opacity-10"></i>
@@ -31,7 +31,7 @@
                 </sidenav-collapse>
             </li>
             <li class="nav-item">
-                <sidenav-collapse @click="$router.push({ name: 'admin.folder.list' })" collapse-ref="" nav-text="Folder"
+                <sidenav-collapse @click="$router.push({ name: 'admin.folder.list' })" collapse-ref="" nav-text="Courses"
                                   :class="getRoute() === 'folder' ? 'active' : ''">
                     <template #icon>
                         <i class="fa-regular fa-folder text-primary text-sm opacity-10"></i>
