@@ -2,12 +2,12 @@
 
 namespace App\Models;
 
- use Illuminate\Contracts\Auth\MustVerifyEmail;
+use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
- use Illuminate\Database\Eloquent\Relations\BelongsTo;
- use Illuminate\Database\Eloquent\Relations\BelongsToMany;
- use Illuminate\Database\Eloquent\Relations\HasMany;
- use Illuminate\Foundation\Auth\User as Authenticate;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Foundation\Auth\User as Authenticate;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
 
@@ -66,12 +66,14 @@ class User extends Authenticate implements MustVerifyEmail
     }
 
     // get all permissions of user
-    public function getAllPermissions(){
+    public function getAllPermissions()
+    {
         return $this->role()->with('permissions')->first()->permissions;
     }
 
     // check if user has permission
-    public function hasPermission($permission){
+    public function hasPermission($permission)
+    {
         return $this->getAllPermissions()->contains('name', $permission);
     }
 

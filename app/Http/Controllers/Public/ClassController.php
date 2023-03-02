@@ -68,7 +68,6 @@ class ClassController extends Controller
     {
         try {
             $class = Classes::findOrFail($class_id);
-            $teacher = User::findOrFail($teacher_id);
             // Check if dont have that teacher in class
             if (!$class->teachers()->find($teacher_id)) {
                 return response()->json([
@@ -105,7 +104,6 @@ class ClassController extends Controller
     {
         try {
             $class = Classes::findOrFail($class_id);
-            $student = User::findOrFail($student_id);
             // Check if dont have that student in class
             if (!$class->students()->find($student_id)) {
                 return response()->json([
@@ -142,7 +140,6 @@ class ClassController extends Controller
     {
         try {
             $class = Classes::findOrFail($class_id);
-            $set = Set::findOrFail($set_id);
             // Check if dont have that set in class
             if (!$class->sets()->find($set_id)) {
                 return response()->json([
@@ -179,7 +176,6 @@ class ClassController extends Controller
     {
         try {
             $class = Classes::findOrFail($class_id);
-            $folder = Folder::findOrFail($folder_id);
             // Check if dont have that folder in class
             if (!$class->folders()->find($folder_id)) {
                 return response()->json([
@@ -215,7 +211,6 @@ class ClassController extends Controller
     {
         try {
             $class = Classes::findOrFail($class_id);
-            $user = User::findOrFail($request->user_id);
             // Check if user is already assigned as a teacher
             if ($class->teachers->contains($request->user_id)) {
                 return response()->json([
@@ -416,8 +411,8 @@ class ClassController extends Controller
             $class->description = $request->description;
             $class->status = $request->status;
             $class->save();
-            // set user who perform created the class as owner in role table
-            $class->users()->attach($request->user()->id, ['role' => 'owner']);
+            //Add user as new teacher to class
+            $class->teachers()->attach($request->user()->id);
             // return json response
             return response()->json([
                 'status' => 'success',
@@ -546,17 +541,12 @@ class ClassController extends Controller
         }
     }
 
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
+    //Unactive Class by id
     public function destroy($id)
     {
         try {
             $class = Classes::findOrFail($id);
-            $class->delete();
+            $class->status = 'inactive';
 
             return response()->json([
                 'status' => 'success',
