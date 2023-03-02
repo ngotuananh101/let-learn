@@ -21,11 +21,6 @@
                                             data-bs-target="#importModal">
                                         Import
                                     </button>
-                                    <button class="mt-1 mb-0 btn btn-outline-success btn-sm export mt-sm-0"
-                                            type="button"
-                                            name="btnExport" @click="this.exportExcel">
-                                        Export
-                                    </button>
                                 </div>
                             </div>
                         </div>
@@ -302,9 +297,6 @@ export default {
         },
         export(){
             this.$store.dispatch('adminSet/exportSet', this.selected_id);
-        },
-        exportExcel() {
-            this.$store.dispatch('adminSet/exportExcel', this.selected_id);
         },
     },
 }

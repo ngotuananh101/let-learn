@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Folder;
+use App\Models\Set;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
@@ -39,7 +40,7 @@ class FolderController extends Controller
                 'status_code' => 200,
                 'data' => $folders
             ]);
-        }catch (\Exception $e) {
+        } catch (\Exception $e) {
             // Return json
             return response()->json([
                 'status' => 'error',
@@ -105,7 +106,7 @@ class FolderController extends Controller
                 'message' => 'Folder created successfully',
                 'data' => $folder
             ]);
-        }catch (\Exception $e) {
+        } catch (\Exception $e) {
             // Return json
             return response()->json([
                 'status' => 'error',
@@ -118,7 +119,7 @@ class FolderController extends Controller
     /**
      * Display the specified resource.
      *
-     * @param  int  $id
+     * @param int $id
      * @return Response
      */
     public function show($id)
@@ -127,26 +128,152 @@ class FolderController extends Controller
     }
 
     /**
-     * Show the form for editing the specified resource.
+     * Get the folder details by id
      *
-     * @param  int  $id
-     * @return Response
+     * @param int $id
+     * @return JsonResponse
      */
     public function edit($id)
     {
-        //
+        try {
+            // Get the folder details
+            $folder = Folder::findOrFail($id);
+            // Get set in folder
+            $set = $folder->sets;
+            $set = $set->map(function ($set) {
+                return [
+                    $set->id,
+                    $set->name,
+                    $set->description,
+                    $set->user->username,
+                    $set->status,
+                ];
+            });
+            // Return json
+            return response()->json([
+                'status' => 'success',
+                'status_code' => 200,
+                'data' => [
+                    'folder' => $folder,
+                    'sets' => $set
+                ]
+            ], 200);
+        } catch (\Exception $e) {
+            // Return json
+            return response()->json([
+                'status' => 'error',
+                'status_code' => 500,
+                'message' => $e->getMessage()
+            ], 500);
+        }
     }
 
     /**
      * Update the specified resource in storage.
      *
      * @param Request $request
-     * @param  int  $id
-     * @return Response
+     * @param int $id
+     * @return JsonResponse
      */
     public function update(Request $request, $id)
     {
-        //
+        try {
+            $request->validate([
+                'type' => 'required|in:update_folder,find_set,add_set,remove_set',
+            ]);
+            switch ($request->type) {
+                case 'update_folder':
+                    $request->validate([
+                        'name' => 'required|string',
+                        'description' => 'required|string',
+                        'is_public' => 'required|in:1,0',
+                        'status' => 'required|in:active,inactive',
+                        'password' => 'nullable',
+                    ]);
+                    // Update the folder
+                    $folder = Folder::findOrFail($id);
+                    $folder->update([
+                        'name' => $request->name,
+                        'description' => $request->description,
+                        'is_public' => $request->is_public,
+                        'status' => $request->status,
+                        'password' => $request->password,
+                    ]);
+                    break;
+
+                case 'find_set':
+                    $request->validate([
+                        'search' => 'required|string',
+                    ]);
+                    // Find set
+                    $set = Set::where('name', 'like', '%' . $request->search . '%')
+                        ->orWhere('description', 'like', '%' . $request->search . '%')
+                        ->orWhere('id', 'like', '%' . $request->search . '%')
+                        ->orWhereHas('user', function ($query) use ($request) {
+                            $query->where('username', 'like', '%' . $request->search . '%');
+                        })
+                        ->get();
+                    $set = $set->map(function ($set) {
+                        return [
+                            'value' => $set->id,
+                            'label' => $set->id . ' - ' . $set->name . ' - ' . $set->user->username,
+                        ];
+                    });
+                    // Return json
+                    return response()->json([
+                        'status' => 'success',
+                        'status_code' => 200,
+                        'data' => $set
+                    ]);
+                    break;
+                case 'add_set':
+                    $request->validate([
+                        'set_id' => 'required|exists:sets,id',
+                    ]);
+                    // Add set to folder
+                    $folder = Folder::findOrFail($id);
+                    $set = Set::findOrFail($request->set_id);
+                    $folder->sets()->attach($set);
+                    $data[] = [
+                        $set->id,
+                        $set->name,
+                        $set->description,
+                        $set->user->username,
+                        $set->status,
+                    ];
+
+                    return response()->json([
+                        'status' => 'success',
+                        'status_code' => 200,
+                        'data' => $data
+                    ]);
+
+                    break;
+                case 'remove_set':
+                    $request->validate([
+                        'set_ids' => 'required|array',
+                    ]);
+                    // Remove set from folder
+                    $folder = Folder::findOrFail($id);
+                    $folder->sets()->detach($request->set_ids);
+                    break;
+            }
+
+            // Return json
+            return response()->json([
+                'status' => 'success',
+                'status_code' => 200,
+                'message' => 'Folder updated successfully',
+            ]);
+
+        } catch (\Exception $e) {
+            // Return json
+            return response()->json([
+                'status' => 'error',
+                'status_code' => 500,
+                'message' => $e->getMessage()
+            ]);
+        }
     }
 
     /**
@@ -167,8 +294,7 @@ class FolderController extends Controller
                 'status_code' => 200,
                 'message' => 'Folder deleted successfully',
             ]);
-        }
-        catch (\Exception $e) {
+        } catch (\Exception $e) {
             // Return json
             return response()->json([
                 'status' => 'error',

@@ -56,6 +56,83 @@ export default {
             adminFolderService.deleteFolder(folder_id).then(() => {
                 overlay();
             });
+        },
+        getFolderById({commit}, folder_id) {
+            overlay();
+            return adminFolderService.getFolderById(folder_id)
+                .then(
+                    folder => {
+                        overlay();
+                        return Promise.resolve(folder);
+                    },
+                    error => {
+                        overlay();
+                        return {
+                            folder: {},
+                            sets: []
+                        }
+                    }
+                );
+        },
+        updateFolder({dispatch}, folder) {
+            overlay();
+            adminFolderService.updateFolder(folder)
+                .then(
+                    folder => {
+                        overlay();
+                        dispatch('alert/success', 'Folder updated', {root: true});
+                    },
+                    error => {
+                        overlay();
+                        dispatch('alert/error', error, {root: true});
+                    }
+                );
+        },
+        findSetByName({commit}, data) {
+            overlay();
+            return adminFolderService.findSetByName(data)
+                .then(
+                    sets => {
+                        overlay();
+                        return Promise.resolve(sets);
+                    },
+                    error => {
+                        overlay();
+                        return [];
+                    }
+                );
+        },
+        addSetToFolder({dispatch}, data) {
+            overlay();
+            return adminFolderService.addSetToFolder(data)
+                .then(
+                    folder => {
+                        overlay();
+                        dispatch('alert/success', 'Set added to folder', {root: true});
+                        return Promise.resolve(folder);
+                    },
+                    error => {
+                        overlay();
+                        dispatch('alert/error', error, {root: true});
+                        return [];
+                    }
+                );
+        },
+        removeSetFromFolder({dispatch}, data) {
+            overlay();
+            return adminFolderService.removeSetFromFolder(data)
+                .then(
+                    folder => {
+                        overlay();
+                        dispatch('alert/success', 'Set removed from folder', {root: true});
+                        return Promise.resolve(folder);
+                    },
+                    error => {
+                        overlay();
+                        dispatch('alert/error', error, {root: true});
+                        return [];
+                    }
+                );
         }
     },
     getters: {
