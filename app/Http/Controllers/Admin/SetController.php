@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Models\Set;
+use App\Models\Lesson;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
@@ -19,7 +19,7 @@ class SetController extends Controller
     public function index(): JsonResponse
     {
         try {
-            $set = Set::all();
+            $set = Lesson::all();
             $set = $set->map(function ($item) {
                 return [
                     "" . $item->id,
@@ -84,7 +84,7 @@ class SetController extends Controller
                         return response()->json([
                             'status' => 'error',
                             'status_code' => 400,
-                            'message' => 'Set must have more or equal 3 details'
+                            'message' => 'Lesson must have more or equal 3 details'
                         ], 400);
                     }
                     break;
@@ -111,13 +111,13 @@ class SetController extends Controller
                         $data = Excel::toArray((object)[], $file);
                         // check data have more than 4 rows
                         if (count($data[0]) > 4) {
-                            // check data have 2 columns
-                            if (count($data[0][0]) == 2) {
+                            // check data have more than 2 columns
+                            if (count($data[0][0]) > 2) {
                                 foreach ($data[0] as $key => $item) {
                                     if ($key >= 1) {
                                         $set->setDetails()->create([
-                                            'term' => $item[0],
-                                            'definition' => $item[1]
+                                            'term' => $item[1],
+                                            'definition' => $item[2]
                                         ]);
                                     }
                                 }
@@ -127,7 +127,7 @@ class SetController extends Controller
                                 return response()->json([
                                     'status' => 'error',
                                     'status_code' => 400,
-                                    'message' => 'File must have 2 columns'
+                                    'message' => 'File must have more than 2 columns'
                                 ], 400);
                             }
                         } else {
@@ -144,12 +144,12 @@ class SetController extends Controller
                         // check data have more than 4 rows
                         if (count($csv) > 4) {
                             // check data have 2 columns
-                            if (count($csv[0]) == 2) {
+                            if (count($csv[0]) > 2) {
                                 foreach ($csv as $key => $item) {
                                     if ($key >= 1) {
                                         $set->setDetails()->create([
-                                            'term' => $item[0],
-                                            'definition' => $item[1]
+                                            'term' => $item[1],
+                                            'definition' => $item[2]
                                         ]);
                                     }
                                 }
@@ -159,7 +159,7 @@ class SetController extends Controller
                                 return response()->json([
                                     'status' => 'error',
                                     'status_code' => 400,
-                                    'message' => 'File must have 2 columns'
+                                    'message' => 'File must have more than 2 columns ( no,term, definition,... )'
                                 ], 400);
                             }
                         } else {
@@ -178,7 +178,7 @@ class SetController extends Controller
             return response()->json([
                 'status' => 'success',
                 'status_code' => 200,
-                'message' => 'Set created successfully'
+                'message' => 'Lesson created successfully'
             ], 200);
 
         } catch (\Throwable $th) {
@@ -198,12 +198,12 @@ class SetController extends Controller
     public function show(int $id)
     {
         try {
-            $set = Set::findOrfail($id);
+            $set = Lesson::findOrfail($id);
             $setData = $set->setDetails()->get()->toArray();
             if (empty($setData)) {
                 return response()->json([
                     'status' => false,
-                    'message' => 'Set is empty'
+                    'message' => 'Lesson is empty'
                 ], 400);
             }
             // write set data to file
@@ -240,12 +240,12 @@ class SetController extends Controller
     public function edit(int $id): JsonResponse
     {
         try {
-            $set = Set::findOrFail($id);
+            $set = Lesson::findOrFail($id);
             $set_data = $set->setDetails()->get()->toArray();
             if (empty($set_data)) {
                 return response()->json([
                     'status' => false,
-                    'message' => 'Set is empty'
+                    'message' => 'Lesson is empty'
                 ], 400);
             }
             return response()->json([
@@ -283,7 +283,7 @@ class SetController extends Controller
                 'data' => 'required|array',
             ]);
 
-            $set = Set::findOrFail($id);
+            $set = Lesson::findOrFail($id);
             $set->update([
                 'name' => $request->name,
                 'description' => $request->description,
@@ -306,7 +306,7 @@ class SetController extends Controller
             return response()->json([
                 'status' => 'success',
                 'status_code' => 200,
-                'message' => 'Set updated successfully'
+                'message' => 'Lesson updated successfully'
             ], 200);
         } catch (\Throwable $th) {
             return response()->json([
@@ -326,19 +326,19 @@ class SetController extends Controller
     {
         try {
             // delete set by id
-            $set = Set::find($id);
+            $set = Lesson::find($id);
             if ($set) {
                 $set->delete();
                 return response()->json([
                     'status' => 'success',
                     'status_code' => 200,
-                    'message' => 'Set deleted successfully'
+                    'message' => 'Lesson deleted successfully'
                 ], 200);
             } else {
                 return response()->json([
                     'status' => 'error',
                     'status_code' => 404,
-                    'message' => 'Set not found'
+                    'message' => 'Lesson not found'
                 ], 404);
             }
         } catch (\Throwable $th) {

@@ -9,7 +9,7 @@
                     </template>
                 </sidenav-collapse>
             </li>
-            <li class="nav-item">
+            <li class="nav-item" v-if="this.checkPermission('admin.settings')">
                 <sidenav-collapse @click="$router.push({ name: 'admin.setting' })" collapse-ref="" nav-text="Settings"
                                   :class="getRoute() === 'setting' ? 'active' : ''">
                     <template #icon>
@@ -19,7 +19,28 @@
             </li>
             <li class="mt-3 nav-item">
                 <h6 class="text-xs ps-4 text-uppercase font-weight-bolder opacity-6 ms-2">
-                    Content
+                    Users
+                </h6>
+            </li>
+            <li class="nav-item" v-if="this.checkPermission('admin.users')">
+                <sidenav-collapse @click="$router.push({ name: 'admin.users' })" collapse-ref="" nav-text="Users"
+                                  :class="getRoute() === 'users' ? 'active' : ''">
+                    <template #icon>
+                        <i class="fa-regular fa-user text-primary text-sm opacity-10"></i>
+                    </template>
+                </sidenav-collapse>
+            </li>
+            <li class="nav-item" v-if="this.checkPermission('admin.roles')">
+                <sidenav-collapse @click="$router.push({ name: 'admin.roles' })" collapse-ref="" nav-text="Roles"
+                                  :class="getRoute() === 'roles' ? 'active' : ''">
+                    <template #icon>
+                        <i class="fa-regular fa-users text-primary text-sm opacity-10"></i>
+                    </template>
+                </sidenav-collapse>
+            </li>
+            <li class="mt-3 nav-item">
+                <h6 class="text-xs ps-4 text-uppercase font-weight-bolder opacity-6 ms-2">
+                    Learning
                 </h6>
             </li>
             <li class="nav-item">
@@ -53,6 +74,7 @@
 import SidenavCollapse from "@/components/Sidenav/SidenavCollapse.vue";
 import SidenavItem from "@/components/Sidenav/SidenavItem.vue";
 import SidenavCard from "@/components/Sidenav/SidenavCard.vue";
+import {mapGetters} from "vuex";
 
 export default {
     name: "SidenavList",
@@ -65,7 +87,13 @@ export default {
         getRoute() {
             const routeArr = this.$route.path.split("/");
             return routeArr[2];
+        },
+        ...mapGetters({
+            permissions:'account/permissions'
+        }),
+        checkPermission(name){
+            return this.permissions().some(permission => permission.name === name);
         }
-    }
+    },
 };
 </script>

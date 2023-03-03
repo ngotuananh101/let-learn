@@ -4,9 +4,9 @@ namespace App\Http\Controllers\Public;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use App\Models\Folder;
+use App\Models\Course;
 use App\Models\User;
-use App\Models\Set;
+use App\Models\Lesson;
 use Illuminate\Http\JsonResponse;
 use PhpOffice\PhpSpreadsheet\Reader\Xml\Style\Font;
 use PhpParser\Node\Stmt\TryCatch;
@@ -58,7 +58,7 @@ class FolderController extends Controller
             return response()->json([
                 'status' => 'success',
                 'status_code' => 200,
-                'message' => 'Folder created successfully',
+                'message' => 'Course created successfully',
             ], 200);
         } catch (\Throwable $th) {
             return response()->json([
@@ -78,13 +78,13 @@ class FolderController extends Controller
     public function show($id)
     {
         try {
-            $folder = Folder::findOrFail($id);
+            $folder = Course::findOrFail($id);
             // check folder is deleted
             if ($folder->status == 'inactive') {
                 return response()->json([
                     'status' => 'error',
                     'status_code' => 404,
-                    'message' => 'Folder not found'
+                    'message' => 'Course not found'
                 ], 404);
             }
             // check folder is public
@@ -138,7 +138,7 @@ class FolderController extends Controller
                 'is_public' => 'required|in:1,0',
                 'password' => 'nullable|string',
             ]);
-            $folder = Folder::findOrFail($id);
+            $folder = Course::findOrFail($id);
             // update folder
             $folder->update([
                 'name' => $request->name,
@@ -173,7 +173,7 @@ class FolderController extends Controller
     public function destroy($id): JsonResponse
     {
         try {
-            $folder = Folder::findOrFail($id);
+            $folder = Course::findOrFail($id);
             // Soft delete folder
             $folder->update([
                 'status' => 'inactive'
@@ -215,13 +215,13 @@ class FolderController extends Controller
     public function addSetToFolder(Request $request, $id, $set_id): JsonResponse
     {
         try {
-            $folder = Folder::findOrFail($id);
+            $folder = Course::findOrFail($id);
             // check folder is deleted
             if ($folder->status == 'inactive') {
                 return response()->json([
                     'status' => 'error',
                     'status_code' => 404,
-                    'message' => 'Folder not found'
+                    'message' => 'Course not found'
                 ], 404);
             }
             // check folder is public
@@ -233,12 +233,12 @@ class FolderController extends Controller
                 ], 403);
             }
             // check set is deleted
-            $set = Set::findOrFail($set_id);
+            $set = Lesson::findOrFail($set_id);
             if ($set->status == 'inactive') {
                 return response()->json([
                     'status' => 'error',
                     'status_code' => 404,
-                    'message' => 'Set not found'
+                    'message' => 'Lesson not found'
                 ], 404);
             }
             // check set is public
@@ -255,7 +255,7 @@ class FolderController extends Controller
                 return response()->json([
                     'status' => 'error',
                     'status_code' => 400,
-                    'message' => 'Set is exist in folder'
+                    'message' => 'Lesson is exist in folder'
                 ], 400);
             }
             // add set to folder
@@ -278,13 +278,13 @@ class FolderController extends Controller
     public function removeSetFromFolder(Request $request, $id, $set_id): JsonResponse
     {
         try {
-            $folder = Folder::findOrFail($id);
+            $folder = Course::findOrFail($id);
             // check folder is deleted
             if ($folder->status == 'inactive') {
                 return response()->json([
                     'status' => 'error',
                     'status_code' => 404,
-                    'message' => 'Folder not found'
+                    'message' => 'Course not found'
                 ], 404);
             }
             // check folder is public
@@ -296,12 +296,12 @@ class FolderController extends Controller
                 ], 403);
             }
             // check set is deleted
-            $set = Set::findOrFail($set_id);
+            $set = Lesson::findOrFail($set_id);
             if ($set->status == 'inactive') {
                 return response()->json([
                     'status' => 'error',
                     'status_code' => 404,
-                    'message' => 'Set not found'
+                    'message' => 'Lesson not found'
                 ], 404);
             }
             // check set is public
@@ -318,7 +318,7 @@ class FolderController extends Controller
                 return response()->json([
                     'status' => 'error',
                     'status_code' => 400,
-                    'message' => 'Set is not exist in folder'
+                    'message' => 'Lesson is not exist in folder'
                 ], 400);
             }
             // remove set from folder

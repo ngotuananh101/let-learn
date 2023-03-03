@@ -50,7 +50,7 @@ class User extends Authenticate implements MustVerifyEmail
     ];
 
     /**
-     * 1 user can have 1 role
+     * 1 user can have 1 roles
      */
     public function role(): BelongsTo
     {
@@ -62,7 +62,7 @@ class User extends Authenticate implements MustVerifyEmail
      */
     public function sets(): HasMany
     {
-        return $this->hasMany(Set::class);
+        return $this->hasMany(Lesson::class);
     }
 
     // get all permissions of user
@@ -81,10 +81,10 @@ class User extends Authenticate implements MustVerifyEmail
         return $this->role->name == 'super';
     }
 
-    // Folder belong to user
+    // Course belong to user
     public function folders(): HasMany
     {
-        return $this->hasMany(Folder::class);
+        return $this->hasMany(Course::class);
     }
 
     // Get all classes of a student

@@ -53,7 +53,7 @@ export default {
         ArgonButton,
     },
     title(){
-        return 'Add Set' + ' - ' + document.querySelector('meta[name="title"]').getAttribute('content');
+        return 'Add Lesson' + ' - ' + document.querySelector('meta[name="title"]').getAttribute('content');
     },
     data() {
         return {

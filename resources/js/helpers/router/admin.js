@@ -16,6 +16,16 @@ const admin = [
                 component: () => import('../../pages/admin/setting/Setting.vue'),
             },
             {
+                path: 'users',
+                name: 'admin.users',
+                component: () => import('../../pages/admin/users/Index.vue'),
+            },
+            {
+                path: 'roles',
+                name: 'admin.roles',
+                component: () => import('../../pages/admin/roles/Index.vue'),
+            },
+            {
                 path: 'set',
                 name: 'admin.set',
                 redirect: {name: 'admin.set.list'},

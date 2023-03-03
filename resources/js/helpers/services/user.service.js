@@ -26,15 +26,14 @@ function login(email, password, rememberMe) {
                 // Store user details and bearer token in local storage to keep user logged in between page refreshes
                 localStorage.setItem('user', JSON.stringify(user.data.user));
                 localStorage.setItem('token', user.data.access_token);
+                localStorage.setItem('permissions', JSON.stringify(user.data.permissions));
             }
             return user;
         });
 }
 
 function logout() {
-    // remove user from local storage to log user out
-    localStorage.removeItem('user');
-    localStorage.removeItem('token');
+    localStorage.clear();
 }
 
 function register(user) {
@@ -52,6 +51,7 @@ function register(user) {
                 // Store user details and bearer token in local storage to keep user logged in between page refreshes
                 localStorage.setItem('user', JSON.stringify(user.data.user));
                 localStorage.setItem('token', JSON.stringify(user.data.access_token));
+                localStorage.setItem('permissions', JSON.stringify(user.data.permissions));
             }
 
             return user;

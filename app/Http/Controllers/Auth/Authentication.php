@@ -49,8 +49,6 @@ class Authentication extends Controller
                 ], 401);
             }
             $user = $request->user();
-            // set role name in user object
-            $user->role;
             $token = $user->createToken('Personal Access Token');
             return response()->json([
                 'status' => 'success',
@@ -58,6 +56,7 @@ class Authentication extends Controller
                 'message' => 'Login successful',
                 'data' => [
                     'user' => $user,
+                    'permissions' => $user->getAllPermissions(),
                     'access_token' => $token->plainTextToken,
                     'token_type' => 'Bearer',
                 ]
@@ -174,7 +173,7 @@ class Authentication extends Controller
                 ], 401);
             }
             $user = $request->user();
-            // set role name in user object
+            // set roles name in user object
             $user->role;
             $token = $user->createToken('Personal Access Token');
             event(new Registered($user));

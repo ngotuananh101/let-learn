@@ -3,6 +3,8 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\Role;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
 class RoleController extends Controller
@@ -10,11 +12,35 @@ class RoleController extends Controller
     /**
      * Display a listing of the resource.
      *
-     * @return \Illuminate\Http\Response
+     * @return JsonResponse
      */
-    public function index()
+    public function index(): JsonResponse
     {
-        //
+        try {
+            // get all roles
+            $roles = Role::all();
+            $roles = $roles->map(function ($role) {
+                return [
+                    $role->id,
+                    $role->name,
+                    $role->description,
+                    $role->status,
+                    $role->updated_at,
+                ];
+            });
+
+            // return response
+            return response()->json([
+                'status' => 'success',
+                'data' => $roles
+            ], 200);
+        }
+        catch (\Exception $e) {
+            return response()->json([
+                'status' => 'error',
+                'message' => $e->getMessage()
+            ], 500);
+        }
     }
 
     /**

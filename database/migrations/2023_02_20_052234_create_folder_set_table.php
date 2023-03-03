@@ -13,10 +13,10 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('folder_set', function (Blueprint $table) {
+        Schema::create('courses_lesson', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('folder_id')->constrained()->onDelete('cascade');
-            $table->foreignId('set_id')->constrained()->onDelete('cascade');
+            $table->foreignId('courses_id')->constrained()->onDelete('cascade');
+            $table->foreignId('lesson_id')->constrained()->onDelete('cascade');
             $table->timestamps();
         });
     }

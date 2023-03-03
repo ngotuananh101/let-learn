@@ -159,7 +159,7 @@ export default {
         DataTable
     },
     title() {
-        return 'List Folder' + ' - ' + document.querySelector('meta[name="title"]').getAttribute('content');
+        return 'List Course' + ' - ' + document.querySelector('meta[name="title"]').getAttribute('content');
     },
     data() {
         return {

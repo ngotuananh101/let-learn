@@ -37,7 +37,7 @@ export default {
             adminSetService.create(data)
                 .then(
                     sets => {
-                        dispatch('alert/success', 'Set created', {root: true});
+                        dispatch('alert/success', 'Lesson created', {root: true});
                         dispatch('index');
                     },
                     error => {
@@ -46,12 +46,12 @@ export default {
                 );
         },
         importSet({dispatch}, data) {
-            dispatch('alert/info', 'Set importing', {root: true});
+            dispatch('alert/info', 'Lesson importing', {root: true});
             overlay();
             adminSetService.importSet(data)
                 .then(
                     sets => {
-                        dispatch('alert/success', 'Set imported', {root: true});
+                        dispatch('alert/success', 'Lesson imported', {root: true});
                     },
                     error => {
                         dispatch('alert/error', error, {root: true});
@@ -65,7 +65,7 @@ export default {
             adminSetService.deleteSet(id)
                 .then(
                     sets => {
-                        dispatch('alert/success', 'Set deleted', {root: true});
+                        dispatch('alert/success', 'Lesson deleted', {root: true});
                         dispatch('index');
                     },
                     error => {
@@ -74,12 +74,12 @@ export default {
                 );
         },
         exportSet({dispatch}, id) {
-            dispatch('alert/info', 'Set exporting', {root: true});
+            dispatch('alert/info', 'Lesson exporting', {root: true});
             overlay();
             adminSetService.exportSet(id)
                 .then(
                     sets => {
-                        dispatch('alert/success', 'Set exported', {root: true});
+                        dispatch('alert/success', 'Lesson exported', {root: true});
                     },
                     error => {
                         dispatch('alert/error', error, {root: true});
@@ -108,7 +108,7 @@ export default {
             adminSetService.updateSet(data)
                 .then(
                     sets => {
-                        dispatch('alert/success', 'Set updated', {root: true});
+                        dispatch('alert/success', 'Lesson updated', {root: true});
                         dispatch('index');
                     },
                     error => {

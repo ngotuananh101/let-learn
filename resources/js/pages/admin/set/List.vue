@@ -178,7 +178,7 @@ export default {
         DataTable
     },
     title() {
-        return 'List Set' + ' - ' + document.querySelector('meta[name="title"]').getAttribute('content');
+        return 'List Lesson' + ' - ' + document.querySelector('meta[name="title"]').getAttribute('content');
     },
     data() {
         return {

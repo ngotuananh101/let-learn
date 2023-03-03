@@ -13,9 +13,9 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('set_details', function (Blueprint $table) {
+        Schema::create('lesson_details', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('set_id')->constrained()->onDelete('cascade');
+            $table->foreignId('lesson_id')->constrained()->onDelete('cascade');
             $table->text('term');
             $table->text('definition');
             $table->text('image')->nullable();
