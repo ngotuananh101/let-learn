@@ -131,12 +131,10 @@ import ArgonInput from "@/components/Argons/ArgonInput.vue";
 import ArgonSwitch from "@/components/Argons/ArgonSwitch.vue";
 import DataTable from 'datatables.net-vue3'
 import DataTablesLib from 'datatables.net-bs5';
-
-DataTable.use(DataTablesLib);
 import 'datatables.net-select';
 import {mapActions} from "vuex";
-import {Modal} from "bootstrap";
-import * as Choices from "choices.js";
+import Choices from 'choices.js';
+DataTable.use(DataTablesLib);
 
 export default {
     name: "FolderContent",

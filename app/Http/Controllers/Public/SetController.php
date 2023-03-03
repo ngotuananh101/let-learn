@@ -3,9 +3,9 @@
 namespace App\Http\Controllers\Public;
 
 use App\Http\Controllers\Controller;
-use App\Models\Set;
+use App\Models\Lesson;
 use App\Models\User;
-use App\Models\Folder;
+use App\Models\Course;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
@@ -28,25 +28,22 @@ class SetController extends Controller
             ]);
             $type = $request->input('type');
             // Tao set moi
-            $set = new Set();
+            $set = new Lesson();
             $set->name = $request->name;
             $set->description = $request->description;
             $set->user_id = auth()->user()->id;
             $set->save();
 
             if ($type == 'text') {
-                $text = $request->text;
-                $termSeparator = $request->term_separator;
-                $setSeparator = $request->set_separator;
-                $details = explode($setSeparator, $text);
-                foreach ($details as $detail) {
+                $raw_detail = explode($request->set_separator, $request->text);
+                foreach ($raw_detail as $item) {
                     try {
-                        $detail = explode($termSeparator, $detail);
-                        $term = $detail[0];
-                        $definition = $detail[1];
+                        $raw = explode($request->term_separator, $item);
+                        $term = $raw[0];
+                        $definition = $raw[1];
                         $set->setDetails()->create([
                             'term' => $term,
-                            'definition' => $definition,
+                            'definition' => $definition
                         ]);
                     } catch (\Throwable $th) {
                         continue;
@@ -54,43 +51,77 @@ class SetController extends Controller
                 }
             } else if ($type == 'file') {
                 $file = $request->file('file');
-                if ($file->getClientOriginalExtension() == 'csv') {
-                    $rows = array_map('str_getcsv', file($file));
-                    $headerRow = array_shift($rows);
-                    if (count($headerRow) < 2 || $headerRow[0] != 'Term' || $headerRow[1] != 'Definition') {
-                        return response()->json(['error' => 'File must have "Term" and "Definition" headers'], 400);
-                    }
-                    foreach ($rows as $row) {
-                        $term = $row[0];
-                        $definition = $row[1];
-                        if (isset($row[0]) && isset($row[1])) {
-                            $set->setDetails()->create([
-                                'term' => $term,
-                                'definition' => $definition,
-                            ]);
+                $file_extension = $file->getClientOriginalExtension();
+                if ($file_extension == 'xls' || $file_extension == 'xlsx') {
+                    $data = Excel::toArray((object)[], $file);
+                    // check data have more than 4 rows
+                    if (count($data[0]) > 4) {
+                        // check data have more than 2 columns
+                        if (count($data[0][0]) > 2) {
+                            foreach ($data[0] as $key => $item) {
+                                if ($key >= 1) {
+                                    $set->setDetails()->create([
+                                        'term' => $item[1],
+                                        'definition' => $item[2]
+                                    ]);
+                                }
+                            }
+                        } else {
+                            // delete set
+                            $set->delete();
+                            return response()->json([
+                                'status' => 'error',
+                                'status_code' => 400,
+                                'message' => 'File must have more than 2 columns'
+                            ], 400);
                         }
+                    } else {
+                        // delete set
+                        $set->delete();
+                        return response()->json([
+                            'status' => 'error',
+                            'status_code' => 400,
+                            'message' => 'File must have more than 4 rows'
+                        ], 400);
                     }
                 } else {
-                    $rows = Excel::toArray((object)[], $file);
-                    if (count($rows[0][0]) > 1 && $rows[0][0][0] == 'Term' && $rows[0][0][1] == 'Definition') {
-                        $rows[0] = array_slice($rows[0], 1);
-                    }
-                    foreach ($rows[0] as $row) {
-                        $term = $row[0];
-                        $definition = $row[1];
-                        if (isset($row[0]) && isset($row[1])) {
-                            $set->setDetails()->create([
-                                'term' => $term,
-                                'definition' => $definition,
-                            ]);
+                    $csv = array_map('str_getcsv', file($file));
+                    // check data have more than 4 rows
+                    if (count($csv) > 4) {
+                        // check data have 2 columns
+                        if (count($csv[0]) > 2) {
+                            foreach ($csv as $key => $item) {
+                                if ($key >= 1) {
+                                    $set->setDetails()->create([
+                                        'term' => $item[1],
+                                        'definition' => $item[2]
+                                    ]);
+                                }
+                            }
+                        } else {
+                            // delete set
+                            $set->delete();
+                            return response()->json([
+                                'status' => 'error',
+                                'status_code' => 400,
+                                'message' => 'File must have more than 2 columns ( no,term, definition,... )'
+                            ], 400);
                         }
+                    } else {
+                        // delete set
+                        $set->delete();
+                        return response()->json([
+                            'status' => 'error',
+                            'status_code' => 400,
+                            'message' => 'File must have more than 4 rows'
+                        ], 400);
                     }
                 }
             }
             return response()->json([
                 'status' => 'success',
                 'status_code' => 200,
-                'message' => 'Set created successfully',
+                'message' => 'Lesson created successfully',
             ]);
         } catch (\Throwable $th) {
             return response()->json([
@@ -104,7 +135,7 @@ class SetController extends Controller
     public function export(Request $request, $id): BinaryFileResponse|JsonResponse
     {
         try {
-            $set = Set::findOrfail($id);
+            $set = Lesson::findOrfail($id);
             $setData = $set->setDetails()->get()->toArray();
             if (empty($setData)) {
                 return response()->json(['message' => 'No data found for this set']);
@@ -173,19 +204,19 @@ class SetController extends Controller
     /**
      * Display the specified resource.
      *
-     * @param  int  $id
+     * @param int $id
      * @return JsonResponse
      */
     public function show($id): JsonResponse
     {
         try {
-            $set = Set::findOrFail($id);
+            $set = Lesson::findOrFail($id);
             // check set is deleted
             if ($set->status == 'inactive') {
                 return response()->json([
                     'status' => 'error',
                     'status_code' => 404,
-                    'message' => 'Set not found!'
+                    'message' => 'Lesson not found!'
                 ], 404);
             }
             $setdetail = $set->setDetails()->get();
@@ -211,7 +242,7 @@ class SetController extends Controller
      * Update the specified resource in storage.
      *
      * @param Request $request
-     * @param  int  $id
+     * @param int $id
      * @return JsonResponse
      */
     public function update(Request $request, $id): JsonResponse
@@ -225,7 +256,7 @@ class SetController extends Controller
                 'password' => 'nullable|string',
                 'data' => 'required|array',
             ]);
-            $set = Set::findOrFail($id);
+            $set = Lesson::findOrFail($id);
             $set->name = $request->name;
             $set->description = $request->description;
             $set->status = $request->status;
@@ -259,13 +290,13 @@ class SetController extends Controller
     /**
      * Remove the specified resource from storage.
      *
-     * @param  int  $id
+     * @param int $id
      * @return JsonResponse
      */
     public function destroy($id): JsonResponse
     {
         try {
-            $set = Set::findOrFail($id);
+            $set = Lesson::findOrFail($id);
             // Soft delete set
             $set->update([
                 'status' => 'inactive'
@@ -309,7 +340,7 @@ class SetController extends Controller
     public function showAllSetByFolderId($id): JsonResponse
     {
         try {
-            $folder = Folder::findOrFail($id);
+            $folder = Course::findOrFail($id);
             $set = $folder->sets()->where('status', 'active')->get();
             return response()->json([
                 'status' => 'success',
@@ -330,7 +361,7 @@ class SetController extends Controller
     public function showProgressBySetId($id): JsonResponse
     {
         try {
-            $set = Set::findOrFail($id);
+            $set = Lesson::findOrFail($id);
             $setdetail = $set->setDetails()->get();
             $progress = 0;
             foreach ($setdetail as $detail) {

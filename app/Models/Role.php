@@ -20,7 +20,7 @@ class Role extends Model
     ];
 
     /**
-     * Get the permissions for the role.
+     * Get the permissions for the roles.
      */
     public function permissions()
     {
@@ -28,7 +28,7 @@ class Role extends Model
     }
 
     /**
-     * 1 role can have many users
+     * 1 roles can have many users
      */
     public function users()
     {

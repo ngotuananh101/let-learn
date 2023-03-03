@@ -4,7 +4,9 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Classes extends Model
 {
@@ -31,15 +33,33 @@ class Classes extends Model
         return $this->belongsToMany(User::class, 'class_teacher', 'class_id', 'teacher_id');
     }
 
-    // Get all sets in a class
-    public function sets(): BelongsToMany
+    // get school own this class
+    public function school(): BelongsTo
     {
-        return $this->belongsToMany(Set::class, 'class_set', 'class_id', 'set_id');
+        return $this->belongsTo(School::class, 'school_id', 'id');
     }
 
-    // Get all folder in a class
-    public function folders(): BelongsToMany
+    // get all lesson in a class
+    public function lessons(): HasMany
     {
-        return $this->belongsToMany(Folder::class, 'class_folder', 'class_id', 'folder_id');
+        return $this->hasMany(Lesson::class, 'class_id', 'id');
+    }
+
+    // get all assignment in a class
+    public function assignments(): HasMany
+    {
+        return $this->hasMany(Assignment::class, 'class_id', 'id');
+    }
+
+    // get all quiz in a class
+    public function quizzes(): HasMany
+    {
+        return $this->hasMany(Quiz::class, 'class_id', 'id');
+    }
+
+    // get all exam in a class
+    public function exams(): HasMany
+    {
+        return $this->hasMany(Exam::class, 'class_id', 'id');
     }
 }

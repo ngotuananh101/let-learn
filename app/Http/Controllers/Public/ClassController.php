@@ -4,8 +4,8 @@ namespace App\Http\Controllers\Public;
 
 use App\Http\Controllers\Controller;
 use App\Models\Classes;
-use App\Models\Folder;
-use App\Models\Set;
+use App\Models\Course;
+use App\Models\Lesson;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -135,7 +135,7 @@ class ClassController extends Controller
         }
     }
 
-    //Delete Set from class
+    //Delete Lesson from class
     public function deleteSet($class_id, $set_id)
     {
         try {
@@ -145,14 +145,14 @@ class ClassController extends Controller
                 return response()->json([
                     'status' => 'error',
                     'status_code' => 400,
-                    'message' => 'Set is not assigned to this class!',
+                    'message' => 'Lesson is not assigned to this class!',
                 ], 400);
             }
             $class->sets()->detach($set_id);
             return response()->json([
                 'status' => 'success',
                 'status_code' => 200,
-                'message' => 'Set deleted successfully from class!',
+                'message' => 'Lesson deleted successfully from class!',
             ], 200);
         } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $ex) {
             if ($ex->getModel() === Classes::class) {
@@ -161,11 +161,11 @@ class ClassController extends Controller
                     'status_code' => 404,
                     'message' => 'Class not found!',
                 ], 404);
-            } elseif ($ex->getModel() === Set::class) {
+            } elseif ($ex->getModel() === Lesson::class) {
                 return response()->json([
                     'status' => 'error',
                     'status_code' => 404,
-                    'message' => 'Set not found!',
+                    'message' => 'Lesson not found!',
                 ], 404);
             }
         }
@@ -181,14 +181,14 @@ class ClassController extends Controller
                 return response()->json([
                     'status' => 'error',
                     'status_code' => 400,
-                    'message' => 'Folder is not assigned to this class!',
+                    'message' => 'Course is not assigned to this class!',
                 ], 400);
             }
             $class->folders()->detach($folder_id);
             return response()->json([
                 'status' => 'success',
                 'status_code' => 200,
-                'message' => 'Folder deleted successfully from class!',
+                'message' => 'Course deleted successfully from class!',
             ], 200);
         } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $ex) {
             if ($ex->getModel() === Classes::class) {
@@ -197,11 +197,11 @@ class ClassController extends Controller
                     'status_code' => 404,
                     'message' => 'Class not found!',
                 ], 404);
-            } elseif ($ex->getModel() === Folder::class) {
+            } elseif ($ex->getModel() === Course::class) {
                 return response()->json([
                     'status' => 'error',
                     'status_code' => 404,
-                    'message' => 'Folder not found!',
+                    'message' => 'Course not found!',
                 ], 404);
             }
         }
@@ -273,10 +273,10 @@ class ClassController extends Controller
                     return response()->json([
                         'status' => 'error',
                         'status_code' => 400,
-                        'message' => 'Folder already exists in this class!'
+                        'message' => 'Course already exists in this class!'
                     ], 400);
                 }
-                $folder = Folder::findOrFail($folder_id);
+                $folder = Course::findOrFail($folder_id);
             } else {
                 $request->validate([
                     'name' => 'required|string|max:255',
@@ -287,7 +287,7 @@ class ClassController extends Controller
 
                 ]);
                 // Create a new folder and associate it with the class
-                $folder = new Folder();
+                $folder = new Course();
                 $folder->user_id = $request->user()->id;
                 $folder->name = $request->name;
                 $folder->description = $request->description;
@@ -301,7 +301,7 @@ class ClassController extends Controller
             return response()->json([
                 'status' => 'success',
                 'status_code' => 200,
-                'message' => 'Folder added successfully to class!',
+                'message' => 'Course added successfully to class!',
             ], 200);
         } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $ex) {
             return response()->json([
@@ -322,17 +322,17 @@ class ClassController extends Controller
     {
         try {
             $class = Classes::findOrFail($classId);
-            $set = Set::findOrFail($request->set_id);
+            $set = Lesson::findOrFail($request->set_id);
             if ($class->sets->contains($request->set_id)) {
                 return response()->json([
                     'status' => 'error',
                     'status_code' => 400,
-                    'message' => 'Set is already in this class!',
+                    'message' => 'Lesson is already in this class!',
                 ], 400);
             }
             $class->sets()->attach($set->id);
             return response()->json([
-                'message' => 'Set added successfully to the class',
+                'message' => 'Lesson added successfully to the class',
                 'class' => $class,
                 'set' => $set
             ], 200);
@@ -411,8 +411,6 @@ class ClassController extends Controller
             $class->description = $request->description;
             $class->status = $request->status;
             $class->save();
-            //Add user as new teacher to class
-            $class->teachers()->attach($request->user()->id);
             // return json response
             return response()->json([
                 'status' => 'success',

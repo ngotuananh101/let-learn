@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
-class Set extends Model
+class Lesson extends Model
 {
     use HasFactory;
 
@@ -66,7 +66,7 @@ class Set extends Model
      */
     public function folder(): BelongsToMany
     {
-        return $this->belongsToMany(Folder::class, 'folder_set', 'set_id', 'folder_id');
+        return $this->belongsToMany(Course::class, 'folder_set', 'set_id', 'folder_id');
     }
 
     /**

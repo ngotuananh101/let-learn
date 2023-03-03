@@ -64,7 +64,7 @@ body {
 // Content grouping
 //
 // 1. Reset Firefox's gray color
-// 2. Set correct height and prevent the `size` attribute to make the `hr` look like an input field
+// 2. Lesson correct height and prevent the `size` attribute to make the `hr` look like an input field
 
 hr {
   margin: $hr-margin-y 0;
@@ -427,7 +427,7 @@ button,
 select {
   text-transform: none;
 }
-// Set the cursor for non-`<button>` buttons
+// Lesson the cursor for non-`<button>` buttons
 //
 // Details at https://github.com/twbs/bootstrap/pull/30562
 [role="button"] {

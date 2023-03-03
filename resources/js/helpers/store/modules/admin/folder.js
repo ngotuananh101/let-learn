@@ -80,7 +80,7 @@ export default {
                 .then(
                     folder => {
                         overlay();
-                        dispatch('alert/success', 'Folder updated', {root: true});
+                        dispatch('alert/success', 'Course updated', {root: true});
                     },
                     error => {
                         overlay();
@@ -108,7 +108,7 @@ export default {
                 .then(
                     folder => {
                         overlay();
-                        dispatch('alert/success', 'Set added to folder', {root: true});
+                        dispatch('alert/success', 'Lesson added to folder', {root: true});
                         return Promise.resolve(folder);
                     },
                     error => {
@@ -124,7 +124,7 @@ export default {
                 .then(
                     folder => {
                         overlay();
-                        dispatch('alert/success', 'Set removed from folder', {root: true});
+                        dispatch('alert/success', 'Lesson removed from folder', {root: true});
                         return Promise.resolve(folder);
                     },
                     error => {

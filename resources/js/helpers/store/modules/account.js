@@ -2,10 +2,11 @@ import {userService} from '../../services';
 import router from "../../router";
 
 const user = JSON.parse(localStorage.getItem('user'));
+const permissions = JSON.parse(localStorage.getItem('permissions'));
 const token = localStorage.getItem('token');
 const state = user
-    ? {status: {loggedIn: true}, user, token}
-    : {status: {}, user: null, token: null};
+    ? {status: {loggedIn: true}, user, token, permissions}
+    : {status: {}, user: null, permissions: null, token: null};
 
 export default {
     namespaced: true,
@@ -14,20 +15,23 @@ export default {
         loginRequest(state) {
             state.status = {loggingIn: true};
         },
-        loginSuccess(state, user, token) {
+        loginSuccess(state, data) {
             state.status = {loggedIn: true};
-            state.user = user;
-            state.token = token;
+            state.user = data.user;
+            state.token = data.access_token;
+            state.permissions = data.permissions;
         },
         loginFailure(state) {
             state.status = {};
             state.user = null;
             state.token = null;
+            state.permissions = null;
         },
         logout(state) {
             state.status = {};
             state.user = null;
             state.token = null;
+            state.permissions = null;
         },
         registerRequest(state) {
             state.status = {registering: true};
@@ -46,10 +50,14 @@ export default {
             userService.login(email, password, rememberMe)
                 .then(
                     user => {
-                        commit('loginSuccess', user.data.user, user.data.access_token);
+                        commit('loginSuccess', {
+                            user: user.data.user,
+                            access_token: user.data.access_token,
+                            permissions: user.data.permissions
+                        });
                         dispatch('alert/success', user.message, {root: true});
                         // check if the user is admin
-                        if (user.data.user.role.name === 'admin' || user.data.user.role.name === 'super') {
+                        if (user.data.permissions.some(permission => permission.name === 'admin.dashboard')) {
                             setTimeout(() => {
                                 router.push({name: 'admin'})
                             }, 1000);
@@ -74,7 +82,6 @@ export default {
             userService.register(user)
                 .then(
                     user => {
-                        console.log(user);
                         commit('registerSuccess', user);
                         dispatch('alert/success', 'Registration successful', {root: true});
                         setTimeout(() => {
@@ -146,15 +153,16 @@ export default {
     },
     getters: {
         isAdmin: state => {
-            if (state.user) {
-                return state.user.role.name === 'admin' || state.user.role.name === 'super';
-            }
+            return state.permissions.some(permission => permission.name === 'admin.dashboard');
         },
         getUser: state => {
             return state.user;
         },
         isEmailVerified: state => {
             return state.user.email_verified_at;
+        },
+        permissions: state => {
+            return state.permissions;
         }
     }
 };

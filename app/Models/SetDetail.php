@@ -47,6 +47,6 @@ class SetDetail extends Model
      */
     public function set()
     {
-        return $this->belongsTo(Set::class);
+        return $this->belongsTo(Lesson::class);
     }
 }

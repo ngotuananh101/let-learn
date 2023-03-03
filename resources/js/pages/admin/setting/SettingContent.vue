@@ -107,7 +107,7 @@
 </template>
 
 <script>
-import * as Choices from "choices.js";
+import Choices from "choices.js";
 import ArgonInput from "@/components/Argons/ArgonInput.vue";
 import ArgonTextarea from "@/components/Argons/ArgonTextarea.vue";
 import {mapActions} from "vuex";

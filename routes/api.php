@@ -6,6 +6,8 @@ use App\Http\Controllers\Admin\AnalyticsController;
 use App\Http\Controllers\Admin\SettingController;
 use App\Http\Controllers\Admin\SetController as AdminSetController;
 use App\Http\Controllers\Admin\FolderController as AdminFolderController;
+use App\Http\Controllers\Admin\UserController as AdminUserController;
+use App\Http\Controllers\Admin\RoleController as AdminRoleController;
 use App\Http\Controllers\Auth\VerificationController;
 use App\Http\Controllers\Public\SetController;
 use App\Http\Controllers\Public\FolderController;
@@ -44,21 +46,18 @@ Route::group(['prefix' => 'auth'], function () {
 Route::get('/meta', [SettingController::class, 'meta']);
 Route::middleware('auth:sanctum')->group(function () {
     Route::prefix('admin')->group(function () {
-        Route::prefix('analytics')->middleware(['permissions:admin.analytics'])->group(function () {
+        Route::prefix('analytics')->group(function () {
             Route::get('google', [AnalyticsController::class, 'getAnalytics']);
-            Route::get('local', function () {
-                return response()->json([
-                    'message' => 'Hello World'
-                ]);
-            });
         });
         Route::prefix('settings')->group(function () {
-            Route::get('/', [SettingController::class, 'index']);
-            Route::post('/{key}', [SettingController::class, 'update']);
-        })->middleware(['permissions:admin.settings']);
+            Route::get('/', [SettingController::class, 'index'])->middleware(['permissions:admin.settings']);
+            Route::post('/{key}', [SettingController::class, 'update'])->middleware(['permissions:admin.settings.update']);
+        });
         Route::resource('set', AdminSetController::class)->middleware(['permissions:admin.sets']);
         Route::resource('folder', AdminFolderController::class)->middleware(['permissions:admin.folders']);
-    })->middleware(['permissions:admin.access']);
+        Route::resource('user', AdminUserController::class)->middleware(['permissions:admin.users']);
+        Route::resource('roles', AdminRoleController::class)->middleware(['permissions:admin.roles']);
+    })->middleware(['permissions:admin.dashboard']);
     // Route set
     Route::prefix('set')->group(function () {
         Route::post('/', [SetController::class, 'store']);

@@ -3,8 +3,8 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Models\Folder;
-use App\Models\Set;
+use App\Models\Course;
+use App\Models\Lesson;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
@@ -21,7 +21,7 @@ class FolderController extends Controller
     {
         try {
             // Get the list of folders
-            $folders = Folder::all();
+            $folders = Course::all();
             $folders = $folders->map(function ($folder) {
                 return [
                     $folder->id,
@@ -79,7 +79,7 @@ class FolderController extends Controller
 
         try {
             // Create the folder
-            $folder = Folder::create([
+            $folder = Course::create([
                 'name' => $request->name,
                 'description' => $request->description,
                 'is_public' => $request->is_public,
@@ -103,7 +103,7 @@ class FolderController extends Controller
             return response()->json([
                 'status' => 'success',
                 'status_code' => 200,
-                'message' => 'Folder created successfully',
+                'message' => 'Course created successfully',
                 'data' => $folder
             ]);
         } catch (\Exception $e) {
@@ -137,7 +137,7 @@ class FolderController extends Controller
     {
         try {
             // Get the folder details
-            $folder = Folder::findOrFail($id);
+            $folder = Course::findOrFail($id);
             // Get set in folder
             $set = $folder->sets;
             $set = $set->map(function ($set) {
@@ -191,7 +191,7 @@ class FolderController extends Controller
                         'password' => 'nullable',
                     ]);
                     // Update the folder
-                    $folder = Folder::findOrFail($id);
+                    $folder = Course::findOrFail($id);
                     $folder->update([
                         'name' => $request->name,
                         'description' => $request->description,
@@ -206,7 +206,7 @@ class FolderController extends Controller
                         'search' => 'required|string',
                     ]);
                     // Find set
-                    $set = Set::where('name', 'like', '%' . $request->search . '%')
+                    $set = Lesson::where('name', 'like', '%' . $request->search . '%')
                         ->orWhere('description', 'like', '%' . $request->search . '%')
                         ->orWhere('id', 'like', '%' . $request->search . '%')
                         ->orWhereHas('user', function ($query) use ($request) {
@@ -231,8 +231,8 @@ class FolderController extends Controller
                         'set_id' => 'required|exists:sets,id',
                     ]);
                     // Add set to folder
-                    $folder = Folder::findOrFail($id);
-                    $set = Set::findOrFail($request->set_id);
+                    $folder = Course::findOrFail($id);
+                    $set = Lesson::findOrFail($request->set_id);
                     $folder->sets()->attach($set);
                     $data[] = [
                         $set->id,
@@ -254,7 +254,7 @@ class FolderController extends Controller
                         'set_ids' => 'required|array',
                     ]);
                     // Remove set from folder
-                    $folder = Folder::findOrFail($id);
+                    $folder = Course::findOrFail($id);
                     $folder->sets()->detach($request->set_ids);
                     break;
             }
@@ -263,7 +263,7 @@ class FolderController extends Controller
             return response()->json([
                 'status' => 'success',
                 'status_code' => 200,
-                'message' => 'Folder updated successfully',
+                'message' => 'Course updated successfully',
             ]);
 
         } catch (\Exception $e) {
@@ -286,13 +286,13 @@ class FolderController extends Controller
     {
         try {
             // Delete the folder
-            Folder::destroy($id);
+            Course::destroy($id);
 
             // Return json
             return response()->json([
                 'status' => 'success',
                 'status_code' => 200,
-                'message' => 'Folder deleted successfully',
+                'message' => 'Course deleted successfully',
             ]);
         } catch (\Exception $e) {
             // Return json
