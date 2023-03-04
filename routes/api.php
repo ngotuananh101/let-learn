@@ -8,6 +8,7 @@ use App\Http\Controllers\Admin\LessonController as AdminSetController;
 use App\Http\Controllers\Admin\CourseController as AdminFolderController;
 use App\Http\Controllers\Admin\UserController as AdminUserController;
 use App\Http\Controllers\Admin\RoleController as AdminRoleController;
+use App\Http\Controllers\Admin\SchoolController as AdminSchoolController;
 use App\Http\Controllers\Auth\VerificationController;
 use App\Http\Controllers\Public\LessonController;
 use App\Http\Controllers\Public\CourseController;
@@ -65,6 +66,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::resource('folder', AdminFolderController::class)->middleware(['permissions:admin.folders']);
         Route::resource('user', AdminUserController::class)->middleware(['permissions:admin.users']);
         Route::resource('role', AdminRoleController::class)->middleware(['permissions:admin.roles']);
+        Route::resource('school', AdminSchoolController::class)->middleware(['permissions:admin.schools']);
     })->middleware(['permissions:admin.dashboard']);
     // Route set
     Route::prefix('set')->group(function () {
