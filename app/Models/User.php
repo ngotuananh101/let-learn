@@ -60,7 +60,7 @@ class User extends Authenticate implements MustVerifyEmail
     /**
      * 1 user can have many sets
      */
-    public function sets(): HasMany
+    public function lesson(): HasMany
     {
         return $this->hasMany(Lesson::class);
     }
