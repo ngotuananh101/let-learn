@@ -9,8 +9,8 @@ use App\Http\Controllers\Admin\FolderController as AdminFolderController;
 use App\Http\Controllers\Admin\UserController as AdminUserController;
 use App\Http\Controllers\Admin\RoleController as AdminRoleController;
 use App\Http\Controllers\Auth\VerificationController;
-use App\Http\Controllers\Public\SetController;
-use App\Http\Controllers\Public\FolderController;
+use App\Http\Controllers\Public\LessonController;
+use App\Http\Controllers\Public\CourseController;
 use App\Http\Controllers\Public\ClassController;
 
 /*
@@ -56,40 +56,40 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::resource('set', AdminSetController::class)->middleware(['permissions:admin.sets']);
         Route::resource('folder', AdminFolderController::class)->middleware(['permissions:admin.folders']);
         Route::resource('user', AdminUserController::class)->middleware(['permissions:admin.users']);
-        Route::resource('roles', AdminRoleController::class)->middleware(['permissions:admin.roles']);
+        Route::resource('role', AdminRoleController::class)->middleware(['permissions:admin.roles']);
     })->middleware(['permissions:admin.dashboard']);
     // Route set
     Route::prefix('set')->group(function () {
-        Route::post('/', [SetController::class, 'store']);
-        Route::get('/{id}', [SetController::class, 'show']);
-        Route::put('/{id}', [SetController::class, 'update']);
-        Route::delete('/{id}', [SetController::class, 'destroy']);
-        Route::post('/import', [SetController::class, 'import']);
-        Route::get('/export/{id}', [SetController::class, 'export']);
-        Route::get('user/{id}', [SetController::class, 'showAllSetByUserId']);
-        Route::get('folder/{id}', [SetController::class, 'showAllSetByFolderId']);
-        Route::get('progress/{id}', [SetController::class, 'showProgressBySetId']);
+        Route::post('/', [LessonController::class, 'store']);
+        Route::get('/{id}', [LessonController::class, 'show']);
+        Route::put('/{id}', [LessonController::class, 'update']);
+        Route::delete('/{id}', [LessonController::class, 'destroy']);
+        Route::post('/import', [LessonController::class, 'import']);
+        Route::get('/export/{id}', [LessonController::class, 'export']);
+        Route::get('user/{id}', [LessonController::class, 'showAllSetByUserId']);
+        Route::get('folder/{id}', [LessonController::class, 'showAllSetByFolderId']);
+        Route::get('progress/{id}', [LessonController::class, 'showProgressBySetId']);
     });
     // Route folder
     Route::prefix('folder')->group(function () {
-        Route::post('/', [FolderController::class, 'store']);
-        Route::get('/{id}', [FolderController::class, 'show']);
-        Route::put('/{id}', [FolderController::class, 'update']);
-        Route::delete('/{id}', [FolderController::class, 'destroy']);
-        Route::get('/{id}/set', [SetController::class, 'showAllSetByFolderId']);
-        Route::post('/add/{folder_id}/{set_id}', [FolderController::class, 'addSetToFolder']);
-        Route::delete('/remove/{folder_id}/{set_id}', [FolderController::class, 'removeSetFromFolder']);
+        Route::post('/', [CourseController::class, 'store']);
+        Route::get('/{id}', [CourseController::class, 'show']);
+        Route::put('/{id}', [CourseController::class, 'update']);
+        Route::delete('/{id}', [CourseController::class, 'destroy']);
+        Route::get('/{id}/set', [LessonController::class, 'showAllSetByFolderId']);
+        Route::post('/add/{folder_id}/{set_id}', [CourseController::class, 'addSetToFolder']);
+        Route::delete('/remove/{folder_id}/{set_id}', [CourseController::class, 'removeSetFromFolder']);
     });
     // Route user
     Route::prefix('user')->group(function () {
-        Route::get('folder', [FolderController::class, 'showAllFolderByUserId']);
-        Route::get('set', [SetController::class, 'showAllSetByUserId']);
+        Route::get('folder', [CourseController::class, 'showAllFolderByUserId']);
+        Route::get('set', [LessonController::class, 'showAllSetByUserId']);
     });
     Route::prefix('class')->group(function () {
         Route::middleware(['checkUserInClass:all'])->group(function () {
-            Route::post('/addFolder/{id}', [ClassController::class, 'addFolder']);               
+            Route::post('/addFolder/{id}', [ClassController::class, 'addFolder']);
             Route::get('/{id}', [ClassController::class, 'show']);
-        });       
+        });
         Route::middleware(['checkUserInClass:teacher'])->group(function () {
             Route::post('/addTeacher/{id}', [ClassController::class, 'addTeacher']);
             Route::post('/addStudent/{id}', [ClassController::class, 'addStudent']);

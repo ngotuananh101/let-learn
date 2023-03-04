@@ -11,7 +11,7 @@ use Illuminate\Http\JsonResponse;
 use PhpOffice\PhpSpreadsheet\Reader\Xml\Style\Font;
 use PhpParser\Node\Stmt\TryCatch;
 
-class FolderController extends Controller
+class CourseController extends Controller
 {
     /**
      * Display a listing of the resource.

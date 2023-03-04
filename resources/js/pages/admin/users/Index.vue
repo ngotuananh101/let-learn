@@ -72,7 +72,7 @@
                             <div class="col-5">
                                 <label class="form-label">Role</label>
                                 <select
-                                    id="role"
+                                    id="role_ele"
                                     name="role"
                                     class="form-control"
                                 >
@@ -191,7 +191,7 @@ export default {
             this.table.rows.add(response).draw();
         });
         this.role().then((response) => {
-            this.choices_role = new Choices('#roles', {
+            this.choices_role = new Choices('#role_ele', {
                 searchEnabled: true,
                 itemSelectText: '',
                 allowHTML: true,
