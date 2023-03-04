@@ -63,7 +63,6 @@ export default {
     },
     methods: {
         addSetCard() {
-            console.log('addSetCard');
             this.children.push(SetCard);
             this.count++;
         },

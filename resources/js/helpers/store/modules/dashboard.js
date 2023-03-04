@@ -76,7 +76,6 @@ export default {
                     },
                     error => {
                         commit('analyticsFailure');
-                        console.log(error);
                         dispatch('alert/error', error, { root: true });
                     }
                 );

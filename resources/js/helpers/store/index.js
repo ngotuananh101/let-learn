@@ -22,6 +22,6 @@ export default createStore({
         adminSet,
         adminFolder,
         adminUser,
-        adminRole
+        adminRole,
     },
 });

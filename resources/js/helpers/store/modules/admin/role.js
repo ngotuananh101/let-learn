@@ -39,6 +39,104 @@ export default {
                         return [];
                     }
                 );
-        }
+        },
+        getRoleUsers({commit}, id) {
+            overlay();
+            commit('indexRequest');
+            return adminRoleService.getRoleUsers(id)
+                .then(
+                    roles => {
+                        commit('indexSuccess', roles);
+                        overlay();
+                        return Promise.resolve(roles);
+                    },
+                    error => {
+                        commit('indexFailure', error);
+                        overlay();
+                        return [];
+                    }
+                );
+        },
+        getRoleInfo({commit}, id) {
+            overlay();
+            commit('indexRequest');
+            return adminRoleService.getRoleInfo(id)
+                .then(
+                    roles => {
+                        commit('indexSuccess', roles);
+                        overlay();
+                        return Promise.resolve(roles);
+                    },
+                    error => {
+                        commit('indexFailure', error);
+                        overlay();
+                        return [];
+                    }
+                );
+        },
+        getAllPermission({commit}) {
+            commit('indexRequest');
+            return adminRoleService.getAllPermission()
+                .then(
+                    roles => {
+                        commit('indexSuccess', roles);
+                        return Promise.resolve(roles);
+                    },
+                    error => {
+                        commit('indexFailure', error);
+                        return [];
+                    }
+                );
+        },
+        addRole({commit}, role) {
+            overlay();
+            commit('indexRequest');
+            return adminRoleService.addRole(role)
+                .then(
+                    roles => {
+                        commit('indexSuccess', roles);
+                        overlay();
+                        return Promise.resolve(roles);
+                    },
+                    error => {
+                        commit('indexFailure', error);
+                        overlay();
+                        return [];
+                    }
+                );
+        },
+        updateRole({commit}, role) {
+            overlay();
+            commit('indexRequest');
+            return adminRoleService.updateRole(role)
+                .then(
+                    roles => {
+                        commit('indexSuccess', roles);
+                        overlay();
+                        return Promise.resolve(roles);
+                    },
+                    error => {
+                        commit('indexFailure', error);
+                        overlay();
+                        return [];
+                    }
+                );
+        },
+
+        deleteRole({commit}, id) {
+            overlay();
+            return adminRoleService.deleteRole(id)
+                .then(
+                    roles => {
+                        overlay();
+                        return true;
+                    },
+                    error => {
+                        overlay();
+                        return false;
+                    }
+                );
+        },
+
     }
 }

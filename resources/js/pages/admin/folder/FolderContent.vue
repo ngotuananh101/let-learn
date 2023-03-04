@@ -189,7 +189,6 @@ export default {
             } else {
                 this.folder[name] = document.getElementById(name).value;
             }
-            console.log(this.folder);
         },
         updateFolderInfo() {
             this.updateFolder(this.folder);

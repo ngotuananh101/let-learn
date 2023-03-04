@@ -4,15 +4,13 @@ namespace App\Http\Controllers\Public;
 
 use App\Http\Controllers\Controller;
 use App\Models\Lesson;
-use App\Models\User;
 use App\Models\Course;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Http\Response;
 use Maatwebsite\Excel\Facades\Excel;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
-class SetController extends Controller
+class LessonController extends Controller
 {
     public function import(Request $request): JsonResponse
     {
