@@ -10,7 +10,7 @@ use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Carbon;
 
-class FolderController extends Controller
+class CourseController extends Controller
 {
     /**
      * Get the list of folders

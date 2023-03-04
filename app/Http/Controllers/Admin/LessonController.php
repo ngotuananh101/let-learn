@@ -9,8 +9,18 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Maatwebsite\Excel\Facades\Excel;
 
-class SetController extends Controller
+class LessonController extends Controller
 {
+    /**
+     * Instantiate a new controller instance.
+     *
+     * @return void
+     */
+    public function __construct()
+    {
+        $this->middleware('permissions:admin.lessons')->only(['index']);
+    }
+
     /**
      * Return list of all set
      *
@@ -256,7 +266,7 @@ class SetController extends Controller
                     'set_data' => $set_data
                 ]
             ], 200);
-        }catch (\Throwable $th) {
+        } catch (\Throwable $th) {
             return response()->json([
                 'status' => false,
                 'message' => $th->getMessage()

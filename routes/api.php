@@ -4,8 +4,8 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Auth\Authentication as Authentication;
 use App\Http\Controllers\Admin\AnalyticsController;
 use App\Http\Controllers\Admin\SettingController;
-use App\Http\Controllers\Admin\SetController as AdminSetController;
-use App\Http\Controllers\Admin\FolderController as AdminFolderController;
+use App\Http\Controllers\Admin\LessonController as AdminSetController;
+use App\Http\Controllers\Admin\CourseController as AdminFolderController;
 use App\Http\Controllers\Admin\UserController as AdminUserController;
 use App\Http\Controllers\Admin\RoleController as AdminRoleController;
 use App\Http\Controllers\Auth\VerificationController;
@@ -43,8 +43,16 @@ Route::group(['prefix' => 'auth'], function () {
     Route::post('forgot-password', [Authentication::class, 'forgotPassword']);
     Route::post('reset-password', [Authentication::class, 'resetPassword']);
 });
+/**
+ * Route to get meta data.
+ */
 Route::get('/meta', [SettingController::class, 'meta']);
+
+/**
+ * Route for authenticated user.
+ */
 Route::middleware('auth:sanctum')->group(function () {
+    // Route for admin
     Route::prefix('admin')->group(function () {
         Route::prefix('analytics')->group(function () {
             Route::get('google', [AnalyticsController::class, 'getAnalytics']);
@@ -53,7 +61,7 @@ Route::middleware('auth:sanctum')->group(function () {
             Route::get('/', [SettingController::class, 'index'])->middleware(['permissions:admin.settings']);
             Route::post('/{key}', [SettingController::class, 'update'])->middleware(['permissions:admin.settings.update']);
         });
-        Route::resource('set', AdminSetController::class)->middleware(['permissions:admin.sets']);
+        Route::resource('set', AdminSetController::class)->middleware(['permissions:admin.lessons']);
         Route::resource('folder', AdminFolderController::class)->middleware(['permissions:admin.folders']);
         Route::resource('user', AdminUserController::class)->middleware(['permissions:admin.users']);
         Route::resource('role', AdminRoleController::class)->middleware(['permissions:admin.roles']);

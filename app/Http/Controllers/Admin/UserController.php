@@ -11,6 +11,19 @@ use Illuminate\Support\Carbon;
 class UserController extends Controller
 {
     /**
+     * Instantiate a new controller instance.
+     *
+     * @return void
+     */
+    public function __construct()
+    {
+        $this->middleware('permissions:admin.users')->only(['index']);
+        $this->middleware('permissions:admin.users.create')->only(['store']);
+        $this->middleware('permissions:admin.users.edit')->only(['update']);
+        $this->middleware('permissions:admin.users.delete')->only(['destroy']);
+    }
+
+    /**
      * Display a listing of the resource.
      *
      * @return JsonResponse

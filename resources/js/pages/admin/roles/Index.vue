@@ -13,7 +13,7 @@
                             :class="'nav-item d-flex justify-content-between align-items-center px-3 py-1 role' + [ getRoute() === role[1] ? ' active ' : '']"
                             :id="'role-'+role[0]">
                             <a class="text-body p-0" :href="'#' + role[1]" @click="getRoleUser(role[0])">
-                                <span class="fs-5">{{ role[1] }}</span>
+                                <span class="fs-6 fw-bold">{{ role[1] }}</span>
                                 <p class="fs-6 m-0">{{ role[2] }}</p>
                             </a>
                             <i v-if="checkPermission('admin.roles.edit')" class="fa-regular fa-gear fs-5"
@@ -32,12 +32,14 @@
                                 <p class="mb-0 text-sm">List all user assigned to this role</p>
                             </div>
                             <div class="my-auto mt-4 ms-auto mt-lg-0">
-                                <div class="my-auto ms-auto">
-                                    <button v-if="checkPermission('admin.roles.create')" type="button"
-                                            class="mx-1 mb-0 btn btn-outline-success btn-sm"
-                                            data-bs-toggle="modal"
-                                            data-bs-target="#userModal">
+                                <div v-if="this.current_role" class="my-auto ms-auto">
+                                    <button v-if="checkPermission('admin.roles.assign')" type="button"
+                                            class="mx-1 mb-0 btn btn-outline-success btn-sm" @click="this.user_modal.show()">
                                         + Assign Users
+                                    </button>
+                                    <button v-if="checkPermission('admin.roles.unassign')" type="button"
+                                            class="mx-1 mb-0 btn btn-outline-danger btn-sm" @click="this.unassignUser">
+                                        Unassign Users
                                     </button>
                                 </div>
                             </div>
@@ -45,7 +47,7 @@
                     </div>
                     <div class="px-0 pb-0 pt-0 card-body">
                         <div class="table-responsive">
-                            <DataTable id="user_data" :options="{select: 'single'}" ref="table"
+                            <DataTable id="user_data" :options="{select: true}" ref="table"
                                        class="table table-flush mx-3">
                                 <thead class="thead-light">
                                 <tr>
@@ -100,11 +102,46 @@
                     <button type="button" class="btn bg-gradient-success btn-sm" id="role-submit">
                         Submit
                     </button>
-                    <button v-if="this.mode === 'edit'" type="button" class="btn bg-gradient-danger btn-sm"
+                    <button v-if="this.mode === 'edit' && checkPermission('admin.roles.delete')" type="button" class="btn bg-gradient-danger btn-sm"
                             id="role-delete" @click="deleteRole">
                         Delete
                     </button>
                     <button type="button" class="btn bg-gradient-primary btn-sm" id="close-option"
+                            data-bs-dismiss="modal">
+                        Close
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div id="roleUserModal" class="modal fade" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog mt-lg-10">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 id="role-title" class="modal-title">
+                        Find User
+                    </h5>
+                    <i class="fa-regular fa-magnifying-glass ms-3"></i>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-12">
+                            <label class="form-label mt-2">Find by username or email</label>
+                            <select
+                                class="form-control"
+                                data-trigger
+                                name="search_user"
+                                id="search_user"
+                            >
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn bg-gradient-success btn-sm" id="role-assign" @click="assignUser">
+                        Add
+                    </button>
+                    <button type="button" class="btn bg-gradient-primary btn-sm" id="close-assign"
                             data-bs-dismiss="modal">
                         Close
                     </button>
@@ -140,9 +177,12 @@ export default {
             roles: null,
             table: null,
             role_modal: null,
+            user_modal: null,
             permission_select: null,
             mode: 'create',
             id: null,
+            current_role: null,
+            search_user: null,
         }
     },
     methods: {
@@ -154,6 +194,7 @@ export default {
             getRoleUsers: 'adminRole/getRoleUsers',
             getRoleInfo: 'adminRole/getRoleInfo',
             getAllPermissions: 'adminRole/getAllPermission',
+            searchUsers: 'adminRole/searchUsers',
         }),
         ...mapGetters({
             permissions: 'account/permissions',
@@ -162,6 +203,7 @@ export default {
             return this.permissions().some(permission => permission.name === name);
         },
         getRoleUser(id) {
+            this.current_role = id;
             this.getRoleUsers(id).then((response) => {
                 this.table.clear();
                 this.table.rows.add(response);
@@ -183,10 +225,6 @@ export default {
                 });
             });
             this.id = id;
-            // remove event listener
-            document.getElementById('role-submit').removeEventListener('click', null);
-            // add event listener
-            document.getElementById('role-submit').addEventListener('click', this.updateRole);
         },
         showFormAddRole() {
             this.mode = 'create';
@@ -197,10 +235,13 @@ export default {
             // remove all selected option
             this.permission_select.removeActiveItems();
             this.role_modal.show();
-            // remove event listener
-            document.getElementById('role-submit').removeEventListener('click', null);
-            // add event listener
-            document.getElementById('role-submit').addEventListener('click', this.addRole);
+        },
+        handleRoleSubmit(){
+            if (this.mode === 'create') {
+                this.addRole();
+            } else if (this.mode === 'edit') {
+                this.updateRole();
+            }
         },
         addRole() {
             let name = document.getElementById('name').value;
@@ -285,6 +326,93 @@ export default {
                 });
             }
         },
+        searchUser(e) {
+            // remove all selected option
+            this.search_user.removeActiveItems();
+            this.search_user.setChoices([], 'value', 'label', true);
+            // wait for user to finish typing
+            clearTimeout(this.timeout);
+            this.timeout = setTimeout(() => {
+                let keyword = e.detail.value;
+                if (keyword.length > 3) {
+                    this.search_user.setChoices(()=>{
+                        return this.searchUsers(keyword).then((response) => {
+                            return response;
+                        });
+                    }, 'value', 'label', true);
+                }
+            }, 600);
+        },
+        assignUser(){
+            // get selected user
+            let user = this.search_user.getValue(true);
+            // get selected role
+            let role = this.current_role;
+            if(!user || role === null){
+                alert('Please select user and role');
+            }else{
+                this.$store.dispatch('adminRole/assignUser', {userId: user, roleId: role}).then((response) => {
+                    if(response === 'ok'){
+                        this.$swal({
+                            icon: "success",
+                            title: "Success!",
+                            text: "User has been assigned to role.",
+                            showConfirmButton: false,
+                            timer: 600,
+                        }).then(() => {
+                            this.user_modal.hide();
+                        }).then(() => {
+                            this.getRoleUser(role);
+                        });
+
+                    }else{
+                        this.$swal({
+                            icon: "error",
+                            title: "Oops...",
+                            text: "Something went wrong!",
+                            showConfirmButton: false,
+                            timer: 600,
+                        });
+                    }
+                });
+            }
+        },
+        unassignUser(){
+            // get select user
+            let selected = this.table.rows({selected: true}).data();
+            if(selected.length === 0){
+                alert('Please select at least one user');
+            }else{
+                let users = [];
+                selected.each(function (value, index) {
+                    users.push(value[0]);
+                });
+                // unassign user
+                this.$store.dispatch('adminRole/unassignUser', {users: users, role: this.current_role}).then((response) => {
+                    if(response === 'ok'){
+                        this.$swal({
+                            icon: "success",
+                            title: "Success!",
+                            text: "User has been unassigned from role.",
+                            showConfirmButton: false,
+                            timer: 600,
+                        }).then(() => {
+                            this.user_modal.hide();
+                        }).then(() => {
+                            this.getRoleUser(this.current_role);
+                        });
+                    }else{
+                        this.$swal({
+                            icon: "error",
+                            title: "Oops...",
+                            text: "Something went wrong!",
+                            showConfirmButton: false,
+                            timer: 600,
+                        });
+                    }
+                });
+            }
+        }
     },
     beforeMount() {
         this.getRole().then((response) => {
@@ -297,6 +425,10 @@ export default {
             keyboard: true,
             backdrop: 'static'
         });
+        this.user_modal = new Modal(document.getElementById('roleUserModal'), {
+            keyboard: true,
+            backdrop: 'static'
+        });
         this.permission_select = new Choices('#permission', {
             removeItemButton: true,
             searchResultLimit: 5,
@@ -305,9 +437,21 @@ export default {
             itemSelectText: '',
             allowHTML: true,
         });
-        this.getAllPermissions().then((response) => {
-            this.permission_select.setChoices(response, 'value', 'label', true);
+        this.permission_select.setChoices(()=>{
+            return this.getAllPermissions().then((response) => {
+                return response;
+            });
+        }, 'value', 'label', true);
+        document.getElementById('role-submit').addEventListener('click', this.handleRoleSubmit);
+        this.search_user = new Choices('#search_user', {
+            removeItemButton: true,
+            searchResultLimit: 5,
+            searchFields: ['label', 'value'],
+            shouldSort: false,
+            itemSelectText: '',
+            allowHTML: true,
         });
+        document.getElementById('search_user').addEventListener('search', this.searchUser);
     },
 };
 </script>

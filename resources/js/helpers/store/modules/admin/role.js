@@ -137,6 +137,50 @@ export default {
                     }
                 );
         },
+        searchUsers({commit}, query) {
+            commit('indexRequest');
+            return adminRoleService.searchUser(query)
+                .then(
+                    roles => {
+                        commit('indexSuccess', roles);
+                        return Promise.resolve(roles);
+                    },
+                    error => {
+                        commit('indexFailure', error);
+                        return [];
+                    }
+                );
+        },
+        assignUser({commit}, data) {
+            overlay();
+            commit('indexRequest');
+            return adminRoleService.assignUser(data)
+                .then(
+                    roles => {
+                        overlay();
+                        return 'ok';
+                    },
+                    error => {
+                        overlay();
+                        return false;
+                    }
+                );
+        },
+        unassignUser({commit}, data) {
+            overlay();
+            commit('indexRequest');
+            return adminRoleService.unassignUser(data)
+                .then(
+                    roles => {
+                        overlay();
+                        return 'ok';
+                    },
+                    error => {
+                        overlay();
+                        return false;
+                    }
+                );
+        },
 
     }
 }
