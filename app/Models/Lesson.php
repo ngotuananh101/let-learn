@@ -56,24 +56,16 @@ class Lesson extends Model
     /**
      * Get set details
      */
-    public function setDetails(): HasMany
+    public function lessonDetail(): HasMany
     {
-        return $this->hasMany(SetDetail::class);
+        return $this->hasMany(LessonDetail::class);
     }
 
     /**
      * Get the folder that owns the set.
      */
-    public function folder(): BelongsToMany
+    public function course(): BelongsToMany
     {
-        return $this->belongsToMany(Course::class, 'folder_set', 'set_id', 'folder_id');
-    }
-
-    /**
-     * Get the class that owns the set.
-     */
-    public function classes(): BelongsToMany
-    {
-        return $this->belongsToMany(Classes::class, 'class_set', 'set_id', 'class_id');
+        return $this->belongsToMany(Course::class);
     }
 }

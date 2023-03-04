@@ -26,20 +26,28 @@ class LessonController extends Controller
             ]);
             $type = $request->input('type');
             // Tao set moi
-            $set = new Lesson();
-            $set->name = $request->name;
-            $set->description = $request->description;
-            $set->user_id = auth()->user()->id;
-            $set->save();
-
+            $lesson = new Lesson();
+            $lesson->name = $request->name;
+            $lesson->description = $request->description;
+            $lesson->user_id = auth()->user()->id;
+            $lesson->save();
             if ($type == 'text') {
                 $raw_detail = explode($request->set_separator, $request->text);
+                if (count($raw_detail) < 3) {
+                    // delete set
+                    $lesson->delete();
+                    return response()->json([
+                        'status' => 'error',
+                        'status_code' => 400,
+                        'message' => 'Text must have more than 3 sets'
+                    ], 400);
+                }
                 foreach ($raw_detail as $item) {
                     try {
                         $raw = explode($request->term_separator, $item);
                         $term = $raw[0];
                         $definition = $raw[1];
-                        $set->setDetails()->create([
+                        $lesson->lessonDetail()->create([
                             'term' => $term,
                             'definition' => $definition
                         ]);
@@ -58,7 +66,7 @@ class LessonController extends Controller
                         if (count($data[0][0]) > 2) {
                             foreach ($data[0] as $key => $item) {
                                 if ($key >= 1) {
-                                    $set->setDetails()->create([
+                                    $lesson->lessonDetail()->create([
                                         'term' => $item[1],
                                         'definition' => $item[2]
                                     ]);
@@ -66,7 +74,7 @@ class LessonController extends Controller
                             }
                         } else {
                             // delete set
-                            $set->delete();
+                            $lesson->delete();
                             return response()->json([
                                 'status' => 'error',
                                 'status_code' => 400,
@@ -75,7 +83,7 @@ class LessonController extends Controller
                         }
                     } else {
                         // delete set
-                        $set->delete();
+                        $lesson->delete();
                         return response()->json([
                             'status' => 'error',
                             'status_code' => 400,
@@ -90,7 +98,7 @@ class LessonController extends Controller
                         if (count($csv[0]) > 2) {
                             foreach ($csv as $key => $item) {
                                 if ($key >= 1) {
-                                    $set->setDetails()->create([
+                                    $lesson->lessonDetail()->create([
                                         'term' => $item[1],
                                         'definition' => $item[2]
                                     ]);
@@ -98,7 +106,7 @@ class LessonController extends Controller
                             }
                         } else {
                             // delete set
-                            $set->delete();
+                            $lesson->delete();
                             return response()->json([
                                 'status' => 'error',
                                 'status_code' => 400,
@@ -107,7 +115,7 @@ class LessonController extends Controller
                         }
                     } else {
                         // delete set
-                        $set->delete();
+                        $lesson->delete();
                         return response()->json([
                             'status' => 'error',
                             'status_code' => 400,
@@ -133,16 +141,16 @@ class LessonController extends Controller
     public function export(Request $request, $id): BinaryFileResponse|JsonResponse
     {
         try {
-            $set = Lesson::findOrfail($id);
-            $setData = $set->setDetails()->get()->toArray();
-            if (empty($setData)) {
+            $lesson = Lesson::findOrfail($id);
+            $lessonData = $lesson->lessonDetail()->get()->toArray();
+            if (empty($lessonData)) {
                 return response()->json(['message' => 'No data found for this set']);
             }
             $fileName = 'set_' . $id . '_' . date('Ymd_His') . '.csv';
             $filePath = storage_path('app/export/set/' . $fileName);
             $file = fopen($filePath, 'w');
-            fputcsv($file, ['Term', 'Definition', 'Image']);
-            foreach ($setData as $row) {
+            fputcsv($file, ['id', 'Term', 'Definition']);
+            foreach ($lessonData as $row) {
                 fputcsv($file, $row);
             }
             fclose($file);
@@ -172,14 +180,15 @@ class LessonController extends Controller
                 'data' => 'required|array',
             ]);
             // add new set to user
-            $set = auth()->user()->sets()->create([
+            $user = auth()->user();
+            $lesson = $user->lesson()->create([
                 'name' => $request->name,
                 'description' => $request->description,
                 'password' => $request->password,
             ]);
             // add set details
             foreach ($request->data as $detail) {
-                $set->setDetails()->create([
+                $lesson->lessonDetail()->create([
                     'term' => $detail['term'],
                     'definition' => $detail['definition'],
                 ]);
@@ -208,23 +217,23 @@ class LessonController extends Controller
     public function show($id): JsonResponse
     {
         try {
-            $set = Lesson::findOrFail($id);
+            $lesson = Lesson::findOrFail($id);
             // check set is deleted
-            if ($set->status == 'inactive') {
+            if ($lesson->status == 'inactive') {
                 return response()->json([
                     'status' => 'error',
                     'status_code' => 404,
                     'message' => 'Lesson not found!'
                 ], 404);
             }
-            $setdetail = $set->setDetails()->get();
+            $lessonDetail = $lesson->lessonDetail()->get();
             return response()->json([
                 'status' => 'success',
                 'status_code' => 200,
                 'message' => 'Get set successfully!',
                 'data' => [
-                    'set' => $set,
-                    'detail' => $setdetail
+                    'set' => $lesson,
+                    'detail' => $lessonDetail
                 ]
             ], 200);
         } catch (\Throwable $th) {
@@ -254,18 +263,18 @@ class LessonController extends Controller
                 'password' => 'nullable|string',
                 'data' => 'required|array',
             ]);
-            $set = Lesson::findOrFail($id);
-            $set->name = $request->name;
-            $set->description = $request->description;
-            $set->status = $request->status;
-            $set->is_public = $request->is_public;
-            $set->password = $request->password;
-            $set->save();
+            $lesson = Lesson::findOrFail($id);
+            $lesson->name = $request->name;
+            $lesson->description = $request->description;
+            $lesson->status = $request->status;
+            $lesson->is_public = $request->is_public;
+            $lesson->password = $request->password;
+            $lesson->save();
 
-            $set->setDetails()->delete();
+            $lesson->lessonDetail()->delete();
 
             foreach ($request->data as $detail) {
-                $set->setDetails()->create([
+                $lesson->lessonDetail()->create([
                     'term' => $detail['term'],
                     'definition' => $detail['definition'],
                 ]);
@@ -294,9 +303,9 @@ class LessonController extends Controller
     public function destroy($id): JsonResponse
     {
         try {
-            $set = Lesson::findOrFail($id);
+            $lesson = Lesson::findOrFail($id);
             // Soft delete set
-            $set->update([
+            $lesson->update([
                 'status' => 'inactive'
             ]);
             return response()->json([
@@ -318,12 +327,12 @@ class LessonController extends Controller
     {
         try {
             $user = auth()->user();
-            $set = $user->sets()->where('status', 'active')->get();
+            $lesson = $user->lesson()->where('status', 'active')->get();
             return response()->json([
                 'status' => 'success',
                 'status_code' => 200,
                 'message' => 'Get set successfully!',
-                'data' => $set
+                'data' => $lesson
             ], 200);
         } catch (\Throwable $th) {
             return response()->json([
@@ -338,13 +347,13 @@ class LessonController extends Controller
     public function showAllSetByFolderId($id): JsonResponse
     {
         try {
-            $folder = Course::findOrFail($id);
-            $set = $folder->sets()->where('status', 'active')->get();
+            $course = Course::findOrFail($id);
+            $lesson = $course->sets()->where('status', 'active')->get();
             return response()->json([
                 'status' => 'success',
                 'status_code' => 200,
                 'message' => 'Get set successfully!',
-                'data' => $set
+                'data' => $lesson
             ], 200);
         } catch (\Throwable $th) {
             return response()->json([
@@ -359,11 +368,11 @@ class LessonController extends Controller
     public function showProgressBySetId($id): JsonResponse
     {
         try {
-            $set = Lesson::findOrFail($id);
-            $setdetail = $set->setDetails()->get();
+            $lesson = Lesson::findOrFail($id);
+            $lessonDetail = $lesson->lessonDetail()->get();
             $progress = 0;
-            foreach ($setdetail as $detail) {
-                if ($detail->progress == 'done') {
+            foreach ($lessonDetail as $detail) {
+                if ($detail->is_learned == 1) {
                     $progress++;
                 }
             }
@@ -373,7 +382,7 @@ class LessonController extends Controller
                 'message' => 'Get progress successfully!',
                 'data' => [
                     'progress' => $progress,
-                    'total' => count($setdetail)
+                    'total' => count($lesson)
                 ]
             ], 200);
         } catch (\Throwable $th) {
