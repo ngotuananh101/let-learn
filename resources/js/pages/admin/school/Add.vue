@@ -181,6 +181,11 @@ export default {
             this.init();
         });
     },
+    beforeUnmount() {
+        this.select_country.destroy();
+        this.select_city.destroy();
+        this.select_state.destroy();
+    },
     methods: {
         ...mapGetters({
             permissions: 'account/permissions',
