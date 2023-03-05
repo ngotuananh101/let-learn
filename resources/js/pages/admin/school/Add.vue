@@ -148,7 +148,7 @@ export default {
     },
     data() {
         return {
-            country: Country.getAllCountries(),
+            country: null,
             state: null,
             city: null,
             school: {
@@ -194,6 +194,7 @@ export default {
             return this.permissions().some(permission => permission.name === name);
         },
         init() {
+            this.country = Country.getAllCountries();
             this.select_country = new Choices('#select_country', {
                 searchEnabled: true,
                 itemSelectText: '',
