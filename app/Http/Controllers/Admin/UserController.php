@@ -162,6 +162,7 @@ class UserController extends Controller
                 'username' => 'nullable|unique:users,username,'.$id,
                 'email' => 'required|email|unique:users,email,'.$id,
                 'date_of_birth' => 'required|date|before:today',
+                'email_verified_at' => 'nullable|date|before:today',
                 'password' => 'nullable|confirmed',
             ]);
             $user = User::findOrFail($id);
@@ -169,11 +170,11 @@ class UserController extends Controller
             $user->username = $request->username ?? uniqid('llu_');
             $user->email = $request->email;
             $user->date_of_birth = $request->date_of_birth;
+            $request->email_verified_at ? $user->email_verified_at = $request->email_verified_at : null;
             if ($request->password) {
                 $user->password = bcrypt($request->password);
             }
             $user->status = 'active';
-            $user->email_verified_at = Carbon::now();
             $user->save();
             return response()->json([
                 'status' => 'success',

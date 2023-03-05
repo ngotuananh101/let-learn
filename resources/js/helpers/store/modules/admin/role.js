@@ -24,18 +24,15 @@ export default {
     },
     actions: {
         index({commit}) {
-            overlay();
             commit('indexRequest');
             return adminRoleService.index()
                 .then(
                     roles => {
                         commit('indexSuccess', roles);
-                        overlay();
                         return Promise.resolve(roles);
                     },
                     error => {
                         commit('indexFailure', error);
-                        overlay();
                         return [];
                     }
                 );

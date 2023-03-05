@@ -38,7 +38,7 @@ const admin = [
                     {
                         path: 'add',
                         name: 'admin.schools.add',
-                        component: () => import('../../pages/admin/school/Index.vue'),
+                        component: () => import('../../pages/admin/school/Add.vue'),
                     },
                     {
                         path: 'edit/:id',

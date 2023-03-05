@@ -24,18 +24,15 @@ export default {
     },
     actions: {
         index({commit}) {
-            overlay();
             commit('indexRequest');
             return adminUserService.index()
                 .then(
                     users => {
                         commit('indexSuccess', users);
-                        overlay();
                         return Promise.resolve(users);
                     },
                     error => {
                         commit('indexFailure', error);
-                        overlay();
                         return [];
                     }
                 );
