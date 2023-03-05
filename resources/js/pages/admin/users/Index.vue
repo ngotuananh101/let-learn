@@ -91,7 +91,8 @@
                             </div>
                             <div class="col-6" v-if="type==='update'">
                                 <label class="form-label">Email verified at</label>
-                                <argon-input id="email_verified_at" type="datetime-local" name="email_verified_at" required/>
+                                <argon-input id="email_verified_at" type="datetime-local" name="email_verified_at"
+                                             required/>
                             </div>
                             <div class="col-6">
                                 <label class="form-label">Password</label>
@@ -207,6 +208,16 @@ export default {
             // set select default
             this.choices_role.setChoiceByValue(3);
         });
+        document.getElementById('userModal').addEventListener('hidden.bs.modal', () => {
+            this.type = 'add';
+            document.getElementById('username').value = '';
+            document.getElementById('email').value = '';
+            this.choices_role.setChoiceByValue(3);
+            document.getElementById('status') ? document.getElementById('status').value = 'active' : '';
+            document.getElementById('email_verified_at') ? document.getElementById('email_verified_at').value = '' : '';
+            document.getElementById('password').value = '';
+            document.getElementById('password_confirmation').value = '';
+        });
     },
     methods: {
         ...mapActions({
@@ -236,7 +247,7 @@ export default {
             let username = document.getElementById('username').value;
             let dob = document.getElementById('dob').value;
             let email = document.getElementById('email').value;
-            let role = document.getElementById('roles').value;
+            let role = this.choices_role.getValue(true);
             let password = document.getElementById('password').value;
             let password_confirmation = document.getElementById('password_confirmation').value;
             if (this.type === 'add') {
@@ -280,14 +291,14 @@ export default {
                 }
             }
         },
-        destroy(){
+        destroy() {
             let id = this.table.rows({selected: true}).data().toArray()[0][0];
             this.delete(id).then(() => {
                 this.table.row({selected: true}).remove().draw();
                 document.getElementById('close-option').click();
             });
         },
-        update(){
+        update() {
             this.type = 'update';
             let id = this.table.rows({selected: true}).data().toArray()[0][0];
             document.getElementById('close-option').click();

@@ -9,7 +9,10 @@ export const adminRoleService = {
     getAllPermission,
     addRole,
     updateRole,
-    deleteRole
+    deleteRole,
+    searchUser,
+    assignUser,
+    unassignUser
 }
 
 function index() {
@@ -72,4 +75,39 @@ function deleteRole(id) {
         method: 'DELETE',
         headers: authHeader()
     }).then(handleResponse);
+}
+
+function searchUser(keyword) {
+    return fetch(`${config.apiUrl}/admin/role?type=search_user&keyword=${keyword}`, {
+        method: 'GET',
+        headers: authHeader()
+    }).then(handleResponse)
+        .then(data => {
+            return data.data;
+        });
+}
+
+function assignUser(data) {
+    return fetch(`${config.apiUrl}/admin/role/${data.roleId}?type=assign&user_id=${data.userId}`, {
+        method: 'PUT',
+        headers: authHeader(),
+    }).then(handleResponse)
+        .then(data => {
+            return data.data;
+        });
+}
+
+function unassignUser(data) {
+    let body = {
+        type : 'unassign',
+        users: data.users
+    }
+    return fetch(`${config.apiUrl}/admin/role/${data.role}`, {
+        method: 'PUT',
+        headers: authHeader(),
+        body: JSON.stringify(body)
+    }).then(handleResponse)
+        .then(data => {
+            return data.data;
+        });
 }

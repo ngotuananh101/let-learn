@@ -26,6 +26,33 @@ const admin = [
                 component: () => import('../../pages/admin/roles/Index.vue'),
             },
             {
+                path: 'schools',
+                name: 'admin.schools',
+                redirect: {name: 'admin.schools.list'},
+                children: [
+                    {
+                        path: '',
+                        name: 'admin.schools.list',
+                        component: () => import('../../pages/admin/school/Index.vue'),
+                    },
+                    {
+                        path: 'add',
+                        name: 'admin.schools.add',
+                        component: () => import('../../pages/admin/school/Add.vue'),
+                    },
+                    {
+                        path: 'edit/:id',
+                        name: 'admin.schools.edit',
+                        component: () => import('../../pages/admin/school/Index.vue'),
+                    },
+                    {
+                        path: 'request',
+                        name: 'admin.schools.request',
+                        component: () => import('../../pages/admin/school/Index.vue'),
+                    },
+                ]
+            },
+            {
                 path: 'set',
                 name: 'admin.set',
                 redirect: {name: 'admin.set.list'},

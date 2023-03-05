@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class School extends Model
@@ -23,9 +24,9 @@ class School extends Model
     ];
 
     // get all manager in a school
-    public function managers(): HasMany
+    public function managers(): BelongsToMany
     {
-        return $this->hasMany(User::class, 'school_id', 'id');
+        return $this->belongsToMany(User::class, 'school_managers', 'school_id', 'user_id');
     }
 
     // get all student in a school

@@ -43,6 +43,22 @@
                     Learning
                 </h6>
             </li>
+            <li class="nav-item" v-if="this.checkPermission('admin.schools')">
+                <sidenav-collapse collapse-ref="" nav-text="School"
+                                  :class="getRoute() === 'schools' ? 'active' : ''">
+                    <template #icon>
+                        <i class="fa-regular fa-school text-primary text-sm opacity-10"></i>
+                    </template>
+                    <template #list>
+                        <ul class="nav ms-4">
+                            <!-- nav links -->
+                            <sidenav-item v-if="this.checkPermission('admin.schools')" :to="{ name: 'admin.schools.list' }" mini-icon="L" text="School List" />
+                            <sidenav-item v-if="this.checkPermission('admin.schools.create')" :to="{ name: 'admin.schools.add' }" mini-icon="A" text="Add School" />
+                            <sidenav-item v-if="this.checkPermission('admin.schools.request')" :to="{ name: 'admin.schools.request' }" mini-icon="R" text="School Request" />
+                        </ul>
+                    </template>
+                </sidenav-collapse>
+            </li>
             <li class="nav-item">
                 <sidenav-collapse @click="$router.push({ name: 'admin.set.list' })" collapse-ref="" nav-text="Lessons"
                                   :class="getRoute() === 'set' ? 'active' : ''">

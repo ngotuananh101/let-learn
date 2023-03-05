@@ -5,12 +5,27 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Permission;
 use App\Models\Role;
+use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
 class RoleController extends Controller
 {
+    /**
+     * Instantiate a new controller instance.
+     *
+     * @return void
+     */
+    public function __construct()
+    {
+        $this->middleware('permissions:admin.roles')->only(['index']);
+        $this->middleware('permissions:admin.roles.create')->only(['store']);
+        $this->middleware('permissions:admin.roles.edit')->only(['update']);
+        $this->middleware('permissions:admin.roles.delete')->only(['destroy']);
+    }
+
+
     /**
      * Display a listing of the resource.
      *
@@ -33,6 +48,24 @@ class RoleController extends Controller
                 return response()->json([
                     'status' => 'success',
                     'data' => $permissions
+                ], 200);
+            } else if ($request->type === 'search_user') {
+                $request->validate([
+                    'keyword' => 'required|string|max:255',
+                ]);
+                $users = User::where('username', 'like', '%' . $request->keyword . '%')
+                    ->orWhere('email', 'like', '%' . $request->keyword . '%')
+                    ->get();
+                $users = $users->map(function ($user) {
+                    return [
+                        'value' => $user->id,
+                        'label' => $user->username . ' - ' . $user->email,
+                    ];
+                });
+                // return response
+                return response()->json([
+                    'status' => 'success',
+                    'data' => $users
                 ], 200);
             }
 
@@ -235,40 +268,93 @@ class RoleController extends Controller
     public function update(Request $request, int $id): JsonResponse
     {
         try {
-            $request->validate([
-                'name' => 'required|string|max:255',
-                'description' => 'required|string|max:255',
-                'permissions' => 'required|array',
-            ]);
+            if ($request->type) {
+                $request->validate([
+                    'type' => 'required|in:assign,unassign',
+                    'user_id' => 'required_if:type,assign|integer|exists:users,id',
+                    'users' => 'required_if:type,unassign|array'
+                ]);
+                if($request->type === 'assign') {
+                    // get role
+                    $role = Role::findOrFail($id);
+                    // check user role
+                    $user = User::findOrFail($request->user_id);
+                    $user_role = $user->role()->get();
+                    // get user role id
+                    $user_role = $user_role->map(function ($role) {
+                        return $role->id;
+                    });
+                    // check if user already assigned to this role
+                    if ($user_role->contains($id)) {
+                        return response()->json([
+                            'status' => 'error',
+                            'message' => 'User already assigned to this role'
+                        ], 400);
+                    }
+                    // assign user to role
+                    $user->role()->associate($role)->save();
+                    // return response
+                    return response()->json([
+                        'status' => 'success',
+                        'message' => 'User assigned to role successfully'
+                    ], 200);
+                }
+                else if( $request->type === 'unassign' ){
+                    $users = $request->users;
+                    for($i = 0; $i < count($users); $i++) {
+                        // get user
+                        $user = User::findOrFail($users[$i]);
+                        // assign user to default role
+                        $user->role()->associate(Role::where('name', 'user')->first())->save();
+                    }
+                    // return response
+                    return response()->json([
+                        'status' => 'success',
+                        'message' => 'User unassigned from role successfully'
+                    ], 200);
+                }
+                else {
+                    return response()->json([
+                        'status' => 'error',
+                        'message' => 'Invalid request'
+                    ], 400);
+                }
+            } else {
+                $request->validate([
+                    'name' => 'required|string|max:255',
+                    'description' => 'required|string|max:255',
+                    'permissions' => 'required|array',
+                ]);
 
-            // get role
-            $role = Role::findOrFail($id);
-            // update role
-            $role->update([
-                'name' => $request->name,
-                'description' => $request->description,
-            ]);
-            // sync permissions
-            $role->permissions()->sync($request->permissions);
-            $role = [
-                $role->id,
-                $role->name,
-                $role->description,
-                $role->status,
-                $role->updated_at,
-            ];
+                // get role
+                $role = Role::findOrFail($id);
+                // update role
+                $role->update([
+                    'name' => $request->name,
+                    'description' => $request->description,
+                ]);
+                // sync permissions
+                $role->permissions()->sync($request->permissions);
+                $role = [
+                    $role->id,
+                    $role->name,
+                    $role->description,
+                    $role->status,
+                    $role->updated_at,
+                ];
 
-            // return response
-            return response()->json([
-                'status' => 'success',
-                'message' => 'Role updated successfully',
-                'data' => $role
-            ], 200);
+                // return response
+                return response()->json([
+                    'status' => 'success',
+                    'message' => 'Role updated successfully',
+                    'data' => $role
+                ], 200);
+            }
         } catch (\Exception $e) {
             return response()->json([
                 'status' => 'error',
                 'message' => $e->getMessage()
-            ], 400);
+            ], 500);
         }
     }
 
@@ -280,10 +366,10 @@ class RoleController extends Controller
      */
     public function destroy(int $id): JsonResponse
     {
-        try{
+        try {
             // get role
             $role = Role::findOrFail($id);
-            if($role->name === 'super' || $role->name === 'admin' || $role->name === 'user' || $role->name === 'manager' || $role->name === 'teacher' || $role->name === 'student'){
+            if ($role->name === 'super' || $role->name === 'admin' || $role->name === 'user' || $role->name === 'manager' || $role->name === 'teacher' || $role->name === 'student') {
                 return response()->json([
                     'status' => 'error',
                     'message' => 'You can not delete this role'

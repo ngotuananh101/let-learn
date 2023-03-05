@@ -24,18 +24,15 @@ export default {
     },
     actions: {
         index({commit}) {
-            overlay();
             commit('indexRequest');
             return adminRoleService.index()
                 .then(
                     roles => {
                         commit('indexSuccess', roles);
-                        overlay();
                         return Promise.resolve(roles);
                     },
                     error => {
                         commit('indexFailure', error);
-                        overlay();
                         return [];
                     }
                 );
@@ -130,6 +127,50 @@ export default {
                     roles => {
                         overlay();
                         return true;
+                    },
+                    error => {
+                        overlay();
+                        return false;
+                    }
+                );
+        },
+        searchUsers({commit}, query) {
+            commit('indexRequest');
+            return adminRoleService.searchUser(query)
+                .then(
+                    roles => {
+                        commit('indexSuccess', roles);
+                        return Promise.resolve(roles);
+                    },
+                    error => {
+                        commit('indexFailure', error);
+                        return [];
+                    }
+                );
+        },
+        assignUser({commit}, data) {
+            overlay();
+            commit('indexRequest');
+            return adminRoleService.assignUser(data)
+                .then(
+                    roles => {
+                        overlay();
+                        return 'ok';
+                    },
+                    error => {
+                        overlay();
+                        return false;
+                    }
+                );
+        },
+        unassignUser({commit}, data) {
+            overlay();
+            commit('indexRequest');
+            return adminRoleService.unassignUser(data)
+                .then(
+                    roles => {
+                        overlay();
+                        return 'ok';
                     },
                     error => {
                         overlay();
