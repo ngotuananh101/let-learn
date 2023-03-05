@@ -47,13 +47,13 @@ class CourseController extends Controller
                 'description' => 'required|string',
                 'password' => 'nullable|string',
             ]);
-            // add new folder to user
-            $folder = auth()->user()->folders()->create([
+            // add new course to user
+            $course = auth()->user()->course()->create([
                 'name' => $request->name,
                 'description' => $request->description,
                 'password' => $request->password,
             ]);
-            $folder->save();
+            $course->save();
             // return json response
             return response()->json([
                 'status' => 'success',
@@ -78,28 +78,28 @@ class CourseController extends Controller
     public function show($id)
     {
         try {
-            $folder = Course::findOrFail($id);
-            // check folder is deleted
-            if ($folder->status == 'inactive') {
+            $course = Course::findOrFail($id);
+            // check course is deleted
+            if ($course->status == 'inactive') {
                 return response()->json([
                     'status' => 'error',
                     'status_code' => 404,
                     'message' => 'Course not found'
                 ], 404);
             }
-            // check folder is public
-            if ($folder->is_public == false && auth()->user()->id != $folder->user_id) {
+            // check course is public
+            if ($course->is_public == false && auth()->user()->id != $course->user_id) {
                 return response()->json([
                     'status' => 'error',
                     'status_code' => 403,
-                    'message' => 'You don\'t have permission to access this folder'
+                    'message' => 'You don\'t have permission to access this course'
                 ], 403);
             }
             return response()->json([
                 'status' => 'success',
                 'status_code' => 200,
-                'message' => 'Get set successfully!',
-                'data' => $folder
+                'message' => 'Get lesson successfully!',
+                'data' => $course
             ], 200);
         } catch (\Throwable $th) {
             return response()->json([
@@ -138,22 +138,22 @@ class CourseController extends Controller
                 'is_public' => 'required|in:1,0',
                 'password' => 'nullable|string',
             ]);
-            $folder = Course::findOrFail($id);
-            // update folder
-            $folder->update([
+            $course = Course::findOrFail($id);
+            // update course
+            $course->update([
                 'name' => $request->name,
                 'description' => $request->description,
                 'status' => $request->status,
                 'is_public' => $request->is_public,
                 'password' => $request->password,
             ]);
-            $folder->save();
+            $course->save();
 
             // return json response
             return response()->json([
                 'status' => 'success',
                 'status_code' => 200,
-                'message' => 'Update folder successfully!',
+                'message' => 'Update course successfully!',
             ], 200);
         } catch (\Throwable $th) {
             return response()->json([
@@ -173,15 +173,15 @@ class CourseController extends Controller
     public function destroy($id): JsonResponse
     {
         try {
-            $folder = Course::findOrFail($id);
-            // Soft delete folder
-            $folder->update([
+            $course = Course::findOrFail($id);
+            // Soft delete course
+            $course->update([
                 'status' => 'inactive'
             ]);
             return response()->json([
                 'status' => 'success',
                 'status_code' => 200,
-                'message' => 'Delete folder successfully!',
+                'message' => 'Delete course successfully!',
             ], 200);
         } catch (\Throwable $th) {
             return response()->json([
@@ -192,16 +192,16 @@ class CourseController extends Controller
         }
     }
 
-    // show all folder by user id
-    public function showAllFolderByUserId(): JsonResponse
+    // show all course by user id
+    public function showAllCourseByUserId(): JsonResponse
     {
         try {
             $user = auth()->user();
-            $folders = $user->folders()->where('status', 'active')->get();
+            $courses = $user->courses()->where('status', 'active')->get();
             return response()->json([
                 'status' => 'success',
                 'status_code' => 200,
-                'data' => $folders
+                'data' => $courses
             ], 200);
         } catch (\Throwable $th) {
             return response()->json([
@@ -211,59 +211,59 @@ class CourseController extends Controller
             ], 500);
         }
     }
-    //add set to folder by set id and folder id
-    public function addSetToFolder(Request $request, $id, $set_id): JsonResponse
+    //add lesson to course by lesson id and course id
+    public function addLessonToCourse(Request $request, $id, $lesson_id): JsonResponse
     {
         try {
-            $folder = Course::findOrFail($id);
-            // check folder is deleted
-            if ($folder->status == 'inactive') {
+            $course = Course::findOrFail($id);
+            // check course is deleted
+            if ($course->status == 'inactive') {
                 return response()->json([
                     'status' => 'error',
                     'status_code' => 404,
                     'message' => 'Course not found'
                 ], 404);
             }
-            // check folder is public
-            if ($folder->is_public == false && auth()->user()->id != $folder->user_id) {
+            // check course is public
+            if ($course->is_public == false && auth()->user()->id != $course->user_id) {
                 return response()->json([
                     'status' => 'error',
                     'status_code' => 403,
-                    'message' => 'You don\'t have permission to access this folder'
+                    'message' => 'You don\'t have permission to access this course'
                 ], 403);
             }
-            // check set is deleted
-            $set = Lesson::findOrFail($set_id);
-            if ($set->status == 'inactive') {
+            // check lesson is deleted
+            $lesson = Lesson::findOrFail($lesson_id);
+            if ($lesson->status == 'inactive') {
                 return response()->json([
                     'status' => 'error',
                     'status_code' => 404,
                     'message' => 'Lesson not found'
                 ], 404);
             }
-            // check set is public
-            if ($set->is_public == false && auth()->user()->id != $set->user_id) {
+            // check lesson is public
+            if ($lesson->is_public == false && auth()->user()->id != $lesson->user_id) {
                 return response()->json([
                     'status' => 'error',
                     'status_code' => 403,
-                    'message' => 'You don\'t have permission to access this set'
+                    'message' => 'You don\'t have permission to access this lesson'
                 ], 403);
             }
-            // check set is exist in folder
-            $checkSet = $folder->sets()->where('set_id', $set_id)->first();
-            if ($checkSet) {
+            // check lesson is exist in course
+            $checkLesson = $course->lessons()->where('lesson_id', $lesson_id)->first();
+            if ($checkLesson) {
                 return response()->json([
                     'status' => 'error',
                     'status_code' => 400,
-                    'message' => 'Lesson is exist in folder'
+                    'message' => 'Lesson is exist in course'
                 ], 400);
             }
-            // add set to folder
-            $folder->sets()->attach($set_id);
+            // add lesson to course
+            $course->lessons()->attach($lesson_id);
             return response()->json([
                 'status' => 'success',
                 'status_code' => 200,
-                'message' => 'Add set to folder successfully!',
+                'message' => 'Add lesson to course successfully!',
             ], 200);
         } catch (\Throwable $th) {
             return response()->json([
@@ -274,59 +274,59 @@ class CourseController extends Controller
         }
     }
 
-    // remove set from folder by set id and folder id
-    public function removeSetFromFolder(Request $request, $id, $set_id): JsonResponse
+    // remove lesson from course by lesson id and course id
+    public function removeLessonFromCourse(Request $request, $id, $lesson_id): JsonResponse
     {
         try {
-            $folder = Course::findOrFail($id);
-            // check folder is deleted
-            if ($folder->status == 'inactive') {
+            $course = Course::findOrFail($id);
+            // check course is deleted
+            if ($course->status == 'inactive') {
                 return response()->json([
                     'status' => 'error',
                     'status_code' => 404,
                     'message' => 'Course not found'
                 ], 404);
             }
-            // check folder is public
-            if ($folder->is_public == false && auth()->user()->id != $folder->user_id) {
+            // check course is public
+            if ($course->is_public == false && auth()->user()->id != $course->user_id) {
                 return response()->json([
                     'status' => 'error',
                     'status_code' => 403,
-                    'message' => 'You don\'t have permission to access this folder'
+                    'message' => 'You don\'t have permission to access this course'
                 ], 403);
             }
-            // check set is deleted
-            $set = Lesson::findOrFail($set_id);
-            if ($set->status == 'inactive') {
+            // check lesson is deleted
+            $lesson = Lesson::findOrFail($lesson_id);
+            if ($lesson->status == 'inactive') {
                 return response()->json([
                     'status' => 'error',
                     'status_code' => 404,
                     'message' => 'Lesson not found'
                 ], 404);
             }
-            // check set is public
-            if ($set->is_public == false && auth()->user()->id != $set->user_id) {
+            // check lesson is public
+            if ($lesson->is_public == false && auth()->user()->id != $lesson->user_id) {
                 return response()->json([
                     'status' => 'error',
                     'status_code' => 403,
-                    'message' => 'You don\'t have permission to access this set'
+                    'message' => 'You don\'t have permission to access this lesson'
                 ], 403);
             }
-            // check set is exist in folder
-            $checkSet = $folder->sets()->where('set_id', $set_id)->first();
-            if (!$checkSet) {
+            // check lesson is exist in course
+            $checkLesson = $course->lessons()->where('lesson_id', $lesson_id)->first();
+            if (!$checkLesson) {
                 return response()->json([
                     'status' => 'error',
                     'status_code' => 400,
-                    'message' => 'Lesson is not exist in folder'
+                    'message' => 'Lesson is not exist in course'
                 ], 400);
             }
-            // remove set from folder
-            $folder->sets()->detach($set_id);
+            // remove lesson from course
+            $course->lessons()->detach($lesson_id);
             return response()->json([
                 'status' => 'success',
                 'status_code' => 200,
-                'message' => 'Remove set from folder successfully!',
+                'message' => 'Remove lesson from course successfully!',
             ], 200);
         } catch (\Throwable $th) {
             return response()->json([

@@ -15,7 +15,7 @@ class LessonDetail extends Model
      * @var array<int, string>
      */
     protected $fillable = [
-        'set_id',
+        'lesson_id',
         'term',
         'definition',
         'image',
@@ -30,7 +30,7 @@ class LessonDetail extends Model
      * @var array<int, string>
      */
     protected $hidden = [
-        'set_id',
+        'lesson_id',
     ];
 
     /**
@@ -39,13 +39,13 @@ class LessonDetail extends Model
      * @var array<string, string>
      */
     protected $casts = [
-        'set_id' => 'integer',
+        'lesson_id' => 'integer',
     ];
 
     /**
-     * Get the set that owns the set detail.
+     * Get the lesson that owns the lesson detail.
      */
-    public function set()
+    public function lesson()
     {
         return $this->belongsTo(Lesson::class);
     }
