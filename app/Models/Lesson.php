@@ -68,4 +68,22 @@ class Lesson extends Model
     {
         return $this->belongsToMany(Course::class);
     }
+    public function logs()
+    {
+        return $this->hasMany(UserLog::class);
+    }
+
+    //save log when logged user access lesson and not if guest
+    public function logAccess()
+    {
+        if (auth()->check()) {
+            $this->logs()->create([
+                'user_id' => auth()->id(),
+                'lesson_id' => $this->id,
+                'accessed_at' => now(),
+            ]);
+        } else {
+            return;
+        }
+    }
 }
