@@ -179,14 +179,14 @@ class LessonController extends Controller
                 'password' => 'nullable|string',
                 'data' => 'required|array',
             ]);
-            // add new set to user
+            // add new lesson to user
             $user = auth()->user();
             $lesson = $user->lesson()->create([
                 'name' => $request->name,
                 'description' => $request->description,
                 'password' => $request->password,
             ]);
-            // add set details
+            // add lesson details
             foreach ($request->data as $detail) {
                 $lesson->lessonDetail()->create([
                     'term' => $detail['term'],
@@ -197,7 +197,7 @@ class LessonController extends Controller
             return response()->json([
                 'status' => 'success',
                 'status_code' => 200,
-                'message' => 'Create set successfully!',
+                'message' => 'Create lesson successfully!',
             ], 200);
         } catch (\Throwable $th) {
             return response()->json([
@@ -218,7 +218,7 @@ class LessonController extends Controller
     {
         try {
             $lesson = Lesson::findOrFail($id);
-            // check set is deleted
+            // check lesson is deleted
             if ($lesson->status == 'inactive') {
                 return response()->json([
                     'status' => 'error',
@@ -230,9 +230,9 @@ class LessonController extends Controller
             return response()->json([
                 'status' => 'success',
                 'status_code' => 200,
-                'message' => 'Get set successfully!',
+                'message' => 'Get lesson successfully!',
                 'data' => [
-                    'set' => $lesson,
+                    'lesson' => $lesson,
                     'detail' => $lessonDetail
                 ]
             ], 200);
@@ -283,7 +283,7 @@ class LessonController extends Controller
             return response()->json([
                 'status' => 'success',
                 'status_code' => 200,
-                'message' => 'Update set successfully!',
+                'message' => 'Update lesson successfully!',
             ], 200);
         } catch (\Throwable $th) {
             return response()->json([
@@ -304,14 +304,14 @@ class LessonController extends Controller
     {
         try {
             $lesson = Lesson::findOrFail($id);
-            // Soft delete set
+            // Soft delete lesson
             $lesson->update([
                 'status' => 'inactive'
             ]);
             return response()->json([
                 'status' => 'success',
                 'status_code' => 200,
-                'message' => 'Delete set successfully!',
+                'message' => 'Delete lesson successfully!',
             ], 200);
         } catch (\Throwable $th) {
             return response()->json([
@@ -322,8 +322,8 @@ class LessonController extends Controller
         }
     }
 
-    //show all set by user id
-    public function showAllSetByUserId(): JsonResponse
+    //show all lesson by user id
+    public function showAllLessonByUserId(): JsonResponse
     {
         try {
             $user = auth()->user();
@@ -331,7 +331,7 @@ class LessonController extends Controller
             return response()->json([
                 'status' => 'success',
                 'status_code' => 200,
-                'message' => 'Get set successfully!',
+                'message' => 'Get lesson successfully!',
                 'data' => $lesson
             ], 200);
         } catch (\Throwable $th) {
@@ -343,16 +343,16 @@ class LessonController extends Controller
         }
     }
 
-    // show all set by folder id
-    public function showAllSetByFolderId($id): JsonResponse
+    // show all lesson by course id
+    public function showAlllessonByCourseId($id): JsonResponse
     {
         try {
             $course = Course::findOrFail($id);
-            $lesson = $course->sets()->where('status', 'active')->get();
+            $lesson = $course->lessons()->where('status', 'active')->get();
             return response()->json([
                 'status' => 'success',
                 'status_code' => 200,
-                'message' => 'Get set successfully!',
+                'message' => 'Get lesson successfully!',
                 'data' => $lesson
             ], 200);
         } catch (\Throwable $th) {
@@ -364,8 +364,8 @@ class LessonController extends Controller
         }
     }
 
-    // show progress by set id
-    public function showProgressBySetId($id): JsonResponse
+    // show progress by lesson id
+    public function showProgressByLessonId($id): JsonResponse
     {
         try {
             $lesson = Lesson::findOrFail($id);

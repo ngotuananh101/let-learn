@@ -32,16 +32,16 @@ class Course extends Model
         'is_public' => 'boolean',
     ];
 
-    // Get the user that owns the set.
+    // Get the user that owns the lesson.
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
     }
 
-    // Get set belong to folder
-    public function sets(): BelongsToMany
+    // Get lesson belong to source
+    public function lessons(): BelongsToMany
     {
-        return $this->belongsToMany(Lesson::class, 'folder_set', 'folder_id', 'set_id');
+        return $this->belongsToMany(Lesson::class, 'courses_lesson', 'courses_id', 'lesson_id');
     }
 
     // Get class belong to folder

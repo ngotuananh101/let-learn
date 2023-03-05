@@ -58,7 +58,7 @@ class User extends Authenticate implements MustVerifyEmail
     }
 
     /**
-     * 1 user can have many sets
+     * 1 user can have many lessons
      */
     public function lesson(): HasMany
     {
@@ -84,7 +84,7 @@ class User extends Authenticate implements MustVerifyEmail
     }
 
     // Course belong to user
-    public function folders(): HasMany
+    public function courses(): HasMany
     {
         return $this->hasMany(Course::class);
     }

@@ -17,7 +17,7 @@ class Lesson extends Model
      *
      * @var array<int, string>
      */
-    // This is basic information of a set
+    // This is basic information of a lesson
     protected $fillable = [
         'name',
         'description',
@@ -46,7 +46,7 @@ class Lesson extends Model
     ];
 
     /**
-     * Get the user that owns the set.
+     * Get the user that owns the lesson.
      */
     public function user(): BelongsTo
     {
@@ -54,7 +54,7 @@ class Lesson extends Model
     }
 
     /**
-     * Get set details
+     * Get lesson details
      */
     public function lessonDetail(): HasMany
     {
@@ -62,7 +62,7 @@ class Lesson extends Model
     }
 
     /**
-     * Get the folder that owns the set.
+     * Get the course that owns the lesson.
      */
     public function course(): BelongsToMany
     {

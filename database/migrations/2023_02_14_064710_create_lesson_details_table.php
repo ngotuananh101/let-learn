@@ -4,7 +4,8 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration {
+return new class extends Migration
+{
     /**
      * Run the migrations.
      *
@@ -12,14 +13,15 @@ return new class extends Migration {
      */
     public function up()
     {
-        Schema::create('courses', function (Blueprint $table) {
+        Schema::create('lesson_details', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
-            $table->string('name');
-            $table->string('description');
+            $table->foreignId('lesson_id')->constrained()->onDelete('cascade');
+            $table->text('term');
+            $table->text('definition');
+            $table->text('image')->nullable();
+            $table->text('audio')->nullable();
+            $table->text('video')->nullable();
             $table->enum('status', ['active', 'inactive'])->default('active');
-            $table->boolean('is_public')->default(false);
-            $table->string('password')->nullable();
             $table->timestamps();
         });
     }
@@ -31,6 +33,6 @@ return new class extends Migration {
      */
     public function down()
     {
-        Schema::dropIfExists('folders');
+        Schema::dropIfExists('lesson_details');
     }
 };
