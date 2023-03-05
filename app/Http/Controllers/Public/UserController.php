@@ -7,6 +7,8 @@ use Illuminate\Http\Request;
 use App\Models\User;
 use App\Models\Lesson;
 use App\Models\Course;
+use App\Models\School;
+use App\Models\UserLog;
 
 use function PHPSTORM_META\type;
 
@@ -22,7 +24,7 @@ class UserController extends Controller
     {
         try {
             $request->validate([
-                'type' => 'string|in:info,lesson,course',
+                'type' => 'string|in:info,lesson,course,search,recent,detail',
             ]);
             // $user = User::findOrFail($id);
             // check user is user login
@@ -73,7 +75,94 @@ class UserController extends Controller
                         'data' => $courses
                     ], 200);
                     break;
+                case 'search': //search lesson, course, school by name of set
+                    $request->validate([
+                        'name' => 'required|string',
+                    ]);
+                    $name = $request->name;
+                    if ($name == '') {
+                        return response()->json([
+                            'status' => 'error',
+                            'status_code' => 404,
+                            'message' => 'Not found'
+                        ], 404);
+                    }
 
+                    //check if set, course, school name is exist
+                    $lessons = Lesson::where('name', 'like', '%' . $name . '%')->get();
+                    $courses = Course::where('name', 'like', '%' . $name . '%')->get();
+                    $schools = School::where('name', 'like', '%' . $name . '%')->get();
+                    if (count($lessons) == 0 && count($courses) == 0 && count($schools) == 0) {
+                        return response()->json([
+                            'status' => 'error',
+                            'status_code' => 404,
+                            'message' => 'Not found'
+                        ], 404);
+                    }
+                    return response()->json([
+                        'status' => 'success',
+                        'status_code' => 200,
+                        'message' => 'Search result',
+                        'data' => [
+                            'lessons' => $lessons,
+                            'courses' => $courses,
+                            'schools' => $schools
+                        ]
+                    ], 200);
+                    break;
+                case 'recent':
+                    $user_log = UserLog::where('user_id', $id)->orderBy('created_at', 'desc')->get();
+                    $recent_lessons = [];
+                    foreach ($user_log as $log) {
+                        $lesson = Lesson::find($log->lesson_id);
+                        if ($lesson) {
+                            $recent_lessons[] = $lesson;
+                        }
+                    }
+                    return response()->json([
+                        'status' => 'success',
+                        'status_code' => 200,
+                        'message' => 'Recent lessons',
+                        'data' => $recent_lessons
+                    ], 200);
+                    break;
+                case 'detail':
+                    $request->validate([
+                        'lesson_id' => 'required|integer',
+                    ]);
+                    ///show lesson detail by lesson id and record user log
+                    $lesson = Lesson::findOrFail($request->lesson_id);
+                    // check user can view lesson (user is owner of lesson or lesson is public and active)
+                    if ($lesson->user_id != $request->user()->id && ($lesson->status == 0 || $lesson->is_public == 0)) {
+                        return response()->json([
+                            'status' => 'error',
+                            'status_code' => 403,
+                            'message' => 'You do not have permission to access this lesson'
+                        ], 403);
+                    }
+                    $lessonDetail = $lesson->lessonDetail()->get();
+                    //check user log is exist, if exist update accessed_at, else create new user log
+                    if (UserLog::where('user_id', $request->user()->id)->where('lesson_id', $request->lesson_id)->exists()) {
+                        $user_log = UserLog::where('user_id', $request->user()->id)->where('lesson_id', $request->lesson_id)->first();
+                        $user_log->accessed_at = now();
+                        $user_log->save();
+                    } else {
+                        $user_log = new UserLog();
+                        $user_log->user_id = $request->user()->id;
+                        $user_log->lesson_id = $request->lesson_id;
+                        $user_log->accessed_at = now();
+                        $user_log->save();
+                    }
+                    return response()->json([
+                        'status' => 'success',
+                        'status_code' => 200,
+                        'message' => 'Get lesson successfully!',
+                        'data' => [
+                            'lesson' => $lesson,
+                            'detail' => $lessonDetail
+                        ]
+                    ], 200);
+                    break;
                 default:
                     return response()->json([
                         'status' => 'error',
@@ -118,7 +207,7 @@ class UserController extends Controller
                         'status' => 200
                     ], 200);
                     break;
-                    
+
                 case 'password';
                     $request->validate([
                         'password' => 'required|string|min:6|confirmed',
