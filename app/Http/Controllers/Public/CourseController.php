@@ -100,8 +100,10 @@ class CourseController extends Controller
             return response()->json([
                 'status' => 'success',
                 'status_code' => 200,
-                'message' => 'Get lesson successfully!',
-                'data' => $course
+                'message' => 'Get course successfully!',
+                'data' => [
+                    'course' => $course,
+                ]
             ], 200);
         } catch (\Throwable $th) {
             return response()->json([
