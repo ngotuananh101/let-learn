@@ -142,19 +142,27 @@ class LessonController extends Controller
     {
         try {
             $lesson = Lesson::findOrfail($id);
-            $lessonData = $lesson->lessonDetail()->get()->toArray();
+            $lessonData = $lesson->setDetails()->get()->toArray();
             if (empty($lessonData)) {
-                return response()->json(['message' => 'No data found for this set']);
+                return response()->json([
+                    'status' => false,
+                    'message' => 'Lesson is empty'
+                ], 400);
             }
-            $fileName = 'set_' . $id . '_' . date('Ymd_His') . '.csv';
-            $filePath = storage_path('app/export/set/' . $fileName);
-            $file = fopen($filePath, 'w');
-            fputcsv($file, ['id', 'Term', 'Definition']);
-            foreach ($lessonData as $row) {
-                fputcsv($file, $row);
+            // write set data to file
+            $file_name = 'set_' . $id . '_' . date('Ymd_His') . '.csv';
+            $file = fopen($file_name, 'w');
+            fputcsv($file, ['id', 'term', 'definition', 'image', 'audio', 'video', 'status', 'created_at', 'updated_at']);
+            foreach ($lessonData as $line) {
+                fputcsv($file, $line);
             }
             fclose($file);
-            return response()->download($filePath, $fileName, ['Content-Type' => 'text/csv'])->deleteFileAfterSend(true);
+            // set header
+            $headers = [
+                'Content-Type' => 'text/csv',
+            ];
+            // download file
+            return response()->download($file_name, $file_name, $headers)->deleteFileAfterSend(true);
         } catch (\Throwable $th) {
             return response()->json([
                 'status' => 'error',
