@@ -264,6 +264,22 @@ class LessonController extends Controller
                 'data' => 'required|array',
             ]);
             $lesson = Lesson::findOrFail($id);
+            // check lesson is deleted 
+            if ($lesson->status == 'inactive') {
+                return response()->json([
+                    'status' => 'error',
+                    'status_code' => 404,
+                    'message' => 'Lesson not found!'
+                ], 404);
+            }
+            //check lesson is public
+            if ($lesson->is_public == 1) {
+                return response()->json([
+                    'status' => 'error',
+                    'status_code' => 400,
+                    'message' => 'Lesson is public!'
+                ], 400);
+            }
             $lesson->name = $request->name;
             $lesson->description = $request->description;
             $lesson->status = $request->status;
@@ -279,7 +295,7 @@ class LessonController extends Controller
                     'definition' => $detail['definition'],
                 ]);
             }
-
+            // return json response
             return response()->json([
                 'status' => 'success',
                 'status_code' => 200,
@@ -367,23 +383,15 @@ class LessonController extends Controller
     // show progress by lesson id
     public function showProgressByLessonId($id): JsonResponse
     {
+        //count progress of lesson by lesson id
         try {
             $lesson = Lesson::findOrFail($id);
-            $lessonDetail = $lesson->lessonDetail()->get();
-            $progress = 0;
-            foreach ($lessonDetail as $detail) {
-                if ($detail->is_learned == 1) {
-                    $progress++;
-                }
-            }
+            $progress = $lesson->progress()->count();
             return response()->json([
                 'status' => 'success',
                 'status_code' => 200,
                 'message' => 'Get progress successfully!',
-                'data' => [
-                    'progress' => $progress,
-                    'total' => count($lesson)
-                ]
+                'data' => $progress
             ], 200);
         } catch (\Throwable $th) {
             return response()->json([
