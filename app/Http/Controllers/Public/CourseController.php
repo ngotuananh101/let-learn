@@ -70,6 +70,7 @@ class CourseController extends Controller
         }
     }
 
+    /// test commit
     /**
      * Display the specified resource.
      *
