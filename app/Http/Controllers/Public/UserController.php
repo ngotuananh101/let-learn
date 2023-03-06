@@ -112,6 +112,14 @@ class UserController extends Controller
                     break;
                 case 'recent':
                     $user_log = UserLog::where('user_id', $id)->orderBy('created_at', 'desc')->get();
+                    //if dont have any lesson log
+                    if (count($user_log) == 0) {
+                        return response()->json([
+                            'status' => 'error',
+                            'status_code' => 404,
+                            'message' => 'You dont learn any lesson!'
+                        ], 404);
+                    }
                     $recent_lessons = [];
                     foreach ($user_log as $log) {
                         $lesson = Lesson::find($log->lesson_id);
