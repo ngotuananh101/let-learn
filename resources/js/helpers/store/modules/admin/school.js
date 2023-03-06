@@ -39,14 +39,23 @@ export default {
                     }
                 );
         },
+        getSchool({commit}, id) {
+            return adminSchoolService.getSchool(id)
+                .then(
+                    school => {
+                        commit('getSchools', school);
+                        return Promise.resolve(school);
+                    },
+                    error => {
+                        commit('getSchools', null);
+                        return Promise.reject(error);
+                    }
+                );
+        },
     },
     mutations: {
         getSchools(state, schools) {
             state.schools = schools;
         },
-    },
-    getters: {
-        schools: state => state.schools,
-        school: state => state.school,
     }
 }

@@ -43,7 +43,7 @@ const admin = [
                     {
                         path: 'edit/:id',
                         name: 'admin.schools.edit',
-                        component: () => import('../../pages/admin/school/Index.vue'),
+                        component: () => import('../../pages/admin/school/edit/Index.vue'),
                     },
                     {
                         path: 'request',
@@ -94,5 +94,4 @@ const admin = [
         ],
     },
 ];
-
 export default admin;

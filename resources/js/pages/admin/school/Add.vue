@@ -132,7 +132,7 @@ import {mapGetters} from "vuex";
 import ArgonButton from "@/components/Argons/ArgonButton.vue";
 import ArgonInput from "@/components/Argons/ArgonInput.vue";
 import Choices from "choices.js";
-import {Country, State, City} from 'country-state-city';
+import {country_data} from '@/helpers/country_data.js';
 
 DataTable.use(DataTablesLib);
 
@@ -194,7 +194,7 @@ export default {
             return this.permissions().some(permission => permission.name === name);
         },
         init() {
-            this.country = Country.getAllCountries();
+            this.country = country_data.getCountry();
             this.select_country = new Choices('#select_country', {
                 searchEnabled: true,
                 itemSelectText: '',
@@ -226,14 +226,14 @@ export default {
         },
         changeCountry(isoCode) {
             this.school.country = isoCode;
-            this.state = State.getStatesOfCountry(isoCode);
+            this.state = country_data.getState(isoCode);
             this.select_state.setChoices(this.state, 'isoCode', 'name', true);
             this.school.state = '';
             this.school.city = '';
         },
         changeState(isoCode) {
             this.school.state = isoCode;
-            this.city = City.getCitiesOfState(this.school.country, isoCode);
+            this.city = country_data.getCity(this.school.country, isoCode);
             this.select_city.setChoices(this.city, 'name', 'name', true);
             this.school.city = '';
         },

@@ -64,16 +64,6 @@ class SchoolController extends Controller
     }
 
     /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create()
-    {
-        //
-    }
-
-    /**
      * Store a newly created resource in storage.
      *
      * @param Request $request
@@ -122,7 +112,7 @@ class SchoolController extends Controller
                     'status' => 'active',
                     'email_verified_at' => Carbon::now(),
                 ]);
-            }else{
+            } else {
                 // assign manager for user
                 $manager->role_id = Role::where('name', 'manager')->first()->id;
                 $manager->save();
@@ -149,12 +139,38 @@ class SchoolController extends Controller
     /**
      * Display the specified resource.
      *
+     * @param Request $request
      * @param int $id
-     * @return \Illuminate\Http\Response
+     * @return JsonResponse
      */
-    public function show($id)
+    public function show(Request $request, $id): JsonResponse
     {
-        //
+        try {
+            $request->validate([
+                'type' => 'required|in:all,managers,teachers,students'
+            ]);
+            // get school
+            $school = School::findOrFail($id);
+            $data = match ($request->type) {
+                'all' => [
+                    'school' => $school,
+                ],
+                default => throw new \Exception('Invalid type'),
+            };
+            // Return json
+            return response()->json([
+                'status' => 'success',
+                'status_code' => 200,
+                'data' => $data
+            ]);
+        } catch (\Exception $e) {
+            // Return json
+            return response()->json([
+                'status' => 'error',
+                'status_code' => 500,
+                'message' => $e->getMessage()
+            ], 500);
+        }
     }
 
     /**
