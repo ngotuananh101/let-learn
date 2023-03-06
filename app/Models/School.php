@@ -16,6 +16,7 @@ class School extends Model
         'address',
         'city',
         'state',
+        'country',
         'zip',
         'phone',
         'email',

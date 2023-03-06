@@ -13,7 +13,7 @@
                             <div v-if="checkPermission('admin.schools.edit')" class="my-auto mt-4 ms-auto mt-lg-0">
                                 <div class="my-auto ms-auto">
                                     <router-link v-if="checkPermission('admin.users.create') && select_id"
-                                            class="mx-1 mb-0 btn btn-outline-success btn-sm" :to=" { name: 'admin.schools.edit', params: { id: select_id } }">
+                                            class="mx-1 mb-0 btn btn-outline-info btn-sm" :to=" { name: 'admin.schools.edit', params: { id: select_id } }">
                                         Update
                                     </router-link>
                                 </div>
@@ -23,7 +23,7 @@
                     <div class="px-0 pb-0 pt-0 card-body">
                         <div class="table-responsive">
                             <DataTable id="user_data" :options="{select: 'single'}" ref="table"
-                                       class="table table-flush mx-3" @click:row="handleRowClick">
+                                       class="table table-flush mx-3">
                                 <thead class="thead-light">
                                 <tr>
                                     <th>ID</th>
@@ -47,12 +47,9 @@
 import DataTable from 'datatables.net-vue3'
 import DataTablesLib from 'datatables.net-bs5';
 import 'datatables.net-select';
-import {mapActions, mapGetters} from "vuex";
+import {mapGetters} from "vuex";
 import ArgonButton from "@/components/Argons/ArgonButton.vue";
 import ArgonInput from "@/components/Argons/ArgonInput.vue";
-import {Modal} from "bootstrap";
-import Choices from "choices.js";
-
 DataTable.use(DataTablesLib);
 
 export default {
@@ -99,9 +96,6 @@ export default {
         }),
         checkPermission(name) {
             return this.permissions().some(permission => permission.name === name);
-        },
-        handleRowClick(row) {
-            console.log(row);
         },
     },
 }

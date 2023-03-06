@@ -4,7 +4,8 @@ import handleResponse from './../handle-response';
 
 export const adminSchoolService = {
     getAllSchools,
-    addSchool
+    addSchool,
+    getSchool
 };
 
 function getAllSchools() {
@@ -24,4 +25,14 @@ function addSchool(data) {
         body: JSON.stringify(data)
     };
     return fetch(`${config.apiUrl}/admin/school`, requestOptions).then(handleResponse);
+}
+
+function getSchool(id) {
+    const requestOptions = {
+        method: 'GET',
+        headers: authHeader(),
+    };
+    return fetch(`${config.apiUrl}/admin/school/${id}?type=all`, requestOptions).then(handleResponse).then(response => {
+        return response.data;
+    });
 }
