@@ -142,7 +142,7 @@ class LessonController extends Controller
     {
         try {
             $lesson = Lesson::findOrfail($id);
-            $lessonData = $lesson->setDetails()->get()->toArray();
+            $lessonData = $lesson->lessonDetail()->get()->toArray();
             if (empty($lessonData)) {
                 return response()->json([
                     'status' => false,
