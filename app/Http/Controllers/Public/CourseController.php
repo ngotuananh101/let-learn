@@ -8,6 +8,7 @@ use App\Models\Course;
 use App\Models\User;
 use App\Models\Lesson;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Response;
 use PhpOffice\PhpSpreadsheet\Reader\Xml\Style\Font;
 use PhpParser\Node\Stmt\TryCatch;
 
@@ -16,7 +17,7 @@ class CourseController extends Controller
     /**
      * Display a listing of the resource.
      *
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function index()
     {
@@ -26,7 +27,7 @@ class CourseController extends Controller
     /**
      * Show the form for creating a new resource.
      *
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function create()
     {
@@ -36,8 +37,8 @@ class CourseController extends Controller
     /**
      * Store a newly created resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
+     * @param Request $request
+     * @return JsonResponse
      */
     public function store(Request $request): JsonResponse
     {
@@ -48,7 +49,7 @@ class CourseController extends Controller
                 'password' => 'nullable|string',
             ]);
             // add new course to user
-            $course = auth()->user()->course()->create([
+            $course = auth()->user()->courses()->create([
                 'name' => $request->name,
                 'description' => $request->description,
                 'password' => $request->password,
@@ -72,8 +73,8 @@ class CourseController extends Controller
     /**
      * Display the specified resource.
      *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response: JsonResponse
+     * @param int $id
+     * @return Response: JsonResponse
      */
     public function show($id)
     {
@@ -113,8 +114,8 @@ class CourseController extends Controller
     /**
      * Show the form for editing the specified resource.
      *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
+     * @param int $id
+     * @return Response
      */
     public function edit($id)
     {
@@ -124,9 +125,9 @@ class CourseController extends Controller
     /**
      * Update the specified resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
+     * @param Request $request
+     * @param int $id
+     * @return Response
      */
     public function update(Request $request, $id): JsonResponse
     {
@@ -167,8 +168,8 @@ class CourseController extends Controller
     /**
      * Remove the specified resource from storage.
      *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
+     * @param int $id
+     * @return Response
      */
     public function destroy($id): JsonResponse
     {
@@ -211,6 +212,7 @@ class CourseController extends Controller
             ], 500);
         }
     }
+
     //add lesson to course by lesson id and course id
     public function addLessonToCourse(Request $request, $id, $lesson_id): JsonResponse
     {
