@@ -71,6 +71,7 @@ Route::middleware('auth:sanctum')->group(function () {
     })->middleware(['permissions:admin.dashboard']);
     // Route lesson
     Route::prefix('lesson')->group(function () {
+        Route::get('/learn/{id}', [LessonController::class, 'learn']);
         Route::post('/', [LessonController::class, 'store']);
         Route::get('/{id}', [LessonController::class, 'show']);
         Route::put('/{id}', [LessonController::class, 'update']);
