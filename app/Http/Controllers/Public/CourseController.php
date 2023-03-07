@@ -138,7 +138,6 @@ class CourseController extends Controller
             $request->validate([
                 'name' => 'required|string',
                 'description' => 'required|string',
-                'status' => 'required|in:active,inactive',
                 'is_public' => 'required|in:1,0',
                 'password' => 'nullable|string',
             ]);
@@ -147,7 +146,6 @@ class CourseController extends Controller
             $course->update([
                 'name' => $request->name,
                 'description' => $request->description,
-                'status' => $request->status,
                 'is_public' => $request->is_public,
                 'password' => $request->password,
             ]);
