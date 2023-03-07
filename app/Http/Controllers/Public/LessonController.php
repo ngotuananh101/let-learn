@@ -39,11 +39,12 @@ class LessonController extends Controller
                 $term = preg_replace('/[\n\r\t]+/', ' ', $term);
 
                 // check if the term is a multiple choice question
-                // check if the term is a multiple choice question
-                if (preg_match('/^(.*?)\s*[a-z]\.\s*(.*)/is', $term, $matches)) {
+                if (preg_match('/^(.*?)\s*[A-Ma-m]\.\s*(.*)/is', $term, $matches)) {
                     $question = trim($matches[1]);
                     $options_str = $matches[2];
-                    $options = preg_split('/\s*[a-z]\.\s*/i', $options_str, -1, PREG_SPLIT_NO_EMPTY);
+
+                    // split the options into arrays
+                    $options = preg_split('/\s*[a-m]\.\s*/i', $options_str, -1, PREG_SPLIT_NO_EMPTY);
                     $answers = array_map('trim', $options);
                     $correct_answer = trim($definition);
                 }
@@ -57,25 +58,25 @@ class LessonController extends Controller
                 else {
                     $question = $term;
                     $correct_answer = trim($definition);
+                    //get current $response and get the and $answers of other lessonDetail except true/false
+                    $otherAnswers = $response['lesson_details'];
+                    $otherAnswers = array_filter($otherAnswers, function ($item) {
+                        return count($item['answers']) > 2;
+                    });
+                    //get random 3 answers from other otherAnswers
+                    $otherAnswers = array_map(function ($item) {
+                        return $item['answers'];
+                    }, $otherAnswers);
+                    $otherAnswers = array_merge(...$otherAnswers);
+                    shuffle($otherAnswers);
+                    $otherAnswers = array_slice($otherAnswers, 0, 3);
 
-                    // get three other definitions from the current lesson
-                    if ($reverse) {
-                        $otherDefs = $lesson->lessonDetail()->where('id', '<>', $lessonDetail->id)
-                            ->inRandomOrder()->take(3)->pluck('term')->toArray();
-                    }else {
-                        $otherDefs = $lesson->lessonDetail()->where('id', '<>', $lessonDetail->id)
-                        ->inRandomOrder()->take(3)->pluck('definition')->toArray();
-                    }
-                    //if reverse is true, $otherDefs will be an array of terms
-                    
-                    // add the correct answer to the other definitions
-                    array_push($otherDefs, $correct_answer);
-
+                    //add correct answer to otherAnswers
+                    array_push($otherAnswers, $correct_answer);
                     // shuffle the answer options
-                    shuffle($otherDefs);
-
-                    // set the answer options to the shuffled definitions
-                    $answers = $otherDefs;
+                    shuffle($otherAnswers);
+                    // set the answer options to the shuffled $otherAnswers
+                    $answers = $otherAnswers;
                 }
 
                 $response['lesson_details'][] = [
