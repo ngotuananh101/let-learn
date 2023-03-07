@@ -5,13 +5,96 @@ namespace App\Http\Controllers\Public;
 use App\Http\Controllers\Controller;
 use App\Models\Lesson;
 use App\Models\Course;
+use App\Models\LessonDetail;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Maatwebsite\Excel\Facades\Excel;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
+
 class LessonController extends Controller
 {
+    public function learn(Request $request, $lesson_id)
+    {
+        try {
+            $reverse = request()->input('reverse', false);
+            $lesson = Lesson::findOrFail($lesson_id);
+            $lessonDetails = $lesson->lessonDetail()->get();
+
+            $response = ['lesson_id' => $lesson_id, 'lesson_details' => []];
+
+            foreach ($lessonDetails as $lessonDetail) {
+                $term = $lessonDetail->term;
+                $definition = $lessonDetail->definition;
+
+                if ($reverse) {
+                    $temp = $term;
+                    $term = $definition;
+                    $definition = $temp;
+                }
+
+                $answers = [];
+
+                // replace special characters with a space character
+                $term = preg_replace('/[\n\r\t]+/', ' ', $term);
+
+                // check if the term is a multiple choice question
+                // check if the term is a multiple choice question
+                if (preg_match('/^(.*?)\s*[a-z]\.\s*(.*)/is', $term, $matches)) {
+                    $question = trim($matches[1]);
+                    $options_str = $matches[2];
+                    $options = preg_split('/\s*[a-z]\.\s*/i', $options_str, -1, PREG_SPLIT_NO_EMPTY);
+                    $answers = array_map('trim', $options);
+                    $correct_answer = trim($definition);
+                }
+                // check if the term is a true/false question
+                elseif (preg_match('/^(.*)\s*[a-z]\.\s*(True|False)/is', $term, $matches)) {
+                    $question = trim($matches[1]);
+                    $answers = array_map('trim', [$matches[2], $matches[3]]);
+                    $correct_answer = trim($definition);
+                }
+                // if the term is neither multiple choice nor true/false
+                else {
+                    $question = $term;
+                    $correct_answer = trim($definition);
+
+                    // get three other definitions from the current lesson
+                    if ($reverse) {
+                        $otherDefs = $lesson->lessonDetail()->where('id', '<>', $lessonDetail->id)
+                            ->inRandomOrder()->take(3)->pluck('term')->toArray();
+                    }else {
+                        $otherDefs = $lesson->lessonDetail()->where('id', '<>', $lessonDetail->id)
+                        ->inRandomOrder()->take(3)->pluck('definition')->toArray();
+                    }
+                    //if reverse is true, $otherDefs will be an array of terms
+                    
+                    // add the correct answer to the other definitions
+                    array_push($otherDefs, $correct_answer);
+
+                    // shuffle the answer options
+                    shuffle($otherDefs);
+
+                    // set the answer options to the shuffled definitions
+                    $answers = $otherDefs;
+                }
+
+                $response['lesson_details'][] = [
+                    'id' => $lessonDetail->id,
+                    'question' => $question,
+                    'answers' => $answers,
+                    'correct_answer' => $correct_answer,
+                ];
+            }
+            return response()->json($response);
+        } catch (\Throwable $th) {
+            return response()->json([
+                'status' => 'error',
+                'status_code' => 500,
+                'message' => $th->getMessage()
+            ], 500);
+        }
+    }
+
     public function import(Request $request): JsonResponse
     {
         try {
