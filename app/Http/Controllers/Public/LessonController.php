@@ -46,13 +46,35 @@ class LessonController extends Controller
                     // split the options into arrays
                     $options = preg_split('/\s*[a-m]\.\s*/i', $options_str, -1, PREG_SPLIT_NO_EMPTY);
                     $answers = array_map('trim', $options);
-                    $correct_answer = trim($definition);
+
+                    // determine the correct answer
+                    switch (trim($definition)) {
+                        case 'A':
+                            $correct_answer = $answers[0];
+                            break;
+                        case 'B':
+                            $correct_answer = $answers[1];
+                            break;
+                        case 'C':
+                            $correct_answer = $answers[2];
+                            break;
+                        case 'D':
+                            $correct_answer = $answers[3];
+                            break;
+                        default:
+                            $correct_answer = '';
+                            break;
+                    }
+
+                    $correct_answer = trim($correct_answer);
                 }
                 // check if the term is a true/false question
                 elseif (preg_match('/^(.*)\s*[a-z]\.\s*(True|False)/is', $term, $matches)) {
                     $question = trim($matches[1]);
                     $answers = array_map('trim', [$matches[2], $matches[3]]);
-                    $correct_answer = trim($definition);
+
+                    // determine the correct answer
+                    $correct_answer = ($definition === 'True') ? 'True' : 'False';
                 }
                 // if the term is neither multiple choice nor true/false
                 else {
@@ -83,7 +105,7 @@ class LessonController extends Controller
                     'id' => $lessonDetail->id,
                     'question' => $question,
                     'answers' => $answers,
-                    'correct_answer' => $correct_answer,
+                    'correct_answer' => $correct_answer ?? '',
                 ];
             }
             return response()->json($response);
