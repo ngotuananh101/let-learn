@@ -17,10 +17,17 @@ class LessonController extends Controller
     public function learn(Request $request, $lesson_id)
     {
         try {
-            $reverse = request()->input('reverse', false);
+            $reverse = $request->input('reverse', false); //request reverse term and definition
+            $mixAnswers = $request->input('mix_answers', false); //request mix answer part
+            $mixDetails = $request->input('mix_details', false); // request mix lesson details
+            
             $lesson = Lesson::findOrFail($lesson_id);
             $lessonDetails = $lesson->lessonDetail()->get();
 
+            if($mixDetails){
+                $lessonDetails = $lessonDetails->shuffle();
+            }
+            
             $response = ['lesson_id' => $lesson_id, 'lesson_details' => []];
 
             foreach ($lessonDetails as $lessonDetail) {
@@ -67,6 +74,9 @@ class LessonController extends Controller
                     }
 
                     $correct_answer = trim($correct_answer);
+                    if($mixAnswers){
+                        shuffle($answers);
+                    }
                 }
                 // check if the term is a true/false question
                 elseif (preg_match('/^(.*)\s*[a-z]\.\s*(True|False)/is', $term, $matches)) {
@@ -75,6 +85,10 @@ class LessonController extends Controller
 
                     // determine the correct answer
                     $correct_answer = ($definition === 'True') ? 'True' : 'False';
+
+                    if($mixAnswers){
+                        shuffle($answers);
+                    }
                 }
                 // if the term is neither multiple choice nor true/false
                 else {
