@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Public;
 use App\Http\Controllers\Controller;
 use App\Models\Lesson;
 use App\Models\Course;
+use App\Models\Learn;
 use App\Models\LessonDetail;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -17,18 +18,32 @@ class LessonController extends Controller
     public function learn(Request $request, $lesson_id)
     {
         try {
+
             $reverse = $request->input('reverse', false); //request reverse term and definition
             $mixAnswers = $request->input('mix_answers', false); //request mix answer part
-            $mixDetails = $request->input('mix_details', false); // request mix lesson details
-            
+            $mixDetails = $request->input('mix_details', false); //request mix lesson details
+            $defaultDetails = $request->input('default_details', false); //request default lesson details
+            $learn = $request->input('learn', false); //request learn lesson details
+
             $lesson = Lesson::findOrFail($lesson_id);
             $lessonDetails = $lesson->lessonDetail()->get();
 
-            if($mixDetails){
+            if ($defaultDetails) {
+                //show first 8 lesson details by lesson id
+                $lessonDetails = $lessonDetails->take(8);
+            }
+            if ($mixDetails) {
                 $lessonDetails = $lessonDetails->shuffle();
             }
-            
-            $response = ['lesson_id' => $lesson_id, 'lesson_details' => []];
+
+            $response = ['lesson_id' => $lesson_id, 'lesson_details' => [], 'not_yet_learn' => []];
+
+            if ($learn) {
+                //convert learned to array
+                $learned = explode(',', $learn->learned);
+                //show all elements in learned array
+                $response = $lessonDetails = $lessonDetails->whereIn('id', $learned);
+            }
 
             foreach ($lessonDetails as $lessonDetail) {
                 $term = $lessonDetail->term;
@@ -74,7 +89,7 @@ class LessonController extends Controller
                     }
 
                     $correct_answer = trim($correct_answer);
-                    if($mixAnswers){
+                    if ($mixAnswers) {
                         shuffle($answers);
                     }
                 }
@@ -86,7 +101,7 @@ class LessonController extends Controller
                     // determine the correct answer
                     $correct_answer = ($definition === 'True') ? 'True' : 'False';
 
-                    if($mixAnswers){
+                    if ($mixAnswers) {
                         shuffle($answers);
                     }
                 }
@@ -116,6 +131,12 @@ class LessonController extends Controller
                 }
 
                 $response['lesson_details'][] = [
+                    'id' => $lessonDetail->id,
+                    'question' => $question,
+                    'answers' => $answers,
+                    'correct_answer' => $correct_answer ?? '',
+                ];
+                $response['not_yet_learn'][] = [
                     'id' => $lessonDetail->id,
                     'question' => $question,
                     'answers' => $answers,
@@ -511,15 +532,26 @@ class LessonController extends Controller
     // show progress by lesson id
     public function showProgressByLessonId($id): JsonResponse
     {
-        //count progress of lesson by lesson id
         try {
             $lesson = Lesson::findOrFail($id);
-            $progress = $lesson->progress()->count();
+            //count the number of lesson detail in lesson
+            $countLessonDetail = $lesson->lessonDetail()->count();
+
+            //Find learn by learn id
+            $learn = Learn::where('lesson_id', $id)->where('user_id', auth()->user()->id)->first();
+            //Get learned from learn
+            $countLearned = count(explode(' ', $learn->learned));
+
             return response()->json([
                 'status' => 'success',
                 'status_code' => 200,
                 'message' => 'Get progress successfully!',
-                'data' => $progress
+                'data' => [
+                    // 'countLessonDetail' => $countLessonDetail,
+                    // 'learn' => $learn,
+                    // 'countLerned' => $countLearned,
+                    'progress' => ($countLearned / $countLessonDetail) * 100 . '%',
+                ]
             ], 200);
         } catch (\Throwable $th) {
             return response()->json([
