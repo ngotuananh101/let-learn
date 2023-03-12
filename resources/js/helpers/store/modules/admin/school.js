@@ -52,6 +52,81 @@ export default {
                     }
                 );
         },
+        update({commit}, data) {
+            overlay();
+            return adminSchoolService.update(data)
+                .then(
+                    school => {
+                        commit('getSchools', school);
+                        overlay();
+                        return Promise.resolve(school);
+                    },
+                    error => {
+                        commit('getSchools', null);
+                        overlay();
+                        return Promise.reject(error);
+                    }
+                );
+        },
+        searchUser({commit}, data) {
+            return adminSchoolService.searchUser(data)
+                .then(
+                    users => {
+                        commit('getSchools', users);
+                        return Promise.resolve(users);
+                    },
+                    error => {
+                        commit('getSchools', null);
+                        return Promise.reject(error);
+                    }
+                );
+        },
+        addManager({commit}, data) {
+            overlay();
+            return adminSchoolService.addManager(data)
+                .then(
+                    school => {
+                        commit('getSchools', school);
+                        overlay();
+                        return Promise.resolve(school);
+                    },
+                    error => {
+                        commit('getSchools', null);
+                        overlay();
+                        return Promise.reject(error);
+                    }
+                );
+        },
+        getManager({commit}, id) {
+            return adminSchoolService.getManager(id)
+                .then(
+                    manager => {
+                        commit('getSchools', manager);
+                        return Promise.resolve(manager);
+                    },
+                    error => {
+                        commit('getSchools', null);
+                        return Promise.reject(error);
+                    }
+                );
+        },
+        removeManager({commit}, id) {
+            console.log(id);
+            overlay();
+            return adminSchoolService.removeManager(id)
+                .then(
+                    school => {
+                        commit('getSchools', school);
+                        overlay();
+                        return Promise.resolve(school);
+                    },
+                    error => {
+                        commit('getSchools', null);
+                        overlay();
+                        return Promise.reject(error);
+                    }
+                );
+        },
     },
     mutations: {
         getSchools(state, schools) {

@@ -304,6 +304,22 @@ class RoleController extends Controller
                     for($i = 0; $i < count($users); $i++) {
                         // get user
                         $user = User::findOrFail($users[$i]);
+                        // check if user role is manager
+                        if ($user->role->name === 'manager') {
+                            // get school
+                            $school = $user->school()->first();
+                            // count manager of school
+                            $manager = $school->managers()->count();
+                            // check if manager is only one
+                            if ($manager === 1) {
+                                return response()->json([
+                                    'status' => 'error',
+                                    'message' => 'You can not unassign this user'
+                                ], 400);
+                            }
+                            // detach school from user
+                            $school->managers()->detach($user->id);
+                        }
                         // assign user to default role
                         $user->role()->associate(Role::where('name', 'user')->first())->save();
                     }
