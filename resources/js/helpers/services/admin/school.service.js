@@ -5,7 +5,12 @@ import handleResponse from './../handle-response';
 export const adminSchoolService = {
     getAllSchools,
     addSchool,
-    getSchool
+    getSchool,
+    update,
+    searchUser,
+    addManager,
+    getManager,
+    removeManager
 };
 
 function getAllSchools() {
@@ -35,4 +40,51 @@ function getSchool(id) {
     return fetch(`${config.apiUrl}/admin/school/${id}?type=all`, requestOptions).then(handleResponse).then(response => {
         return response.data;
     });
+}
+
+
+function update(data) {
+    const requestOptions = {
+        method: 'PUT',
+        headers: authHeader(),
+        body: JSON.stringify(data.school)
+    };
+    return fetch(`${config.apiUrl}/admin/school/${data.school.id}?type=${data.type}`, requestOptions).then(handleResponse);
+}
+
+function searchUser(data) {
+    const requestOptions = {
+        method: 'GET',
+        headers: authHeader(),
+    };
+    return fetch(`${config.apiUrl}/admin/school/${data.schoolId}?type=search_user&keyword=${data.keyword}`, requestOptions).then(handleResponse).then(response => {
+        return response;
+    });
+}
+
+function addManager(data) {
+    const requestOptions = {
+        method: 'PUT',
+        headers: authHeader(),
+        body: JSON.stringify(data)
+    };
+    return fetch(`${config.apiUrl}/admin/school/${data.schoolId}?type=add_manager`, requestOptions).then(handleResponse);
+}
+function getManager(id) {
+    const requestOptions = {
+        method: 'GET',
+        headers: authHeader(),
+    };
+    return fetch(`${config.apiUrl}/admin/school/${id}?type=managers`, requestOptions).then(handleResponse).then(response => {
+        return response;
+    });
+}
+
+function removeManager(data) {
+    const requestOptions = {
+        method: 'PUT',
+        headers: authHeader(),
+        body: JSON.stringify(data)
+    };
+    return fetch(`${config.apiUrl}/admin/school/${data.schoolId}?type=remove_manager`, requestOptions).then(handleResponse);
 }

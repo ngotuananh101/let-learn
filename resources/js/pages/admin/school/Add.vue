@@ -230,12 +230,15 @@ export default {
             this.select_state.setChoices(this.state, 'isoCode', 'name', true);
             this.school.state = '';
             this.school.city = '';
+            this.state = [];
+            this.city = [];
         },
         changeState(isoCode) {
             this.school.state = isoCode;
             this.city = country_data.getCity(this.school.country, isoCode);
             this.select_city.setChoices(this.city, 'name', 'name', true);
             this.school.city = '';
+            this.city = [];
         },
         changeCity(name) {
             this.school.city = name;
