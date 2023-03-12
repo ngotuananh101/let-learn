@@ -69,7 +69,9 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::resource('user', AdminUserController::class)->middleware(['permissions:admin.users']);
         Route::resource('role', AdminRoleController::class)->middleware(['permissions:admin.roles']);
         Route::resource('school', AdminSchoolController::class)->middleware(['permissions:admin.schools']);
-        Route::resource('class', AdminClassController::class)->middleware(['permissions:admin.classes']);
+        Route::resource('class', AdminClassController::class)->middleware(['permissions:admin.school.class.create']);
+        Route::resource('class', AdminClassController::class)->middleware(['permissions:admin.school.class.edit']);
+        Route::resource('class', AdminClassController::class)->middleware(['permissions:admin.school.class.delete']);
     })->middleware(['permissions:admin.dashboard']);
     // Route lesson
     Route::prefix('lesson')->group(function () {
