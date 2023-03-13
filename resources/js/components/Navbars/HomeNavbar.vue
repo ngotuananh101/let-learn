@@ -1,7 +1,7 @@
 <template>
     <!-- Navbar -->
     <nav
-        class="navbar navbar-expand-lg top-0 z-index-3 position-absolute"
+        class="navbar navbar-expand-lg top-0"
         :class="isBlur ? isBlur : 'shadow-none my-2 navbar-transparent'"
     >
         <div class="container-fluid p-0">

@@ -7,19 +7,32 @@
             </div>
         </div>
     </div>
-    <main class="main-content main-content-bg mt-0">
+    <main class="main-content main-content-bg mt-0" >
         <div class="container">
-            
+            <router-view></router-view>
         </div>
     </main>
+    <AppFooter />
 </template>
 
 <script lang="js">
 import Navbar from "@/components/Navbars/HomeNavbar.vue";
+import AppFooter from "@/components/Footer.vue";
+import { mapActions } from "vuex";
+import data from "bootstrap/js/src/dom/data";
 export default {
     name: "Home",
     components: {
         Navbar,
+        AppFooter,
+    },
+    methods: {
+        ...mapActions(['adminSchool/getAllSchools']),
+    },
+    mounted() {
+        this.getAllSchools().then(data => {
+            console.log(data);
+        });
     },
 };
 </script>
