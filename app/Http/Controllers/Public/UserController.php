@@ -17,7 +17,7 @@ class UserController extends Controller
     /**
      * Display the specified resource.
      *
-     * @param  int  $id
+     * @param int $id
      * @return \Illuminate\Http\Response
      */
     public function show(Request $request, $id)
@@ -28,7 +28,7 @@ class UserController extends Controller
             ]);
             // $user = User::findOrFail($id);
             // check user is user login
-            if ($request->user()->id != $id) {
+            if (!$request->user()) {
                 return response()->json([
                     'status' => 'error',
                     'status_code' => 403,
@@ -37,7 +37,7 @@ class UserController extends Controller
             }
             switch ($request->type) {
                 case 'info':
-                    //show all information of user 
+                    //show all information of user
                     $user = $request->user();
                     //check user is active
                     if ($user->status == 0) {
@@ -55,19 +55,48 @@ class UserController extends Controller
                     break;
 
                 case 'lesson':
-                    //show all lesson by user id
-                    $lessons = Lesson::where('user_id', $id)->get();
+                    $request->validate([
+                        'limit' => 'nullable|integer',
+                    ]);
+                    //show lesson by user id
+                    if ($request->limit) {
+                        $lessons = Lesson::where('user_id', $id)->where('status', 'active')->limit($request->limit)->get();
+                    } else {
+                        $lessons = Lesson::where('user_id', $id)->where('status', 'active')->get();
+                    }
+
+                    $lessons = $lessons->map(function ($lessons) {
+                        return [
+                            'name' => $lessons->name,
+                            'detail_count' => count($lessons->lessonDetail),
+                            'username' => $lessons->user->username,
+                        ];
+                    });
+
                     return response()->json([
                         'status' => 'success',
                         'status_code' => 200,
-                        'message' => 'Get all lesson by user id successfully',
                         'data' => $lessons
                     ], 200);
                     break;
 
                 case 'course':
-                    //show all course by user id
-                    $courses = Course::where('user_id', $id)->get();
+                    $request->validate([
+                        'limit' => 'nullable|integer',
+                    ]);
+                    //show course by user id
+                    if ($request->limit) {
+                        $courses = Course::where('user_id', $id)->where('status', 'active')->limit($request->limit)->get();
+                    } else {
+                        $courses = Course::where('user_id', $id)->where('status', 'active')->get();
+                    }
+                    $courses = $courses->map(function ($courses) {
+                        return [
+                            'name' => $courses->name,
+                            'lesson_count' => count($courses->lessons),
+                            'username' => $courses->user->username,
+                        ];
+                    });
                     return response()->json([
                         'status' => 'success',
                         'status_code' => 200,
@@ -190,8 +219,8 @@ class UserController extends Controller
     /**
      * Update the specified resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
+     * @param \Illuminate\Http\Request $request
+     * @param int $id
      * @return \Illuminate\Http\Response
      */
     public function update(Request $request, $id)
@@ -250,7 +279,7 @@ class UserController extends Controller
     /**
      * Remove the specified resource from storage.
      *
-     * @param  int  $id
+     * @param int $id
      * @return \Illuminate\Http\Response
      */
     public function destroy($id)

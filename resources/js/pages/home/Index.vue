@@ -1,83 +1,24 @@
 <template>
     <header>
-        <h1>Welcome to Let Learn</h1>
-        <p>Learn anything, anytime, anywhere.</p>
-        <form>
-            <input type="text" placeholder="Search...">
-            <button>Search</button>
-        </form>
+        <info-card
+            title="Welcome to Let Learn"
+            description="Learn anything, anytime, anywhere"
+            :badge="{ text: 'Moderate', color: 'success' }"
+        />
     </header>
     <div class="row">
-        <h2>Lesson</h2>
-        <div class="col-lg-4 col-md-6 col-12">
-            <LessonCard title="VNR" value="76 terms" description="<span
-                  class='text-sm font-weight-bolder text-success'
-                  /span> hailongvu"/>
-        </div>
-        <div class="col-lg-4 col-md-6 col-12">
-            <LessonCard title="HCM" value="78 terms" description="<span
-                  class='text-sm font-weight-bolder text-success'
-                  >+3%</span> since last week"/>
-        </div>
-        <div class="col-lg-4 col-md-6 col-12">
-            <LessonCard title="SSC" value="108 terms" description="<span
-                  class='text-sm font-weight-bolder text-success'
-                  /span> HoaNK"/>
+        <h3>Lesson</h3>
+        <div class="col-lg-4 col-md-6 col-12" v-for="lesson in lessons">
+            <LessonCard :title="lesson.name" :value="lesson.detail_count + ' terms'" :description="lesson.username"/>
         </div>
     </div>
     <div class="row">
-        <div class="col-lg-4 col-md-6 col-12">
-            <LessonCard title="VNR" value="76 terms" description="<span
-                  class='text-sm font-weight-bolder text-success'
-                  /span> hailongvu"/>
-        </div>
-        <div class="col-lg-4 col-md-6 col-12">
-            <LessonCard title="HCM" value="78 terms" description="<span
-                  class='text-sm font-weight-bolder text-success'
-                  >+3%</span> since last week"/>
-        </div>
-        <div class="col-lg-4 col-md-6 col-12">
-            <LessonCard title="SSC" value="108 terms" description="<span
-                  class='text-sm font-weight-bolder text-success'
-                  /span> HoaNK"/>
+        <h3>Course</h3>
+        <div class="col-lg-4 col-md-6 col-12" v-for="course in courses">
+            <LessonCard :title="course.name" :value="course.lesson_count + ' lessons'" :description="course.username"/>
         </div>
     </div>
-    <div class="row">
-        <h2>Course</h2>
-        <div class="col-lg-4 col-md-6 col-12">
-            <LessonCard title="VNR" value="76 terms" description="<span
-                  class='text-sm font-weight-bolder text-success'
-                  /span> hailongvu"/>
-        </div>
-        <div class="col-lg-4 col-md-6 col-12">
-            <LessonCard title="HCM" value="78 terms" description="<span
-                  class='text-sm font-weight-bolder text-success'
-                  >+3%</span> since last week"/>
-        </div>
-        <div class="col-lg-4 col-md-6 col-12">
-            <LessonCard title="SSC" value="108 terms" description="<span
-                  class='text-sm font-weight-bolder text-success'
-                  /span> HoaNK"/>
-        </div>
-    </div>
-    <div class="row">
-        <div class="col-lg-4 col-md-6 col-12">
-            <LessonCard title="VNR" value="76 terms" description="<span
-                  class='text-sm font-weight-bolder text-success'
-                  /span> hailongvu"/>
-        </div>
-        <div class="col-lg-4 col-md-6 col-12">
-            <LessonCard title="HCM" value="78 terms" description="<span
-                  class='text-sm font-weight-bolder text-success'
-                  >+3%</span> since last week"/>
-        </div>
-        <div class="col-lg-4 col-md-6 col-12">
-            <LessonCard title="SSC" value="108 terms" description="<span
-                  class='text-sm font-weight-bolder text-success'
-                  /span> HoaNK"/>
-        </div>
-    </div>
-    <div class="row">
+    <div class="row" v-if="classes">
         <h2>Class</h2>
         <div class="col-lg-4 col-md-6 col-12">
             <LessonCard title="VNR" value="76 terms" description="<span
@@ -95,40 +36,7 @@
                   /span> HoaNK"/>
         </div>
     </div>
-    <div class="row">
-        <div class="col-lg-4 col-md-6 col-12">
-            <LessonCard title="VNR" value="76 terms" description="<span
-                  class='text-sm font-weight-bolder text-success'
-                  /span> hailongvu"/>
-        </div>
-        <div class="col-lg-4 col-md-6 col-12">
-            <LessonCard title="HCM" value="78 terms" description="<span
-                  class='text-sm font-weight-bolder text-success'
-                  >+3%</span> since last week"/>
-        </div>
-        <div class="col-lg-4 col-md-6 col-12">
-            <LessonCard title="SSC" value="108 terms" description="<span
-                  class='text-sm font-weight-bolder text-success'
-                  /span> HoaNK"/>
-        </div>
-    </div>
-    <section>
-        <h2>What Our Users Say</h2>
-        <ul>
-            <li>
-                <blockquote>"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse varius enim in eros
-                    elementum tristique."
-                </blockquote>
-                <cite>- John Doe</cite>
-            </li>
-            <li>
-                <blockquote>"Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis
-                    egestas."
-                </blockquote>
-                <cite>- Jane Doe</cite>
-            </li>
-        </ul>
-    </section>
+
     <footer>
         <nav>
             <a href="#">Terms of Service</a>
@@ -140,19 +48,39 @@
 
 <script>
 import LessonCard from "@/components/Cards/LessonCard.vue";
+import InfoCard from "@/components/Cards/InfoCard.vue";
 
 export default {
     name: "HomePage",
-    components: {LessonCard},
+    components: {LessonCard, InfoCard},
+    data() {
+        return {
+            lessons: null,
+            courses: null,
+            classes: null
+        };
+    },
+    title() {
+        return "Home - " + document.getElementsByTagName("meta")["title"].content;
+    },
+    beforeMount() {
+        this.$store.dispatch('home/getLesson').then(
+            lesson => {
+                console.log(lesson);
+                this.lessons = lesson;
+            }
+        );
+        this.$store.dispatch('home/getCourse').then(
+            course => {
+                console.log(course);
+                this.courses = course;
+            }
+        );
+    }
 };
 </script>
 
 <style scoped>
-.container {
-    max-width: 960px;
-    margin: 0 auto;
-    font-family: 'Helvetica Neue', sans-serif;
-}
 
 header nav {
     display: flex;
