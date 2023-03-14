@@ -82,9 +82,6 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::delete('/{id}', [LessonController::class, 'destroy']);
         Route::post('/import', [LessonController::class, 'import']);
         Route::get('/export/{id}', [LessonController::class, 'export']);
-        Route::get('user/{id}', [LessonController::class, 'showAllLessontByUserId']);
-        Route::get('course/{id}', [LessonController::class, 'showAllLessonByCourseId']);
-        Route::get('progress/{id}', [LessonController::class, 'showProgressByLessonId']);
     });
     // Route course
     Route::prefix('course')->group(function () {
