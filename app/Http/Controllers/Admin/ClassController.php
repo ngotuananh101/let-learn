@@ -77,14 +77,12 @@ class ClassController extends Controller
                 'status' => 'required|in:active,inactive',
                 'school_id' => 'required|exists:schools,id',
             ]);
-
             $class = Classes::create([
                 'name' => $request->name,
                 'description' => $request->description,
                 'status' => $request->status,
                 'school_id' => $request->school_id,
             ]);
-
             // Return json
             return response()->json([
                 'status' => 'success',
@@ -126,6 +124,8 @@ class ClassController extends Controller
                 // 'search_user' => User::where('email', 'like', '%' . $request->keyword . '%')
                 //     ->orWhere('username', 'like', '%' . $request->keyword . '%')
                 //     ->get(),
+                'teachers' => $class->teachers,
+                'students' => $class->students,
                 default => throw new \Exception('Invalid type'),
             };
             // Return json
@@ -166,30 +166,86 @@ class ClassController extends Controller
     {
         try {
             $request->validate([
-                'type' => 'required|in:class,add_manager,remove_manager',
+                'type' => 'required|in:class,add_teacher,add_student',
             ]);
             $class = Classes::findOrFail($id);
-            switch ($request->type) {
-                case 'class':
-                    $request->validate([
-                        'name' => 'required|string',
-                        'description' => 'required|string',
-                        'status' => 'required|in:active,inactive',
-                    ]);
-                    $class->name = $request->name;
-                    $class->description = $request->description;
-                    $class->status = $request->status;
-                    $class->save();                    
-                    break;                
-                default:
-                    throw new \Exception('Invalid type');
+            if ($this->checkPermiss($id) == false) {
+                throw new \Exception('You do not have permission to edit this class');
+            } else {
+                switch ($request->type) {
+                    case 'class':
+                        $request->validate([
+                            'name' => 'required|string',
+                            'description' => 'required|string',
+                            'status' => 'required|in:active,inactive',
+                        ]);
+                        $class->name = $request->name;
+                        $class->description = $request->description;
+                        $class->status = $request->status;
+                        $class->save();
+                        // Return json
+                        return response()->json([
+                            'status' => 'success',
+                            'status_code' => 200,
+                            'message' => 'Class updated successfully'
+                        ], 200);
+                        break;
+                    case 'add_teacher':
+                        //request input user_id
+                        $request->validate([
+                            'user_id' => 'required|exists:users,id',
+                        ]);
+                        $user = User::findOrFail($request->user_id);
+                        //check if user is teacher
+                        $role = Role::where('name', 'teacher')->first();
+                        if (!$request->user()->hasRole($role)) {
+                            throw new \Exception('User is not teacher');
+                        } else {
+                            //check if user is already teacher of class
+                            if ($class->teachers->contains($request->user())) {
+                                throw new \Exception('User is already teacher of class');
+                            } else {
+                                //add user to class
+                                $class->teachers()->attach($request->user());
+                                // Return json
+                                return response()->json([
+                                    'status' => 'success',
+                                    'status_code' => 200,
+                                    'message' => 'Teacher added successfully'
+                                ], 200);
+                            }
+                        }
+                        break;
+                    case 'add_student':
+                        $request->validate([
+                            'user_id' => 'required|exists:users,id',
+                        ]);
+                        $user = User::findOrFail($request->user_id);
+                        //check if user is student
+                        $role = Role::where('name', 'student')->first();
+                        if (!$request->user()->hasRole($role)) {
+                            throw new \Exception('User is not student');
+                        } else {
+                            //check if user is already student of class
+                            if ($class->students->contains($request->user())) {
+                                throw new \Exception('User is already student of class');
+                            } else {
+                                //add user to class
+                                $class->students()->attach($request->user());
+                                // Return json
+                                return response()->json([
+                                    'status' => 'success',
+                                    'status_code' => 200,
+                                    'message' => 'Student added successfully'
+                                ], 200);
+                            }
+                        }
+                        break;
+                    default:
+                        throw new \Exception('Invalid type');
+                        break;
+                }
             }
-            // Return json
-            return response()->json([
-                'status' => 'success',
-                'status_code' => 200,
-                'message' => 'Class updated successfully'
-            ], 200);
         } catch (\Exception $e) {
             // Return json
             return response()->json([
@@ -206,24 +262,79 @@ class ClassController extends Controller
      * @param int $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id)
+    public function destroy(Request $request, $id)
     {
         try {
-            // delete class by id (soft delete by set status to inactive)
-            $class = Classes::find($id);
-            if ($class) {
-                $class->status = 'inactive';
-                return response()->json([
-                    'status' => 'success',
-                    'status_code' => 200,
-                    'message' => 'Class deleted successfully'
-                ], 200);
+            //request input type delete class or delete student and teacher in class
+            $request->validate([
+                'type' => 'required|in:delete_class,delete_teacher,delete_student',
+            ]);
+            if ($this->checkPermiss($id) == false) {
+                throw new \Exception('You do not have permission to delete this class');
             } else {
-                return response()->json([
-                    'status' => 'error',
-                    'status_code' => 404,
-                    'message' => 'Class not found'
-                ], 404);
+                //switch case check type
+                switch ($request->type) {
+                    case 'delete_class':
+                        //delete class by id
+                        $class = Classes::find($id);
+                        if ($class) {
+                            $class->delete();
+                            return response()->json([
+                                'status' => 'success',
+                                'status_code' => 200,
+                                'message' => 'Class deleted successfully'
+                            ], 200);
+                        } else {
+                            return response()->json([
+                                'status' => 'error',
+                                'status_code' => 404,
+                                'message' => 'Class not found'
+                            ], 404);
+                        }
+                        break;
+                    case 'delete_teacher':
+                        //delete teacher by user_id in class by id
+                        $class = Classes::find($id);
+                        if ($class) {
+                            //check if user not exist 
+                            if (!$class->teachers->contains($request->user()) && !$class->students->contains($request->user())) {
+                                throw new \Exception('User not exist in class');
+                            }
+                            $class->teachers()->detach($request->user());
+                            return response()->json([
+                                'status' => 'success',
+                                'status_code' => 200,
+                                'message' => 'Teacher deleted successfully'
+                            ], 200);
+                        } else {
+                            return response()->json([
+                                'status' => 'error',
+                                'status_code' => 404,
+                                'message' => 'Class not found'
+                            ], 404);
+                        }
+                        break;
+                    case 'delete_student':
+                        //delete student in class by id
+                        $class = Classes::find($id);
+                        if ($class) {
+                            $class->students()->detach($request->user());
+                            return response()->json([
+                                'status' => 'success',
+                                'status_code' => 200,
+                                'message' => 'Student deleted successfully'
+                            ], 200);
+                        } else {
+                            return response()->json([
+                                'status' => 'error',
+                                'status_code' => 404,
+                                'message' => 'Class not found'
+                            ], 404);
+                        }
+                        break;
+                    default:
+                        throw new \Exception('Invalid type');
+                }
             }
         } catch (\Throwable $th) {
             return response()->json([
@@ -231,6 +342,20 @@ class ClassController extends Controller
                 'status_code' => 500,
                 'message' => $th->getMessage()
             ], 500);
+        }
+    }
+
+    //check permission
+    public function checkPermiss($id)
+    {
+        try {
+            $class = Classes::findOrFail($id);
+            $user = auth()->user();
+            $roles = $user->roles;
+            return ($roles->contains('admin') || $roles->contains('super_admin') ||
+                ($roles->contains('manager') && $class->school->managers->contains($user)));
+        } catch (\Exception $e) {
+            return false;
         }
     }
 }
