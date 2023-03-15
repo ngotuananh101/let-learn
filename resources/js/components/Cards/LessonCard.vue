@@ -17,7 +17,7 @@
               }}
             </h5>
             <!--  eslint-disable-next-line vue/no-v-html -->
-            <p v-if="description" class="mt-2 mb-0"><span class='text-sm font-weight-bolder text-success'>{{ description }}</span></p>
+            <p v-if="description" class="mt-2 mb-0"><span class='text-sm font-weight-bolder text-success' :style=" fontsize?'font-size: ' + fontsize + 'px !important;' : ''">{{ description }}</span></p>
           </div>
         </div>
       </div>
@@ -40,6 +40,10 @@ export default {
     value: {
       type: String,
       required: true,
+    },
+    fontsize: {
+      type: String,
+      default: "",
     },
     classContent: {
       type: String,
