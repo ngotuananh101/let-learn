@@ -11,7 +11,6 @@ import adminUser from "./modules/admin/user.js";
 import adminRole from "./modules/admin/role.js";
 import adminSchool from "./modules/admin/school.js";
 import home from "./modules/home.js";
-
 export default createStore({
     namespaced: true,
     modules: {
