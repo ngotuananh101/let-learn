@@ -37,13 +37,6 @@
         </div>
     </div>
 
-    <footer>
-        <nav>
-            <a href="#">Terms of Service</a>
-            <a href="#">Privacy Policy</a>
-            <a href="#">Contact Us</a>
-        </nav>
-    </footer>
 </template>
 
 <script>

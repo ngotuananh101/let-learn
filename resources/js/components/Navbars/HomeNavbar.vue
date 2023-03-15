@@ -53,7 +53,7 @@
                             data-bs-toggle="dropdown"
                             aria-expanded="false"
                         >
-                           Hello,  {{this.user.username}}
+                            Hello, {{ this.user.username }}
                             <span
                                 class="arrow ms-1 d-block"
                                 :class="darkMode ? 'd-lg-block' : 'd-lg-none'"
@@ -75,14 +75,17 @@
                                             <div class="d-flex">
                                                 <div class="h-10 mt-1 icon me-3 d-flex">
                                                     <i
-                                                        class="ni ni-single-copy-04 text-gradient text-success"
+                                                        class="fa-regular fa-user"
                                                     ></i>
                                                 </div>
                                                 <div
                                                     class="w-100 d-flex align-items-center justify-content-between"
                                                 >
                                                     <div>
-                                                        <p class="p-0 dropdown-header text-dark">Profile</p>
+                                                        <router-link :to="{ name: 'home.profile'}"
+                                                                     class="p-0 dropdown-header text-dark"
+                                                                     aria-current="page">Profile
+                                                        </router-link>
                                                     </div>
                                                 </div>
                                             </div>
@@ -98,7 +101,7 @@
                                             <div class="d-flex">
                                                 <div class="h-10 mt-1 icon me-3 d-flex">
                                                     <i
-                                                        class="ni ni-laptop text-gradient text-success"
+                                                        class="fa-regular fa-circle-info"
                                                     ></i>
                                                 </div>
                                                 <div
@@ -120,7 +123,7 @@
                                         >
                                             <div class="d-flex">
                                                 <div class="h-10 mt-1 icon me-3 d-flex">
-                                                    <i class="ni ni-badge text-gradient text-success"></i>
+                                                    <i class="fa-regular fa-gear"></i>
                                                 </div>
                                                 <div
                                                     class="w-100 d-flex align-items-center justify-content-between"
@@ -140,7 +143,7 @@
                                         <a class="py-2 ps-3 border-radius-md" href="/auth/logout">
                                             <div class="d-flex">
                                                 <div class="h-10 mt-1 icon me-3 d-flex">
-                                                    <i class="ni ni-notification-70 text-gradient text-success"></i>
+                                                    <i class="fa-solid fa-arrow-right-from-bracket"></i>
                                                 </div>
                                                 <div class="w-100 d-flex align-items-center justify-content-between">
                                                     <div>
@@ -170,7 +173,7 @@
                                                 class="w-100 d-flex align-items-center justify-content-between"
                                             >
                                                 <div>
-                                                    <p class="p-0 dropdown-header text-dark">Kanban</p>
+                                                    <p class="p-0 dropdown-header text-dark">Profile</p>
                                                 </div>
                                             </div>
                                         </div>
@@ -187,7 +190,7 @@
                                                 class="w-100 d-flex align-items-center justify-content-between"
                                             >
                                                 <div>
-                                                    <p class="p-0 dropdown-header text-dark">Wizard</p>
+                                                    <p class="p-0 dropdown-header text-dark">Help Center</p>
                                                 </div>
                                             </div>
                                         </div>
@@ -205,7 +208,7 @@
                                             >
                                                 <div>
                                                     <p class="p-0 dropdown-header text-dark">
-                                                        DataTables
+                                                        Setting
                                                     </p>
                                                 </div>
                                             </div>
@@ -215,20 +218,19 @@
                                         class="py-2 ps-3 border-radius-md"
                                         :to="{ name: 'home' }"
                                     >
-                                        <div class="d-flex">
-                                            <div class="h-10 mt-1 icon me-3 d-flex">
-                                                <i
-                                                    class="ni ni-notification-70 text-gradient text-success"
-                                                ></i>
-                                            </div>
-                                            <div
-                                                class="w-100 d-flex align-items-center justify-content-between"
-                                            >
-                                                <div>
-                                                    <p class="p-0 dropdown-header text-dark">Calendar</p>
+                                        <a class="py-2 ps-3 border-radius-md" href="/auth/logout">
+                                            <div class="d-flex">
+                                                <div class="h-10 mt-1 icon me-3 d-flex">
+                                                    <i class="ni ni-notification-70 text-gradient text-success"></i>
+                                                </div>
+                                                <div class="w-100 d-flex align-items-center justify-content-between">
+                                                    <div>
+                                                        <p class="p-0 dropdown-header text-dark">Logout</p>
+                                                    </div>
                                                 </div>
                                             </div>
-                                        </div>
+                                        </a>
+
                                     </router-link>
                                 </div>
                             </div>
@@ -260,7 +262,7 @@ export default {
     },
     data() {
         return {
-            user : null,
+            user: null,
         };
     },
     beforeMount() {

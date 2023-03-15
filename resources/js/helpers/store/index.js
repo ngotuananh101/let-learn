@@ -11,6 +11,7 @@ import adminUser from "./modules/admin/user.js";
 import adminRole from "./modules/admin/role.js";
 import adminSchool from "./modules/admin/school.js";
 import home from "./modules/home.js";
+// import profile from "./modules/profile.js";
 
 export default createStore({
     namespaced: true,
@@ -20,6 +21,7 @@ export default createStore({
         account,
         alert,
         home,
+        // profile,
         dashboard,
         adminSetting,
         adminSet,
