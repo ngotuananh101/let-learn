@@ -17,6 +17,8 @@ class Classes extends Model
         'school_id',
         'name',
         'description',
+        'start_date',
+        'end_date',
         'status',
         'updated_at',
     ];

@@ -52,77 +52,54 @@ class DatabaseSeeder extends Seeder
         $permissions = [
             // permissions in admin page
             [
+                'name' => 'admin.super',
+                'description' => 'Give all permissions to user',
+            ],
+            [
                 'name' => 'admin.dashboard',
-                'description' => 'Admin Dashboard',
+                'description' => 'Require to access any admin page',
             ],
             [
-                'name' => 'admin.settings',
-                'description' => 'Admin Settings',
+                'name' => 'admin.analytics',
+                'description' => 'Require to access analytics page',
             ],
             [
-                'name' => 'admin.settings.update',
-                'description' => 'Admin Settings Update',
+                'name' => 'admin.setting',
+                'description' => 'Require to update setting',
+            ],
+            // permissions in manager of school
+            [
+                'name' => 'manager.super',
+                'description' => 'Give all permissions of school to user',
             ],
             [
-                'name' => 'admin.users',
-                'description' => 'Admin Users',
+                'name' => 'manager.dashboard',
+                'description' => 'Require to access any manager page',
             ],
             [
-                'name' => 'admin.users.create',
-                'description' => 'Admin Users Create',
+                'name' => 'manager.info',
+                'description' => 'Require to update info of school',
             ],
             [
-                'name' => 'admin.users.edit',
-                'description' => 'Admin Users Edit',
+                'name' => 'manager.user',
+                'description' => 'Require to manage users of school',
             ],
             [
-                'name' => 'admin.users.delete',
-                'description' => 'Admin Users Delete',
+                'name' => 'manager.class',
+                'description' => 'Require to manage classes of school',
             ],
             [
-                'name' => 'admin.roles',
-                'description' => 'Admin Roles',
+                'name' => 'manager.student',
+                'description' => 'Require to manage students of school',
             ],
             [
-                'name' => 'admin.roles.create',
-                'description' => 'Admin Roles Create',
+                'name' => 'manager.teacher',
+                'description' => 'Require to manage teachers of school',
             ],
             [
-                'name' => 'admin.roles.edit',
-                'description' => 'Admin Roles Edit',
+                'name' => 'manager.mark',
+                'description' => 'Require to manage marks of school',
             ],
-            [
-                'name' => 'admin.roles.delete',
-                'description' => 'Admin Roles Delete',
-            ],
-            [
-                'name' => 'admin.roles.assign',
-                'description' => 'Admin Roles Assign',
-            ],
-            [
-                'name' => 'admin.roles.unassign',
-                'description' => 'Admin Roles Unassign',
-            ],
-            [
-                'name' => 'admin.schools',
-                'description' => 'Admin Schools',
-            ],
-            [
-                'name' => 'admin.schools.create',
-                'description' => 'Admin Schools Create',
-            ],
-            [
-                'name' => 'admin.schools.edit',
-                'description' => 'Admin Schools Edit',
-            ],
-            [
-                'name' => 'admin.schools.delete',
-                'description' => 'Admin Schools Delete',
-            ],
-            [
-                'name' => 'admin.schools.request',
-                'description' => 'Admin Schools Request',
-            ]
         ];
         foreach ($permissions as $permission) {
             Permission::create($permission);

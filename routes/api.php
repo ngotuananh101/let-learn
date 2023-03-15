@@ -61,18 +61,23 @@ Route::middleware('auth:sanctum')->group(function () {
             Route::get('google', [AnalyticsController::class, 'getAnalytics']);
         });
         Route::prefix('settings')->group(function () {
-            Route::get('/', [SettingController::class, 'index'])->middleware(['permissions:admin.settings']);
-            Route::post('/{key}', [SettingController::class, 'update'])->middleware(['permissions:admin.settings.update']);
+            Route::get('/', [SettingController::class, 'index']);
+            Route::post('/{key}', [SettingController::class, 'update']);
         });
-        Route::resource('set', AdminSetController::class)->middleware(['permissions:admin.lessons']);
-        Route::resource('folder', AdminFolderController::class)->middleware(['permissions:admin.folders']);
-        Route::resource('user', AdminUserController::class)->middleware(['permissions:admin.users']);
-        Route::resource('role', AdminRoleController::class)->middleware(['permissions:admin.roles']);
-        Route::resource('school', AdminSchoolController::class)->middleware(['permissions:admin.schools']);
-        Route::resource('class', AdminClassController::class)->middleware(['permissions:admin.school.class.create']);
-        Route::resource('class', AdminClassController::class)->middleware(['permissions:admin.school.class.edit']);
-        Route::resource('class', AdminClassController::class)->middleware(['permissions:admin.school.class.delete']);
+        Route::resource('set', AdminSetController::class);
+        Route::resource('folder', AdminFolderController::class);
+        Route::resource('user', AdminUserController::class);
+        Route::resource('role', AdminRoleController::class);
+        Route::resource('school', AdminSchoolController::class);
+        Route::resource('class', AdminClassController::class);
     })->middleware(['permissions:admin.dashboard']);
+
+    // Route for school
+    Route::prefix('school')->group(function () {
+        Route::resource('user', AdminUserController::class);
+        Route::resource('class', AdminClassController::class);
+    })->middleware(['permissions:manager.dashboard']);
+
     // Route lesson
     Route::prefix('lesson')->group(function () {
         Route::get('/learn/{id}', [LessonController::class, 'learn']);
@@ -98,24 +103,4 @@ Route::middleware('auth:sanctum')->group(function () {
     });
     // Route user
     Route::resource('user', UserController::class)->only(['show', 'update', 'destroy']);
-
-    Route::prefix('class')->group(function () {
-        Route::middleware(['checkUserInClass:all'])->group(function () {
-            Route::post('/addFolder/{id}', [ClassController::class, 'addFolder']);
-            Route::get('/{id}', [ClassController::class, 'show']);
-        });
-        Route::middleware(['checkUserInClass:teacher'])->group(function () {
-            Route::post('/addTeacher/{id}', [ClassController::class, 'addTeacher']);
-            Route::post('/addStudent/{id}', [ClassController::class, 'addStudent']);
-            Route::post('/addSet/{id}', [ClassController::class, 'addSet']);
-            Route::delete('/{id}/teacher/{teacher_id}', [ClassController::class, 'deleteTeacher']);
-            Route::delete('/{id}/student/{student_id}', [ClassController::class, 'deleteStudent']);
-            Route::delete('/{id}/set/{set_id}', [ClassController::class, 'deleteSet']);
-            Route::delete('/{id}/folder/{folder_id}', [ClassController::class, 'deleteFolder']);
-            Route::put('/{id}', [ClassController::class, 'update']);
-            Route::delete('/{id}', [ClassController::class, 'destroy']);
-        });
-        Route::post('/', [ClassController::class, 'store']);
-        Route::get('/', [ClassController::class, 'index']);
-    });
 });

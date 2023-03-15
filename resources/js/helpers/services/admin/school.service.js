@@ -10,7 +10,10 @@ export const adminSchoolService = {
     searchUser,
     addManager,
     getManager,
-    removeManager
+    removeManager,
+    addClass,
+    getClass,
+    removeClass
 };
 
 function getAllSchools() {
@@ -87,4 +90,32 @@ function removeManager(data) {
         body: JSON.stringify(data)
     };
     return fetch(`${config.apiUrl}/admin/school/${data.schoolId}?type=remove_manager`, requestOptions).then(handleResponse);
+}
+
+function addClass(data) {
+    const requestOptions = {
+        method: 'PUT',
+        headers: authHeader(),
+        body: JSON.stringify(data)
+    };
+    return fetch(`${config.apiUrl}/admin/school/${data.schoolId}?type=add_class`, requestOptions).then(handleResponse);
+}
+
+function getClass(id) {
+    const requestOptions = {
+        method: 'GET',
+        headers: authHeader(),
+    };
+    return fetch(`${config.apiUrl}/admin/school/${id}?type=classes`, requestOptions).then(handleResponse).then(response => {
+        return response;
+    });
+}
+
+function removeClass(data) {
+    const requestOptions = {
+        method: 'PUT',
+        headers: authHeader(),
+        body: JSON.stringify(data)
+    };
+    return fetch(`${config.apiUrl}/admin/school/${data.schoolId}?type=remove_class`, requestOptions).then(handleResponse);
 }

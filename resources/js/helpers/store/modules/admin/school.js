@@ -127,6 +127,51 @@ export default {
                     }
                 );
         },
+        addClass({commit}, data) {
+            overlay();
+            return adminSchoolService.addClass(data)
+                .then(
+                    school => {
+                        commit('getSchools', school);
+                        overlay();
+                        return Promise.resolve(school);
+                    },
+                    error => {
+                        commit('getSchools', null);
+                        overlay();
+                        return Promise.reject(error);
+                    }
+                );
+        },
+        getClasses({commit}, id) {
+            return adminSchoolService.getClass(id)
+                .then(
+                    schoolClass => {
+                        commit('getSchools', schoolClass);
+                        return Promise.resolve(schoolClass);
+                    },
+                    error => {
+                        commit('getSchools', null);
+                        return Promise.reject(error);
+                    }
+                );
+        },
+        removeClass({commit}, data){
+            overlay();
+            return adminSchoolService.removeClass(data)
+                .then(
+                    school => {
+                        commit('getSchools', school);
+                        overlay();
+                        return Promise.resolve(school);
+                    },
+                    error => {
+                        commit('getSchools', null);
+                        overlay();
+                        return Promise.reject(error);
+                    }
+                );
+        },
     },
     mutations: {
         getSchools(state, schools) {

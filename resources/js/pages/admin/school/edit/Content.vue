@@ -144,12 +144,15 @@
                     <div class="my-auto ms-auto">
                         <button type="button"
                                 class="mx-1 mb-0 btn btn-outline-success btn-sm"
-                                @click="showForm('manager')">
-                            Assign Manager
+                                data-bs-toggle="modal" data-bs-target="#modalClass">
+                            Add Class
                         </button>
+                        <router-link v-if="selected_class" :to="{ name:'' }" class="mx-1 mb-0 btn btn-outline-warning btn-sm">
+                            Edit Class
+                        </router-link>
                         <button type="button"
-                                class="mx-1 mb-0 btn btn-outline-danger btn-sm" @click="removeManager">
-                            Unassign Manager
+                                class="mx-1 mb-0 btn btn-outline-danger btn-sm" @click="removeClass">
+                            Remove Class
                         </button>
                     </div>
                 </div>
@@ -162,10 +165,10 @@
                     <thead class="thead-light">
                     <tr>
                         <th>ID</th>
-                        <th>Username</th>
-                        <th>Email</th>
-                        <th>Position</th>
-                        <th>Created at</th>
+                        <th>Name</th>
+                        <th>Description</th>
+                        <th>Start date</th>
+                        <th>End date</th>
                         <th>Updated at</th>
                     </tr>
                     </thead>
@@ -287,6 +290,63 @@
             </div>
         </div>
     </div>
+    <div id="modalClass" class="modal fade" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog mt-lg-10">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 id="ModalLabel" class="modal-title">
+                        Add class
+                    </h5>
+                    <i class="fa-regular fa-cloud-arrow-up ms-3"></i>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-7">
+                            <label class="form-label mt-2">Name</label>
+                            <argon-input id="class_name" type="text" name="name"
+                                         placeholder="Class name" required/>
+                        </div>
+                        <div class="col-5">
+                            <label class="form-label mt-2">Status</label>
+                            <select
+                                id="class_status"
+                                name="active"
+                                class="form-control"
+                                required
+                            >
+                                <option value="active">Active</option>
+                                <option value="inactive">Inactive</option>
+                            </select>
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label mt-2">Description</label>
+                            <argon-input id="class_description" type="text" name="description"
+                                         placeholder="Class description" required/>
+                        </div>
+                        <div class="col-6">
+                            <label class="form-label mt-2">Start date</label>
+                            <argon-input id="class_start_date" type="date" name="start_date"
+                                         placeholder="Start date" required/>
+                        </div>
+                        <div class="col-6">
+                            <label class="form-label mt-2">End date</label>
+                            <argon-input id="class_end_date" type="date" name="end_date"
+                                         placeholder="End date" required/>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn bg-gradient-success btn-sm" id="btnSubmitClass" @click="addClass">
+                        Submit
+                    </button>
+                    <button type="button" class="btn bg-gradient-secondary btn-sm"
+                            data-bs-dismiss="modal">
+                        Close
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
 </template>
 
 <script>
@@ -330,9 +390,11 @@ export default {
             select_state: null,
             select_user: null,
             manager_table: null,
+            class_table: null,
             modal_search: null,
             form_type: 'manager',
             selected_manager: null,
+            selected_class: null,
         }
     },
     mounted() {
@@ -408,6 +470,7 @@ export default {
                 this.school = res.school;
                 this.setChoice();
                 this.setManager(res.managers)
+                this.setClass(res.classes)
             });
             this.setEventListener();
             this.modal_search = new Modal(document.getElementById('modalUser'));
@@ -442,14 +505,30 @@ export default {
             this.manager_table.clear();
             this.manager_table.rows.add(manager).draw();
             // handle event for manager table
-            this.manager_table.on('select' , (e, dt, type, indexes) => {
+            this.manager_table.on('select', (e, dt, type, indexes) => {
                 if (type === 'row') {
                     this.selected_manager = this.manager_table.rows(indexes).data().toArray()[0];
                 }
             });
-            this.manager_table.on('deselect' , (e, dt, type, indexes) => {
+            this.manager_table.on('deselect', (e, dt, type, indexes) => {
                 if (type === 'row') {
                     this.selected_manager = null;
+                }
+            });
+        },
+        setClass(classes) {
+            this.class_table = this.$refs.class_table.dt();
+            this.class_table.clear();
+            this.class_table.rows.add(classes).draw();
+            // handle event for class table
+            this.class_table.on('select', (e, dt, type, indexes) => {
+                if (type === 'row') {
+                    this.selected_class = this.class_table.rows(indexes).data().toArray()[0];
+                }
+            });
+            this.class_table.on('deselect', (e, dt, type, indexes) => {
+                if (type === 'row') {
+                    this.selected_class = null;
                 }
             });
         },
@@ -578,8 +657,8 @@ export default {
                 });
             }
         },
-        removeManager(){
-            if(this.selected_manager){
+        removeManager() {
+            if (this.selected_manager) {
                 // unassign manager
                 this.$store.dispatch('adminSchool/removeManager', {
                     user_id: this.selected_manager[0],
@@ -601,7 +680,7 @@ export default {
                         });
                     }
                 });
-            }else{
+            } else {
                 this.$swal({
                     title: 'Error!',
                     text: 'Please select a manager',
@@ -610,10 +689,83 @@ export default {
                 });
             }
         },
+        addClass() {
+            let name = document.getElementById('class_name').value;
+            let description = document.getElementById('class_description').value;
+            let status = document.getElementById('class_status').value;
+            let start_date = document.getElementById('class_start_date').value;
+            let end_date = document.getElementById('class_end_date').value;
+
+            if (name && description && status) {
+                this.$store.dispatch('adminSchool/addClass', {
+                    name: name,
+                    description: description,
+                    status: status,
+                    schoolId: this.school.id,
+                    start_date: start_date,
+                    end_date: end_date
+                }).then(
+                    school => {
+                        this.$swal({
+                            title: 'Success!',
+                            text: 'Class added successfully',
+                            icon: 'success',
+                            confirmButtonText: 'Ok'
+                        });
+                        // reload class list
+                        this.getClasses(this.school.id).then((res) => {
+                            this.setClass(res.data);
+                        });
+                    },
+                    error => {
+                        this.$swal({
+                            title: 'Error!',
+                            text: error,
+                            icon: 'error',
+                            confirmButtonText: 'Ok'
+                        });
+                    }
+                )
+            } else {
+                this.$swal({
+                    title: 'Error!',
+                    text: 'Please fill all fields',
+                    icon: 'error',
+                    confirmButtonText: 'Ok'
+                });
+            }
+        },
+        getClasses(schoolId) {
+            return this.$store.dispatch('adminSchool/getClasses',schoolId);
+        },
+        removeClass(){
+            let class_id = this.selected_class[0];
+            if (class_id) {
+                this.$store.dispatch('adminSchool/removeClass', {
+                    class_id: class_id,
+                    schoolId: this.school.id
+                }).then(
+                    school => {
+                        this.class_table.row('.selected').remove().draw(false);
+                    },
+                    error => {
+                        this.$swal({
+                            title: 'Error!',
+                            text: error,
+                            icon: 'error',
+                            confirmButtonText: 'Ok'
+                        });
+                    }
+                )
+            } else {
+                this.$swal({
+                    title: 'Error!',
+                    text: 'Please select a class',
+                    icon: 'error',
+                    confirmButtonText: 'Ok'
+                });
+            }
+        }
     }
 }
 </script>
-
-<style scoped>
-
-</style>
