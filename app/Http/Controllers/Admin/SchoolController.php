@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\Classes;
 use App\Models\Role;
 use App\Models\School;
 use App\Models\User;
@@ -20,10 +21,6 @@ class SchoolController extends Controller
      */
     public function __construct()
     {
-        $this->middleware('permissions:admin.schools')->only(['index']);
-        $this->middleware('permissions:admin.schools.create')->only(['store']);
-        $this->middleware('permissions:admin.schools.edit')->only(['update']);
-        $this->middleware('permissions:admin.schools.delete')->only(['destroy']);
     }
 
 
@@ -147,7 +144,7 @@ class SchoolController extends Controller
     {
         try {
             $request->validate([
-                'type' => 'required|in:all,managers,teachers,students,search_user',
+                'type' => 'required|in:all,managers,teachers,students,search_user,classes',
                 'keyword' => 'required_if:type,search_user|string',
             ]);
             // get school
@@ -166,7 +163,27 @@ class SchoolController extends Controller
                             \Carbon\Carbon::parse($manager->updated_at)->format('d/m/Y'),
                         ];
                     }),
+                    'classes' => $school->classes->map(function ($class) {
+                        return [
+                            $class->id,
+                            $class->name,
+                            $class->description,
+                            $class->start_date,
+                            $class->end_date,
+                            $class->status,
+                        ];
+                    }),
                 ],
+                'classes' => $school->classes->map(function ($class) {
+                    return [
+                        $class->id,
+                        $class->name,
+                        $class->description,
+                        $class->start_date,
+                        $class->end_date,
+                        $class->status,
+                    ];
+                }),
                 'search_user' => User::where('email', 'like', '%' . $request->keyword . '%')
                     ->orWhere('username', 'like', '%' . $request->keyword . '%')
                     ->get(),
@@ -220,7 +237,7 @@ class SchoolController extends Controller
     {
         try {
             $request->validate([
-                'type' => 'required|in:school,add_manager,remove_manager',
+                'type' => 'required|in:school,add_manager,remove_manager,add_class,remove_class',
             ]);
             $school = School::findOrFail($id);
             switch ($request->type) {
@@ -290,6 +307,29 @@ class SchoolController extends Controller
                         $user->save();
                     }else{
                         throw new \Exception('User is not manager of school');
+                    }
+                    break;
+                case 'add_class':
+                    $request->merge([
+                        'school_id' => $school->id
+                    ]);
+                    // call class controller
+                    $class = new ClassController();
+                    // call store method
+                    return $class->store($request);
+                    break;
+                case 'remove_class':
+                    $request->validate([
+                        'class_id' => 'required|exists:classes,id',
+                    ]);
+                    // find class
+                    $class = Classes::findOrFail($request->class_id);
+                    // check if class is in school
+                    if ($school->classes->contains($class)) {
+                        // delete class
+                        $class->delete();
+                    }else{
+                        throw new \Exception('Class is not in school');
                     }
                     break;
                 default:

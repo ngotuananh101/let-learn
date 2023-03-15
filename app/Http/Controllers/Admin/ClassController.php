@@ -20,10 +20,6 @@ class ClassController extends Controller
      */
     public function __construct()
     {
-        $this->middleware('permissions:admin.schclass')->only(['index']);
-        $this->middleware('permissions:admin.school.class.create')->only(['store']);
-        $this->middleware('permissions:admin.school.class.edit')->only(['update']);
-        $this->middleware('permissions:admin.school.class.delete')->only(['destroy']);
     }
 
 
@@ -32,35 +28,6 @@ class ClassController extends Controller
      *
      * @return JsonResponse
      */
-    public function index(): JsonResponse
-    {
-        try {
-            // get all classes
-            $classes = Classes::all();
-            $classes = $classes->map(function ($class) {
-                return [
-                    $class->id,
-                    $class->name,
-                    $class->description,
-                    $class->status,
-                    $class->school->name,
-                ];
-            });
-            // Return json
-            return response()->json([
-                'status' => 'success',
-                'status_code' => 200,
-                'data' => $classes
-            ]);
-        } catch (\Exception $e) {
-            // Return json
-            return response()->json([
-                'status' => 'error',
-                'status_code' => 500,
-                'message' => $e->getMessage()
-            ]);
-        }
-    }
 
     /**
      * Store a newly created resource in storage.
@@ -76,18 +43,22 @@ class ClassController extends Controller
                 'description' => 'required|string',
                 'status' => 'required|in:active,inactive',
                 'school_id' => 'required|exists:schools,id',
+                'start_date' => 'required|date|after_or_equal:today',
+                'end_date' => 'required|date|after:start_date',
             ]);
             $class = Classes::create([
                 'name' => $request->name,
                 'description' => $request->description,
                 'status' => $request->status,
                 'school_id' => $request->school_id,
+                'start_date' => $request->start_date,
+                'end_date' => $request->end_date,
             ]);
             // Return json
             return response()->json([
                 'status' => 'success',
                 'status_code' => 200,
-                'message' => 'Class created successfully'
+                'data' => 'Class created successfully'
             ], 200);
         } catch (\Exception $e) {
             // Return json
@@ -260,7 +231,7 @@ class ClassController extends Controller
      * Remove the specified resource from storage.
      *
      * @param int $id
-     * @return \Illuminate\Http\Response
+     * @return JsonResponse
      */
     public function destroy(Request $request, $id)
     {

@@ -18,7 +18,6 @@ class LessonController extends Controller
      */
     public function __construct()
     {
-        $this->middleware('permissions:admin.lessons')->only(['index']);
     }
 
     /**

@@ -19,10 +19,6 @@ class RoleController extends Controller
      */
     public function __construct()
     {
-        $this->middleware('permissions:admin.roles')->only(['index']);
-        $this->middleware('permissions:admin.roles.create')->only(['store']);
-        $this->middleware('permissions:admin.roles.edit')->only(['update']);
-        $this->middleware('permissions:admin.roles.delete')->only(['destroy']);
     }
 
 
