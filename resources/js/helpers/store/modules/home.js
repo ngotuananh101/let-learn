@@ -34,6 +34,14 @@ export default {
                         return Promise.resolve(course);
                     },
                 );
+        },
+        getClass(){
+            return homeService.loadClass()
+                .then(
+                    classes => {
+                        return Promise.resolve(classes);
+                    },
+                );
         }
     }
 }

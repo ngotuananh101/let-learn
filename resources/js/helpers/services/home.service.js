@@ -6,7 +6,7 @@ import handleResponse from './handle-response';
 export const homeService = {
     loadLesson,
     loadCourse,
-    // loadClass
+    loadClass
 }
 
 function loadLesson() {
@@ -29,10 +29,10 @@ function loadCourse() {
         });
 }
 
-// function loadClass(class_id) {
-//     return fetch(`${config.apiUrl}/class/${class_id}`, { method: 'GET', headers: authHeader() })
-//         .then(handleResponse)
-//         .then(data => {
-//             return data.data;
-//         });
-// }
+function loadClass(class_id) {
+    return fetch(`${config.apiUrl}/user/${class_id}?type=class&limit=6`, { method: 'GET', headers: authHeader() })
+        .then(handleResponse)
+        .then(data => {
+            return data.data;
+        });
+}

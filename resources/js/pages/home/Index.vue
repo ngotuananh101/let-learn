@@ -20,20 +20,8 @@
     </div>
     <div class="row" v-if="classes">
         <h2>Class</h2>
-        <div class="col-lg-4 col-md-6 col-12">
-            <LessonCard title="VNR" value="76 terms" description="<span
-                  class='text-sm font-weight-bolder text-success'
-                  /span> hailongvu"/>
-        </div>
-        <div class="col-lg-4 col-md-6 col-12">
-            <LessonCard title="HCM" value="78 terms" description="<span
-                  class='text-sm font-weight-bolder text-success'
-                  >+3%</span> since last week"/>
-        </div>
-        <div class="col-lg-4 col-md-6 col-12">
-            <LessonCard title="SSC" value="108 terms" description="<span
-                  class='text-sm font-weight-bolder text-success'
-                  /span> HoaNK"/>
+        <div class="col-lg-4 col-md-6 col-12" v-for="classes in classes">
+            <LessonCard :title="classes.name" :value="classes.classes_count + ' courses'"/>
         </div>
     </div>
 
@@ -67,6 +55,12 @@ export default {
             course => {
                 console.log(course);
                 this.courses = course;
+            }
+        );
+        this.$store.dispatch('home/getClass').then(
+            classes => {
+                console.log(classes);
+                this.classes = classes;
             }
         );
     }
