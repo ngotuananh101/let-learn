@@ -10,6 +10,12 @@ use App\Http\Controllers\Admin\UserController as AdminUserController;
 use App\Http\Controllers\Admin\RoleController as AdminRoleController;
 use App\Http\Controllers\Admin\SchoolController as AdminSchoolController;
 use App\Http\Controllers\Admin\ClassController as AdminClassController;
+
+use App\Http\Controllers\Manager\LessonController as ManagerSetController;
+use App\Http\Controllers\Manager\CourseController as ManagerFolderController;
+use App\Http\Controllers\Manager\UserController as ManagerUserController;
+use App\Http\Controllers\Manager\SchoolController as ManagerSchoolController;
+use App\Http\Controllers\Manager\ClassController as ManagerClassController;
 use App\Http\Controllers\Auth\VerificationController;
 use App\Http\Controllers\Public\LessonController;
 use App\Http\Controllers\Public\CourseController;
@@ -69,13 +75,16 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::resource('user', AdminUserController::class);
         Route::resource('role', AdminRoleController::class);
         Route::resource('school', AdminSchoolController::class);
-        Route::resource('class', AdminClassController::class);
+        //Route::resource('class', AdminClassController::class);
     })->middleware(['permissions:admin.dashboard']);
 
     // Route for school
     Route::prefix('school')->group(function () {
-        Route::resource('user', AdminUserController::class);
-        Route::resource('class', AdminClassController::class);
+        Route::resource('user', ManagerUserController::class)->only(['index', 'store']); 
+        Route::resource('class', ManagerClassController::class); 
+        Route::resource('school', ManagerSchoolController::class)->only(['show', 'update']);
+        Route::resource('set', ManagerSetController::class);
+        Route::resource('folder', ManagerFolderController::class);
     })->middleware(['permissions:manager.dashboard']);
 
     // Route lesson
