@@ -9,7 +9,7 @@
                     </template>
                 </sidenav-collapse>
             </li>
-            <li class="nav-item" v-if="this.checkPermission('admin.settings')">
+            <li class="nav-item" v-if="this.checkPermission('admin.setting')">
                 <sidenav-collapse @click="$router.push({ name: 'admin.setting' })" collapse-ref="" nav-text="Settings"
                                   :class="getRoute() === 'setting' ? 'active' : ''">
                     <template #icon>
@@ -22,7 +22,7 @@
                     Users
                 </h6>
             </li>
-            <li class="nav-item" v-if="this.checkPermission('admin.users')">
+            <li class="nav-item">
                 <sidenav-collapse @click="$router.push({ name: 'admin.users' })" collapse-ref="" nav-text="Users"
                                   :class="getRoute() === 'users' ? 'active' : ''">
                     <template #icon>
@@ -30,7 +30,7 @@
                     </template>
                 </sidenav-collapse>
             </li>
-            <li class="nav-item" v-if="this.checkPermission('admin.roles')">
+            <li class="nav-item">
                 <sidenav-collapse @click="$router.push({ name: 'admin.roles' })" collapse-ref="" nav-text="Roles"
                                   :class="getRoute() === 'roles' ? 'active' : ''">
                     <template #icon>
@@ -43,7 +43,7 @@
                     Learning
                 </h6>
             </li>
-            <li class="nav-item" v-if="this.checkPermission('admin.schools')">
+            <li class="nav-item">
                 <sidenav-collapse collapse-ref="" nav-text="School"
                                   :class="getRoute() === 'schools' ? 'active' : ''">
                     <template #icon>
@@ -52,9 +52,9 @@
                     <template #list>
                         <ul class="nav ms-4">
                             <!-- nav links -->
-                            <sidenav-item v-if="this.checkPermission('admin.schools')" :to="{ name: 'admin.schools.list' }" mini-icon="L" text="School List" />
-                            <sidenav-item v-if="this.checkPermission('admin.schools.create')" :to="{ name: 'admin.schools.add' }" mini-icon="A" text="Add School" />
-                            <sidenav-item v-if="this.checkPermission('admin.schools.request')" :to="{ name: 'admin.schools.request' }" mini-icon="R" text="School Request" />
+                            <sidenav-item :to="{ name: 'admin.schools.list' }" mini-icon="L" text="School List" />
+                            <sidenav-item :to="{ name: 'admin.schools.add' }" mini-icon="A" text="Add School" />
+                            <sidenav-item :to="{ name: 'admin.schools.request' }" mini-icon="R" text="School Request" />
                         </ul>
                     </template>
                 </sidenav-collapse>
