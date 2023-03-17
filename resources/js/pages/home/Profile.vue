@@ -74,26 +74,5 @@ export default {
     created() {
         this.$router.push({name: 'home.profile.lessons'});
     },
-    // data() {
-    //     return {
-    //         lessons: null,
-    //         courses: null,
-    //         classes: null
-    //     };
-    // },
-    // beforeMount() {
-    //     this.$store.dispatch('home/getLesson').then(
-    //         lesson => {
-    //             console.log(lesson);
-    //             this.lessons = lesson;
-    //         }
-    //     );
-    //     this.$store.dispatch('home/getCourse').then(
-    //         course => {
-    //             console.log(course);
-    //             this.courses = course;
-    //         }
-    //     );
-    // }
 };
 </script>
