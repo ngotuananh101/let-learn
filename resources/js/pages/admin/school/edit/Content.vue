@@ -140,22 +140,22 @@
                     <h5 class="mb-0">Class</h5>
                     <p class="mb-0 text-sm">List all class in {{ this.school.name }}</p>
                 </div>
-                <div v-if="checkPermission('admin.schools.edit')" class="my-auto mt-4 ms-auto mt-lg-0">
-                    <div class="my-auto ms-auto">
-                        <button type="button"
-                                class="mx-1 mb-0 btn btn-outline-success btn-sm"
-                                data-bs-toggle="modal" data-bs-target="#modalClass">
-                            Add Class
-                        </button>
-                        <router-link v-if="selected_class" :to="{ name:'' }" class="mx-1 mb-0 btn btn-outline-warning btn-sm">
-                            Edit Class
-                        </router-link>
-                        <button type="button"
-                                class="mx-1 mb-0 btn btn-outline-danger btn-sm" @click="removeClass">
-                            Remove Class
-                        </button>
-                    </div>
-                </div>
+<!--                <div v-if="checkPermission('admin.schools.edit')" class="my-auto mt-4 ms-auto mt-lg-0">-->
+<!--                    <div class="my-auto ms-auto">-->
+<!--                        <button type="button"-->
+<!--                                class="mx-1 mb-0 btn btn-outline-success btn-sm"-->
+<!--                                data-bs-toggle="modal" data-bs-target="#modalClass">-->
+<!--                            Add Class-->
+<!--                        </button>-->
+<!--                        <router-link v-if="selected_class" :to="{ name:'' }" class="mx-1 mb-0 btn btn-outline-warning btn-sm">-->
+<!--                            Edit Class-->
+<!--                        </router-link>-->
+<!--                        <button type="button"-->
+<!--                                class="mx-1 mb-0 btn btn-outline-danger btn-sm" @click="removeClass">-->
+<!--                            Remove Class-->
+<!--                        </button>-->
+<!--                    </div>-->
+<!--                </div>-->
             </div>
         </div>
         <div class="card-body pt-0">
@@ -738,34 +738,34 @@ export default {
         getClasses(schoolId) {
             return this.$store.dispatch('adminSchool/getClasses',schoolId);
         },
-        removeClass(){
-            let class_id = this.selected_class[0];
-            if (class_id) {
-                this.$store.dispatch('adminSchool/removeClass', {
-                    class_id: class_id,
-                    schoolId: this.school.id
-                }).then(
-                    school => {
-                        this.class_table.row('.selected').remove().draw(false);
-                    },
-                    error => {
-                        this.$swal({
-                            title: 'Error!',
-                            text: error,
-                            icon: 'error',
-                            confirmButtonText: 'Ok'
-                        });
-                    }
-                )
-            } else {
-                this.$swal({
-                    title: 'Error!',
-                    text: 'Please select a class',
-                    icon: 'error',
-                    confirmButtonText: 'Ok'
-                });
-            }
-        }
+        // removeClass(){
+        //     let class_id = this.selected_class[0];
+        //     if (class_id) {
+        //         this.$store.dispatch('adminSchool/removeClass', {
+        //             class_id: class_id,
+        //             schoolId: this.school.id
+        //         }).then(
+        //             school => {
+        //                 this.class_table.row('.selected').remove().draw(false);
+        //             },
+        //             error => {
+        //                 this.$swal({
+        //                     title: 'Error!',
+        //                     text: error,
+        //                     icon: 'error',
+        //                     confirmButtonText: 'Ok'
+        //                 });
+        //             }
+        //         )
+        //     } else {
+        //         this.$swal({
+        //             title: 'Error!',
+        //             text: 'Please select a class',
+        //             icon: 'error',
+        //             confirmButtonText: 'Ok'
+        //         });
+        //     }
+        // }
     }
 }
 </script>
