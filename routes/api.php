@@ -57,9 +57,7 @@ Route::get('/meta', [SettingController::class, 'meta']);
 Route::middleware('auth:sanctum')->group(function () {
     // Route for admin
     Route::prefix('admin')->group(function () {
-        Route::prefix('analytics')->group(function () {
-            Route::get('google', [AnalyticsController::class, 'getAnalytics']);
-        });
+        Route::get('analytics', [AnalyticsController::class, 'getAnalytics']);
         Route::prefix('settings')->group(function () {
             Route::get('/', [SettingController::class, 'index']);
             Route::post('/{key}', [SettingController::class, 'update']);
