@@ -24,7 +24,13 @@
             <div class="settings-menu">
                 <!-- add settings button -->
                 <button class="settings-close-button" @click="toggleSettings">×</button>
-                <h2>Settings</h2>
+                <h2>Tùy chọn</h2>
+                <h6>Sắp xếp thẻ</h6>
+                <p>Sắp xếp thẻ của bạn để tập trung vào những thuật ngữ cần chú tâm học. Tắt tính năng sắp xếp nếu bạn muốn nhanh chóng ôn lại các thẻ ghi nhớ.</p>
+                <div class="form-check form-switch">
+                    <input class="form-check-input" type="checkbox" id="flexSwitchCheckDefault">
+                    <label class="form-check-label" for="flexSwitchCheckDefault">Âm thanh</label>
+                </div>
                 <!-- add your settings options here -->
                 <button @click="toggleSettings">Close</button>
             </div>
@@ -135,7 +141,7 @@ export default {
 
 .settings-menu {
     position: relative;
-    width: 400px;
+    width: 800px;
     max-width: 90%;
     background-color: #f5f5f5;
     border-radius: 4px;

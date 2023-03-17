@@ -129,9 +129,10 @@
                                                     class="w-100 d-flex align-items-center justify-content-between"
                                                 >
                                                     <div>
-                                                        <p class="p-0 dropdown-header text-dark">
-                                                            Setting
-                                                        </p>
+                                                        <router-link :to="{ name: 'home.setting'}"
+                                                                     class="p-0 dropdown-header text-dark"
+                                                                     aria-current="page">Setting
+                                                        </router-link>
                                                     </div>
                                                 </div>
                                             </div>
