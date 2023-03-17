@@ -1,75 +1,103 @@
 <template>
-    <canvas :id="id" class="chart-canvas" height="300"></canvas>
+    <div class="card">
+        <div class="p-3 pb-0 card-header">
+            <h6 class="mb-0">{{ title }}</h6>
+            <span class="fs-6">{{ subtitle }}</span>
+            <div class="d-flex align-items-center">
+                                    <span class="badge badge-md badge-dot me-4">
+                                        <i class="bg-success"></i>
+                                        <span class="text-xs text-dark">{{badge[0]}}</span>
+                                    </span>
+                <span class="badge badge-md badge-dot me-4">
+                                        <i class="bg-danger"></i>
+                                        <span class="text-xs text-dark">{{badge[1]}}</span>
+                                    </span>
+            </div>
+        </div>
+        <div class="p-3 card-body">
+            <div class="chart">
+                <canvas :id="id" class="chart-canvas"></canvas>
+            </div>
+        </div>
+    </div>
 </template>
 
 <script>
 import Chart from "chart.js/auto";
 export default {
-    name: "StatsChart",
+    name: "TrafficChart",
     props: {
+        title:{
+            type: String,
+            default: "Title of static chart",
+        },
+        subtitle:{
+            type: String,
+            default: "subtitle of static chart",
+        },
+        badge:{
+            type: Array,
+            default: ["badge", "badge"],
+        },
         id: {
             type: String,
-            default: "stats-chart",
+            default: "traffic-chart",
         },
-        chart: {
-            type: Object,
-            required: true,
-            labels: String,
-            datasets: {
-                type: Array,
-                label: Array,
-                data: Array,
-            },
+        labels: {
+            type: Array,
+            default: () => ["monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"],
         },
+        datasets: {
+            type: Array,
+            default: [
+                {
+                    label: 'no',
+                    data: [0, 0, 0, 0, 0, 0, 0],
+                },
+                {
+                    label: 'yes',
+                    tension: 0.4,
+                    borderWidth: 0,
+                    pointRadius: 2,
+                    pointBackgroundColor: "#f5365c",
+                    borderColor: "#f5365c",
+                    // eslint-disable-next-line no-dupe-keys
+                    data: [0, 0, 0, 0, 0, 0, 0],
+                    maxBarThickness: 6,
+                },
+            ],
+        }
     },
     mounted() {
-        var chart = document.getElementById(this.id).getContext("2d");
-
-        var gradientStroke1 = chart.createLinearGradient(0, 230, 0, 50);
-
+        const chart = document.getElementById(this.id).getContext("2d");
+        const gradientStroke1 = chart.createLinearGradient(0, 230, 0, 50);
         gradientStroke1.addColorStop(1, "rgba(203,12,159,0.2)");
         gradientStroke1.addColorStop(0.2, "rgba(72,72,176,0.0)");
         gradientStroke1.addColorStop(0, "rgba(203,12,159,0)"); //purple colors
-
-        var gradientStroke2 = chart.createLinearGradient(0, 230, 0, 50);
-
+        const gradientStroke2 = chart.createLinearGradient(0, 230, 0, 50);
         gradientStroke2.addColorStop(1, "rgba(20,23,39,0.2)");
         gradientStroke2.addColorStop(0.2, "rgba(72,72,176,0.0)");
         gradientStroke2.addColorStop(0, "rgba(20,23,39,0)"); //purple colors
-
+        // get datasets
+        let chart_data = this.datasets.map((dataset) => {
+            return {
+                label: dataset.label || "no",
+                tension: dataset.tension || 0.4,
+                // borderWidth: dataset.borderWidth || 0,
+                pointRadius: dataset.pointRadius || 2,
+                pointBackgroundColor: dataset.pointBackgroundColor || "#f5365c",
+                borderColor: dataset.borderColor || "#f5365c",
+                borderWidth: dataset.borderWidth || 3,
+                data: dataset.data || [0, 0, 0, 0, 0, 0, 0],
+                maxBarThickness: dataset.maxBarThickness || 6,
+            };
+        });
         // Line chart
         new Chart(chart, {
             type: "line",
             data: {
-                labels: this.chart.labels,
-                datasets: [
-                    {
-                        label: this.chart.datasets[0].label,
-                        tension: 0.4,
-                        borderWidth: 0,
-                        pointRadius: 2,
-                        pointBackgroundColor: "#4BB543 ",
-                        borderColor: "#4BB543 ",
-                        // eslint-disable-next-line no-dupe-keys
-                        borderWidth: 3,
-                        backgroundColor: gradientStroke1,
-                        data: this.chart.datasets[0].data,
-                        maxBarThickness: 6,
-                    },
-                    {
-                        label: this.chart.datasets[1].label,
-                        tension: 0.4,
-                        borderWidth: 0,
-                        pointRadius: 2,
-                        pointBackgroundColor: "#f5365c",
-                        borderColor: "#f5365c",
-                        // eslint-disable-next-line no-dupe-keys
-                        borderWidth: 3,
-                        backgroundColor: gradientStroke2,
-                        data: this.chart.datasets[1].data,
-                        maxBarThickness: 6,
-                    },
-                ],
+                labels: this.labels,
+                datasets: chart_data,
             },
             options: {
                 responsive: true,
@@ -118,3 +146,9 @@ export default {
     },
 };
 </script>
+
+<style scoped>
+    .chart-canvas {
+        height: 300px !important;
+    }
+</style>
