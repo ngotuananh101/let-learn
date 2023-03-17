@@ -3,6 +3,7 @@ import admin from "./admin";
 import auth from "./auth";
 import home from "./home";
 import store from "../store";
+import learn from "./learn";
 
 const error = [
     {
@@ -12,7 +13,7 @@ const error = [
     }
 ];
 
-const routes = [...home, ...admin, ...auth, ...error];
+const routes = [...home, ...admin, ...auth,...learn ,...error];
 
 const router = createRouter({
     history: createWebHistory(),

@@ -45,14 +45,9 @@ const home = [
             {
                 path: 'flashcards',
                 name: 'home.flashcards',
-                component: () => import('../../pages/home/Flashcards.vue'),
+                component: () => import('../../pages/learn/Flashcards.vue'),
             }
         ],
     },
-    {
-        path: '/learn',
-        name: 'learn',
-        component: () => import('../../layouts/Learn.vue'),
-    }
 ];
 export default home;
