@@ -512,6 +512,14 @@ class LessonController extends Controller
         try {
             $course = Course::findOrFail($id);
             $lesson = $course->lessons()->where('status', 'active')->get();
+            //map to get name, description, status of lesson
+            $lesson = $lesson->map(function ($item) {
+                return [
+                    'name' => $item->name,
+                    'username' => $item->user->username,
+                    'detail_count' => $item->lessonDetail()->count(),
+                ];
+            });
             return response()->json([
                 'status' => 'success',
                 'status_code' => 200,

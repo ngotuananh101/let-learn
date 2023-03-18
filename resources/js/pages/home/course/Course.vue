@@ -13,8 +13,8 @@
     <br>
 
     <div class="row">
-        <div class="col-lg-4 col-md-6 col-12" >
-            <LessonCard title="fwfawf" value="" description="wfafw"/>
+        <div class="col-lg-4 col-md-6 col-12" v-for="lesson in lessons">
+            <LessonCard :title="lesson.name" value=""  description=""/>
         </div>
     </div>
     <argon-pagination>
@@ -32,7 +32,7 @@ import ArgonPagination from "@/components/Argons/ArgonPagination.vue";
 import ArgonPaginationItem from "@/components/Argons/ArgonPaginationItem.vue";
 import ArgonButton from "@/components/Argons/ArgonButton.vue";
 import ArgonAvatar from "@/components/Argons/ArgonAvatar.vue";
-
+import { mapActions } from "vuex";
 export default {
     name: "course",
     components: {
@@ -42,22 +42,25 @@ export default {
         ArgonButton,
         ArgonAvatar,
     },
-    // data() {
-    //     return {
-    //         lessons: null,
-    //     }
-    // },
-    // title() {
-    //     return "Home - " + document.getElementsByTagName("meta")["title"].content;
-    // },
-    // beforeMount() {
-    //     this.$store.dispatch('home/getLessonByCourseID').then(
-    //         lesson => {
-    //             console.log(lesson);
-    //             this.lessons = lesson;
-    //         }
-    //     );
-    // }
+    data() {
+        return {
+            lessons: null,
+            course_id: this.$route.params.id,
+        }
+    },
+    title() {
+        return "Home - " + document.getElementsByTagName("meta")["title"].content;
+    },
+    beforeMount() {
+        this.getLesson(this.course_id).then((response) => {
+            this.lessons = response;
+        });
+    },
+    methods: {
+        ...mapActions({
+            getLesson: "home/getLessonByCourseId",
+        }),
+    },
 };
 </script>
 

@@ -34,5 +34,14 @@ export default {
                     },
                 );
         },
+
+        getLessonByCourseId({ commit }, course_id) {
+            return homeService.getLessonByCourseId(course_id)
+                .then(
+                    lesson => {
+                        return Promise.resolve(lesson);
+                    }
+                );
+        }
     }
 }
