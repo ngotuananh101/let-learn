@@ -7,7 +7,7 @@
 
         <section class="card-container">
             <div class="card d-flex justify-content-center align-items-center p-5" @click="rotateCard">
-                <p id="card-title" class="fs-3"></p>
+                <p id="card-title" class="fs-3" style="white-space: pre-line;"></p>
             </div>
         </section>
         <div class="buttons-container">
@@ -35,8 +35,7 @@
             </div>
             <div>
                 <button id="quit-button" onclick="window.location.href = '/'">Quit</button>
-                <button id="announcement-button" @click="speak(cards[currentCardIndex].front)"><i
-                    class="fa-solid fa-bullhorn"></i></button>
+                <button id="announcement-button" class="bg-transparent" @click="speak(this.data[currentCardIndex].definition)"><i class="fa-regular fa-volume"></i></button>
             </div>
         </div>
     </div>
@@ -45,63 +44,44 @@
 
 
 <script>
+import { mapActions, mapGetters } from "vuex";
 export default {
     name: "Flashcards",
     data() {
         return {
-            cards: [
-                {
-                    front: "Which statement is true?\n" +
-                        "a. Current liabilities include accounts receivable, unearned revenues, and salaries payable.\n" +
-                        "b. Current liabilities include prepayment, unearned revenues, and salaries payable.\n" +
-                        "c. Current liabilities include revenue, unearned revenues, and salaries payable.\n" +
-                        "d. Current liabilities include accounts payable, unearned revenues, and salaries payable.\n" +
-                        "e. Current liabilities include expense, unearned revenues, and salaries payable.",
-                    back: "d"
-                },
-                {
-                    front: "Which accounts don't need to do closing entries?\n" +
-                        "a. Revenue\n" +
-                        "b. Income Summary\n" +
-                        "c. Prepaid expense\n" +
-                        "d. Withdrawals\n" +
-                        "e. Expense",
-                    back: "c"
-                },
-                {
-                    front: "The special account used only in the closing process to temporarily hold the amounts of revenues and expenses before the net difference is added to (or subtracted from) the owner's capital account is the:\n" +
-                        "a. Income Summary account.\n" +
-                        "b. Closing account.\n" +
-                        "c. Balance column account.\n" +
-                        "d. Profit accounts.\n" +
-                        "e. Loss accounts.",
-                    back: "a"
-                }
-            ],
+            id : this.$route.params.id,
+            data: [],
             currentCardIndex: 0,
             currentSide: 'front',
             showSettings: false // add showSettings data property
-        };
+        }
     },
     mounted() {
-        document.getElementById('card-title').innerHTML = this.cards[this.currentCardIndex].front;
+        // get id from params
+        this.getLessons(this.id).then(detail => {
+            this.data = detail;
+            document.getElementById('card-title').innerHTML = this.data[this.currentCardIndex].definition;
+        });
     },
     methods: {
+        ...mapActions({
+            getLessons: 'learn/getLessons'
+        }),
         nextCard() {
-            if (this.currentCardIndex < this.cards.length - 1) {
+            if (this.currentCardIndex < this.data.length - 1) {
                 this.currentCardIndex++;
             } else {
                 this.currentCardIndex = 0;
             }
-            document.getElementById('card-title').innerHTML = this.cards[this.currentCardIndex].front;
+            document.getElementById('card-title').innerHTML = this.data[this.currentCardIndex].definition;
         },
         previousCard() {
             if (this.currentCardIndex > 0) {
                 this.currentCardIndex--;
             } else {
-                this.currentCardIndex = this.cards.length - 1;
+                this.currentCardIndex = this.data.length - 1;
             }
-            document.getElementById('card-title').innerHTML = this.cards[this.currentCardIndex].front;
+            document.getElementById('card-title').innerHTML = this.data[this.currentCardIndex].definition;
         },
         toggleSettings() { // add toggleSettings method
             this.showSettings = !this.showSettings;
@@ -117,12 +97,12 @@ export default {
             if (this.currentSide === 'front') {
                 card.classList.add('rotate');
                 document.getElementById('card-title').classList.add('card-title-transition');
-                document.getElementById('card-title').innerHTML = this.cards[this.currentCardIndex].back;
+                document.getElementById('card-title').innerHTML = this.data[this.currentCardIndex].term;
                 this.currentSide = 'back';
             } else {
                 card.classList.remove('rotate');
                 document.getElementById('card-title').classList.remove('card-title-transition');
-                document.getElementById('card-title').innerHTML = this.cards[this.currentCardIndex].front;
+                document.getElementById('card-title').innerHTML = this.data[this.currentCardIndex].definition;
                 this.currentSide = 'front';
             }
         }
@@ -131,7 +111,7 @@ export default {
         cardsCount() { // add cardsCount computed property
             return {
                 currentCardIndex: this.currentCardIndex,
-                totalCards: this.cards.length
+                totalCards: this.data ? this.data.length : 0
             };
         }
     }
