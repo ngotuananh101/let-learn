@@ -28,7 +28,7 @@ function loadCourse() {
             return data.data;
         });
 }
-// function get lessons by course id
+
 function getLessonByCourseId(course_id) {
     console.log(course_id);
     return fetch(`${config.apiUrl}/course/${course_id}/lesson`, { method: 'GET', headers: authHeader() })
@@ -37,3 +37,4 @@ function getLessonByCourseId(course_id) {
             return data.data;
         });
 }
+
