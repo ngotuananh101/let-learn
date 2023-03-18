@@ -23,22 +23,8 @@
     <br>
     <h6>Relearn: 40</h6>
     <h7>You have already started learning these terms. Continue to promote offline!</h7>
-    <div class="row">
-        <LessonCard title="D" :fontsize="'16'" value="" description="QN=1 Nguyễn Ái Quốc đọc Sơ thảo lần thứ nhất những luận cương về vấn đề dân tộc và vấn đề thuộc địa của Lênin vào thời gian nào?
-    a. 7/1917
-    b. 7/1918
-    c. 7/1919
-    d. 7/1920" />
-        <LessonCard title="C" :fontsize="'16'" value="" description="QN=2 Hồ Chí Minh mất bao nhiêu năm bôn ba nước ngoài để tìm đường cứu nước?
-    a. 10 năm
-    b. 25 năm
-    c. 30 năm
-    d. 35 năm" />
-        <LessonCard title="B" :fontsize="'16'" value="" description="QN=4 Giai đoạn nào sau đây Hồ Chí Minh tìm thấy con đường cứu nước giải phóng dân tộc?
-    a. 1911 đến 1930
-    b. 1911 đến 1920
-    c. 1911 đến 1935
-    d. 1930 đến 1945" />
+    <div class="row" v-if=lessonDetails>
+        <LessonCard :title="lessonDetails.terms" :fontsize="'16'" value="" :description="lessonDetails.description" />
     </div>
 
     <br>
@@ -62,36 +48,25 @@
     </div>
 
     <br>
-    <h6>Other lessons from this user</h6>
+    <!-- <h6>Other lessons from this user</h6>
     <div class="row">
-        <div class="col-lg-4 col-md-6 col-12">
-            <LessonCard title="HCM201 Full" value="423 terms" description="admin" />
+        <div class="col-lg-4 col-md-6 col-12" v-for="lesson in lessons">
+            <LessonCard :title="lesson.name" :value="lesson.detail_count + ' terms'" :description="lesson.username"/>
         </div>
-        <div class="col-lg-4 col-md-6 col-12">
-            <LessonCard title="MKT301 Full" value="320 terms" description="user" />
-        </div>
-    </div>
-    <div class="row">
-        <div class="col-lg-4 col-md-6 col-12">
-            <LessonCard title="VNR201" value="510 terms" description="admin" />
-        </div>
-        <div class="col-lg-4 col-md-6 col-12">
-            <LessonCard title="IAR401" value="65 terms" description="super_admin" />
-        </div>
-    </div>
-    <argon-pagination>
+    </div> -->
+    <!-- <argon-pagination>
         <argon-pagination-item prev />
         <argon-pagination-item label="1" active />
         <argon-pagination-item label="2" />
         <argon-pagination-item label="3" />
         <argon-pagination-item next />
-    </argon-pagination>
+    </argon-pagination> -->
 </template>
 
 <script>
 import LessonCard from "@/components/Cards/LessonCard.vue";
-import ArgonPagination from "@/components/Argons/ArgonPagination.vue";
-import ArgonPaginationItem from "@/components/Argons/ArgonPaginationItem.vue";
+// import ArgonPagination from "@/components/Argons/ArgonPagination.vue";
+// import ArgonPaginationItem from "@/components/Argons/ArgonPaginationItem.vue";
 import ArgonButton from "@/components/Argons/ArgonButton.vue";
 import ArgonAvatar from "@/components/Argons/ArgonAvatar.vue";
 
@@ -99,11 +74,34 @@ export default {
     name: "lesson",
     components: {
         LessonCard,
-        ArgonPagination,
-        ArgonPaginationItem,
+        // ArgonPagination,
+        // ArgonPaginationItem,
         ArgonButton,
         ArgonAvatar,
     },
+    data() {
+        return {
+            lessons: null,
+            lessonDetails: null,
+        };
+    },
+    title() {
+        return "Home - " + document.getElementsByTagName("meta")["title"].content;
+    },
+    beforeMount() {
+        // this.$store.dispatch('home/getLesson').then(
+        //     lesson => {
+        //         console.log(lesson);
+        //         this.lessons = lesson;
+        //     }
+        // );
+        this.$store.dispatch('home/getLessonDetail').then(
+            lessonDetail => {
+                console.log(lessonDetail);
+                this.lessonDetails = lessonDetail;
+            }
+        );
+    }
 };
 </script>
 
