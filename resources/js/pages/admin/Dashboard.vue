@@ -57,8 +57,8 @@
                     </div>
                 </div>
                 <div class="row">
-                    <div class="col-lg-7 mb-lg">
-                        <gradient-line-chart v-if="this.analytics.duration" id="chart-line"
+                    <div v-if="this.analytics.duration" class="col-lg-7 mb-lg">
+                        <gradient-line-chart id="chart-line"
                                              title="Average Duration" description="<i class='fa-solid fa-timer text-success'></i>
         <span class='font-weight-bold'>average session duration</span> of last 30 days" :chart="{
             labels: this.analytics.duration.date,
@@ -70,8 +70,8 @@
             ]
         }"/>
                     </div>
-                    <div class="col-lg-5">
-                        <carousel v-if="quotes" :items="[
+                    <div v-if="quotes" class="col-lg-5">
+                        <carousel :items="[
                             {
                                 img: 'https://source.unsplash.com/1600x900/?nature',
                                 title: `“${quotes[0].quoteAuthor}”`,

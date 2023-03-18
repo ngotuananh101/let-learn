@@ -140,22 +140,6 @@
                     <h5 class="mb-0">Class</h5>
                     <p class="mb-0 text-sm">List all class in {{ this.school.name }}</p>
                 </div>
-<!--                <div v-if="checkPermission('admin.schools.edit')" class="my-auto mt-4 ms-auto mt-lg-0">-->
-<!--                    <div class="my-auto ms-auto">-->
-<!--                        <button type="button"-->
-<!--                                class="mx-1 mb-0 btn btn-outline-success btn-sm"-->
-<!--                                data-bs-toggle="modal" data-bs-target="#modalClass">-->
-<!--                            Add Class-->
-<!--                        </button>-->
-<!--                        <router-link v-if="selected_class" :to="{ name:'' }" class="mx-1 mb-0 btn btn-outline-warning btn-sm">-->
-<!--                            Edit Class-->
-<!--                        </router-link>-->
-<!--                        <button type="button"-->
-<!--                                class="mx-1 mb-0 btn btn-outline-danger btn-sm" @click="removeClass">-->
-<!--                            Remove Class-->
-<!--                        </button>-->
-<!--                    </div>-->
-<!--                </div>-->
             </div>
         </div>
         <div class="card-body pt-0">

@@ -10,10 +10,10 @@
                                 <h5 class="mb-0">All School</h5>
                                 <p class="mb-0 text-sm">List of all school in the system</p>
                             </div>
-                            <div v-if="checkPermission('admin.schools.edit')" class="my-auto mt-4 ms-auto mt-lg-0">
+                            <div class="my-auto mt-4 ms-auto mt-lg-0">
                                 <div class="my-auto ms-auto">
-                                    <router-link v-if="checkPermission('admin.users.create') && select_id"
-                                            class="mx-1 mb-0 btn btn-outline-info btn-sm" :to=" { name: 'admin.schools.edit', params: { id: select_id } }">
+                                    <router-link v-if="this.select_id"
+                                            class="mx-1 mb-0 btn btn-outline-info w-100" :to=" { name: 'admin.schools.edit', params: { id: select_id } }">
                                         Update
                                     </router-link>
                                 </div>
