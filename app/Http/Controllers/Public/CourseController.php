@@ -194,26 +194,6 @@ class CourseController extends Controller
         }
     }
 
-    // show all course by user id
-    public function showAllCourseByUserId(): JsonResponse
-    {
-        try {
-            $user = auth()->user();
-            $courses = $user->courses()->where('status', 'active')->get();
-            return response()->json([
-                'status' => 'success',
-                'status_code' => 200,
-                'data' => $courses
-            ], 200);
-        } catch (\Throwable $th) {
-            return response()->json([
-                'status' => 'error',
-                'status_code' => 500,
-                'message' => $th->getMessage()
-            ], 500);
-        }
-    }
-
     //add lesson to course by lesson id and course id
     public function addLessonToCourse(Request $request, $id, $lesson_id): JsonResponse
     {

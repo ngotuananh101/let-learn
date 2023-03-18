@@ -57,12 +57,12 @@ export default {
                 this.courses = course;
             }
         );
-        this.$store.dispatch('home/getClass').then(
-            classes => {
-                console.log(classes);
-                this.classes = classes;
-            }
-        );
+        // this.$store.dispatch('home/getClass').then(
+        //     classes => {
+        //         console.log(classes);
+        //         this.classes = classes;
+        //     }
+        // );
     }
 };
 </script>
