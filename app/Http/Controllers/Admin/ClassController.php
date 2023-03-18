@@ -20,10 +20,6 @@ class ClassController extends Controller
      */
     public function __construct()
     {
-        $this->middleware('permissions:admin.schclass')->only(['index']);
-        $this->middleware('permissions:admin.school.class.create')->only(['store']);
-        $this->middleware('permissions:admin.school.class.edit')->only(['update']);
-        $this->middleware('permissions:admin.school.class.delete')->only(['destroy']);
     }
 
 

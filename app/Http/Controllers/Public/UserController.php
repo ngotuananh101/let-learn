@@ -7,6 +7,8 @@ use Illuminate\Http\Request;
 use App\Models\User;
 use App\Models\Lesson;
 use App\Models\Course;
+use App\Models\Learn;
+use App\Models\LessonDetail;
 use App\Models\School;
 use App\Models\UserLog;
 
@@ -24,7 +26,7 @@ class UserController extends Controller
     {
         try {
             $request->validate([
-                'type' => 'string|in:info,lesson,course,search,recent,detail',
+                'type' => 'string|in:info,lesson,course,search,recent,detail,learn,detail_split',
             ]);
             // $user = User::findOrFail($id);
             // check user is user login
@@ -163,6 +165,7 @@ class UserController extends Controller
                         'data' => $recent_lessons
                     ], 200);
                     break;
+
                 case 'detail':
                     $request->validate([
                         'lesson_id' => 'required|integer',
@@ -177,6 +180,84 @@ class UserController extends Controller
                             'message' => 'You do not have permission to access this lesson'
                         ], 403);
                     }
+
+                    $lessonDetail = $lesson->lessonDetail()->get();
+                    //map to get only name and content of lesson detail
+                    $lessonDetail = $lessonDetail->map(function ($lessonDetail) {
+                        return [
+                            'id' => $lessonDetail->id,
+                            'term' => $lessonDetail->term,
+                            'definition' => $lessonDetail->definition,
+                        ];
+                    });
+                    //check user log is exist, if exist update accessed_at, else create new user log
+                    if (UserLog::where('user_id', $request->user()->id)->where('lesson_id', $request->lesson_id)->exists()) {
+                        $user_log = UserLog::where('user_id', $request->user()->id)->where('lesson_id', $request->lesson_id)->first();
+                        $user_log->accessed_at = now();
+                        $user_log->save();
+                    } else {
+                        $user_log = new UserLog();
+                        $user_log->user_id = $request->user()->id;
+                        $user_log->lesson_id = $request->lesson_id;
+                        $user_log->accessed_at = now();
+                        $user_log->save();
+                    }
+                    return response()->json([
+                        'status' => 'success',
+                        'status_code' => 200,
+                        'message' => 'Get lesson successfully!',
+                        'data' => [
+                            'lesson' => $lesson,
+                            'lessonDetail' => $lessonDetail,
+                        ]
+                    ], 200);
+                    break;
+                    
+                case 'detail_split':
+                    $request->validate([
+                        'lesson_id' => 'required|integer',
+                    ]);
+                    ///show lesson detail by lesson id and record user log
+                    $lesson = Lesson::findOrFail($request->lesson_id);
+                    // check user can view lesson (user is owner of lesson or lesson is public and active)
+                    if ($lesson->user_id != $request->user()->id && ($lesson->status == 0 || $lesson->is_public == 0)) {
+                        return response()->json([
+                            'status' => 'error',
+                            'status_code' => 403,
+                            'message' => 'You do not have permission to access this lesson'
+                        ], 403);
+                    }
+
+                    //get lesson id from lesson
+                    $lesson_id = $lesson->id;
+                    //get learned lesson details                    
+                    $learn = Learn::where('user_id', auth()->user()->id)->whereIn('lesson_id', [$lesson_id])->first();
+                    //get id of learned lesson details
+                    $learned = $learn ? explode(',', $learn->learned) : [];
+                    //get id of relearn lesson details
+                    $relearn = $learn ? explode(',', $learn->relearn) : [];
+                    // $lessonDetails = LessonDetail::where('lesson_id', $lesson_id)->whereNotIn('id', $learned)->whereNotIn('id', $relearn);
+                    $lessonDetails = [];
+                    //get relearn lesson details
+                    if ($relearn) {
+                        $lessonDetails = LessonDetail::whereIn('id', $relearn)->get();
+                        $lessonDetails = $lessonDetails->map(function ($lessonDetails) {
+                            return [
+                                'id' => $lessonDetails->id,
+                                'term' => $lessonDetails->term,
+                                'definition' => $lessonDetails->definition,
+                            ];
+                        });
+                    }
+                    $notLearn = LessonDetail::where('lesson_id', $lesson_id)->whereNotIn('id', $learned)->whereNotIn('id', $relearn)->get();
+                    //map to get only name and content of not learned lesson detail
+                    $notLearn = $notLearn->map(function ($notLearn) {
+                        return [
+                            'id' => $notLearn->id,
+                            'term' => $notLearn->term,
+                            'definition' => $notLearn->definition,
+                        ];
+                    });
                     $lessonDetail = $lesson->lessonDetail()->get();
                     //check user log is exist, if exist update accessed_at, else create new user log
                     if (UserLog::where('user_id', $request->user()->id)->where('lesson_id', $request->lesson_id)->exists()) {
@@ -196,10 +277,21 @@ class UserController extends Controller
                         'message' => 'Get lesson successfully!',
                         'data' => [
                             'lesson' => $lesson,
-                            'detail' => $lessonDetail
+                            'relearn' => $lessonDetails,
+                            'notLearn' => $notLearn,
                         ]
                     ], 200);
                     break;
+                case 'learn':
+                    $request->validate([
+                        'lesson_id' => 'required|integer',
+                    ]);
+                    $lesson_id = $request->lesson_id;
+                    //call to learn method from LessonController
+                    $lessonController = new LessonController();
+                    return $lessonController->learn($request, $lesson_id);
+                    break;
+
                 default:
                     return response()->json([
                         'status' => 'error',
@@ -245,7 +337,7 @@ class UserController extends Controller
                     ], 200);
                     break;
 
-                case 'password';
+                case 'password':
                     $request->validate([
                         'password' => 'required|string|min:6|confirmed',
                     ]);
