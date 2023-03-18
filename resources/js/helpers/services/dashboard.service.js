@@ -16,10 +16,10 @@ function quotes() {
     );
 }
 
-function analytics() {
-    return fetch(`${config.apiUrl}/admin/analytics/google`, { method: 'GET', headers: authHeader() })
+function analytics(type) {
+    return fetch(`${config.apiUrl}/admin/analytics?type=${type}`, { method: 'GET', headers: authHeader() })
         .then(handleResponse)
         .then(data => {
-            return data;
+            return data.data;
         });
 }

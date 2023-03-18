@@ -34,24 +34,6 @@ export default {
                         return Promise.resolve(course);
                     },
                 );
-        },
-        // Get lesson detail by lesson_id
-        getLessonDetail(lesson_id) {
-            return homeService.loadLessonDetailByLessonId(lesson_id)
-                .then(
-                    lesson => {
-                        return Promise.resolve(lesson);
-                    },
-                );
-        },
-        // Get lesson by course_id
-        getLessonByCourseID(course_id) {
-            return homeService.getLessonByCourseID(course_id)
-                .then(
-                    lesson => {
-                        return Promise.resolve(lesson);
-                    }
-                );
         }
     }
 }

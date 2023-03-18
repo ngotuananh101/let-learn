@@ -8,8 +8,6 @@ export const homeService = {
     loadCourse,
     loadLessonDetailByLessonId,
     getLessonByCourseID
-    // loadClass
-
 }
 
 function loadLesson() {
@@ -31,6 +29,7 @@ function loadCourse() {
             return data.data;
         });
 }
+
 function loadLessonDetailByLessonId(lesson_id) {
     let lesson = JSON.parse(localStorage.getItem('lesson'));
     let lesson_id = lesson.id;
@@ -40,6 +39,7 @@ function loadLessonDetailByLessonId(lesson_id) {
             return data.data;
         });
 }
+
 function getLessonByCourseID(course_id) {
     let course = JSON.parse(localStorage.getItem('course'));
     let course_id = course.id;
@@ -49,10 +49,3 @@ function getLessonByCourseID(course_id) {
             return data.data;
         });
 }
-// function loadClass(class_id) {
-//     return fetch(`${config.apiUrl}/class/${class_id}`, { method: 'GET', headers: authHeader() })
-//         .then(handleResponse)
-//         .then(data => {
-//             return data.data;
-//         });
-// }
