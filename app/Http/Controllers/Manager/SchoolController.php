@@ -305,33 +305,33 @@ class SchoolController extends Controller
                         $user->school_id = null;
                         // save user info
                         $user->save();
-                    } else {
+                    }else{
                         throw new \Exception('User is not manager of school');
                     }
                     break;
-                    // case 'add_class':
-                    //     $request->merge([
-                    //         'school_id' => $school->id
-                    //     ]);
-                    //     // call class controller
-                    //     $class = new ClassController();
-                    //     // call store method
-                    //     return $class->store($request);
-                    //     break;
-                    // case 'remove_class':
-                    //     $request->validate([
-                    //         'class_id' => 'required|exists:classes,id',
-                    //     ]);
-                    //     // find class
-                    //     $class = Classes::findOrFail($request->class_id);
-                    //     // check if class is in school
-                    //     if ($school->classes->contains($class)) {
-                    //         // delete class
-                    //         $class->delete();
-                    //     }else{
-                    //         throw new \Exception('Class is not in school');
-                    //     }
-                    //     break;
+                case 'add_class':
+                    $request->merge([
+                        'school_id' => $school->id
+                    ]);
+                    // call class controller
+                    $class = new ClassController();
+                    // call store method
+                    return $class->store($request);
+                    break;
+                case 'remove_class':
+                    $request->validate([
+                        'class_id' => 'required|exists:classes,id',
+                    ]);
+                    // find class
+                    $class = Classes::findOrFail($request->class_id);
+                    // check if class is in school
+                    if ($school->classes->contains($class)) {
+                        // delete class
+                        $class->delete();
+                    }else{
+                        throw new \Exception('Class is not in school');
+                    }
+                    break;
                 default:
                     throw new \Exception('Invalid type');
             }
@@ -360,23 +360,6 @@ class SchoolController extends Controller
     public
     function destroy($id)
     {
-        //delete school
-        try {
-            $school = School::findOrFail($id);
-            $school->delete();
-            // Return json
-            return response()->json([
-                'status' => 'success',
-                'status_code' => 200,
-                'message' => 'School deleted successfully'
-            ], 200);
-        } catch (\Exception $e) {
-            // Return json
-            return response()->json([
-                'status' => 'error',
-                'status_code' => 500,
-                'message' => $e->getMessage()
-            ], 500);
-        }
+        //
     }
 }

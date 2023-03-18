@@ -5,15 +5,17 @@
                 <div class="card">
                     <!-- Card header -->
                     <div class="card-header pb-0">
-                        <h5 class="mb-0">Add Set</h5>
-                        <p class="mb-0 text-sm">Add new set to server</p>
+                        <h5 class="mb-0">Add New Lesson</h5>
                     </div>
                     <div class="card-body">
+                        <label class="form-label mt-2 fs-6">Name</label>
+                                <argon-input id="name" type="text" name="name"
+                                             placeholder="Enter a name. Example:'MAE Chapter 1' "/>
                         <div class="row">
                             <div class="col-md-4 col-12">
                                 <label class="form-label mt-2 fs-6">Name</label>
                                 <argon-input id="name" type="text" name="name"
-                                             placeholder="Enter a name, like:'MAE Chapter 1' "/>
+                                             placeholder="Enter a name. Example:'MAE Chapter 1' "/>
                             </div>
                             <div class="col-md-8 col-12">
                                 <label class="form-label mt-2 fs-6">Description</label>

@@ -2,54 +2,70 @@
     <div class="py-4 container-fluid">
         <div class="row">
             <div class="col-lg-12">
-                <div class="row">
+                <div v-if="this.analytics.local" class="row">
                     <div class="col-lg-3 col-md-6 col-12">
-                        <mini-statistics-card title="Total Users" value="$53,000" description="<span
-                  class='text-sm font-weight-bolder text-success'
-                  >+55%</span> since yesterday" :icon="{
-                      component: 'fa-regular fa-users',
-                      background: 'bg-gradient-primary',
-                      shape: 'rounded-circle'
-                  }"/>
+                        <mini-statistics-card
+                            title="Total Users"
+                            :value="analytics.local.users.total"
+                            :description="`<span class='text-sm font-weight-bolder text-success'>
+                                            ${analytics.local.users.change}</span> since yesterday`"
+                            :icon="{
+                                component: 'fa-regular fa-users',
+                                background: 'bg-gradient-primary',
+                                shape: 'rounded-circle'
+                            }"
+                        />
                     </div>
                     <div class="col-lg-3 col-md-6 col-12">
-                        <mini-statistics-card title="Total Sets" value="2,300" description="<span
-                  class='text-sm font-weight-bolder text-success'
-                  >+3%</span> since last week" :icon="{
-                      component: 'fa-sharp fa-solid fa-books',
-                      background: 'bg-gradient-danger',
-                      shape: 'rounded-circle'
-                  }"/>
+                        <mini-statistics-card
+                            title="Total Lessons"
+                            :value="analytics.local.lessons.total"
+                            :description="`<span class='text-sm font-weight-bolder text-success'>
+                                            ${analytics.local.lessons.change}</span> since yesterday`"
+                            :icon="{
+                                component: 'fa-regular fa-books',
+                                background: 'bg-gradient-success',
+                                shape: 'rounded-circle'
+                            }"
+                        />
                     </div>
                     <div class="col-lg-3 col-md-6 col-12">
-                        <mini-statistics-card title="Total Folders" value="+3,462" description="<span
-                  class='text-sm font-weight-bolder text-danger'
-                  >-2%</span> since last quarter" :icon="{
-                      component: 'fa-solid fa-folders',
-                      background: 'bg-gradient-success',
-                      shape: 'rounded-circle'
-                  }"/>
+                        <mini-statistics-card
+                            title="Total Courses"
+                            :value="analytics.local.courses.total"
+                            :description="`<span class='text-sm font-weight-bolder text-success'>
+                                            ${analytics.local.courses.change}</span> since yesterday`"
+                            :icon="{
+                                component: 'fa-regular fa-folder-open',
+                                background: 'bg-gradient-warning',
+                                shape: 'rounded-circle'
+                            }"
+                        />
                     </div>
                     <div class="col-lg-3 col-md-6 col-12">
-                        <mini-statistics-card title="Total Classes" value="$103,430" description="<span
-                  class='text-sm font-weight-bolder text-success'
-                  >+5%</span> than last month" :icon="{
-                      component: 'fa-duotone fa-screen-users',
-                      background: 'bg-gradient-warning',
-                      shape: 'rounded-circle'
-                  }"/>
+                        <mini-statistics-card
+                            title="Total Classes"
+                            :value="analytics.local.classes.total"
+                            :description="`<span class='text-sm font-weight-bolder text-success'>
+                                            ${analytics.local.classes.change}</span> since yesterday`"
+                            :icon="{
+                                component: 'fa-regular fa-screen-users',
+                                background: 'bg-gradient-danger',
+                                shape: 'rounded-circle'
+                            }"
+                        />
                     </div>
                 </div>
                 <div class="row">
                     <div class="col-lg-7 mb-lg">
-                        <gradient-line-chart v-if="this.analytics.averageSessionDuration" id="chart-line"
+                        <gradient-line-chart v-if="this.analytics.duration" id="chart-line"
                                              title="Average Duration" description="<i class='fa-solid fa-timer text-success'></i>
         <span class='font-weight-bold'>average session duration</span> of last 30 days" :chart="{
-            labels: this.analytics.averageSessionDuration.date,
+            labels: this.analytics.duration.date,
             datasets: [
                 {
-                    label: 'Duration (min)',
-                    data: this.analytics.averageSessionDuration.value,
+                    label: 'Duration (s)',
+                    data: this.analytics.duration.duration,
                 }
             ]
         }"/>
@@ -88,27 +104,28 @@
                 </div>
                 <div class="row mt-4">
                     <div class="col-lg-7 col-md-12">
-                        <div class="card">
-                            <div class="p-3 pb-0 card-header">
-                                <h6 class="mb-0">This Week vs Last Week</h6>
-                                <span class="fs-6">by page views</span>
-                                <div class="d-flex align-items-center">
-                                    <span class="badge badge-md badge-dot me-4">
-                                        <i class="bg-success"></i>
-                                        <span class="text-xs text-dark">This Week</span>
-                                    </span>
-                                    <span class="badge badge-md badge-dot me-4">
-                                        <i class="bg-danger"></i>
-                                        <span class="text-xs text-dark">Last Week</span>
-                                    </span>
-                                </div>
-                            </div>
-                            <div class="p-3 card-body">
-                                <div class="chart">
-                                    <!-- <StatsChart id="page-views-week" /> -->
-                                </div>
-                            </div>
-                        </div>
+                        <StatsChart
+                            v-if="this.analytics.week"
+                            :title="'This week vs Last week'"
+                            :subtitle="'By Page views'"
+                            :badge="['This week', 'Last week']"
+                            :id="'page-views-week'"
+                            :labels="this.weekday"
+                            :datasets="[
+                                {
+                                    label: 'This week',
+                                    pointBackgroundColor: 'white',
+                                    borderColor: '#2dce89',
+                                    data: this.analytics.week.lastweek,
+                                },
+                                {
+                                    label: 'Last week',
+                                    pointBackgroundColor: 'white',
+                                    borderColor: '#f5365c',
+                                    data: this.analytics.week.thisweek,
+                                }
+                            ]"
+                        />
                     </div>
                     <div class="mt-4 col-lg-5 col-md-12 mt-lg-0">
                         <default-doughnut-chart
@@ -123,27 +140,28 @@
                 </div>
                 <div class="row mt-4">
                     <div class="col-lg-7 col-md-12">
-                        <div class="card">
-                            <div class="p-3 pb-0 card-header">
-                                <h6 class="mb-0">This Week vs Last Week</h6>
-                                <span class="fs-6">by page views</span>
-                                <div class="d-flex align-items-center">
-                                    <span class="badge badge-md badge-dot me-4">
-                                        <i class="bg-success"></i>
-                                        <span class="text-xs text-dark">This Week</span>
-                                    </span>
-                                    <span class="badge badge-md badge-dot me-4">
-                                        <i class="bg-danger"></i>
-                                        <span class="text-xs text-dark">Last Week</span>
-                                    </span>
-                                </div>
-                            </div>
-                            <div class="p-3 card-body">
-                                <div class="chart">
-                                    <!-- <StatsChart id="page-views-week" /> -->
-                                </div>
-                            </div>
-                        </div>
+                        <StatsChart
+                            v-if="this.analytics.weekByEvent"
+                            :title="'This week vs Last week'"
+                            :subtitle="'By Events'"
+                            :badge="['This week', 'Last week']"
+                            :id="'page-views-week-by-event'"
+                            :labels="this.weekday"
+                            :datasets="[
+                                {
+                                    label: 'This week',
+                                    pointBackgroundColor: 'white',
+                                    borderColor: '#2dce89',
+                                    data: this.analytics.weekByEvent.lastweek,
+                                },
+                                {
+                                    label: 'Last week',
+                                    pointBackgroundColor: 'white',
+                                    borderColor: '#f5365c',
+                                    data: this.analytics.weekByEvent.thisweek,
+                                }
+                            ]"
+                        />
                     </div>
                     <div class="mt-4 col-lg-5 col-md-12 mt-lg-0">
                         <default-doughnut-chart
@@ -178,18 +196,18 @@ export default {
         DefaultDoughnutChart,
     },
     data() {
-        return {};
+        return {
+            weekday: ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'],
+        };
     },
     title() {
         return 'Admin Dashboard' + ' - ' + document.querySelector('meta[name="title"]').getAttribute('content');
     },
-    created() {
-        this.getQuotes();
-        this.getAnalytics();
+    beforeCreate() {
+        this.$store.dispatch('dashboard/getQuotes');
+        this.$store.dispatch('dashboard/getAnalytics');
     },
-    methods: {
-        ...mapActions('dashboard', ['getQuotes', 'getAnalytics']),
-    },
+    methods: {},
     computed: {
         ...mapState({
             quotes: state => state.dashboard.quotes,
