@@ -16,6 +16,11 @@ const home = [
                 component: () => import('../../pages/home/lesson/Lesson.vue'),
             },
             {
+                path: 'c/:id',
+                name: 'home.course.index',
+                component: () => import('../../pages/home/course/Course.vue'),
+            },
+            {
                 path: 'photoshop',
                 name: 'home.photoshop',
                 component: () => import('../../pages/home/Photoshop.vue'),
