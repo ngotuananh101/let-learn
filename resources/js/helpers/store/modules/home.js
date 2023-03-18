@@ -34,8 +34,7 @@ export default {
                     },
                 );
         },
-<<<<<<< HEAD
-=======
+
         getLessonByCourseId({ commit }, course_id) {
             return homeService.getLessonByCourseId(course_id)
                 .then(
@@ -44,6 +43,5 @@ export default {
                     }
                 );
         }
->>>>>>> 1d11a814c3cc9f62259f7a4a52f699969a25ce50
     }
 }
