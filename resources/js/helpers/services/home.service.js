@@ -6,8 +6,12 @@ import handleResponse from './handle-response';
 export const homeService = {
     loadLesson,
     loadCourse,
+<<<<<<< HEAD
     // loadLessonDetailByLessonId,
     // getLessonByCourseID
+=======
+    getLessonByCourseId
+>>>>>>> 1d11a814c3cc9f62259f7a4a52f699969a25ce50
 }
 
 function loadLesson() {
@@ -29,6 +33,7 @@ function loadCourse() {
             return data.data;
         });
 }
+<<<<<<< HEAD
 
 // function loadLessonDetailByLessonId(lesson_id) {
 //     let lesson = JSON.parse(localStorage.getItem('lesson'));
@@ -43,6 +48,11 @@ function loadCourse() {
 function getLessonByCourseID(course_id) {
     // let course = JSON.parse(localStorage.getItem('course'));
     // let course_id = course.id;
+=======
+// function get lessons by course id
+function getLessonByCourseId(course_id) {
+    console.log(course_id);
+>>>>>>> 1d11a814c3cc9f62259f7a4a52f699969a25ce50
     return fetch(`${config.apiUrl}/course/${course_id}/lesson`, { method: 'GET', headers: authHeader() })
         .then(handleResponse)
         .then(data => {
