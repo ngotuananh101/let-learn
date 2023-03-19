@@ -73,7 +73,7 @@
 <script>
 import {mapActions} from "vuex";
 import ArgonInput from "@/components/Argons/ArgonInput.vue";
-import SetCard from "@/pages/admin/set/SetCard.vue";
+import SetCard from "@/pages/admin/lesson/SetCard.vue";
 import ArgonButton from "@/components/Argons/ArgonButton.vue";
 import ArgonSwitch from "@/components/Argons/ArgonSwitch.vue";
 
@@ -103,7 +103,7 @@ export default {
             this.children = [];
             this.count = 0;
             for (let i = 0; i < this.data.set_data.length; i++) {
-                // set data for each card
+                // lesson data for each card
                 this.children.push(SetCard);
                 this.count++;
             }

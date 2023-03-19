@@ -60,7 +60,7 @@
                 </sidenav-collapse>
             </li>
             <li class="nav-item">
-                <sidenav-collapse @click="$router.push({ name: 'admin.set.list' })" collapse-ref="" nav-text="Lessons"
+                <sidenav-collapse @click="$router.push({ name: 'admin.lesson.list' })" collapse-ref="" nav-text="Lessons"
                                   :class="getRoute() === 'set' ? 'active' : ''">
                     <template #icon>
                         <i class="fa-regular fa-book text-primary text-sm opacity-10"></i>

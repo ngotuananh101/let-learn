@@ -21,7 +21,7 @@ class LessonController extends Controller
     }
 
     /**
-     * Return list of all set
+     * Return list of all lesson
      *
      * @return JsonResponse
      */
@@ -85,10 +85,10 @@ class LessonController extends Controller
                     $details = $request->detail;
                     // request have more or equal 3 details
                     if (count($details) >= 3) {
-                        // add set detail
+                        // add lesson detail
                         $set->setDetails()->createMany($details);
                     } else {
-                        // delete set
+                        // delete lesson
                         $set->delete();
                         return response()->json([
                             'status' => 'error',
@@ -131,7 +131,7 @@ class LessonController extends Controller
                                     }
                                 }
                             } else {
-                                // delete set
+                                // delete lesson
                                 $set->delete();
                                 return response()->json([
                                     'status' => 'error',
@@ -140,7 +140,7 @@ class LessonController extends Controller
                                 ], 400);
                             }
                         } else {
-                            // delete set
+                            // delete lesson
                             $set->delete();
                             return response()->json([
                                 'status' => 'error',
@@ -163,7 +163,7 @@ class LessonController extends Controller
                                     }
                                 }
                             } else {
-                                // delete set
+                                // delete lesson
                                 $set->delete();
                                 return response()->json([
                                     'status' => 'error',
@@ -172,7 +172,7 @@ class LessonController extends Controller
                                 ], 400);
                             }
                         } else {
-                            // delete set
+                            // delete lesson
                             $set->delete();
                             return response()->json([
                                 'status' => 'error',
@@ -199,7 +199,7 @@ class LessonController extends Controller
     }
 
     /**
-     * Export set data to csv file
+     * Export lesson data to csv file
      *
      * @param int $id
      * @return Response
@@ -215,7 +215,7 @@ class LessonController extends Controller
                     'message' => 'Lesson is empty'
                 ], 400);
             }
-            // write set data to file
+            // write lesson data to file
             $file_name = 'set_' . $id . '_' . date('Ymd_His') . '.csv';
 //            $file_path = storage_path('app/public/sets/' . $file_name);
 //            $file = fopen($file_path, 'w');
@@ -225,7 +225,7 @@ class LessonController extends Controller
                 fputcsv($file, $line);
             }
             fclose($file);
-            // set header
+            // lesson header
             $headers = [
                 'Content-Type' => 'text/csv',
             ];
@@ -261,7 +261,7 @@ class LessonController extends Controller
                 'status' => 'success',
                 'status_code' => 200,
                 'data' => [
-                    'set' => $set,
+                    'lesson' => $set,
                     'set_data' => $set_data
                 ]
             ], 200);
@@ -301,10 +301,10 @@ class LessonController extends Controller
                 'password' => $request->password,
             ]);
 
-            // delete set details
+            // delete lesson details
             $set->setDetails()->delete();
 
-            // create set details
+            // create lesson details
             foreach ($request->data as $item) {
                 $set->setDetails()->create([
                     'term' => $item['term'],
@@ -334,7 +334,7 @@ class LessonController extends Controller
     public function destroy(int $id): JsonResponse
     {
         try {
-            // delete set by id
+            // delete lesson by id
             $set = Lesson::find($id);
             if ($set) {
                 $set->delete();

@@ -223,7 +223,7 @@ export default {
             });
         },
         addSet() {
-            if (this.selected_id === null) alert('Please select a set');
+            if (this.selected_id === null) alert('Please select a lesson');
             else {
                 let data = {
                     folder_id: this.$route.params.id,
@@ -236,7 +236,7 @@ export default {
         },
         removeSet() {
             let selected = this.table.rows({selected: true}).data();
-            if (selected.length === 0) alert('Please select a set');
+            if (selected.length === 0) alert('Please select a lesson');
             else {
                 // get selected id
                 let ids = [];

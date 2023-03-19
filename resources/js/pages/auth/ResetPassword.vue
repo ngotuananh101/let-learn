@@ -96,11 +96,11 @@ export default {
                         token: this.token
                     });
                 } else {
-                    // set password error
+                    // lesson password error
                     this.pass_err = "Password confirmation doesn't match";
                 }
             } else {
-                // set error
+                // lesson error
                 this.error("Please fill all the fields");
             }
         }

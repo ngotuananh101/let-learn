@@ -36,11 +36,11 @@ export default {
     },
     mounted() {
         if (this.meta) {
-            // set meta title
+            // lesson meta title
             document.querySelector('meta[name="title"]').setAttribute('content', this.meta.name);
-            // set meta description
+            // lesson meta description
             document.querySelector('meta[name="description"]').setAttribute('content', this.meta.description);
-            // set meta keywords
+            // lesson meta keywords
             document.querySelector('meta[name="keywords"]').setAttribute('content', this.meta.keywords);
             // add html code to head
             document.querySelector('head').insertAdjacentHTML('beforeend', this.meta.header);

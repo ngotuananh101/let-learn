@@ -140,7 +140,7 @@ class ClassController extends Controller
     {
         try {
             $class = Classes::findOrFail($class_id);
-            // Check if dont have that set in class
+            // Check if dont have that lesson in class
             if (!$class->sets()->find($set_id)) {
                 return response()->json([
                     'status' => 'error',
@@ -334,13 +334,13 @@ class ClassController extends Controller
             return response()->json([
                 'message' => 'Lesson added successfully to the class',
                 'class' => $class,
-                'set' => $set
+                'lesson' => $set
             ], 200);
         } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $ex) {
             return response()->json([
                 'status' => 'error',
                 'status_code' => 404,
-                'message' => 'Class or set not found!',
+                'message' => 'Class or lesson not found!',
             ], 404);
         } catch (\Throwable $th) {
             return response()->json([
@@ -405,7 +405,7 @@ class ClassController extends Controller
                 'status' => 'required|in:active,inactive'
             ]);
 
-            // Tao set moi
+            // Tao lesson moi
             $class = new Classes();
             $class->name = $request->name;
             $class->description = $request->description;
@@ -451,7 +451,7 @@ class ClassController extends Controller
             return response()->json([
                 'status' => 'success',
                 'status_code' => 200,
-                'message' => 'Get set successfully!',
+                'message' => 'Get lesson successfully!',
                 'data' => [
                     'class' => $class,
                     'sets' => $sets,
