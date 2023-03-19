@@ -16,7 +16,7 @@
     <!-- Font Awesome Icons -->
     <link href="https://cdn.jsdelivr.net/gh/hung1001/font-awesome-pro-v6@44659d9/css/all.min.css" rel="stylesheet" type="text/css" />
     <!-- CKEditor 5 -->
-    <script src="/build/editor/ckeditor.js"></script>
+    <script src="/editor/ckeditor.js"></script>
 </head>
 
 <body>
