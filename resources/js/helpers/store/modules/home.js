@@ -1,15 +1,15 @@
-import {homeService} from '../../services/home.service';
+import { homeService } from '../../services/home.service';
 
-let state = {status: {}, user: null};
+let state = { status: {}, user: null };
 export default {
     namespaced: true,
     state: state,
     mutations: {
         indexRequest(state) {
-            state.status = {indexing: true};
+            state.status = { indexing: true };
         },
         indexSuccess(state, folders) {
-            state.status = {index: true};
+            state.status = { index: true };
             state.folders = folders;
         },
         indexFailure(state) {
@@ -37,6 +37,14 @@ export default {
 
         getLessonByCourseId({ commit }, course_id) {
             return homeService.getLessonByCourseId(course_id)
+                .then(
+                    lesson => {
+                        return Promise.resolve(lesson);
+                    }
+                );
+        },
+        getLessonDetail({ commit }, lesson_id) {
+            return homeService.showLessonDetailOfRelearnAndNotYetLearn(lesson_id)
                 .then(
                     lesson => {
                         return Promise.resolve(lesson);

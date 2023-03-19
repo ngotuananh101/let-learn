@@ -13,23 +13,14 @@
     <br>
 
     <div class="row">
-        <div class="col-lg-4 col-md-6 col-12" v-for="lesson in lessons">
-            <LessonCard :title="lesson.name" value=""  description=""/>
+        <div class="col-md-6 col-12" v-for="lesson in lessons">
+            <LessonCard :title="lesson.name" :value="lesson.detail_count + ' terms'"  :description="lesson.username"/>
         </div>
     </div>
-    <argon-pagination>
-        <argon-pagination-item prev />
-        <argon-pagination-item label="1" active />
-        <argon-pagination-item label="2" />
-        <argon-pagination-item label="3" />
-        <argon-pagination-item next />
-    </argon-pagination>
 </template>
 
 <script>
 import LessonCard from "@/components/Cards/LessonCard.vue";
-import ArgonPagination from "@/components/Argons/ArgonPagination.vue";
-import ArgonPaginationItem from "@/components/Argons/ArgonPaginationItem.vue";
 import ArgonButton from "@/components/Argons/ArgonButton.vue";
 import ArgonAvatar from "@/components/Argons/ArgonAvatar.vue";
 import { mapActions } from "vuex";
@@ -37,8 +28,6 @@ export default {
     name: "course",
     components: {
         LessonCard,
-        ArgonPagination,
-        ArgonPaginationItem,
         ArgonButton,
         ArgonAvatar,
     },
