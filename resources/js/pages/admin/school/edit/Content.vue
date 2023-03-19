@@ -344,14 +344,17 @@ import 'datatables.net-select';
 import {Modal} from "bootstrap";
 
 DataTable.use(DataTablesLib);
+import CKEditor from '@ckeditor/ckeditor5-vue';
+
 export default {
     name: "Content",
     components: {
         ArgonInput,
-        DataTable
+        DataTable,
     },
     data() {
         return {
+            editor: ClassicEditor,
             country: null,
             state: null,
             city: null,
@@ -385,6 +388,7 @@ export default {
         this.$nextTick(() => {
             this.init();
         });
+        console.log(CKEditor);
     },
     beforeUnmount() {
         this.select_country.destroy();
@@ -720,7 +724,7 @@ export default {
             }
         },
         getClasses(schoolId) {
-            return this.$store.dispatch('adminSchool/getClasses',schoolId);
+            return this.$store.dispatch('adminSchool/getClasses', schoolId);
         },
         // removeClass(){
         //     let class_id = this.selected_class[0];

@@ -27,6 +27,7 @@
     },
     "dependencies": {
         "@babel/eslint-parser": "^7.19.1",
+        "@ckeditor/ckeditor5-vue": "^4.0.1",
         "@fullcalendar/core": "^6.1.4",
         "@fullcalendar/daygrid": "^6.1.4",
         "@fullcalendar/interaction": "^6.1.4",
