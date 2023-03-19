@@ -258,8 +258,8 @@ button {
 
 .buttons {
     position: absolute;
-    bottom: 10px; /* set bottom offset */
-    right: 10px; /* set right offset */
+    bottom: 10px; /* lesson bottom offset */
+    right: 10px; /* lesson right offset */
     display: flex;
     align-items: center;
     justify-content: center;
@@ -275,7 +275,7 @@ button {
     border: none;
     cursor: pointer;
     position: absolute; /* add position: absolute */
-    bottom: 10px; /* set bottom offset */
+    bottom: 10px; /* lesson bottom offset */
     right: 90px; /* adjust right offset as needed */
 }
 

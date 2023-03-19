@@ -44,7 +44,7 @@
 <script>
 import {mapActions} from "vuex";
 import ArgonInput from "@/components/Argons/ArgonInput.vue";
-import SetCard from "@/pages/admin/set/SetCard.vue";
+import SetCard from "@/pages/admin/lesson/SetCard.vue";
 import ArgonButton from "@/components/Argons/ArgonButton.vue";
 
 export default {
@@ -88,7 +88,7 @@ export default {
                 alert('Please fill all fields and add at least 3 cards');
             }else{
                 this.$store.dispatch('adminSet/create', {name: name, description: description, detail: setDetail}).then(() => {
-                    this.$router.push({name: 'admin.set.list'});
+                    this.$router.push({name: 'admin.lesson.list'});
                 });
             }
         }

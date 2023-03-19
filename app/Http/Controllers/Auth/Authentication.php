@@ -173,7 +173,7 @@ class Authentication extends Controller
                 ], 401);
             }
             $user = $request->user();
-            // set roles name in user object
+            // lesson roles name in user object
             $user->role;
             $token = $user->createToken('Personal Access Token');
             event(new Registered($user));

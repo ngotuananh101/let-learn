@@ -135,13 +135,13 @@ export default {
         this.setting = this.$store.state.adminSetting.settings;
     },
     mounted() {
-        // set timezone
+        // lesson timezone
         this.setTimeZone();
-        // set description
+        // lesson description
         document.getElementById('description').value = this.setting.description;
-        // set header
+        // lesson header
         document.getElementById('header').value = this.setting.header;
-        // set keywords
+        // lesson keywords
         this.setKeywords();
     },
     methods: {

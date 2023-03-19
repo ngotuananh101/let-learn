@@ -53,24 +53,24 @@ const admin = [
                 ]
             },
             {
-                path: 'set',
-                name: 'admin.set',
-                redirect: {name: 'admin.set.list'},
+                path: 'lessons',
+                name: 'admin.lesson',
+                redirect: {name: 'admin.lesson.list'},
                 children: [
                     {
-                        path: 'list',
-                        name: 'admin.set.list',
-                        component: () => import('../../pages/admin/set/List.vue'),
+                        path: '',
+                        name: 'admin.lesson.list',
+                        component: () => import('../../pages/admin/lesson/List.vue'),
                     },
                     {
                         path: 'add',
-                        name: 'admin.set.add',
-                        component: () => import('../../pages/admin/set/Add.vue'),
+                        name: 'admin.lesson.add',
+                        component: () => import('../../pages/admin/lesson/Add.vue'),
                     },
                     {
                         path: 'edit/:id',
-                        name: 'admin.set.edit',
-                        component: () => import('../../pages/admin/set/Edit.vue'),
+                        name: 'admin.lesson.edit',
+                        component: () => import('../../pages/admin/lesson/Edit.vue'),
                     }
                 ]
             },

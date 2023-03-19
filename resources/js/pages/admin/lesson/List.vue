@@ -12,7 +12,7 @@
                             </div>
                             <div class="my-auto mt-4 ms-auto mt-lg-0">
                                 <div class="my-auto ms-auto">
-                                    <router-link :to="{ name: 'admin.set.add' }"
+                                    <router-link :to="{ name: 'admin.lesson.add' }"
                                                  class="mb-0 btn bg-gradient-success btn-sm">+&nbsp;
                                         New Set
                                     </router-link>
@@ -269,7 +269,7 @@ export default {
         },
         edit() {
             document.getElementById('edit-close').click();
-            this.$router.push({name: 'admin.set.edit', params: {id: this.selected_id}});
+            this.$router.push({name: 'admin.lesson.edit', params: {id: this.selected_id}});
         },
         delete() {
             this.$swal({

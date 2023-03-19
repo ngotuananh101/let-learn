@@ -107,7 +107,7 @@ class SettingController extends Controller
                 $meta_data = $meta_data->mapWithKeys(function ($item) {
                     return [$item['key'] => $item['value']];
                 });
-                // set meta data to cache
+                // lesson meta data to cache
                 cache()->put('meta_data', $meta_data);
                 $meta = $meta_data;
             }

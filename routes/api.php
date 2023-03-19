@@ -68,7 +68,7 @@ Route::middleware('auth:sanctum')->group(function () {
             Route::get('/', [SettingController::class, 'index']);
             Route::post('/{key}', [SettingController::class, 'update']);
         });
-        Route::resource('set', AdminSetController::class);
+        Route::resource('lesson', AdminSetController::class);
         Route::resource('folder', AdminFolderController::class);
         Route::resource('user', AdminUserController::class);
         Route::resource('role', AdminRoleController::class);
@@ -78,10 +78,10 @@ Route::middleware('auth:sanctum')->group(function () {
 
     // Route for school
     Route::prefix('school')->group(function () {
-        Route::resource('user', ManagerUserController::class)->only(['index', 'store']); 
-        Route::resource('class', ManagerClassController::class); 
+        Route::resource('user', ManagerUserController::class)->only(['index', 'store']);
+        Route::resource('class', ManagerClassController::class);
         Route::resource('school', ManagerSchoolController::class)->only(['show', 'update']);
-        Route::resource('set', ManagerSetController::class);
+        Route::resource('lesson', ManagerSetController::class);
         Route::resource('folder', ManagerFolderController::class);
     })->middleware(['permissions:manager.dashboard']);
 

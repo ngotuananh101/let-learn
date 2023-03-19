@@ -55,16 +55,16 @@ class LessonController extends Controller
                     $answers = [];
                     // replace special characters with a space character
                     $term = preg_replace('/[\n\r\t]+/', ' ', $term);
-    
+
                     // check if the term is a multiple choice question
                     if (preg_match('/^(.*?)\s*[A-Ma-m]\.\s*(.*)/is', $term, $matches)) {
                         $question = trim($matches[1]);
                         $options_str = $matches[2];
-    
+
                         // split the options into arrays
                         $options = preg_split('/\s*[a-m]\.\s*/i', $options_str, -1, PREG_SPLIT_NO_EMPTY);
                         $answers = array_map('trim', $options);
-    
+
                         // determine the correct answer
                         switch (trim($definition)) {
                             case 'A':
@@ -83,7 +83,7 @@ class LessonController extends Controller
                                 $correct_answer = '';
                                 break;
                         }
-    
+
                         $correct_answer = trim($correct_answer);
                         if ($mixAnswers) {
                             shuffle($answers);
@@ -93,10 +93,10 @@ class LessonController extends Controller
                     else if (preg_match('/^(.*)\s*[a-z]\.\s*(True|False)/is', $term, $matches)) {
                         $question = trim($matches[1]);
                         $answers = array_map('trim', [$matches[2], $matches[3]]);
-                        
+
                         // determine the correct answer
                         $correct_answer = ($definition === 'True') ? 'True' : 'False';
-    
+
                         if ($mixAnswers) {
                             shuffle($answers);
                         }
@@ -117,15 +117,15 @@ class LessonController extends Controller
                         $otherAnswers = array_merge(...$otherAnswers);
                         shuffle($otherAnswers);
                         $otherAnswers = array_slice($otherAnswers, 0, 3);
-    
+
                         //add correct answer to otherAnswers
                         array_push($otherAnswers, $correct_answer);
                         // shuffle the answer options
                         shuffle($otherAnswers);
-                        // set the answer options to the shuffled $otherAnswers
+                        // lesson the answer options to the shuffled $otherAnswers
                         $answers = $otherAnswers;
                     }
-                    
+
                 } catch (\Throwable $th) {
                     return response()->json([
                         'status' => 'error',
@@ -164,7 +164,7 @@ class LessonController extends Controller
                 'file' => 'required_if:type,file|mimes:xls,xlsx,csv',
             ]);
             $type = $request->input('type');
-            // Tao set moi
+            // Tao lesson moi
             $lesson = new Lesson();
             $lesson->name = $request->name;
             $lesson->description = $request->description;
@@ -173,7 +173,7 @@ class LessonController extends Controller
             if ($type == 'text') {
                 $raw_detail = explode($request->set_separator, $request->text);
                 if (count($raw_detail) < 3) {
-                    // delete set
+                    // delete lesson
                     $lesson->delete();
                     return response()->json([
                         'status' => 'error',
@@ -212,7 +212,7 @@ class LessonController extends Controller
                                 }
                             }
                         } else {
-                            // delete set
+                            // delete lesson
                             $lesson->delete();
                             return response()->json([
                                 'status' => 'error',
@@ -221,7 +221,7 @@ class LessonController extends Controller
                             ], 400);
                         }
                     } else {
-                        // delete set
+                        // delete lesson
                         $lesson->delete();
                         return response()->json([
                             'status' => 'error',
@@ -244,7 +244,7 @@ class LessonController extends Controller
                                 }
                             }
                         } else {
-                            // delete set
+                            // delete lesson
                             $lesson->delete();
                             return response()->json([
                                 'status' => 'error',
@@ -253,7 +253,7 @@ class LessonController extends Controller
                             ], 400);
                         }
                     } else {
-                        // delete set
+                        // delete lesson
                         $lesson->delete();
                         return response()->json([
                             'status' => 'error',
@@ -288,7 +288,7 @@ class LessonController extends Controller
                     'message' => 'Lesson is empty'
                 ], 400);
             }
-            // write set data to file
+            // write lesson data to file
             $file_name = 'set_' . $id . '_' . date('Ymd_His') . '.csv';
             $file = fopen($file_name, 'w');
             fputcsv($file, ['id', 'term', 'definition', 'image', 'audio', 'video', 'status', 'created_at', 'updated_at']);
@@ -296,7 +296,7 @@ class LessonController extends Controller
                 fputcsv($file, $line);
             }
             fclose($file);
-            // set header
+            // lesson header
             $headers = [
                 'Content-Type' => 'text/csv',
             ];
@@ -411,7 +411,7 @@ class LessonController extends Controller
                 'data' => 'required|array',
             ]);
             $lesson = Lesson::findOrFail($id);
-            // check lesson is deleted 
+            // check lesson is deleted
             if ($lesson->status == 'inactive') {
                 return response()->json([
                     'status' => 'error',

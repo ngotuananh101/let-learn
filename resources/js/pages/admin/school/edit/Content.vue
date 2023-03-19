@@ -6,7 +6,7 @@
                     <h5 class="mb-0">Basic school information</h5>
                     <p class="mb-0 text-sm">Basic information of a {{ this.school.name }}</p>
                 </div>
-                <div v-if="checkPermission('admin.schools.edit')" class="my-auto mt-4 ms-auto mt-lg-0">
+                <div class="my-auto mt-4 ms-auto mt-lg-0">
                     <div class="my-auto ms-auto">
                         <button type="button"
                                 class="mx-1 mb-0 btn btn-outline-success btn-sm" @click="updateInfo">
@@ -100,7 +100,7 @@
                     <h5 class="mb-0">Staff</h5>
                     <p class="mb-0 text-sm">List all manager in {{ this.school.name }}</p>
                 </div>
-                <div v-if="checkPermission('admin.schools.edit')" class="my-auto mt-4 ms-auto mt-lg-0">
+                <div class="my-auto mt-4 ms-auto mt-lg-0">
                     <div class="my-auto ms-auto">
                         <button type="button"
                                 class="mx-1 mb-0 btn btn-outline-success btn-sm"
@@ -167,19 +167,6 @@
                     <h5 class="mb-0">Student</h5>
                     <p class="mb-0 text-sm">List all student in {{ this.school.name }}</p>
                 </div>
-                <div v-if="checkPermission('admin.schools.edit')" class="my-auto mt-4 ms-auto mt-lg-0">
-                    <div class="my-auto ms-auto">
-                        <button type="button"
-                                class="mx-1 mb-0 btn btn-outline-success btn-sm"
-                                @click="showForm('manager')">
-                            Assign Manager
-                        </button>
-                        <button type="button"
-                                class="mx-1 mb-0 btn btn-outline-danger btn-sm" @click="removeManager">
-                            Unassign Manager
-                        </button>
-                    </div>
-                </div>
             </div>
         </div>
         <div class="card-body pt-0">
@@ -206,19 +193,6 @@
                 <div>
                     <h5 class="mb-0">Teacher</h5>
                     <p class="mb-0 text-sm">List all teacher in {{ this.school.name }}</p>
-                </div>
-                <div v-if="checkPermission('admin.schools.edit')" class="my-auto mt-4 ms-auto mt-lg-0">
-                    <div class="my-auto ms-auto">
-                        <button type="button"
-                                class="mx-1 mb-0 btn btn-outline-success btn-sm"
-                                @click="showForm('manager')">
-                            Assign Manager
-                        </button>
-                        <button type="button"
-                                class="mx-1 mb-0 btn btn-outline-danger btn-sm" @click="removeManager">
-                            Unassign Manager
-                        </button>
-                    </div>
                 </div>
             </div>
         </div>
@@ -274,63 +248,6 @@
             </div>
         </div>
     </div>
-    <div id="modalClass" class="modal fade" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog mt-lg-10">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 id="ModalLabel" class="modal-title">
-                        Add class
-                    </h5>
-                    <i class="fa-regular fa-cloud-arrow-up ms-3"></i>
-                </div>
-                <div class="modal-body">
-                    <div class="row">
-                        <div class="col-7">
-                            <label class="form-label mt-2">Name</label>
-                            <argon-input id="class_name" type="text" name="name"
-                                         placeholder="Class name" required/>
-                        </div>
-                        <div class="col-5">
-                            <label class="form-label mt-2">Status</label>
-                            <select
-                                id="class_status"
-                                name="active"
-                                class="form-control"
-                                required
-                            >
-                                <option value="active">Active</option>
-                                <option value="inactive">Inactive</option>
-                            </select>
-                        </div>
-                        <div class="col-12">
-                            <label class="form-label mt-2">Description</label>
-                            <argon-input id="class_description" type="text" name="description"
-                                         placeholder="Class description" required/>
-                        </div>
-                        <div class="col-6">
-                            <label class="form-label mt-2">Start date</label>
-                            <argon-input id="class_start_date" type="date" name="start_date"
-                                         placeholder="Start date" required/>
-                        </div>
-                        <div class="col-6">
-                            <label class="form-label mt-2">End date</label>
-                            <argon-input id="class_end_date" type="date" name="end_date"
-                                         placeholder="End date" required/>
-                        </div>
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn bg-gradient-success btn-sm" id="btnSubmitClass" @click="addClass">
-                        Submit
-                    </button>
-                    <button type="button" class="btn bg-gradient-secondary btn-sm"
-                            data-bs-dismiss="modal">
-                        Close
-                    </button>
-                </div>
-            </div>
-        </div>
-    </div>
 </template>
 
 <script>
@@ -344,8 +261,6 @@ import 'datatables.net-select';
 import {Modal} from "bootstrap";
 
 DataTable.use(DataTablesLib);
-import CKEditor from '@ckeditor/ckeditor5-vue';
-
 export default {
     name: "Content",
     components: {
@@ -381,14 +296,12 @@ export default {
             modal_search: null,
             form_type: 'manager',
             selected_manager: null,
-            selected_class: null,
         }
     },
     mounted() {
         this.$nextTick(() => {
             this.init();
         });
-        console.log(CKEditor);
     },
     beforeUnmount() {
         this.select_country.destroy();
@@ -488,7 +401,7 @@ export default {
             this.select_city.setChoiceByValue(this.school.city);
         },
         setManager(manager) {
-            // set data for manager table
+            // lesson data for manager table
             this.manager_table = this.$refs.manager_table.dt();
             this.manager_table.clear();
             this.manager_table.rows.add(manager).draw();
@@ -525,11 +438,9 @@ export default {
             for (let schoolKey in this.school) {
                 if (schoolKey === 'state' || schoolKey === 'city') {
                     if (this.state && this.state.length > 0 && this.school['state'] === '') {
-                        console.log('check state');
                         check = false;
                         break;
                     } else if (this.city && this.city.length && this.school['city'] === '') {
-                        console.log(this.city);
                         check = false;
                         break;
                     }
@@ -610,7 +521,6 @@ export default {
         addManager() {
             let manager = this.select_user.getValue(true);
             let position = document.getElementById('position').value;
-            console.log(manager, position);
             if (manager.length > 0 && position !== '') {
                 this.$store.dispatch('adminSchool/addManager', {
                     user_id: manager,
@@ -677,83 +587,9 @@ export default {
                 });
             }
         },
-        addClass() {
-            let name = document.getElementById('class_name').value;
-            let description = document.getElementById('class_description').value;
-            let status = document.getElementById('class_status').value;
-            let start_date = document.getElementById('class_start_date').value;
-            let end_date = document.getElementById('class_end_date').value;
-
-            if (name && description && status) {
-                this.$store.dispatch('adminSchool/addClass', {
-                    name: name,
-                    description: description,
-                    status: status,
-                    schoolId: this.school.id,
-                    start_date: start_date,
-                    end_date: end_date
-                }).then(
-                    school => {
-                        this.$swal({
-                            title: 'Success!',
-                            text: 'Class added successfully',
-                            icon: 'success',
-                            confirmButtonText: 'Ok'
-                        });
-                        // reload class list
-                        this.getClasses(this.school.id).then((res) => {
-                            this.setClass(res.data);
-                        });
-                    },
-                    error => {
-                        this.$swal({
-                            title: 'Error!',
-                            text: error,
-                            icon: 'error',
-                            confirmButtonText: 'Ok'
-                        });
-                    }
-                )
-            } else {
-                this.$swal({
-                    title: 'Error!',
-                    text: 'Please fill all fields',
-                    icon: 'error',
-                    confirmButtonText: 'Ok'
-                });
-            }
-        },
         getClasses(schoolId) {
             return this.$store.dispatch('adminSchool/getClasses', schoolId);
         },
-        // removeClass(){
-        //     let class_id = this.selected_class[0];
-        //     if (class_id) {
-        //         this.$store.dispatch('adminSchool/removeClass', {
-        //             class_id: class_id,
-        //             schoolId: this.school.id
-        //         }).then(
-        //             school => {
-        //                 this.class_table.row('.selected').remove().draw(false);
-        //             },
-        //             error => {
-        //                 this.$swal({
-        //                     title: 'Error!',
-        //                     text: error,
-        //                     icon: 'error',
-        //                     confirmButtonText: 'Ok'
-        //                 });
-        //             }
-        //         )
-        //     } else {
-        //         this.$swal({
-        //             title: 'Error!',
-        //             text: 'Please select a class',
-        //             icon: 'error',
-        //             confirmButtonText: 'Ok'
-        //         });
-        //     }
-        // }
     }
 }
 </script>

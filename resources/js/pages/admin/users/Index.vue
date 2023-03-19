@@ -205,7 +205,7 @@ export default {
                 });
             });
             this.choices_role.setChoices(roles, 'value', 'label', true);
-            // set select default
+            // lesson select default
             this.choices_role.setChoiceByValue(3);
         });
         document.getElementById('userModal').addEventListener('hidden.bs.modal', () => {
