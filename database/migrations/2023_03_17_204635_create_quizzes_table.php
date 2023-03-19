@@ -17,6 +17,10 @@ return new class extends Migration
             $table->id();
             $table->string('name');
             $table->text('description');
+            $table->boolean('is_active')->default(false);
+            $table->boolean('score_reporting')->default(false); // true = show score, false = hide score
+            $table->timestamp('start_time');
+            $table->timestamp('end_time')->default('2030-12-31 23:59:59');
             $table->timestamps();
         });
     }

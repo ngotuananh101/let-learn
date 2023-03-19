@@ -21,7 +21,7 @@ use App\Http\Controllers\Public\LessonController;
 use App\Http\Controllers\Public\CourseController;
 use App\Http\Controllers\Public\ClassController;
 use App\Http\Controllers\Public\UserController;
-
+use App\Http\Controllers\Public\QuizController;
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -87,6 +87,7 @@ Route::middleware('auth:sanctum')->group(function () {
 
     // Route lesson
     Route::prefix('lesson')->group(function () {
+        Route::post('/quiz', [QuizController::class, 'store']);
         Route::get('/learn/{id}', [LessonController::class, 'learn']);
         Route::post('/', [LessonController::class, 'store']);
         Route::get('/{id}', [LessonController::class, 'show']);
