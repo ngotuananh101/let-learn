@@ -1,24 +1,32 @@
 <template>
-    <div class="container-fluid top-0 position-sticky z-index-sticky">
-        <div class="row">
-            <div class="col-12">
-                <navbar is-blur="blur border-radius-lg my-3 py-2 start-0 end-0 shadow m-0" btn-background="bg-gradient-success"
-                        :dark-mode="true" />
-            </div>
-        </div>
-    </div>
-    <main class="main-content main-content-bg mt-0" >
+    <Navbar :title="title" :showOptions="showOptions" :progress="progress" />
+    <main class="main-content main-content-bg mt-5 d-flex justify-content-center align-items-center" >
         <div class="container">
-            <router-view></router-view>
+            <router-view @change-progress="updateProgress"></router-view>
         </div>
     </main>
     <AppFooter />
 </template>
 
 <script>
+import Navbar from "@/components/Navbars/LearnNavbar.vue";
 export default {
-    name: "Learn"
-
+    name: "Learn",
+    components: {
+        Navbar
+    },
+    data()  {
+        return {
+            title: 'Learn',
+            showOptions: true,
+            progress: 10
+        }
+    },
+    methods: {
+        updateProgress(data) {
+            this.progress = data;
+        }
+    },
 }
 </script>
 

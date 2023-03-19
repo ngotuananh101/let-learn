@@ -37,8 +37,7 @@ function getLessonByCourseId(course_id) {
         .then(data => {
             return data.data;
         });
-}
-//show lesson detail of relearn and not yet learn
+
 function showLessonDetailOfRelearnAndNotYetLearn(lesson_id){
     let user = JSON.parse(localStorage.getItem('user'));
     let user_id = user.id;
@@ -49,4 +48,5 @@ function showLessonDetailOfRelearnAndNotYetLearn(lesson_id){
         }
     );
 }
+
 
