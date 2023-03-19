@@ -6,7 +6,8 @@ import handleResponse from './handle-response';
 export const homeService = {
     loadLesson,
     loadCourse,
-    getLessonByCourseId
+    getLessonByCourseId,
+    showLessonDetailOfRelearnAndNotYetLearn
 }
 
 function loadLesson() {
@@ -36,5 +37,16 @@ function getLessonByCourseId(course_id) {
         .then(data => {
             return data.data;
         });
+}
+//show lesson detail of relearn and not yet learn
+function showLessonDetailOfRelearnAndNotYetLearn(lesson_id){
+    let user = JSON.parse(localStorage.getItem('user'));
+    let user_id = user.id;
+    return fetch(`${config.apiUrl}/user/${user_id}?type=detail_split&lesson_id=${lesson_id}`, { method: 'GET', headers: authHeader() })
+        .then(handleResponse)
+        .then(data => {
+            return data.data;
+        }
+    );
 }
 
