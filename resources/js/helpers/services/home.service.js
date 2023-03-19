@@ -36,7 +36,7 @@ function getLessonByCourseId(course_id) {
         .then(handleResponse)
         .then(data => {
             return data.data;
-        });
+        })};
 
 function showLessonDetailOfRelearnAndNotYetLearn(lesson_id){
     let user = JSON.parse(localStorage.getItem('user'));
