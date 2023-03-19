@@ -7,10 +7,15 @@ const learn = [
         redirect: {name: 'error'},
         children: [
             {
-                path: ':id',
-                name: 'learn.index',
+                path: 'flashcard/:id',
+                name: 'learn.flashcard.index',
                 component: () => import('../../pages/learn/Flashcards.vue'),
             },
+            {
+                path: 'self-learning/:id',
+                name: 'learn.quiz.index',
+                component: () => import('../../pages/learn/Learn.vue'),
+            }
         ]
     },
 ];

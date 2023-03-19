@@ -35,7 +35,7 @@
             </div>
             <div>
                 <button id="quit-button" onclick="window.location.href = '/'">Quit</button>
-                <button id="announcement-button" class="bg-transparent" @click="speak(this.data[currentCardIndex].definition)"><i class="fa-regular fa-volume"></i></button>
+                <button id="announcement-button" class="bg-transparent" @click="speak(this.data[currentCardIndex].definition)"><i class="fa-regular fa-volume fs-2"></i></button>
             </div>
         </div>
     </div>
