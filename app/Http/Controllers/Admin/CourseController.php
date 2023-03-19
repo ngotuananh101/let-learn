@@ -138,7 +138,7 @@ class CourseController extends Controller
         try {
             // Get the folder details
             $folder = Course::findOrFail($id);
-            // Get set in folder
+            // Get lesson in folder
             $set = $folder->sets;
             $set = $set->map(function ($set) {
                 return [
@@ -205,7 +205,7 @@ class CourseController extends Controller
                     $request->validate([
                         'search' => 'required|string',
                     ]);
-                    // Find set
+                    // Find lesson
                     $set = Lesson::where('name', 'like', '%' . $request->search . '%')
                         ->orWhere('description', 'like', '%' . $request->search . '%')
                         ->orWhere('id', 'like', '%' . $request->search . '%')
@@ -230,7 +230,7 @@ class CourseController extends Controller
                     $request->validate([
                         'set_id' => 'required|exists:sets,id',
                     ]);
-                    // Add set to folder
+                    // Add lesson to folder
                     $folder = Course::findOrFail($id);
                     $set = Lesson::findOrFail($request->set_id);
                     $folder->sets()->attach($set);
@@ -253,7 +253,7 @@ class CourseController extends Controller
                     $request->validate([
                         'set_ids' => 'required|array',
                     ]);
-                    // Remove set from folder
+                    // Remove lesson from folder
                     $folder = Course::findOrFail($id);
                     $folder->sets()->detach($request->set_ids);
                     break;

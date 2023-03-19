@@ -106,7 +106,7 @@ class UserController extends Controller
                         'data' => $courses
                     ], 200);
                     break;
-                case 'search': //search lesson, course, school by name of set
+                case 'search': //search lesson, course, school by name of lesson
                     $request->validate([
                         'name' => 'required|string',
                     ]);
@@ -119,7 +119,7 @@ class UserController extends Controller
                         ], 404);
                     }
 
-                    //check if set, course, school name is exist
+                    //check if lesson, course, school name is exist
                     $lessons = Lesson::where('name', 'like', '%' . $name . '%')->get();
                     $courses = Course::where('name', 'like', '%' . $name . '%')->get();
                     $schools = School::where('name', 'like', '%' . $name . '%')->get();
@@ -212,7 +212,7 @@ class UserController extends Controller
                         ]
                     ], 200);
                     break;
-                    
+
                 case 'detail_split':
                     $request->validate([
                         'lesson_id' => 'required|integer',
@@ -230,7 +230,7 @@ class UserController extends Controller
 
                     //get lesson id from lesson
                     $lesson_id = $lesson->id;
-                    //get learned lesson details                    
+                    //get learned lesson details
                     $learn = Learn::where('user_id', auth()->user()->id)->whereIn('lesson_id', [$lesson_id])->first();
                     //get id of learned lesson details
                     $learned = $learn ? explode(',', $learn->learned) : [];
