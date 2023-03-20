@@ -14,7 +14,7 @@
 
     <div class="row">
         <div class="col-md-6 col-12" v-for="lesson in lessons">
-            <LessonCard :title="lesson.name" :value="lesson.detail_count + ' terms'"  :description="lesson.username"/>
+            <router-link :to="`/l/${lesson.id}`"><LessonCard :title="lesson.name" :value="lesson.detail_count + ' terms'"  :description="lesson.username"/></router-link>
         </div>
     </div>
 </template>
