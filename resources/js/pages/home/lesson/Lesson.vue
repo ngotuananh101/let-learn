@@ -32,7 +32,7 @@
                     </div>
                 </div>
                 <div class="col-lg-8 col-md-8 col-8">
-                    <h6>Composed by user</h6>
+                    <h6>Composed by user </h6>
                     <div v-if="lesson">
                         <h7>{{ lesson.description }}</h7>
                     </div>
@@ -40,18 +40,23 @@
             </div>
         </div>
     </div>
+    <div class="row mt-4">
+        <div class="col-lg-2 col-md-2 col-4"><argon-button class="w-100">Flash Card</argon-button></div>
+        <div class="col-lg-2 col-md-2 col-4"><argon-button class="w-100">Learn</argon-button></div>
+        <div class="col-lg-2 col-md-2 col-4"><argon-button class="w-100">Test</argon-button></div>
+    </div>
     <!-- <h5 class="mt-4">Number of terms in this lesson: {{ cardsCount.totalCards }}</h5> -->
-    <div v-if="relearns">
+    <div class="mt-4" v-if="relearns">
         <h6>Relearn: {{ relearns.length }}</h6>
-        <div class="row">
+        <div class="row mt-4">
             <div class="col-12" v-for="relearn in relearns">
                 <LessonCard :title="relearn.term" :value="relearn.definition" />
             </div>
         </div>
     </div>
-    <div v-if="notlearns">
+    <div class="mt-4" v-if="notlearns">
         <h6>Relearn: {{ notlearns.length }}</h6>
-        <div class="row">
+        <div class="row mt-4">
             <div class="col-12" v-for="notlearn in notlearns">
                 <LessonCard :title="notlearn.term" :value="notlearn.definition" />
             </div>

@@ -9,13 +9,13 @@
     <div class="row">
         <h3>Lesson</h3>
         <div class="col-lg-4 col-md-6 col-12" v-for="lesson in lessons">
-            <LessonCard :title="lesson.name" :value="lesson.detail_count + ' terms'" :description="lesson.username"/>
+            <router-link :to="`/l/${lesson.id}`"><LessonCard :title="lesson.name" :value="lesson.detail_count + ' terms'" :description="lesson.username"/></router-link>
         </div>
     </div>
     <div class="row">
         <h3>Course</h3>
         <div class="col-lg-4 col-md-6 col-12" v-for="course in courses">
-            <LessonCard :title="course.name" :value="course.lesson_count + ' lessons'" :description="course.username"/>
+            <router-link :to="`/c/${course.id}`"><LessonCard :title="course.name" :value="course.lesson_count + ' lessons'" :description="course.username"/></router-link>
         </div>
     </div>
     <div class="row" v-if="classes">
