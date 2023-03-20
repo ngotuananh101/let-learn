@@ -515,6 +515,7 @@ class LessonController extends Controller
             //map to get name, description, status of lesson
             $lesson = $lesson->map(function ($item) {
                 return [
+                    'id' => $item->id,
                     'name' => $item->name,
                     'username' => $item->user->username,
                     'detail_count' => $item->lessonDetail()->count(),
