@@ -69,6 +69,7 @@ class UserController extends Controller
 
                     $lessons = $lessons->map(function ($lessons) {
                         return [
+                            'id' => $lessons->id,
                             'name' => $lessons->name,
                             'detail_count' => count($lessons->lessonDetail),
                             'username' => $lessons->user->username,
@@ -94,6 +95,7 @@ class UserController extends Controller
                     }
                     $courses = $courses->map(function ($courses) {
                         return [
+                            'id' => $courses->id,
                             'name' => $courses->name,
                             'lesson_count' => count($courses->lessons),
                             'username' => $courses->user->username,
@@ -308,6 +310,7 @@ class UserController extends Controller
         }
     }
 
+
     /**
      * Update the specified resource in storage.
      *
@@ -319,7 +322,7 @@ class UserController extends Controller
     {
         try {
             $request->validate([
-                'type' => 'string|in:username,password',
+                'type' => 'string|in:username,password,learned',
             ]);
             switch ($request->type) {
                 case 'username':
@@ -351,7 +354,51 @@ class UserController extends Controller
                         'status' => 200
                     ], 200);
                     break;
-
+                case 'learned':
+                    $request->validate([
+                        'lesson_id' => 'required|integer',
+                        'learned' => 'required|string',
+                        'relearn' => 'required|string',
+                    ]);
+                    //update learned and relearn of user
+                    $user = $request->user();
+                    $learn = Learn::where('user_id', $user->id)->where('lesson_id', $request->lesson_id)->first();
+                    if ($learn) {
+                        //update learned and relearn of user
+                        //get id of learned lesson details
+                        $learned = $learn ? explode(',', $learn->learned) : [];
+                        //get id of relearn lesson details
+                        $relearn = $learn ? explode(',', $learn->relearn) : [];
+                        //add new learned lesson detail to learned
+                        $learned = array_merge($learned, explode(',', $request->learned));
+                        //remove learned lesson detail from relearn
+                        $relearn = array_diff($relearn, explode(',', $request->learned));
+                        //add new relearn lesson detail to relearn
+                        $relearn = array_merge($relearn, explode(',', $request->relearn));
+                        //remove duplicate learned and relearn
+                        $learned = array_unique($learned);
+                        $relearn = array_unique($relearn);
+                        //convert array to string
+                        $learned = implode(',', $learned);
+                        $relearn = implode(',', $relearn);
+                        //update learned and relearn of user
+                        $learn->learned = $learned;
+                        $learn->relearn = $relearn;
+                        $learn->save();
+                    } else {
+                        $learn = new Learn();
+                        $learn->user_id = $user->id;
+                        $learn->lesson_id = $request->lesson_id;
+                        $learn->learned = $request->learned;
+                        $learn->relearn = $request->relearn;
+                        $learn->save();
+                    }
+                    return response()->json([
+                        'user' => $learn,
+                        'message' => 'Update learned and relearn of user successfully',
+                        'status' => 200
+                    ], 200);
+                    break;
                 default:
                     return response()->json([
                         'status' => 'error',
