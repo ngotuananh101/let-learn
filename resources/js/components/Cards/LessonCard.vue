@@ -11,7 +11,7 @@
             >
               {{ typeof title === "string" ? title : ""}}
             </p>
-            <h5 :class="`mb-0 font-weight-bolder ${value}`">
+            <h5 :class="`mb-0 font-weight-bolder ${value}`" style="white-space: break-spaces;">
               {{
                 value
               }}

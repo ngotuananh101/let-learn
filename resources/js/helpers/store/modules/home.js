@@ -43,13 +43,30 @@ export default {
                     }
                 );
         },
-        getLessonDetail({ commit }, lesson_id) {
-            return homeService.showLessonDetailOfRelearnAndNotYetLearn(lesson_id)
+        getLessonDetailRelearn({ commit }, lesson_id) {
+            return homeService.showLessonDetailRelearn(lesson_id)
+                .then(
+                    relearn => {
+                        return Promise.resolve(relearn);
+                    }
+                );
+        },
+        getLessonDetailNotLearn({ commit }, lesson_id) {
+            return homeService.showLessonDetailNotLearn(lesson_id)
+                .then(
+                    notlearn => {
+                        return Promise.resolve(notlearn);
+                    }
+                );
+        },
+        getLessonInfo({ commit }, lesson_id) {
+            return homeService.getLessonInfo(lesson_id)
                 .then(
                     lesson => {
                         return Promise.resolve(lesson);
                     }
                 );
         }
+
     }
 }
