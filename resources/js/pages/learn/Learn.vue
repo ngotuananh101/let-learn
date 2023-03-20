@@ -1,22 +1,20 @@
 <template>
-    <div class="container">
+    <div class="container" v-if="questions && !show_result">
         <div class="card p-3">
             <div class="card-body">
                 <p>Question</p>
-                <h5 class="card-title text-sans-serif pb-5">{{ question }}</h5>
+                <h5 class="card-title text-sans-serif pb-5">{{ questions[currentQuestion].question }}</h5>
                 <div class="row">
                     <div
                         class="col-md-6 pb-3"
-                        v-for="(ans, index) in answer"
+                        v-for="(ans, index) in  questions[currentQuestion].answers"
                         :key="index"
-                        :id="'answer-' + index"
+                        @click="checkAnswer(index)"
                     >
                         <div
-                            class="card"
-                            :class="{ 'bg-success': selected === ans && isCorrect, 'bg-danger': selected === ans && !isCorrect }"
-                            @click="checkAnswer(index)"
+                            class="card ans-card" :id="'answer-' + index"
                         >
-                            <div class="card-body d-flex align-items-center ">
+                            <div class="card-body d-flex align-items-center">
                 <span
                     class="card-text p-2 rounded-circle d-flex justify-content-center align-items-center"
                     :style="'width: 2rem; height: 2rem; background-color:'+ bg[index]"
@@ -26,116 +24,173 @@
                         </div>
                     </div>
                 </div>
+                <div class="d-none" id="next">
+                    <button
+                        class="btn btn-primary"
+                        @click="nextQuestion"
+                    >
+                        Next Question
+                    </button>
+                    <div>
+                        <p v-if="isCorrectAnswer" class="congrat">Congratulations!</p>
+                        <p v-else class="encourage">Don't give up! Keep trying!</p>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
+    <div class="container" v-if="show_result">
+        <h2>Learn Results</h2>
+        <p>You answered {{ numCorrectAnswers }} out of {{ questions.length }} questions correctly.</p>
+
+        <h3>Correct Answers:</h3>
+        <ul>
+            <template v-for="(question, index) in questions">
+                <li :key="'correct_' + index" v-if="question.isCorrect && question.count_answered <= 1">
+                    <span style="color:brown;">{{ question.question }}</span> -  {{ question.correct_answer }}
+                    <span style="color:green;">- Correct </span>
+                </li>
+            </template>
+        </ul>
+
+        <h3>Incorrect Answers:</h3>
+        <ul>
+            <template v-for="(answer, index) in userAnswers">
+                <li :key="'incorrect_' + index" v-if="!answer.isCorrect">
+                    <span style="color:brown;">{{ answer.question }}</span> - {{ answer.selectedAnswer }} - <span style="color:red;">Incorrect</span>
+                </li>
+            </template>
+        </ul>
+        <button class="btn btn-primary" @click="reloadPage">Try Again</button>
+    </div>
+
+
+
 </template>
 
 <script>
+import {mapActions} from "vuex";
+
 export default {
+    name: "Self-Learning",
     data() {
         return {
-            question: "",
-            answer: "",
-            correctAnswer: "",
-            selected: "",
-            progress: 0,
-            totalQuestions: 5,
-            showSettings: false,// Change this to the number of questions you have
+            id: this.$route.params.id,
+            questions: null,
+            currentQuestion: 0,
+            isCorrectAnswer: false,
+            answered: false,
+            show_result: false,
             bg: ['rgb(219, 238, 255)', 'rgb(253, 240, 227)', 'rgb(230, 223, 242)', 'rgb(235, 242, 223)'],
             ans_icon: ['A', 'B', 'C', 'D'],
+            progress: 0,
+            userAnswers: []
         };
     },
+
     created() {
-        this.setQuestion();
+        // get id from params
+        this.getLearn(this.id).then(detail => {
+            this.questions = detail;
+        });
+    },
+    computed: {
+        numCorrectAnswers() {
+            return this.questions.filter(q => q.isCorrect).length;
+        }
     },
     methods: {
-        setQuestion() {
-            // example questions
-            const questions = [
-                {
-                    question:
-                        "Costs included in the Merchandise Inventory account can include:",
-                    answers: [
-                        "Invoice price minus any discount, Transportation-in, Storage, Insurance",
-                        "Invoice price plus any discount, Transportation-in, Storage, Insurance",
-                        "Invoice price minus any discount, Transportation-out, Storage, Insurance",
-                        "All of these",
-                    ],
-                    correctAnswer:
-                        "Invoice price minus any discount, Transportation-in, Storage, Insurance",
-                },
-                {
-                    question: "Who invented the telephone?",
-                    answers: [
-                        "Alexander Graham Bell",
-                        "Thomas Edison",
-                        "Nikola Tesla",
-                        "Michael Faraday",
-                    ],
-                    correctAnswer: "Alexander Graham Bell",
-                },
-                {
-                    question:
-                        "Hefty Company wants to know the effect of different inventory methods on financial statements. Given below is information about beginning inventory and purchases for the current year.\n" +
-                        "January 2 Beginning Inventory: 500 units at $3.00\n" +
-                        "April 7 Purchased : 1,100 units at $3.20\n" +
-                        "June 30 Purchased : 400 units at $4.00\n" +
-                        "December 7 Purchased : 1,600 units at $4.40\n" +
-                        "Sales during the year were 2,700 units at $5.00. If Hefty used the periodic LIFO method, cost of goods sold would be:",
-                    answers: ["$2,780", "$3,960", "$3,780", "$1,964"],
-                    correctAnswer: "$3,960",
-                },
-                {
-                    question: "Who invented the car?",
-                    answers: [
-                        "Alexander Graham Bell",
-                        "Long",
-                        "Nikola Tesla",
-                        "Michael Faraday",
-                    ],
-                    correctAnswer: "Long",
-                },
-                {
-                    question: "What is the largest planet in our solar system?",
-                    answers: ["Saturn", "Jupiter", "Mars", "Uranus"],
-                    correctAnswer: "Jupiter",
-                },
-            ];
-
-            // Get a random question and its answers from the array
-            const randomQuestion =
-                questions[Math.floor(Math.random() * questions.length)];
-            this.question = randomQuestion.question;
-            this.answer = randomQuestion.answers;
-            this.correctAnswer = randomQuestion.correctAnswer;
-            this.selected = '';
-            this.isCorrect = false;
+        ...mapActions({
+            getLearn: 'learn/getLearn'
+        }),
+        checkAnswer(index) {
+            if (this.answered) {
+                return;
+            } else {
+                this.answered = true;
+                let selectedAnswerIndex = index;
+                const selectedAnswer = this.questions[this.currentQuestion].answers[selectedAnswerIndex];
+                let element = document.getElementById('answer-' + index);
+                if (selectedAnswer === this.questions[this.currentQuestion].correct_answer) {
+                    // if (1===1) {
+                    element.classList.add('bg-success');
+                    this.isCorrectAnswer = true;
+                } else {
+                    element.classList.add('bg-danger');
+                    this.isCorrectAnswer = false;
+                }
+                this.userAnswers.push({
+                    question: this.questions[this.currentQuestion].question,
+                    selectedAnswer: selectedAnswer,
+                    isCorrect: this.isCorrectAnswer
+                });
+                if (this.currentQuestion === this.questions.length - 1) {
+                    this.show_result = true;
+                } else {
+                    document.getElementById('next').classList.remove('d-none');
+                }
+            }
         },
-        checkAnswer(selectedAnswerIndex) {
-            const selectedAnswer = this.answer[selectedAnswerIndex];
-            this.selected = selectedAnswer;
-            this.isCorrect = selectedAnswer === this.correctAnswer;
 
-            if (this.isCorrect) {
-                const progressIncrement = 100 / this.totalQuestions;
-                this.progress += progressIncrement;
-                this.$emit('change-progress', this.progress);
+        nextQuestion() {
+            this.answered = false;
+            document.getElementById('next').classList.add('d-none');
+            let ans_cards = document.getElementsByClassName('ans-card');
+            for (let i = 0; i < ans_cards.length; i++) {
+                ans_cards[i].classList.remove('bg-success');
+                ans_cards[i].classList.remove('bg-danger');
             }
 
-            setTimeout(() => {
-                this.setQuestion();
-            }, 500);
+            if (this.currentQuestion === this.questions.length - 1) {
+                // reload page
+                // location.reload();
+                console.log(this.questions);
+                this.show_result = true;
+            } else {
+                if (this.questions[this.currentQuestion].count_answered === 1) {
+                    this.currentQuestion++;
+                    this.progress = Math.round((this.currentQuestion / this.questions.length) * 100);
+                    this.$emit('change-progress', this.progress);
+                }else{
+                    this.questions[this.currentQuestion].count_answered ? this.questions[this.currentQuestion].count_answered++ : this.questions[this.currentQuestion].count_answered = 1;
+                    this.questions[this.currentQuestion].isCorrect = this.isCorrectAnswer;
+                    if (this.isCorrectAnswer) {
+                        this.currentQuestion++;
+                        this.progress = Math.round((this.currentQuestion / this.questions.length) * 100);
+                        this.$emit('change-progress', this.progress);
+                    } else {
+                        // move answer to the end of the array
+                        this.questions.push(this.questions[this.currentQuestion]);
+                        this.questions.splice(this.currentQuestion, 1);
+                    }
+                }
+            }
         },
-        toggleSettings() {
-            // add toggleSettings method
-            this.showSettings = !this.showSettings;
-        },
+        reloadPage() {
+            location.reload();
+        }
     },
-}
-;
+};
 </script>
 
 <style scoped>
+.answered {
+    background-color: #ffc107;
+    color: white;
+}
 
+.not-answered {
+    background-color: #dc3545;
+    color: white;
+}
+
+.congrat {
+    font-weight: bold;
+    color: green;
+}
+
+.encourage {
+    font-weight: bold;
+    color: red;
+}
 </style>

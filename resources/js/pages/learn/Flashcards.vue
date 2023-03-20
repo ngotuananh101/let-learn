@@ -60,6 +60,7 @@ export default {
         // get id from params
         this.getLessons(this.id).then(detail => {
             this.data = detail;
+            console.log(this.data);
             document.getElementById('card-title').innerHTML = this.data[this.currentCardIndex].definition;
         });
     },

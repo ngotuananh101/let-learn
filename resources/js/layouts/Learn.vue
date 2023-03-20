@@ -19,7 +19,7 @@ export default {
         return {
             title: 'Learn',
             showOptions: true,
-            progress: 10
+            progress: 0
         }
     },
     methods: {
