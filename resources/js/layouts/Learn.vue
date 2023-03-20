@@ -2,7 +2,7 @@
     <Navbar :title="title" :showOptions="showOptions" :progress="progress" />
     <main class="main-content main-content-bg mt-5 d-flex justify-content-center align-items-center" >
         <div class="container">
-            <router-view @change-progress="updateProgress"></router-view>
+            <router-view @change-progress="updateProgress" @change-title="updateTitle"></router-view>
         </div>
     </main>
     <AppFooter />
@@ -17,7 +17,7 @@ export default {
     },
     data()  {
         return {
-            title: 'Learn',
+            title: 'Let Learn',
             showOptions: true,
             progress: 0
         }
@@ -25,6 +25,10 @@ export default {
     methods: {
         updateProgress(data) {
             this.progress = data;
+        },
+        updateTitle(data) {
+            console.log(data);
+            this.title = data;
         }
     },
 }
