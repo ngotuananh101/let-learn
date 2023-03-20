@@ -41,8 +41,16 @@
         </div>
     </div>
     <div class="row mt-4">
-        <div class="col-lg-2 col-md-2 col-4"><argon-button class="w-100">Flash Card</argon-button></div>
-        <div class="col-lg-2 col-md-2 col-4"><argon-button class="w-100">Learn</argon-button></div>
+        <div class="col-lg-2 col-md-2 col-4">
+            <router-link :to="{ name: 'learn.flashcard.index', params: { id: lesson_id } }">
+                <argon-button class="w-100">Flash Card</argon-button>
+            </router-link>
+        </div>
+        <div class="col-lg-2 col-md-2 col-4">
+            <router-link :to="{ name: 'learn.quiz.index', params: { id: lesson_id } }">
+                <argon-button class="w-100">Learn</argon-button>
+            </router-link>
+        </div>
         <div class="col-lg-2 col-md-2 col-4"><argon-button class="w-100">Test</argon-button></div>
     </div>
     <!-- <h5 class="mt-4">Number of terms in this lesson: {{ cardsCount.totalCards }}</h5> -->
@@ -72,6 +80,7 @@ import { mapActions, mapGetters } from "vuex";
 
 export default {
     name: "lesson",
+    props:['lesson_id'],
     components: {
         LessonCard,
         ArgonButton,
@@ -113,8 +122,8 @@ export default {
     },
     mounted() {
         // get id from params
-        this.getLessons(this.id).then(detail => {
-            this.data = detail;
+        this.getLessons(this.id).then(data => {
+            this.data = data.detail;
             document.getElementById('card-title').innerHTML = this.data[this.currentCardIndex].definition;
         });
     },
@@ -160,7 +169,7 @@ export default {
                 document.getElementById('card-title').innerHTML = this.data[this.currentCardIndex].definition;
                 this.currentSide = 'front';
             }
-        }
+        },
     },
     computed: {
         cardsCount() { // add cardsCount computed property

@@ -1,11 +1,7 @@
 <template>
     <div class="flashcards-container">
-        <!-- add card count display -->
-        <div class="card-count">{{ cardsCount.currentCardIndex + 1 }} / {{ cardsCount.totalCards }}</div>
-        <!-- add settings button outside of card container -->
-        <button @click="toggleSettings" class="settings-button">Settings</button>
-
         <section class="card-container">
+            <div class="card-count text-center w-100">{{ cardsCount.currentCardIndex + 1 }} / {{ cardsCount.totalCards }}</div>
             <div class="card d-flex justify-content-center align-items-center p-5" @click="rotateCard">
                 <p id="card-title" class="fs-3" style="white-space: pre-line;"></p>
             </div>
@@ -58,9 +54,9 @@ export default {
     },
     mounted() {
         // get id from params
-        this.getLessons(this.id).then(detail => {
-            this.data = detail;
-            console.log(this.data);
+        this.getLessons(this.id).then(data => {
+            this.data = data.detail;
+            this.updateTitle(data.lesson.name);
             document.getElementById('card-title').innerHTML = this.data[this.currentCardIndex].definition;
         });
     },
@@ -68,8 +64,12 @@ export default {
         ...mapActions({
             getLessons: 'learn/getLessons'
         }),
+        updateTitle(title) {
+            this.$emit('change-title', title);
+        },
         nextCard() {
             if (this.currentCardIndex < this.data.length - 1) {
+                this.$emit('change-progress', Math.round((this.currentCardIndex / this.data.length) * 100));
                 this.currentCardIndex++;
             } else {
                 this.currentCardIndex = 0;

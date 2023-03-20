@@ -17,7 +17,7 @@ function getLessons(lesson_id) {
     return fetch(`${config.apiUrl}/lesson/${lesson_id}`, requestOptions)
         .then(handleResponse)
         .then(data => {
-            return data.data.detail;
+            return data.data;
         });
 }
 
