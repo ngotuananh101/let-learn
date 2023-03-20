@@ -26,6 +26,9 @@ export default {
         getLessons({commit}, id) {
             commit('getLessonsRequest')
             return learnService.getLessons(id);
+        },
+        getLearn({commit}, id) {
+            return learnService.getLearn(id);
         }
     },
     getters: {
@@ -38,6 +41,6 @@ export default {
         error(state) {
             return state.error
         }
-    }
+    },
 }
 
