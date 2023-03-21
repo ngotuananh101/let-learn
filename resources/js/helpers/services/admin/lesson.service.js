@@ -13,12 +13,9 @@ export const adminSetService = {
 }
 
 function index() {
-    return fetch(`${config.apiUrl}/admin/set`, {method: 'GET', headers: authHeader()})
+    return fetch(`${config.apiUrl}/admin/lesson`, {method: 'GET', headers: authHeader()})
         .then(handleResponse)
         .then(data => {
-            if (data.data) {
-                localStorage.setItem('set', JSON.stringify(data.data));
-            }
             return data.data;
         });
 }
@@ -86,10 +83,12 @@ function exportSet(id) {
 }
 
 function getSet(id) {
-    return fetch(`${config.apiUrl}/admin/set/${id}/edit`, {
+    return fetch(`${config.apiUrl}/admin/lesson/${id}/edit`, {
         method: 'GET',
         headers: authHeader()
-    }).then(handleResponse);
+    }).then(handleResponse).then(data => {
+        return data.data;
+    });
 }
 
 function updateSet(data) {

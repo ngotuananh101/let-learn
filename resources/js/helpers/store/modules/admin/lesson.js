@@ -1,8 +1,10 @@
-import {adminSetService} from '../../../services/admin/set.service';
+import {adminSetService} from '../../../services/admin/lesson.service';
 import overlay from '../../../overlay';
 
-let sets = JSON.parse(localStorage.getItem('set'));
-let state = sets ? {status: {index: true}, sets: sets} : {status: {}, sets: []};
+let state = {
+    lessons: [],
+    status: {}
+};
 
 export default {
     namespaced: true,
@@ -11,13 +13,13 @@ export default {
         indexRequest(state) {
             state.status = {indexing: true};
         },
-        indexSuccess(state, sets) {
+        indexSuccess(state, lessons) {
             state.status = {index: true};
-            state.sets = sets;
+            state.lessons = lessons;
         },
         indexFailure(state) {
             state.status = {};
-            state.sets = [];
+            state.lessons = [];
         }
     },
     actions: {
@@ -25,8 +27,8 @@ export default {
             commit('indexRequest');
             adminSetService.index()
                 .then(
-                    sets => {
-                        commit('indexSuccess', sets);
+                    lessons => {
+                        commit('indexSuccess', lessons);
                     },
                     error => {
                         commit('indexFailure', error);
@@ -90,11 +92,9 @@ export default {
             );
         },
         getSet({dispatch}, id) {
-            overlay();
             return adminSetService.getSet(id)
                 .then(
                     sets => {
-                        overlay();
                         return sets;
                     },
                     error => {
@@ -118,8 +118,8 @@ export default {
         }
     },
     getters: {
-        sets: state => {
-            return state.sets;
+        lessons: state => {
+            return state.lessons;
         }
     }
 }

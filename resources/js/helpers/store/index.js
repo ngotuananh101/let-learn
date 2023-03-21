@@ -5,7 +5,7 @@ import account from "./modules/account.js";
 import alert from "./modules/alert.js";
 import dashboard from "./modules/dashboard.js";
 import adminSetting from "./modules/admin/setting.js";
-import adminSet from "./modules/admin/set.js";
+import adminLesson from "./modules/admin/lesson.js";
 import adminFolder from "./modules/admin/folder.js";
 import adminUser from "./modules/admin/user.js";
 import adminRole from "./modules/admin/role.js";
@@ -23,7 +23,7 @@ export default createStore({
         learn,
         dashboard,
         adminSetting,
-        adminSet,
+        adminLesson,
         adminFolder,
         adminUser,
         adminRole,
