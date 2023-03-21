@@ -393,9 +393,13 @@ class UserController extends Controller
                         $learn->relearn = $request->relearn;
                         $learn->save();
                     }
+                    //count learned from learn 
                     return response()->json([
-                        'user' => $learn,
-                        'message' => 'Update learned and relearn of user successfully',
+                        'progress' => [
+                            'learned' => count(explode(',', $learn->learned)),
+                            'total' => LessonDetail::where('lesson_id', $request->lesson_id)->count(),
+                        ],
+                        'message' => 'Update learn progress successfully',
                         'status' => 200
                     ], 200);
                     break;
