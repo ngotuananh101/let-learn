@@ -6,31 +6,12 @@
                 <p id="card-title" class="fs-3" style="white-space: pre-line;"></p>
             </div>
         </section>
-        <div class="buttons-container">
-            <button @click="previousCard">Previous</button>
-            <button @click="nextCard">Next</button>
+        <div class="buttons-container ">
+            <button class="w-15" @click="previousCard">Previous</button>
+            <button class="w-15" @click="nextCard">Next</button>
         </div>
-        <!-- add settings menu popup -->
-
         <div class="buttons">
-            <div v-if="showSettings" class="settings-overlay">
-                <div class="settings-menu">
-                    <!-- add settings button -->
-                    <button class="settings-close-button" @click="toggleSettings">×</button>
-                    <h2>Tùy chọn</h2>
-                    <h6>Sắp xếp thẻ</h6>
-                    <p>Sắp xếp thẻ của bạn để tập trung vào những thuật ngữ cần chú tâm học. Tắt tính năng sắp xếp nếu
-                        bạn muốn nhanh chóng ôn lại các thẻ ghi nhớ.</p>
-                    <div class="form-check form-switch">
-                        <input class="form-check-input" type="checkbox" id="flexSwitchCheckDefault">
-                        <label class="form-check-label" for="flexSwitchCheckDefault">Âm thanh</label>
-                    </div>
-                    <!-- add your settings options here -->
-                    <button @click="toggleSettings">Close</button>
-                </div>
-            </div>
             <div>
-                <button id="quit-button" onclick="window.location.href = '/'">Quit</button>
                 <button id="announcement-button" class="bg-transparent" @click="speak(this.data[currentCardIndex].definition)"><i class="fa-regular fa-volume fs-2"></i></button>
             </div>
         </div>
@@ -137,57 +118,7 @@ export default {
     font-size: 18px;
 }
 
-.settings-button {
-    position: absolute;
-    top: 10px;
-    right: 10px;
-    z-index: 999; /* make sure it appears above other elements */
-    left: auto; /* remove left property */
-}
 
-/* add styles for settings menu */
-.settings-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0, 0, 0, 0.5);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    z-index: 998; /* make sure it appears below the settings button */
-}
-
-.settings-menu {
-    position: relative;
-    width: 800px;
-    max-width: 90%;
-    background-color: #f5f5f5;
-    border-radius: 4px;
-    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.19), 0 6px 6px rgba(0, 0, 0, 0.23);
-    padding: 20px;
-    animation-name: slide-in-down;
-    animation-duration: 0.3s;
-    animation-timing-function: ease-out;
-}
-
-.settings-close-button {
-    position: absolute;
-    top: 10px;
-    right: 10px;
-    padding: 5px;
-    font-size: 24px;
-    line-height: 1;
-    color: #666;
-    border: none;
-    background-color: transparent;
-    cursor: pointer;
-}
-
-.settings-close-button:hover {
-    color: #000;
-}
 
 @keyframes slide-in-down {
     from {
@@ -200,9 +131,6 @@ export default {
     }
 }
 
-.settings-close-button:hover {
-    color: #000;
-}
 
 .flashcards-container {
     display: flex;
