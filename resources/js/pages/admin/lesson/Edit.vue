@@ -8,30 +8,30 @@
                         <h5 class="mb-0">Update Set</h5>
                         <p class="mb-0 text-sm">Update set data</p>
                     </div>
-                    <div class="card-body" v-if="this.data">
-                        <div class="row">
+                    <div class="card-body">
+                        <div class="row" v-if="this.data">
                             <div class="col-md-4 col-12">
                                 <label class="form-label mt-2 fs-6">Name</label>
                                 <argon-input id="name" type="text" name="name"
                                              placeholder="Enter a name, like:'MAE Chapter 1'"
-                                             :value="this.data.set.name"/>
+                                             :value="this.data.lesson.name"/>
                             </div>
                             <div class="col-md-8 col-12">
                                 <label class="form-label mt-2 fs-6">Description</label>
                                 <argon-input id="description" type="text" name="description"
-                                             placeholder="Add a description..." :value="this.data.set.description"/>
+                                             placeholder="Add a description..." :value="this.data.lesson.description"/>
                             </div>
                             <div class="col-4">
                                 <label class="form-label mt-2 fs-6">Status</label>
                                 <argon-switch id="status" name="status" class="mb-3"
-                                              :checked="this.data.set.status === 'active'">
+                                              :checked="this.data.lesson.status === 'active'">
                                     Active
                                 </argon-switch>
                             </div>
                             <div class="col-2">
                                 <label class="form-label mt-2 fs-6">Public</label>
                                 <argon-switch id="is_public" name="is_public" class="mb-3"
-                                              :checked="this.data.set.is_public" @change="publicChange">
+                                              :checked="this.data.lesson.is_public" @change="publicChange">
                                     Public
                                 </argon-switch>
                             </div>
@@ -39,7 +39,7 @@
                                 <label class="form-label mt-2 fs-6">Password (option)</label>
                                 <argon-input id="name" type="password" name="name"
                                              placeholder="Enter passord for this set"
-                                             :value="this.data.set.password"/>
+                                             :value="this.data.lesson.password"/>
                             </div>
                             <div class="col-12">
                                 <label class="form-label mt-2 fs-6">Detail</label>
@@ -47,14 +47,14 @@
                                     <component :is="child" :title="index+1 + ''" :key="'setDetail'+index"
                                                @remove="this.removeCard"
                                                :data="{
-                                                   term: data.set_data[index]?data.set_data[index].term:'',
-                                                   definition: data.set_data[index]?data.set_data[index].definition:'' }"
+                                                   term: data.detail[index]?data.detail[index].term:'',
+                                                   definition: data.detail[index]?data.detail[index].definition:'' }"
                                     ></component>
                                 </div>
                             </div>
                             <div class="col-12">
                                 <argon-button color="secondary" variant="gradient" full-width
-                                              class="my-2 py-5 btn-lg fs-6" @click="this.addSetCard">Add Card
+                                              class="my-2 py-4 btn-lg fs-6" @click="this.addSetCard">Add Card
                                 </argon-button>
                             </div>
                             <div class="col-xl-3 col-lg-4 col-sm-5">
@@ -71,7 +71,6 @@
 </template>
 
 <script>
-import {mapActions} from "vuex";
 import ArgonInput from "@/components/Argons/ArgonInput.vue";
 import SetCard from "@/pages/admin/lesson/SetCard.vue";
 import ArgonButton from "@/components/Argons/ArgonButton.vue";
@@ -94,29 +93,18 @@ export default {
         }
     },
     beforeMount() {
-        this.getSet(this.$route.params.id).then((res) => {
-            // return res.data;
-            this.data = res.data;
-            if(!this.data.set.is_public){
-                this.password_option = true;
-            }
-            this.children = [];
-            this.count = 0;
-            for (let i = 0; i < this.data.set_data.length; i++) {
-                // lesson data for each card
+        this.$store.dispatch('adminLesson/getSet', this.$route.params.id).then((res) => {
+            this.data = res;
+            this.password_option = !this.data.lesson.is_public;
+            for (let i = 0; i < this.data.detail.length; i++) {
                 this.children.push(SetCard);
                 this.count++;
             }
-        }).then(() => {
-            window.scrollTo(0, document.body.scrollHeight);
         });
     },
     mounted() {
     },
     methods: {
-        ...mapActions({
-            getSet: 'adminSet/getSet',
-        }),
         addSetCard() {
             this.children.push(SetCard);
             this.count++;

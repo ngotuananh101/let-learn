@@ -92,11 +92,9 @@ export default {
             );
         },
         getSet({dispatch}, id) {
-            overlay();
             return adminSetService.getSet(id)
                 .then(
                     sets => {
-                        overlay();
                         return sets;
                     },
                     error => {

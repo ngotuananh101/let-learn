@@ -86,7 +86,9 @@ function getSet(id) {
     return fetch(`${config.apiUrl}/admin/lesson/${id}/edit`, {
         method: 'GET',
         headers: authHeader()
-    }).then(handleResponse);
+    }).then(handleResponse).then(data => {
+        return data.data;
+    });
 }
 
 function updateSet(data) {

@@ -7,14 +7,14 @@
                     <div class="pb-0 card-header">
                         <div class="d-lg-flex">
                             <div>
-                                <h5 class="mb-0">All Sets</h5>
-                                <p class="mb-0 text-sm">List of all Sets in the system</p>
+                                <h5 class="mb-0">All Lesson</h5>
+                                <p class="mb-0 text-sm">List of all lesson in the system</p>
                             </div>
                             <div class="my-auto mt-4 ms-auto mt-lg-0">
                                 <div class="my-auto ms-auto">
                                     <router-link :to="{ name: 'admin.lesson.add' }"
                                                  class="mb-0 btn bg-gradient-success btn-sm">+&nbsp;
-                                        New Set
+                                        New Lesson
                                     </router-link>
                                     <button type="button" class="mx-1 mb-0 btn btn-outline-success btn-sm"
                                             data-bs-toggle="modal"
@@ -36,7 +36,6 @@
                                     <th>Description</th>
                                     <th>Username</th>
                                     <th>Is Public</th>
-                                    <th>Created At</th>
                                     <th>Updated At</th>
                                     <th>Status</th>
                                 </tr>
@@ -51,42 +50,37 @@
     <div id="optionModal" class="modal fade" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog mt-lg-10">
             <div class="modal-content">
-                <div class="modal-header">
-                    <h5 id="edit-title" class="modal-title">
-                        Option
-                    </h5>
-                    <i class="fa-solid fa-option ms-3"></i>
-                </div>
                 <div class="modal-body">
-                    <p>You can select option for this Set</p>
-                    <div class="row">
-                        <div class="col-3">
-                            <button type="button" class="mx-1 mb-0 btn bg-gradient-primary btn-sm">
+                    <div class="row justify-content-between">
+                        <div class="col-6">
+                            <span class="text-start fs-6 fw-bold float-start">Choose an option</span>
+                        </div>
+                        <div class="col-6">
+                            <span class="text-end fs-6 fw-bold float-end" data-bs-dismiss="modal"><i class="fa-regular fa-circle-xmark"></i></span>
+                        </div>
+                    </div>
+                    <div class="row mt-3">
+                        <div class="col-md-3 col-6">
+                            <button type="button" class="w-100 btn btn-sm btn-outline-secondary">
                                 View
                             </button>
                         </div>
-                        <div class="col-3">
-                            <button type="button" class="mx-1 mb-0 btn bg-gradient-warning btn-sm" @click="this.edit">
+                        <div class="col-md-3 col-6">
+                            <button type="button" class="w-100 btn btn-sm btn-outline-warning" @click="this.edit">
                                 Update
                             </button>
                         </div>
-                        <div class="col-3">
-                            <button type="button" class="mx-1 mb-0 btn bg-gradient-danger btn-sm" @click="this.delete">
+                        <div class="col-md-3 col-6">
+                            <button type="button" class="w-100 btn btn-sm btn-outline-danger" @click="this.delete">
                                 Delete
                             </button>
                         </div>
-                        <div class="col-3">
-                            <button type="button" class="mx-1 mb-0 btn btn-outline-success btn-sm" @click="this.export">
+                        <div class="col-md-3 col-6">
+                            <button type="button" class="w-100 btn btn-sm btn-outline-success" @click="this.export">
                                 Export
                             </button>
                         </div>
                     </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn bg-gradient-primary btn-sm" id="edit-close"
-                            data-bs-dismiss="modal">
-                        Close
-                    </button>
                 </div>
             </div>
         </div>
@@ -183,42 +177,45 @@ export default {
     data() {
         return {
             table: null,
-            sets: [],
+            lessons: [],
             importType: 'file',
-            selected_id: null
-
+            selected_id: null,
+            modal_option: null
         };
     },
-    beforeMount() {
-        this.index();
-        this.sets = this.$store.state.adminSet.sets;
+    beforeCreate() {
+        this.$store.dispatch('adminSet/index');
     },
     mounted() {
         this.table = this.$refs.table.dt();
-        this.handleClickRow();
+        this.modal_option = new Modal(document.getElementById('optionModal'));
         // load data to table
-        this.loadTable();
+        let delay = setInterval(() => {
+            this.lessons = this.$store.getters['adminSet/lessons'];
+            if (this.lessons && this.lessons.length > 0) {
+                this.table.clear();
+                this.table.rows.add(this.lessons);
+                this.table.draw();
+                clearInterval(delay);
+            }
+        }, 100);
+        this.table.on('select', (e, dt, type, indexes) => {
+            if (type === 'row') {
+                this.selected_id = this.table.rows(indexes).data()[0][0];
+                this.modal_option.show();
+            }
+        });
+        this.table.on('deselect', (e, dt, type, indexes) => {
+            if (type === 'row') {
+                this.selected_id = null;
+            }
+        });
+    },
+    beforeUnmount() {
+        this.table.destroy(true);
+        this.modal_option.dispose();
     },
     methods: {
-        ...mapActions({
-            index: 'adminSet/index',
-        }),
-        handleClickRow() {
-            document.getElementById('setdata').addEventListener('click', () => {
-                // get id
-                this.selected_id = this.table.rows({selected: true}).data().toArray()[0][0];
-                // show modal
-                let myModal = new Modal(document.getElementById('optionModal'));
-                myModal.show();
-                document.getElementById('optionModal').addEventListener('hidden.bs.modal', () => {
-                    this.table.rows().deselect();
-                });
-            });
-        },
-        loadTable() {
-            this.table.clear();
-            this.table.rows.add(this.sets).draw();
-        },
         switchImport() {
             if (this.importType === 'file') {
                 this.importType = 'text';
@@ -258,7 +255,6 @@ export default {
                 this.$store.dispatch('adminSet/importSet', formData).then(() => {
                     this.$store.dispatch('adminSet/index').then(() => {
                         this.sets = this.$store.state.adminSet.sets;
-                        this.setTable();
                     }).then(() => {
                         document.getElementById('closeImport').click();
                     });
@@ -268,7 +264,7 @@ export default {
             }
         },
         edit() {
-            document.getElementById('edit-close').click();
+            this.modal_option.hide();
             this.$router.push({name: 'admin.lesson.edit', params: {id: this.selected_id}});
         },
         delete() {
@@ -295,7 +291,7 @@ export default {
                 }
             });
         },
-        export(){
+        export() {
             this.$store.dispatch('adminSet/exportSet', this.selected_id);
         },
     },

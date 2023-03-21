@@ -8,6 +8,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Maatwebsite\Excel\Facades\Excel;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
 class LessonController extends Controller
 {
@@ -36,7 +37,6 @@ class LessonController extends Controller
                     $item->description,
                     $item->user->username,
                     $item->is_public ? 'public' : 'private',
-                    Carbon::parse($item->created_at)->format('d/m/Y'),
                     Carbon::parse($item->updated_at)->format('d/m/Y'),
                     $item->status,
                 ];
@@ -202,7 +202,7 @@ class LessonController extends Controller
      * Export lesson data to csv file
      *
      * @param int $id
-     * @return Response
+     * @return BinaryFileResponse | JsonResponse
      */
     public function show(int $id)
     {
@@ -249,9 +249,9 @@ class LessonController extends Controller
     public function edit(int $id): JsonResponse
     {
         try {
-            $set = Lesson::findOrFail($id);
-            $set_data = $set->setDetails()->get()->toArray();
-            if (empty($set_data)) {
+            $lesson = Lesson::findOrFail($id);
+            $detail = $lesson->lessonDetail()->get();
+            if (empty($detail)) {
                 return response()->json([
                     'status' => false,
                     'message' => 'Lesson is empty'
@@ -261,8 +261,8 @@ class LessonController extends Controller
                 'status' => 'success',
                 'status_code' => 200,
                 'data' => [
-                    'lesson' => $set,
-                    'set_data' => $set_data
+                    'lesson' => $lesson,
+                    'detail' => $detail
                 ]
             ], 200);
         } catch (\Throwable $th) {
