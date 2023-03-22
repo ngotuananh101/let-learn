@@ -4,6 +4,7 @@ import auth from "./auth";
 import home from "./home";
 import store from "../store";
 import learn from "./learn";
+import classes from "./class";
 
 const error = [
     {
@@ -13,7 +14,7 @@ const error = [
     }
 ];
 
-const routes = [...home, ...admin, ...auth,...learn ,...error];
+const routes = [...home, ...admin, ...auth,...learn, ...classes,...error];
 
 const router = createRouter({
     history: createWebHistory(),

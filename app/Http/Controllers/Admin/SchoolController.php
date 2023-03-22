@@ -144,7 +144,7 @@ class SchoolController extends Controller
     {
         try {
             $request->validate([
-                'type' => 'required|in:all,managers,teachers,students,search_user,classes',
+                'type' => 'required|in:all,managers,teachers,students,search_user,class',
                 'keyword' => 'required_if:type,search_user|string',
             ]);
             // get school
@@ -163,7 +163,7 @@ class SchoolController extends Controller
                             \Carbon\Carbon::parse($manager->updated_at)->format('d/m/Y'),
                         ];
                     }),
-                    'classes' => $school->classes->map(function ($class) {
+                    'class' => $school->classes->map(function ($class) {
                         return [
                             $class->id,
                             $class->name,
@@ -174,7 +174,7 @@ class SchoolController extends Controller
                         ];
                     }),
                 ],
-                'classes' => $school->classes->map(function ($class) {
+                'class' => $school->classes->map(function ($class) {
                     return [
                         $class->id,
                         $class->name,
@@ -320,12 +320,12 @@ class SchoolController extends Controller
                     //     break;
                     // case 'remove_class':
                     //     $request->validate([
-                    //         'class_id' => 'required|exists:classes,id',
+                    //         'class_id' => 'required|exists:class,id',
                     //     ]);
                     //     // find class
                     //     $class = Classes::findOrFail($request->class_id);
                     //     // check if class is in school
-                    //     if ($school->classes->contains($class)) {
+                    //     if ($school->class->contains($class)) {
                     //         // delete class
                     //         $class->delete();
                     //     }else{

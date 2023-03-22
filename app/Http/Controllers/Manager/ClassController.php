@@ -35,7 +35,7 @@ class ClassController extends Controller
     public function index(): JsonResponse
     {
         try {
-            // get all classes
+            // get all class
             $classes = Classes::all();
             $classes = $classes->map(function ($class) {
                 return [
@@ -299,7 +299,7 @@ class ClassController extends Controller
                         //delete teacher by user_id in class by id
                         $class = Classes::find($id);
                         if ($class) {
-                            //check if user not exist 
+                            //check if user not exist
                             if (!$class->teachers->contains($request->user()) && !$class->students->contains($request->user())) {
                                 throw new \Exception('User not exist in class');
                             }
