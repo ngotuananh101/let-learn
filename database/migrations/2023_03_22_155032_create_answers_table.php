@@ -17,7 +17,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('user_id')->constrained()->onDelete('cascade')->onUpdate('cascade');
             $table->foreignId('quiz_id')->constrained()->onDelete('cascade')->onUpdate('cascade');           
-            $table->json('answer_text')->nullable(); // include question_id, answer_text, is_correct
+            $table->json('answer_text')->nullable(); // include question_id, answer_text, is_correct, points
             $table->timestamps();
         });
     }

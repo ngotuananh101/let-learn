@@ -15,7 +15,8 @@ class Question extends Model
         'question',
         'is_multiple_choice',
         'answer_option',
-        'correct_answer'
+        'correct_answer',
+        'points',
     ];
 
     public function quiz()
