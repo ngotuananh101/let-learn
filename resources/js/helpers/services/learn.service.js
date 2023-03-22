@@ -33,3 +33,16 @@ function getLearn(lesson_id) {
             return data.lesson_details;
         });
 }
+
+function putLearn(lesson_id, learn_id, data) {
+    const requestOptions = {
+        method: 'PUT',
+        headers: authHeader(),
+        body: JSON.stringify(data)
+    };
+    return fetch(`${config.apiUrl}/user/${user.id}/learn/${learn_id}`, requestOptions)
+        .then(handleResponse)
+        .then(data => {
+            return data;
+        });
+}

@@ -12,6 +12,7 @@ import adminRole from "./modules/admin/role.js";
 import adminSchool from "./modules/admin/school.js";
 import home from "./modules/home.js";
 import learn from "./modules/learn";
+// import classes from "./modules/class";
 export default createStore({
     namespaced: true,
     modules: {
@@ -21,6 +22,7 @@ export default createStore({
         alert,
         home,
         learn,
+        // classes,
         dashboard,
         adminSetting,
         adminLesson,

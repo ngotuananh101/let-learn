@@ -37,7 +37,7 @@ $rfs-factor: 10 !default;
 // Mode. Possibilities: "min-media-query", "max-media-query"
 $rfs-mode: min-media-query !default;
 
-// Generate enable or disable classes. Possibilities: false, "enable" or "disable"
+// Generate enable or disable class. Possibilities: false, "enable" or "disable"
 $rfs-class: false !default;
 
 // 1 rem = $rfs-rem-value px
@@ -139,7 +139,7 @@ $rfs-mq-property-height: if($rfs-mode == max-media-query, max-height, min-height
   }
 }
 
-// Internal mixin that adds disable classes to the selector if needed.
+// Internal mixin that adds disable class to the selector if needed.
 @mixin _rfs-rule {
   @if $rfs-class == disable and $rfs-mode == max-media-query {
     // Adding an extra class increases specificity, which prevents the media query to override the property
@@ -160,7 +160,7 @@ $rfs-mq-property-height: if($rfs-mode == max-media-query, max-height, min-height
   }
 }
 
-// Internal mixin that adds enable classes to the selector if needed.
+// Internal mixin that adds enable class to the selector if needed.
 @mixin _rfs-media-query-rule {
 
   @if $rfs-class == enable {

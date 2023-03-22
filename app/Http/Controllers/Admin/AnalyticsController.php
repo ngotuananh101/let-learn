@@ -196,7 +196,7 @@ class AnalyticsController extends Controller
                 'total' => Course::all()->count(),
                 'change' => Course::whereDate('created_at', Carbon::today())->count() - Course::whereDate('created_at', Carbon::today()->subDays(1))->count(),
             ],
-            'classes' => [
+            'class' => [
                 'total' => Classes::all()->count(),
                 'change' => Classes::whereDate('created_at', Carbon::today())->count() - Classes::whereDate('created_at', Carbon::today()->subDays(1))->count(),
             ],

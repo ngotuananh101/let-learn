@@ -380,7 +380,7 @@ class ClassController extends Controller
     public function create()
     {
         try {
-            return view('classes.create');
+            return view('class.create');
         } catch (\Throwable $th) {
             return response()->json([
                 'status' => 'error',
@@ -480,7 +480,7 @@ class ClassController extends Controller
         try {
             $class = Classes::findOrFail($id);
 
-            return view('classes.edit', compact('class'));
+            return view('class.edit', compact('class'));
         } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $ex) {
             return response()->json([
                 'status' => 'error',
