@@ -2,13 +2,19 @@
 
 namespace App\Http\Controllers\Public;
 
+use App\Exports\AnswersExport;
+use App\Exports\ExportAnswerData;
+use App\Exports\ExportQuizData;
 use App\Http\Controllers\Controller;
 use App\Models\Answer;
 use App\Models\Quiz;
 use App\Models\Question;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
-use Illuminate\Support\Facades\Validator;
+use Maatwebsite\Excel\Facades\Excel;
+use Illuminate\Support\Collection;
+use Maatwebsite\Excel\Concerns\WithMultipleSheets;
 
 class QuizController extends Controller
 {
@@ -148,6 +154,83 @@ class QuizController extends Controller
             ], 500);
         }
     }
+
+    public function exportToExcel($id)
+    {
+        $quiz = Quiz::findOrFail($id);;
+        $answers = Answer::where('quiz_id', $quiz->id)->get();
+        $data = [];
+        $data_per_user = [];
+
+        $maxPoints = Question::where('quiz_id', $quiz->id)->sum('points');
+        foreach ($answers as $answer) {
+            $user = User::findOrFail($answer->user_id);
+            $ans = json_decode($answer->answer_text, true);
+
+            $sumPoints = 0;
+            $ques_ids = [];
+            //$ans_by_user = [];
+            foreach ($ans as $a) {
+                $sumPoints += $a['points'];
+                $ques_ids[] = $a['question_id'];
+                //$ans_by_user = $a['answer'];
+                $data_per_user[$a['answer']][] = [
+                    'quiz_id' => $quiz->id,
+                    'quiz_name' => $quiz->name,
+                    'user_name' => $user->name,
+                    'question' => Question::findOrFail($a['question_id'])->question,
+                    'answer' => $a['answer'],
+                    'is_correct' => $a['is_correct'],
+                ];
+            }
+            $data[] = [
+                'quiz_id' => $quiz->id,
+                'quiz_name' => $quiz->name,
+                'user_name' => $user->name,
+                'quiz_total_points' => $sumPoints,
+                'quiz_max_points' => $maxPoints,
+                'questions' => Question::whereIn('id', $ques_ids)->get(),
+                'answers' => $ans,
+            ];
+        }
+        // Create a new Excel workbook
+        $filename = 'quiz_data.xlsx';
+        $filepath = storage_path('app/export' . $filename);
+
+        Excel::download(new class($data, $data_per_user) implements WithMultipleSheets
+        {
+            private $data;
+            private $dataPerUser;
+
+            public function __construct($data, $dataPerUser)
+            {
+                $this->data = $data;
+                $this->dataPerUser = $dataPerUser;
+            }
+
+            public function sheets(): array
+            {
+                $sheets = [];
+
+                // Add the main quiz data sheet
+                $sheets[] = new ExportQuizData(collect($this->data));
+
+                // Loop through each answer and add a sheet for the answer data
+                foreach ($this->dataPerUser as $answer => $group_data_by_user) {
+                    $sheet_name = str_replace(['\\', '/', '?', '*', '[', ']'], '', $answer); // Clean up answer string for sheet name
+                    $sheet_name = substr($sheet_name, 0, 30); // Truncate to 30 characters, maximum sheet name length
+                    $sheet_name = trim($sheet_name); // Trim any whitespace
+
+                    $sheets[] = new ExportAnswerData(collect($group_data_by_user), $sheet_name);
+                }
+
+                return $sheets;
+            }
+        }, $filename)->deleteFileAfterSend(true);
+        // Return a success message
+        return response()->json(['success' => true]);
+
+    }
     //method to compare answer with correct answer
     public function compareAnswer($questionId, $correctAnswer, $answer)
     {
@@ -174,12 +257,12 @@ class QuizController extends Controller
         }
         return false;
     }
+    
     public function update(Request $request, $id)
     {
         try {
-
             $request->validate([
-                'type' => 'required|string|in:quiz,updateQuestions,updateAnswers,grade,addQuestion,removeQuestion,addAnswer,removeAnswer',
+                'type' => 'required|string|in:quiz,updateQuestions,grade,addQuestion,addAnswer',
             ]);
             switch ($request->type) {
                 case 'quiz':
@@ -205,6 +288,7 @@ class QuizController extends Controller
                         'status' => 200
                     ], 200);
                     break;
+
                 case 'updateQuestions':
                     $request->validate([
                         'questions' => 'required|array',
@@ -292,30 +376,8 @@ class QuizController extends Controller
                         'status' => 200
                     ], 200);
                     break;
-                case 'removeAnswer':
-                    $request->validate([
-                        'answers' => 'required|array',
-                        'answers.*.answer_id' => 'required|integer',
-                    ]);
-                    $answers = $request->input('answers');
-                    foreach ($answers as $answer) {
-                        $answer = Answer::findOrFail($answer['answer_id']);
-                        $answer->delete();
-                    }
-                    break;
-                case 'removeQuestion':
-                    $request->validate([
-                        'questions' => 'required|array',
-                        'questions.*.question_id' => 'required|integer',
-                    ]);
-                    $questions = $request->input('questions');
-                    foreach ($questions as $question) {
-                        $question = Question::findOrFail($question['question_id']);
-                        $question->delete();
-                    }
-                    break;
 
-                case 'grade': //grade only not multiple choice question 
+                case 'grade': //grade (for not multiple choice question and return the total points) 
                     $request->validate([
                         'user_id' => 'required|integer',
                         'answers' => 'required|array',
@@ -332,59 +394,33 @@ class QuizController extends Controller
 
                     // Decode the answer text from JSON to a PHP array
                     $answers = json_decode($answer->answer_text, true);
-
+                    // $sumPoints to calculate total points of the answer
+                    $sumPoints = 0;
                     // Loop through the answers array and update the points value for each matching question ID
                     foreach ($request->answers as $a) {
                         foreach ($answers as &$ans) {
+                            $sumPoints += $ans['points'];
                             if ($ans['question_id'] == $a['question_id']) {
                                 $ans['points'] = $a['points'] ?? 0;
+
                                 break;
                             }
                         }
                     }
+                    dd($sumPoints);
+                    //get the total points of the quiz from question table
+                    $maxPoints = Question::where('quiz_id', $quiz_id->id)->sum('points');
                     // Encode the updated array back to JSON format and save it as the new answer text
                     $answer->answer_text = json_encode($answers);
-                    dd($answer);
                     $answer->save();
                     return response()->json([
                         'data' => $answer,
+                        'sumPoints' => $sumPoints,
+                        'maxPoints' => $maxPoints,
                         'message' => 'Update answers successfully',
                         'status' => 200
                     ], 200);
-
-                    // case 'updateAnswers':
-                    //     $request->validate([                                              
-                    //         'answers' => 'required|array',
-                    //         'answers.*.question_id' => 'required|integer',
-                    //         'answers.*.answer' => 'required|string',
-                    //         'answers.*.is_correct' => 'required|boolean',
-                    //         'answers.*.points' => 'nullable|integer|',
-                    //     ]);
-                    //     $quiz_id = Quiz::where('id', $id)->first();
-                    //     $answerData = collect($request->input('answers'))->map(function ($answer) {
-                    //         return [
-                    //             'question_id' => $answer['question_id'],
-                    //             'answer' => $answer['answer'], // or any other answer data you want to store
-                    //             //get type of question, if question is not multiple choice then is_correct is input from user, else is_correct is same with case store answer
-                    //             'is_correct' => ((Question::where('id', $answer['question_id'])->first()->is_multiple_choice) ? ($this->compareAnswer($answer['question_id'], Question::where('id', $answer['question_id'])->first()->correct_answer, $answer['answer'])) : $answer['is_correct']),
-                    //             'points' => ((Question::where('id', $answer['question_id'])->first()->is_multiple_choice) ? ($this->compareAnswer($answer['question_id'], Question::where('id', $answer['question_id'])->first()->correct_answer, $answer['answer'])) ? Question::where('id', $answer['question_id'])->first()->points : 0 : $answer['points']),
-                    //         ];
-                    //     });
-                    //     // //store answerData to answer_text column as json text
-                    //     $answerText = json_encode($answerData);
-                    //     $answer = Answer::findOrFail($id);
-                    //     $answer->quiz_id = $request->input('quiz_id', $answer->quiz_id);
-                    //     //get user id from auth
-                    //     $answer->user_id = $request->user()->id;
-                    //     $answer->answer_text = $answerText;
-                    //     $answer->save();
-                    //     return response()->json([
-                    //         'data' => $answer,
-                    //         'message' => 'Update answer successfully',
-                    //         'status' => 200
-                    //     ], 200);
-                    //     break;
-
+                    break;
                 default:
                     break;
             }
@@ -397,16 +433,51 @@ class QuizController extends Controller
         }
     }
 
-    public function destroy($id)
+    public function destroy(Request $request, $id)
     {
         try {
-            $quiz = Quiz::findOrFail($id);
-            $quiz->delete();
+            $request->validate([
+                'type' => 'required|string|in:quiz,question,answer',
+            ]);
+            switch ($request->type) {
+                case 'quiz':
+                    $quiz = Quiz::findOrFail($id);
+                    $quiz->delete();
 
-            return response()->json([
-                'message' => 'Delete quiz successfully',
-                'status' => 200
-            ], 200);
+                    return response()->json([
+                        'message' => 'Delete quiz successfully',
+                        'status' => 200
+                    ], 200);
+                    break;
+
+                case 'question':
+                    $request->validate([
+                        'question_id' => 'required|integer',
+                    ]);
+                    $question = Question::findOrFail($request->question_id);
+                    $question->delete();
+
+                    return response()->json([
+                        'message' => 'Delete question successfully',
+                        'status' => 200
+                    ], 200);
+                    break;
+                case 'answer':
+                    $request->validate([
+                        'user_id' => 'required|integer',
+                    ]);
+                    $answer = Answer::where('quiz_id', $request->quiz_id)
+                        ->where('user_id', $request->user_id)
+                        ->firstOrFail();
+                    $answer->delete();
+                    return response()->json([
+                        'message' => 'Delete answer successfully',
+                        'status' => 200
+                    ], 200);
+                    break;
+                default:
+                    break;
+            }
         } catch (\Throwable $th) {
             return response()->json([
                 'status' => 'error',

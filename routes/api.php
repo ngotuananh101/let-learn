@@ -91,6 +91,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/quiz/{id}', [QuizController::class, 'show']);
         Route::put('/quiz/{id}', [QuizController::class, 'update']);
         Route::delete('/quiz/{id}', [QuizController::class, 'destroy']);
+        Route::get('/quiz/export/{id}/', [QuizController::class, 'exportToExcel']);
         Route::get('/learn/{id}', [LessonController::class, 'learn']);
         Route::post('/', [LessonController::class, 'store']);
         Route::get('/{id}', [LessonController::class, 'show']);
