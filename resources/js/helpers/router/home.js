@@ -42,7 +42,7 @@ const home = [
                     },
                     {
                         path: 'classes',
-                        name: 'home.profile.class',
+                        name: 'home.profile.class.js',
                         component: () => import('../../pages/home/ProfileClass.vue'),
                     }
                 ],

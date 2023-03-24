@@ -12,7 +12,7 @@ import adminRole from "./modules/admin/role.js";
 import adminSchool from "./modules/admin/school.js";
 import home from "./modules/home.js";
 import learn from "./modules/learn";
-// import classes from "./modules/class";
+// import classes from "./modules/class.js";
 export default createStore({
     namespaced: true,
     modules: {

@@ -1,14 +1,18 @@
 const classes = [
     {
         path: '/class',
-        // component: () => import('../../pages/home/class/class.vue'),
         redirect: {name: 'error'},
         children: [
             {
                 path: ':id',
-                name: 'class.index',
-                component: () => import('../../pages/home/class/class.vue'),
+                name: 'class.js.index',
+                component: () => import('../../pages/home/class/Class.vue'),
             },
+            {
+                path: 'detail/:id',
+                name: 'exerciseDetail.js.index',
+                component: () => import('../../pages/home/class/ExerciseDetail.vue'),
+            }
     ]
     },
 ];

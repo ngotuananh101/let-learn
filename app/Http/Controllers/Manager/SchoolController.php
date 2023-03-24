@@ -144,7 +144,7 @@ class SchoolController extends Controller
     {
         try {
             $request->validate([
-                'type' => 'required|in:all,managers,teachers,students,search_user,class',
+                'type' => 'required|in:all,managers,teachers,students,search_user,class.js',
                 'keyword' => 'required_if:type,search_user|string',
             ]);
             // get school
@@ -163,7 +163,7 @@ class SchoolController extends Controller
                             \Carbon\Carbon::parse($manager->updated_at)->format('d/m/Y'),
                         ];
                     }),
-                    'class' => $school->classes->map(function ($class) {
+                    'class.js' => $school->classes->map(function ($class) {
                         return [
                             $class->id,
                             $class->name,
@@ -174,7 +174,7 @@ class SchoolController extends Controller
                         ];
                     }),
                 ],
-                'class' => $school->classes->map(function ($class) {
+                'class.js' => $school->classes->map(function ($class) {
                     return [
                         $class->id,
                         $class->name,
@@ -313,20 +313,20 @@ class SchoolController extends Controller
                     $request->merge([
                         'school_id' => $school->id
                     ]);
-                    // call class controller
+                    // call class.js controller
                     $class = new ClassController();
                     // call store method
                     return $class->store($request);
                     break;
                 case 'remove_class':
                     $request->validate([
-                        'class_id' => 'required|exists:class,id',
+                        'class_id' => 'required|exists:class.js,id',
                     ]);
-                    // find class
+                    // find class.js
                     $class = Classes::findOrFail($request->class_id);
-                    // check if class is in school
+                    // check if class.js is in school
                     if ($school->classes->contains($class)) {
-                        // delete class
+                        // delete class.js
                         $class->delete();
                     }else{
                         throw new \Exception('Class is not in school');

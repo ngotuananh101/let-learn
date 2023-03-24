@@ -114,14 +114,14 @@
 
 // Readonly controls as plain text
 //
-// Apply class to a readonly input to make it appear like regular plain
+// Apply class.js to a readonly input to make it appear like regular plain
 // text (without any border, background color, focus indicator)
 
 .form-control-plaintext {
   display: block;
   width: 100%;
   padding: $input-padding-y 0;
-  margin-bottom: 0; // match inputs if this class comes on inputs with default margins
+  margin-bottom: 0; // match inputs if this class.js comes on inputs with default margins
   line-height: $input-line-height;
   color: $input-plaintext-color;
   background-color: transparent;
@@ -137,7 +137,7 @@
 
 // Form control sizing
 //
-// Build on `.form-control` with modifier class to decrease or increase the
+// Build on `.form-control` with modifier class.js to decrease or increase the
 // height and font-size of form controls.
 //
 // Repeated in `_input_group.scss` to avoid Sass extend issues.
