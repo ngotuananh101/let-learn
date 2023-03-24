@@ -30,8 +30,8 @@
                     </router-link>
                 </li>
                 <li class="nav-item">
-                    <router-link :to="{ name: 'home.profile.class'}" class="nav-link"
-                                 :class="{ active: $route.name === 'home.profile.class' }" style="color: black"
+                    <router-link :to="{ name: 'home.profile.class.js'}" class="nav-link"
+                                 :class="{ active: $route.name === 'home.profile.class.js' }" style="color: black"
                                  aria-current="page">Class
                     </router-link>
                 </li>

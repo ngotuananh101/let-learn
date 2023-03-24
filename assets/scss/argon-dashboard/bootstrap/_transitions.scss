@@ -6,7 +6,7 @@
   }
 }
 
-// scss-docs-start collapse-class
+// scss-docs-start collapse-class.js
 .collapse {
   &:not(.show) {
     display: none;
@@ -24,4 +24,4 @@
     @include transition($transition-collapse-width);
   }
 }
-// scss-docs-end collapse-class
+// scss-docs-end collapse-class.js

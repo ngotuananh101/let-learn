@@ -1,4 +1,4 @@
-// Notes on the class:
+// Notes on the class.js:
 //
 // 1. .carousel.pointer-event should ideally be pan-y (to allow for users to scroll vertically)
 //    even when their scroll action started on a carousel, but for compatibility (with Firefox)
@@ -152,7 +152,7 @@
 
 // Optional indicator pips/controls
 //
-// Add a container (such as a list) with the following class and add an item (ideally a focusable control,
+// Add a container (such as a list) with the following class.js and add an item (ideally a focusable control,
 // like a button) with data-bs-target for each slide your carousel holds.
 
 .carousel-indicators {

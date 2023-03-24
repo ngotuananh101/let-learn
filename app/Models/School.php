@@ -42,7 +42,7 @@ class School extends Model
         return $this->hasMany(User::class, 'school_id', 'id');
     }
 
-    // get all class in a school
+    // get all class.js in a school
     public function classes(): HasMany
     {
         return $this->hasMany(Classes::class, 'school_id', 'id');

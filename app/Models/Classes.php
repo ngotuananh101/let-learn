@@ -12,7 +12,7 @@ class Classes extends Model
 {
     use HasFactory;
 
-    protected $table = 'class';
+    protected $table = 'class.js';
     protected $fillable = [
         'school_id',
         'name',
@@ -23,7 +23,7 @@ class Classes extends Model
         'updated_at',
     ];
 
-    // get school of a class
+    // get school of a class.js
     public function school(): BelongsTo
     {
         return $this->belongsTo(School::class, 'school_id', 'id');

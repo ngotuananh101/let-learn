@@ -18,27 +18,27 @@ class CheckUserInClass
     {
         if($request->expectsJson()) {
             if($request->user()){
-                
+
                 switch($params) {
                     case 'all':
                         if($request->user()->isInClass($request->route('id'))){
                             return $next($request);
                         } else {
-                            return response()->json(['message' => 'You are not in this class'], 403);
+                            return response()->json(['message' => 'You are not in this class.js'], 403);
                         }
                         break;
                     case 'student':
                         if($request->user()->isStudentInClass($request->route('id'))){
                             return $next($request);
                         } else {
-                            return response()->json(['message' => 'You are not student in this class'], 403);
+                            return response()->json(['message' => 'You are not student in this class.js'], 403);
                         }
                         break;
                     case 'teacher':
                         if($request->user()->isTeacherInClass($request->route('id'))){
                             return $next($request);
                         } else {
-                            return response()->json(['message' => 'You are not teacher in this class'], 403);
+                            return response()->json(['message' => 'You are not teacher in this class.js'], 403);
                         }
                         break;
                     default:
@@ -49,7 +49,7 @@ class CheckUserInClass
                 return response()->json(['message' => 'You are not logged in'], 403);
             }
         }
-        
+
         return abort (500, 'This route is not available in HTML');
     }
 }

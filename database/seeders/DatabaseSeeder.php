@@ -85,8 +85,8 @@ class DatabaseSeeder extends Seeder
                 'description' => 'Require to manage users of school',
             ],
             [
-                'name' => 'manager.class',
-                'description' => 'Require to manage class of school',
+                'name' => 'manager.class.js',
+                'description' => 'Require to manage class.js of school',
             ],
             [
                 'name' => 'manager.student',

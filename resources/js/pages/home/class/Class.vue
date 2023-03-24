@@ -1,10 +1,10 @@
 <template>
     <div class="container pt-3">
         <!-- Navbar -->
-        <nav class="navbar navbar-expand-lg navbar-light bg-light border-radius-xl">
+        <nav class="navbar navbar-expand-lg navbar-light bg-light border-radius-xl justify-content-between">
             <a class="navbar-brand" href="#">Back</a>
-            <div class="collapse navbar-collapse justify-content-center" id="navbarNav">
-                <ul class="nav nav-pills mb-3" id="pills-tab" role="tablist">
+            <div class="justify-content-center" id="navbarNav">
+                <ul class="nav nav-pills bg-transparent border-0" id="pills-tab" role="tablist">
                     <li class="nav-item" role="presentation">
                         <button class="nav-link active" id="pills-home-tab" data-bs-toggle="pill"
                                 data-bs-target="#pills-home" type="button" role="tab" aria-controls="pills-home"
@@ -23,6 +23,12 @@
                                 aria-selected="false" style="color: black; font-weight: bold">Members
                         </button>
                     </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="pills-score-tab" data-bs-toggle="pill"
+                                data-bs-target="#pills-score" type="button" role="tab" aria-controls="pills-contact"
+                                aria-selected="false" style="color: black; font-weight: bold">Score
+                        </button>
+                    </li>
                 </ul>
             </div>
             <div class="d-flex align-items-center">
@@ -35,7 +41,8 @@
         <div class="tab-content" id="pills-tabContent">
             <div class="tab-pane fade show active" id="pills-home" role="tabpanel" aria-labelledby="pills-home-tab">
                 <div class="card my-4">
-                    <div class="card-header border-radius-xl bg-info" style="color: black; font-weight: bold; font-size: 18px">
+                    <div class="card-header border-radius-xl bg-info"
+                         style="color: black; font-weight: bold; font-size: 18px">
                         IS1431
                     </div>
                     <div class="card-body">
@@ -98,138 +105,183 @@
                 </div>
             </div>
             <div class="tab-pane fade" id="pills-profile" role="tabpanel" aria-labelledby="pills-profile-tab">
-                <div class="card my-4">
-                    <div
-                        class="card-body"
-                        data-toggle="collapse"
-                        :href="'#lesson1-detail'"
-                        @click="showLesson1Details = !showLesson1Details"
-                        :aria-expanded="showLesson1Details"
-                        aria-controls="lesson1-detail"
-                        style="color: black; font-weight: bold"
-                    >
-                        Java - Lesson 1
-                    </div>
-                    <div
-                        id="lesson1-detail"
-                        class="collapse"
-                        :class="{ show: showLesson1Details }"
-                    >
-                        <hr/>
-                        <div class="card-body">
-                            Viết chương trình Java in ra dòng chữ "Hello world!" trên màn hình
-                            console.
-                        </div>
-                        <hr/>
-                        <div class="form-group">
-                            <label for="lesson1-input">Submit:</label>
-                            <input
-                                type="file"
-                                class="form-control-file"
-                                id="lesson1-input"
-                                name="file"
-                            />
-                        </div>
-                    </div>
-                </div>
-
-                <hr/>
-
-                <div class="card my-4">
-                    <div
-                        class="card-body"
-                        data-toggle="collapse"
-                        :href="'#lesson2-detail'"
-                        @click="showLesson2Details = !showLesson2Details"
-                        :aria-expanded="showLesson2Details"
-                        aria-controls="lesson2-detail"
-                        style="color: black; font-weight: bold"
-                    >
-                        Java - Lesson 2
-                    </div>
-                    <div
-                        id="lesson2-detail"
-                        class="collapse"
-                        :class="{ show: showLesson2Details }"
-                    >
-                        <hr/>
-                        <div class="card-body">
-                            Viết chương trình Java tính tổng của hai số nguyên đầu vào và in ra
-                            kết quả.
-                        </div>
-                        <hr/>
-                        <div class="form-group">
-                            <label for="lesson2-input">Submit:</label>
-                            <input
-                                type="file"
-                                class="form-control-file"
-                                id="lesson2-input"
-                                name="file"
-                            />
+                <div class="card my-4  mx-md-12" v-for="(lesson, index) in lessons" :key="index">
+                    <div class="row">
+                        <div class="col">
+                            <div
+                                class="card-body"
+                                :data-toggle="'#lesson-detail-' + index"
+                                @click="toggleLessonDetails(index)"
+                                style="color: black; font-weight: bold"
+                            >
+                                {{ lesson.title }}
+                            </div>
+                            <div
+                                :id="'lesson-detail-' + index"
+                                class="collapse"
+                                :class="{ show: lesson.showDetails }"
+                            >
+                                <hr/>
+                                <div class="card-body">
+                                    <p>{{ lesson.duration }}</p>
+                                    <p>{{ lesson.numQuestions }} questions</p>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
             <div class="tab-pane fade" id="pills-contact" role="tabpanel" aria-labelledby="pills-contact-tab">
-                <h4 class="pt-3">Teacher</h4>
-                <div class="card my-4">
-                <div class="card">
-                    <div class="card-body">
-                        <div class="d-flex align-items-center">
-                            <img
-                                src="https://cdn.discordapp.com/attachments/702150671943860266/1088118611794726922/ArsBlink.JPG"
-                                style="height: 30px" class="rounded-circle">
-                            <span class="mr-2">Long Cute pho mai que</span>
+                <div class="container">
+                    <div class="row">
+                        <div class="col-12">
+                            <!-- Add button -->
+                            <button class="btn btn-primary position-fixed bottom-0 end-0 mt-3 ms-3" type="button">Add Student</button>
                         </div>
                     </div>
-                </div>
-                </div>
-                <hr/>
-                <h4 class="pt-3">Students</h4>
-                <div class="card my-4">
-                    <div class="card-body">
-                        <div class="d-flex align-items-center">
-                            <img
-                                src="https://cdn.discordapp.com/attachments/702150671943860266/1088118611794726922/ArsBlink.JPG"
-                                style="height: 30px" class="rounded-circle">
-                            <span class="mr-2">Long Cute</span>
-                        </div>
-                    </div>
-                </div>
-                <hr/>
-                <div class="card my-4">
-                    <div class="card-body">
-                        <div class="d-flex align-items-center">
-                            <img
-                                src="https://cdn.discordapp.com/attachments/702150671943860266/1088118611794726922/ArsBlink.JPG"
-                                style="height: 30px" class="rounded-circle">
-                            <span class="mr-2">Long Cute</span>
-                        </div>
-                    </div>
-                </div><hr/>
-                <div class="card my-4">
-                    <div class="card-body">
-                        <div class="d-flex align-items-center">
-                            <img
-                                src="https://cdn.discordapp.com/attachments/702150671943860266/1088118611794726922/ArsBlink.JPG"
-                                style="height: 30px" class="rounded-circle">
-                            <span class="mr-2">Long Cute</span>
+                    <div class="row">
+                        <div class="col-12">
+                            <h4 class="pt-3">Teacher</h4>
+                            <div class="card my-4">
+                                <div class="card-body">
+                                    <div class="d-flex align-items-center">
+                                        <img src="https://cdn.discordapp.com/attachments/702150671943860266/1088118611794726922/ArsBlink.JPG" style="height: 30px" class="rounded-circle">
+                                        <span class="ms-2 me-auto">Long Cute pho mai que</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <hr />
+                            <h4 class="pt-3">Students</h4>
+                            <div class="card my-4">
+                                <div class="card-body d-flex align-items-center justify-content-between">
+                                    <div class="d-flex align-items-center">
+                                        <img src="https://cdn.discordapp.com/attachments/702150671943860266/1088118611794726922/ArsBlink.JPG" style="height: 30px" class="rounded-circle">
+                                        <span class="ms-2 me-auto">Long Cute</span>
+                                    </div>
+                                    <div class="dropdown">
+                                        <button class="btn btn-secondary dropdown-toggle" type="button" id="student-options-1" data-bs-toggle="dropdown" aria-expanded="false">...</button>
+                                        <ul class="dropdown-menu" aria-labelledby="student-options-1">
+                                            <li><a class="dropdown-item" href="#">Delete</a></li>
+                                            <li><a class="dropdown-item" href="#">Hide</a></li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="card my-4">
+                                <div class="card-body d-flex align-items-center justify-content-between">
+                                    <div class="d-flex align-items-center">
+                                        <img src="https://cdn.discordapp.com/attachments/702150671943860266/1088118611794726922/ArsBlink.JPG" style="height: 30px" class="rounded-circle">
+                                        <span class="ms-2 me-auto">Long Cute</span>
+                                    </div>
+                                    <div class="dropdown">
+                                        <button class="btn btn-secondary dropdown-toggle" type="button" id="student-options-2" data-bs-toggle="dropdown" aria-expanded="false">...</button>
+                                        <ul class="dropdown-menu" aria-labelledby="student-options-2">
+                                            <li><a class="dropdown-item" href="#">Delete</a></li>
+                                            <li><a class="dropdown-item" href="#">Hide</a></li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="card my-4">
+                                <div class="card-body d-flex align-items-center justify-content-between">
+                                    <div class="d-flex align-items-center">
+                                        <img src="https://cdn.discordapp.com/attachments/702150671943860266/1088118611794726922/ArsBlink.JPG" style="height: 30px" class="rounded-circle">
+                                        <span class="ms-2 me-auto">Long Cute</span>
+                                    </div>
+                                    <div class="dropdown">
+                                        <button class="btn btn-secondary dropdown-toggle" type="button" id="student-options-3" data-bs-toggle="dropdown" aria-expanded="false">...</button>
+                                        <ul class="dropdown-menu" aria-labelledby="student-options-3">
+                                            <li><a class="dropdown-item" href="#">Delete</a></li>
+                                            <li><a class="dropdown-item" href="#">Hide</a></li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
 
             </div>
+            <div class="tab-pane fade" id="pills-score" role="tabpanel" aria-labelledby="pills-score-tab">
+                <div class="container">
+                    <table class="table">
+                        <thead>
+                        <tr>
+                            <th>
+                                <div class="dropdown">
+                                    <a class="btn btn-secondary dropdown-toggle" href="#" role="button"
+                                       id="dropdownMenuLink" data-bs-toggle="dropdown" aria-expanded="false">
+                                        Sort
+                                    </a>
+                                    <ul class="dropdown-menu" aria-labelledby="dropdownMenuLink">
+                                        <li><a class="dropdown-item" href="#">sort by name</a></li>
+                                        <li><a class="dropdown-item" href="#">sort by last name</a></li>
+                                    </ul>
+                                </div>
+                            </th>
+                            <th><router-link :to="{ name: 'exerciseDetail.js.index', params: { id: 'HCM_Test_1' }}">HCM Test 1</router-link></th>
+                            <th><a href="#">VNR Test 1</a></th>
+                            <th><a href="#">SSC Test 1</a></th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr style="background-color: #f2f2f2;">
+                            <td>Average Score of class</td>
+                            <td>50/100</td>
+                            <td>50/100</td>
+                            <td>50/100</td>
+                        </tr>
+                        <tr>
+                            <td>Hai Long</td>
+                            <td>70/100</td>
+                            <td>80/100</td>
+                            <td>100/100</td>
+                        </tr>
+                        <tr>
+                            <td>Xuan Dat</td>
+                            <td>20/100</td>
+                            <td>20/100</td>
+                            <td>90/100</td>
+                        </tr>
+                        <tr>
+                            <td>Tuan Anh</td>
+                            <td>20/100</td>
+                            <td>20/100</td>
+                            <td>00/100</td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
         </div>
-
     </div>
 </template>
+
 <script>
 
 export default {
     data() {
         return {
-            showLesson1Details: false,
-            showLesson2Details: false,
+            lessons: [
+                {
+                    title: 'Java - Lesson 1',
+                    duration: '30 min',
+                    numQuestions: '25',
+                    showDetails: false,
+                },
+                {
+                    title: 'Java - Lesson 2',
+                    duration: '40 min',
+                    numQuestions: '25',
+                    showDetails: false,
+                },
+                {
+                    title: 'Java - Lesson 3',
+                    duration: '30 min',
+                    numQuestions: '25',
+                    showDetails: false,
+                },
+            ],
         };
     },
     mounted() {
@@ -242,6 +294,15 @@ export default {
     methods: {
         onSubmit() {
             // Handle form submission here
+        },
+        toggleLessonDetails(index) {
+            this.lessons.forEach((lesson, i) => {
+                if (i === index) {
+                    lesson.showDetails = !lesson.showDetails;
+                } else {
+                    lesson.showDetails = false;
+                }
+            });
         },
     }
 }

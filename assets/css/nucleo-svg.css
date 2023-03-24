@@ -49,14 +49,14 @@ Change icon size
   width: 2em;
 }
 
-/* -------------------------------- 
+/* --------------------------------
 
-Align icon and text 
+Align icon and text
 
 -------------------------------- */
 
 .icon-text-aligner {
-  /* add this class to parent element that contains icon + text */
+  /* add this class.js to parent element that contains icon + text */
   display: flex;
   align-items: center;
 }
@@ -75,7 +75,7 @@ Align icon and text
   stroke: currentColor;
 }
 
-/* -------------------------------- 
+/* --------------------------------
 
 Icon reset values - used to enable color customizations
 
@@ -99,7 +99,7 @@ Icon reset values - used to enable color customizations
   fill: none;
 }
 
-/* -------------------------------- 
+/* --------------------------------
 
 Stroke effects - Nucleo outline icons
 

@@ -39,7 +39,7 @@
             </div>
         </div>
     </div>
-    <div class="container" v-if="show_result">
+    <div class="container mx-md-5" v-if="show_result">
         <h2>Learn Results</h2>
         <p>You answered {{ numCorrectAnswers }} out of {{ questions.length }} questions correctly.</p>
         <h3>Correct Answers:</h3>
@@ -69,7 +69,13 @@
                 </div>
             </template>
         </div>
-        <button class="fa-sharp fa-solid fa-arrow-right btn btn-primary rounded-circle float-md-end" @click="reloadPage"></button>
+        <div class="row">
+            <div class="col-12">
+                <!-- Add button -->
+                <button class="btn btn-primary position-fixed bottom-0 end-0 mt-3 ms-3" @click="reloadPage" type="button"><i class="fa-solid fa-arrow-right"></i></button>
+            </div>
+        </div>
+<!--        <button class="fa-sharp fa-solid fa-arrow-right btn btn-primary rounded-circle float-md-end" @click="reloadPage"></button>-->
     </div>
 
 
@@ -133,7 +139,16 @@ export default {
                     isCorrect: this.isCorrectAnswer
                 });
                 if (this.currentQuestion === this.questions.length - 1) {
-                    this.show_result = true;
+                    this.$emit('change-progress', 100);
+                    let incorrect_answers = this.questions.filter(q => !q.isCorrect).map(q => q.id);
+                    let correct_answers = this.questions.filter(q => q.isCorrect).map(q => q.id);
+                    this.$store.dispatch('learn/updateResult', {
+                        lesson_id: this.id,
+                        learned: correct_answers,
+                        relearn: incorrect_answers
+                    }).then((res) => {
+                        this.show_result = true;
+                    });
                 } else {
                     document.getElementById('next').classList.remove('d-none');
                 }
@@ -150,9 +165,6 @@ export default {
             }
 
             if (this.currentQuestion === this.questions.length - 1) {
-                // reload page
-                // location.reload();
-                console.log(this.questions);
                 this.show_result = true;
             } else {
                 if (this.questions[this.currentQuestion].count_answered === 1) {

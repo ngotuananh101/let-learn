@@ -58,9 +58,9 @@ export default {
             }
         );
         // this.$store.dispatch('home/getClass').then(
-        //     class => {
-        //         console.log(class);
-        //         this.class = class;
+        //     class.js => {
+        //         console.log(class.js);
+        //         this.class.js = class.js;
         //     }
         // );
     }
