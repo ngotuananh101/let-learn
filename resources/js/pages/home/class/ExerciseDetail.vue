@@ -67,7 +67,7 @@ export default {
                 ],
                 unsubmitted: [
                     { avatar: "https://cdn.discordapp.com/attachments/702150671943860266/1088118611794726922/ArsBlink.JPG", name: "Hoa"},
-                    { avatar: "https://cdn.discordapp.com/attachments/702150671943860266/1088118611794726922/ArsBlink.JPG", name: "Nguyen Quynh Trang" },
+                    { avatar: "https://cdn.discordapp.com/attachments/702150671943860266/1088118611794726922/ArsBlink.JPG", name: "Le Quynh Trang" },
                     { avatar: "https://cdn.discordapp.com/attachments/702150671943860266/1088118611794726922/ArsBlink.JPG", name: "Thu"},
                     { avatar: "https://cdn.discordapp.com/attachments/702150671943860266/1088118611794726922/ArsBlink.JPG", name: "Huong"},
                     { avatar: "https://cdn.discordapp.com/attachments/702150671943860266/1088118611794726922/ArsBlink.JPG", name: "Vy"},
