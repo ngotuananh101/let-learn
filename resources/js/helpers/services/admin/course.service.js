@@ -2,7 +2,7 @@ import config from '../../config';
 import {authHeader} from '../../auth-header';
 import handleResponse from './../handle-response';
 
-export const adminFolderService = {
+export const adminCourseService = {
     index,
     add,
     deleteFolder,

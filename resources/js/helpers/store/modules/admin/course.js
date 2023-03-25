@@ -1,7 +1,7 @@
-import {adminFolderService} from '../../../services/admin/folder.service';
+import {adminCourseService} from '../../../services/admin/course.service';
 import overlay from '../../../overlay';
 
-let state = {status: {}, folders: []};
+let state = {status: {}, courses: []};
 
 export default {
     namespaced: true,
@@ -10,36 +10,30 @@ export default {
         indexRequest(state) {
             state.status = {indexing: true};
         },
-        indexSuccess(state, folders) {
+        indexSuccess(state, courses) {
             state.status = {index: true};
-            state.folders = folders;
+            state.courses = courses;
         },
         indexFailure(state) {
             state.status = {};
-            state.folders = [];
+            state.courses = [];
         }
     },
     actions: {
         index({commit}) {
-            overlay();
-            commit('indexRequest');
-            return adminFolderService.index()
+            adminCourseService.index()
                 .then(
-                    folders => {
-                        commit('indexSuccess', folders);
-                        overlay();
-                        return Promise.resolve(folders);
+                    courses => {
+                        commit('indexSuccess', courses);
                     },
                     error => {
                         commit('indexFailure', error);
-                        overlay();
-                        return [];
                     }
                 );
         },
         add({commit}, folder) {
             overlay();
-            return adminFolderService.add(folder)
+            return admincourseservice.add(folder)
                 .then(
                     folder => {
                         overlay();
@@ -53,13 +47,13 @@ export default {
         },
         delete({commit}, folder_id) {
             overlay();
-            adminFolderService.deleteFolder(folder_id).then(() => {
+            admincourseservice.deleteFolder(folder_id).then(() => {
                 overlay();
             });
         },
         getFolderById({commit}, folder_id) {
             overlay();
-            return adminFolderService.getFolderById(folder_id)
+            return admincourseservice.getFolderById(folder_id)
                 .then(
                     folder => {
                         overlay();
@@ -76,7 +70,7 @@ export default {
         },
         updateFolder({dispatch}, folder) {
             overlay();
-            adminFolderService.updateFolder(folder)
+            admincourseservice.updateFolder(folder)
                 .then(
                     folder => {
                         overlay();
@@ -90,7 +84,7 @@ export default {
         },
         findSetByName({commit}, data) {
             overlay();
-            return adminFolderService.findSetByName(data)
+            return admincourseservice.findSetByName(data)
                 .then(
                     sets => {
                         overlay();
@@ -104,7 +98,7 @@ export default {
         },
         addSetToFolder({dispatch}, data) {
             overlay();
-            return adminFolderService.addSetToFolder(data)
+            return admincourseservice.addSetToFolder(data)
                 .then(
                     folder => {
                         overlay();
@@ -120,7 +114,7 @@ export default {
         },
         removeSetFromFolder({dispatch}, data) {
             overlay();
-            return adminFolderService.removeSetFromFolder(data)
+            return admincourseservice.removeSetFromFolder(data)
                 .then(
                     folder => {
                         overlay();
@@ -136,7 +130,7 @@ export default {
         }
     },
     getters: {
-        folders: state => state.folders,
+        courses: state => state.courses,
         status: state => state.status
     }
 }

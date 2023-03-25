@@ -82,12 +82,12 @@ const admin = [
                     {
                         path: 'list',
                         name: 'admin.folder.list',
-                        component: () => import('../../pages/admin/folder/List.vue'),
+                        component: () => import('../../pages/admin/course/List.vue'),
                     },
                     {
                         path: 'edit/:id',
                         name: 'admin.folder.edit',
-                        component: () => import('../../pages/admin/folder/Edit.vue'),
+                        component: () => import('../../pages/admin/course/Edit.vue'),
                     }
                 ]
             }
