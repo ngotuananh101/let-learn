@@ -39,29 +39,43 @@
             </div>
         </div>
     </div>
-    <div class="container" v-if="show_result">
+    <div class="container mx-md-5" v-if="show_result">
         <h2>Learn Results</h2>
         <p>You answered {{ numCorrectAnswers }} out of {{ questions.length }} questions correctly.</p>
-
         <h3>Correct Answers:</h3>
-        <ul>
+        <div class="row row-cols-1 g-4 p-3">
             <template v-for="(question, index) in questions">
-                <li :key="'correct_' + index" v-if="question.isCorrect && question.count_answered <= 1">
-                    <span style="color:brown;">{{ question.question }}</span> -  {{ question.correct_answer }}
-                    <span style="color:green;">- Correct </span>
-                </li>
+                <div :key="'correct_' + index" v-if="question.isCorrect && question.count_answered <= 1" class="col">
+                    <div class="card text-dark bg-light">
+                        <div class="card-body">
+                            <h5 class="card-title">{{ question.question }}</h5>
+                            <p class="card-text text-success">Your answer: {{ question.correct_answer }}</p>
+                        </div>
+                    </div>
+                </div>
             </template>
-        </ul>
-
-        <h3>Incorrect Answers:</h3>
-        <ul>
+        </div>
+        <h3 class="p-3">Incorrect Answers:</h3>
+        <div class="row row-cols-1 g-4 p-3">
             <template v-for="(answer, index) in userAnswers">
-                <li :key="'incorrect_' + index" v-if="!answer.isCorrect">
-                    <span style="color:brown;">{{ answer.question }}</span> - {{ answer.selectedAnswer }} - <span style="color:red;">Incorrect</span>
-                </li>
+                <div :key="'incorrect_' + index" v-if="!answer.isCorrect" class="col">
+                    <div class="card text-dark bg-light">
+                        <div class="card-body">
+                            <h5 class="card-title">{{ answer.question }}</h5>
+                            <p class="card-text text-danger">Your answer: {{ answer.selectedAnswer }}</p>
+                            <p class="card-text text-success">Correct answer: {{ questions.find(q => q.question === answer.question).correct_answer }}</p>
+                        </div>
+                    </div>
+                </div>
             </template>
-        </ul>
-        <button class="btn btn-primary" @click="reloadPage">Try Again</button>
+        </div>
+        <div class="row">
+            <div class="col-12">
+                <!-- Add button -->
+                <button class="btn btn-primary position-fixed bottom-0 end-0 mt-3 ms-3" @click="reloadPage" type="button"><i class="fa-solid fa-arrow-right"></i></button>
+            </div>
+        </div>
+<!--        <button class="fa-sharp fa-solid fa-arrow-right btn btn-primary rounded-circle float-md-end" @click="reloadPage"></button>-->
     </div>
 
 
@@ -125,7 +139,16 @@ export default {
                     isCorrect: this.isCorrectAnswer
                 });
                 if (this.currentQuestion === this.questions.length - 1) {
-                    this.show_result = true;
+                    this.$emit('change-progress', 100);
+                    let incorrect_answers = this.questions.filter(q => !q.isCorrect).map(q => q.id);
+                    let correct_answers = this.questions.filter(q => q.isCorrect).map(q => q.id);
+                    this.$store.dispatch('learn/updateResult', {
+                        lesson_id: this.id,
+                        learned: correct_answers,
+                        relearn: incorrect_answers
+                    }).then((res) => {
+                        this.show_result = true;
+                    });
                 } else {
                     document.getElementById('next').classList.remove('d-none');
                 }
@@ -142,9 +165,6 @@ export default {
             }
 
             if (this.currentQuestion === this.questions.length - 1) {
-                // reload page
-                // location.reload();
-                console.log(this.questions);
                 this.show_result = true;
             } else {
                 if (this.questions[this.currentQuestion].count_answered === 1) {

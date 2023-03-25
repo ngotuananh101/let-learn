@@ -31,7 +31,7 @@ class ClassController extends Controller
     public function index(): JsonResponse
     {
         try {
-            // get all classes
+            // get all class.js
             $classes = Classes::all();
             $classes = $classes->map(function ($class) {
                 return [
@@ -113,12 +113,12 @@ class ClassController extends Controller
                 'type' => 'required|in:all,managers,teachers,students,search_user',
                 'keyword' => 'required_if:type,search_user|string',
             ]);
-            // get class
+            // get class.js
             $class = Classes::findOrFail($id);
             $data = match ($request->type) {
                 'all' => [
-                    'class' => $class,
-                    //get school of class
+                    'class.js' => $class,
+                    //get school of class.js
                     'school' => $class->school,
                 ],
                 // 'search_user' => User::where('email', 'like', '%' . $request->keyword . '%')
@@ -166,14 +166,14 @@ class ClassController extends Controller
     {
         try {
             $request->validate([
-                'type' => 'required|in:class,add_teacher,add_student',
+                'type' => 'required|in:class.js,add_teacher,add_student',
             ]);
             $class = Classes::findOrFail($id);
             if ($this->checkPermiss($id) == false) {
-                throw new \Exception('You do not have permission to edit this class');
+                throw new \Exception('You do not have permission to edit this class.js');
             } else {
                 switch ($request->type) {
-                    case 'class':
+                    case 'class.js':
                         $request->validate([
                             'name' => 'required|string',
                             'description' => 'required|string',
@@ -201,11 +201,11 @@ class ClassController extends Controller
                         if (!$request->user()->hasRole($role)) {
                             throw new \Exception('User is not teacher');
                         } else {
-                            //check if user is already teacher of class
+                            //check if user is already teacher of class.js
                             if ($class->teachers->contains($request->user())) {
-                                throw new \Exception('User is already teacher of class');
+                                throw new \Exception('User is already teacher of class.js');
                             } else {
-                                //add user to class
+                                //add user to class.js
                                 $class->teachers()->attach($request->user());
                                 // Return json
                                 return response()->json([
@@ -226,11 +226,11 @@ class ClassController extends Controller
                         if (!$request->user()->hasRole($role)) {
                             throw new \Exception('User is not student');
                         } else {
-                            //check if user is already student of class
+                            //check if user is already student of class.js
                             if ($class->students->contains($request->user())) {
-                                throw new \Exception('User is already student of class');
+                                throw new \Exception('User is already student of class.js');
                             } else {
-                                //add user to class
+                                //add user to class.js
                                 $class->students()->attach($request->user());
                                 // Return json
                                 return response()->json([
@@ -265,17 +265,17 @@ class ClassController extends Controller
     public function destroy(Request $request, $id)
     {
         try {
-            //request input type delete class or delete student and teacher in class
+            //request input type delete class.js or delete student and teacher in class.js
             $request->validate([
                 'type' => 'required|in:delete_class,delete_teacher,delete_student',
             ]);
             if ($this->checkPermiss($id) == false) {
-                throw new \Exception('You do not have permission to delete this class');
+                throw new \Exception('You do not have permission to delete this class.js');
             } else {
                 //switch case check type
                 switch ($request->type) {
                     case 'delete_class':
-                        //delete class by id
+                        //delete class.js by id
                         $class = Classes::find($id);
                         if ($class) {
                             $class->delete();
@@ -293,12 +293,12 @@ class ClassController extends Controller
                         }
                         break;
                     case 'delete_teacher':
-                        //delete teacher by user_id in class by id
+                        //delete teacher by user_id in class.js by id
                         $class = Classes::find($id);
                         if ($class) {
-                            //check if user not exist 
+                            //check if user not exist
                             if (!$class->teachers->contains($request->user()) && !$class->students->contains($request->user())) {
-                                throw new \Exception('User not exist in class');
+                                throw new \Exception('User not exist in class.js');
                             }
                             $class->teachers()->detach($request->user());
                             return response()->json([
@@ -315,7 +315,7 @@ class ClassController extends Controller
                         }
                         break;
                     case 'delete_student':
-                        //delete student in class by id
+                        //delete student in class.js by id
                         $class = Classes::find($id);
                         if ($class) {
                             $class->students()->detach($request->user());

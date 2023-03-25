@@ -53,7 +53,7 @@
         </div>
         <div class="col-lg-2 col-md-2 col-4"><argon-button class="w-100">Test</argon-button></div>
     </div>
-    <!-- <h5 class="mt-4">Number of terms in this lesson: {{ cardsCount.totalCards }}</h5> -->
+    <!-- <h5 class.js="mt-4">Number of terms in this lesson: {{ cardsCount.totalCards }}</h5> -->
     <div class="mt-4" v-if="relearns">
         <h6>Relearn: {{ relearns.length }}</h6>
         <div class="row mt-4">

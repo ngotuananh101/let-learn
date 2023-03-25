@@ -73,21 +73,25 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::resource('user', AdminUserController::class);
         Route::resource('role', AdminRoleController::class);
         Route::resource('school', AdminSchoolController::class);
-        //Route::resource('class', AdminClassController::class);
+        //Route::resource('class.js', AdminClassController::class.js);
     })->middleware(['permissions:admin.dashboard']);
 
     // Route for school
 //    Route::prefix('school')->group(function () {
-//        Route::resource('user', ManagerUserController::class)->only(['index', 'store']);
-//        Route::resource('class', ManagerClassController::class);
-//        Route::resource('school', ManagerSchoolController::class)->only(['show', 'update']);
-//        Route::resource('lesson', ManagerSetController::class);
-//        Route::resource('folder', ManagerFolderController::class);
+//        Route::resource('user', ManagerUserController::class.js)->only(['index', 'store']);
+//        Route::resource('class.js', ManagerClassController::class.js);
+//        Route::resource('school', ManagerSchoolController::class.js)->only(['show', 'update']);
+//        Route::resource('lesson', ManagerSetController::class.js);
+//        Route::resource('folder', ManagerFolderController::class.js);
 //    })->middleware(['permissions:manager.dashboard']);
 
     // Route lesson
     Route::prefix('lesson')->group(function () {
         Route::post('/quiz', [QuizController::class, 'store']);
+        Route::get('/quiz/{id}', [QuizController::class, 'show']);
+        Route::put('/quiz/{id}', [QuizController::class, 'update']);
+        Route::delete('/quiz/{id}', [QuizController::class, 'destroy']);
+        Route::get('/quiz/export/{id}/', [QuizController::class, 'exportToExcel']);
         Route::get('/learn/{id}', [LessonController::class, 'learn']);
         Route::post('/', [LessonController::class, 'store']);
         Route::get('/{id}', [LessonController::class, 'show']);

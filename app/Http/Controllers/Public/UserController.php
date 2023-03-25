@@ -357,8 +357,8 @@ class UserController extends Controller
                 case 'learned':
                     $request->validate([
                         'lesson_id' => 'required|integer',
-                        'learned' => 'required|string',
-                        'relearn' => 'required|string',
+                        'learned' => 'required|array',
+                        'relearn' => 'required|array',
                     ]);
                     //update learned and relearn of user
                     $user = $request->user();
@@ -370,11 +370,11 @@ class UserController extends Controller
                         //get id of relearn lesson details
                         $relearn = $learn ? explode(',', $learn->relearn) : [];
                         //add new learned lesson detail to learned
-                        $learned = array_merge($learned, explode(',', $request->learned));
+                        $learned = array_merge($learned,$request->learned);
                         //remove learned lesson detail from relearn
-                        $relearn = array_diff($relearn, explode(',', $request->learned));
+                        $relearn = array_diff($relearn, $request->learned);
                         //add new relearn lesson detail to relearn
-                        $relearn = array_merge($relearn, explode(',', $request->relearn));
+                        $relearn = array_merge($relearn, $request->relearn);
                         //remove duplicate learned and relearn
                         $learned = array_unique($learned);
                         $relearn = array_unique($relearn);
@@ -393,9 +393,13 @@ class UserController extends Controller
                         $learn->relearn = $request->relearn;
                         $learn->save();
                     }
+                    //count learned from learn
                     return response()->json([
-                        'user' => $learn,
-                        'message' => 'Update learned and relearn of user successfully',
+                        'progress' => [
+                            'learned' => count(explode(',', $learn->learned)),
+                            'total' => LessonDetail::where('lesson_id', $request->lesson_id)->count(),
+                        ],
+                        'message' => 'Update learn progress successfully',
                         'status' => 200
                     ], 200);
                     break;

@@ -3,9 +3,9 @@ FullCalendar v5.6.0
 Docs & License: https://fullcalendar.io/
 (c) 2020 Adam Shaw
 */
-/* classes attached to <body> */
+/* class.js attached to <body> */
 
-/* classes attached to <body> */
+/* class.js attached to <body> */
 
 .fc-not-allowed,
 .fc-not-allowed .fc-event { /* override events' custom cursors */
@@ -136,7 +136,7 @@ Docs & License: https://fullcalendar.io/
 Lots taken from Flatly (MIT): https://bootswatch.com/4/flatly/bootstrap.css
 
 These styles only apply when the standard-theme is activated.
-When it's NOT activated, the fc-button classes won't even be in the DOM.
+When it's NOT activated, the fc-button class.js won't even be in the DOM.
 */
 .fc {
 

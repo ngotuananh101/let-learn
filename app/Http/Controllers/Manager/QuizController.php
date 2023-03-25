@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Public;
+namespace App\Http\Controllers\Manager;
 
 use App\Exports\ExportAnswerData;
 use App\Exports\ExportQuizData;

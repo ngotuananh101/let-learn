@@ -29,6 +29,16 @@ export default {
         },
         getLearn({commit}, id) {
             return learnService.getLearn(id);
+        },
+        updateResult({commit}, data) {
+            return learnService.updateResult(data)
+                .then(data => {
+                        return data;
+                    },
+                    error => {
+                        return null;
+                    }
+                );
         }
     },
     getters: {
