@@ -16,7 +16,8 @@
                                                  class="mb-0 btn bg-gradient-success btn-sm">+&nbsp;
                                         New Lesson
                                     </router-link>
-                                    <button type="button" class="mx-1 mb-0 btn btn-outline-success btn-sm" @click="this.modal_import.show()">
+                                    <button type="button" class="mx-1 mb-0 btn btn-outline-success btn-sm"
+                                            @click="this.modal_import.show()">
                                         Import
                                     </button>
                                 </div>
@@ -54,7 +55,8 @@
                             <span class="text-start fs-6 fw-bold float-start">Choose an option</span>
                         </div>
                         <div class="col-6">
-                            <span class="text-end fs-6 fw-bold float-end" data-bs-dismiss="modal"><i class="fa-regular fa-circle-xmark"></i></span>
+                            <span class="text-end fs-6 fw-bold float-end" data-bs-dismiss="modal"><i
+                                class="fa-regular fa-circle-xmark"></i></span>
                         </div>
                     </div>
                     <div class="row mt-3">
@@ -110,7 +112,9 @@
                             Import from text
                         </argon-switch>
                         <div v-if="this.importType === 'file'">
-                            <p>Import set from csv, xls, xlsx file ( <a href="https://s3-hcm-r1.longvan.net/19403879-letlearn/template/lesson_template.xlsx" target="_blank">Template</a> )</p>
+                            <p>Import set from csv, xls, xlsx file ( <a
+                                href="https://s3-hcm-r1.longvan.net/19403879-letlearn/template/lesson_template.xlsx"
+                                target="_blank">Template</a> )</p>
                             <input type="file" placeholder="Browse file..." class="mb-3 form-control"
                                    accept=".csv, .xls, .xlsx" name="file"/>
                         </div>
@@ -213,8 +217,8 @@ export default {
     },
     beforeUnmount() {
         this.table.destroy(true);
-        this.modal_option.dispose();
-        this.modal_import.dispose();
+        // this.modal_option.dispose();
+        // this.modal_import.dispose();
     },
     methods: {
         switchImport() {
@@ -242,14 +246,14 @@ export default {
             }
             if (new_lesson_id !== 0) {
                 new_lesson_id.then((res) => {
-                    if(res !== 0){
+                    if (res !== 0) {
                         this.modal_import.hide();
                         this.$root.$data.snackbar = {
                             color: 'success',
                             message: 'Imported successfully',
                         };
                         this.$router.push({name: 'admin.lesson.edit', params: {id: res}});
-                    }else{
+                    } else {
                         this.$root.$data.snackbar = {
                             color: 'danger',
                             message: 'Imported failed',
@@ -290,13 +294,13 @@ export default {
                         message: 'Deleting...',
                     };
                     this.$store.dispatch('adminLesson/deleteLesson', id).then((res) => {
-                        if(res){
+                        if (res) {
                             this.table.rows({selected: true}).remove().draw();
                             this.$root.$data.snackbar = {
                                 color: 'success',
                                 message: 'Deleted successfully',
                             };
-                        }else{
+                        } else {
                             this.$root.$data.snackbar = {
                                 color: 'danger',
                                 message: 'Something went wrong',

@@ -96,6 +96,10 @@ export default {
             delete_id: []
         }
     },
+    title() {
+        let name = this.data ? this.data.lesson.name : 'Lesson';
+        return 'Edit ' + name + '  - ' + document.querySelector('meta[name="title"]').getAttribute('content');
+    },
     beforeMount() {
         this.$store.dispatch('adminLesson/getLesson', this.lesson_id).then((res) => {
             this.data = res;
