@@ -214,6 +214,7 @@ export default {
     beforeUnmount() {
         this.table.destroy(true);
         this.modal_option.dispose();
+        this.modal_import.dispose();
     },
     methods: {
         switchImport() {

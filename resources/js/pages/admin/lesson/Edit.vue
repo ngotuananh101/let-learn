@@ -55,7 +55,7 @@
                             </div>
                             <div class="col-12">
                                 <argon-button color="secondary" variant="gradient" full-width
-                                              class="my-2 py-4 btn-lg fs-6" @click="this.addSetCard">Add Card
+                                              class="my-2 py-4 btn-lg fs-6" @click="this.addCard">Add Card
                                 </argon-button>
                             </div>
                             <div class="col-xl-3 col-lg-4 col-sm-5">
@@ -107,7 +107,7 @@ export default {
         });
     },
     methods: {
-        addSetCard() {
+        addCard() {
             // add new card
             this.children = markRaw([...this.children, SetCard]);
             this.count++;
