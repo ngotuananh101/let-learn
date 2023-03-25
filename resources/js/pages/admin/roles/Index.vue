@@ -3,7 +3,7 @@
         <div class="row mb-5">
             <div class="col-lg-3">
                 <div class="card position-sticky top-1 mt-4">
-                    <button v-if="checkPermission('admin.roles.create')" type="button"
+                    <button type="button"
                             class="mx-3 mb-0 mt-3 btn btn-outline-success" @click="showFormAddRole">
                         + New Role
                     </button>

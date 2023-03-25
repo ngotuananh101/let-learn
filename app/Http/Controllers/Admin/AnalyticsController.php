@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers\Admin;
 
-use AkkiIo\LaravelGoogleAnalytics\Exceptions\InvalidPeriod;
 use App\Http\Controllers\Controller;
 use App\Models\Classes;
 use App\Models\Course;
@@ -58,119 +57,140 @@ class AnalyticsController extends Controller
     /**
      * Get average session duration
      * @return array
-     * @throws InvalidPeriod
      */
     private function getAverageSessionDuration(): array
     {
-        // load data from cache if exists
-        if (cache()->has('averageSessionDuration')) {
-            return cache()->get('averageSessionDuration');
+        try {
+            // load data from cache if exists
+            if (cache()->has('averageSessionDuration')) {
+                return cache()->get('averageSessionDuration');
+            }
+            $averageSessionDuration = LaravelGoogleAnalytics::dateRanges(Period::create(Carbon::today()->subDays(30), Carbon::today()))
+                ->metrics('averageSessionDuration')
+                ->dimensions('year', 'month', 'day')
+                ->orderByDimension('year', 'ASC')
+                ->orderByDimension('month', 'ASC')
+                ->orderByDimension('day', 'ASC')
+                ->get();
+            // save data to cache
+            cache()->put('averageSessionDuration', $averageSessionDuration->table, 60 * 60 * 24);
+            return $averageSessionDuration->table;
+        } catch (\Throwable $th) {
+            return [];
         }
-        $averageSessionDuration = LaravelGoogleAnalytics::dateRanges(Period::create(Carbon::today()->subDays(30), Carbon::today()))
-            ->metrics('averageSessionDuration')
-            ->dimensions('year', 'month', 'day')
-            ->orderByDimension('year', 'ASC')
-            ->orderByDimension('month', 'ASC')
-            ->orderByDimension('day', 'ASC')
-            ->get();
-        // save data to cache
-        cache()->put('averageSessionDuration', $averageSessionDuration->table, 60 * 60 * 24);
-        return $averageSessionDuration->table;
     }
 
     /**
      * Get browser and country by sessions
      * @return array
-     * @throws InvalidPeriod
      */
     private function getBrowserAndCountry(): array
     {
-        // load data from cache if exists
-        if (cache()->has('browserAndCountry')) {
-            return cache()->get('browserAndCountry');
+        try {
+            // load data from cache if exists
+            if (cache()->has('browserAndCountry')) {
+                return cache()->get('browserAndCountry');
+            }
+            $sessions = LaravelGoogleAnalytics::dateRanges(Period::create(Carbon::today()->subDays(30), Carbon::today()))
+                ->metrics('sessions')
+                ->dimensions('browser', 'countryId')
+                ->get()->table;
+            $browsers = $countries = [];
+            foreach ($sessions as $session) {
+                $browsers[$session['browser']] = ($browsers[$session['browser']] ?? 0) + $session['sessions'];
+                $countries[$session['countryId']] = ($countries[$session['countryId']] ?? 0) + $session['sessions'];
+            }
+            arsort($browsers);
+            arsort($countries);
+            // save data to cache
+            cache()->put('browserAndCountry', [
+                'browser' => array_slice($browsers, 0, 5),
+                'country' => array_slice($countries, 0, 5),
+            ], 60 * 60 * 24);
+            return [
+                'browser' => array_slice($browsers, 0, 5),
+                'country' => array_slice($countries, 0, 5),
+            ];
+        } catch (\Throwable $th) {
+            return [
+                'browser' => [],
+                'country' => [],
+            ];
         }
-        $sessions = LaravelGoogleAnalytics::dateRanges(Period::create(Carbon::today()->subDays(30), Carbon::today()))
-            ->metrics('sessions')
-            ->dimensions('browser', 'country')
-            ->get()->table;
-        $browsers = $countries = [];
-        foreach ($sessions as $session) {
-            $browsers[$session['browser']] = ($browsers[$session['browser']] ?? 0) + $session['sessions'];
-            $countries[$session['country']] = ($countries[$session['country']] ?? 0) + $session['sessions'];
-        }
-        arsort($browsers);
-        arsort($countries);
-        // save data to cache
-        cache()->put('browserAndCountry', [
-            'browser' => array_slice($browsers, 0, 5),
-            'country' => array_slice($countries, 0, 5),
-        ], 60 * 60 * 24);
-        return [
-            'browser' => array_slice($browsers, 0, 5),
-            'country' => array_slice($countries, 0, 5),
-        ];
     }
 
     /**
      * Compare this week with last week by page views
      * @return array
-     * @throws InvalidPeriod
      */
     private function compareWeek(): array
     {
-        // load data from cache if exists
-        if (cache()->has('compareWeek')) {
-            return cache()->get('compareWeek');
-        }
-        $lastWeek = LaravelGoogleAnalytics::dateRanges(Period::create(Carbon::today()->subDays(14), Carbon::today()->subDays(7)))
-            ->metrics('screenPageViews')
-            ->dimensions('dayOfWeek')
-            ->get()->table;
+        try {
+            // load data from cache if exists
+            if (cache()->has('compareWeek')) {
+                return cache()->get('compareWeek');
+            }
+            $lastWeek = LaravelGoogleAnalytics::dateRanges(Period::create(Carbon::today()->subDays(14), Carbon::today()->subDays(7)))
+                ->metrics('screenPageViews')
+                ->dimensions('dayOfWeek')
+                ->get()->table;
 
-        $thisWeek = LaravelGoogleAnalytics::dateRanges(Period::create(Carbon::today()->subDays(7), Carbon::today()))
-            ->metrics('screenPageViews')
-            ->dimensions('dayOfWeek')
-            ->get()->table;
-        // save data to cache
-        cache()->put('compareWeek', [
-            'lastWeek' => $lastWeek,
-            'thisWeek' => $thisWeek,
-        ], 60 * 60 * 24);
-        return [
-            'lastWeek' => $lastWeek,
-            'thisWeek' => $thisWeek,
-        ];
+            $thisWeek = LaravelGoogleAnalytics::dateRanges(Period::create(Carbon::today()->subDays(7), Carbon::today()))
+                ->metrics('screenPageViews')
+                ->dimensions('dayOfWeek')
+                ->get()->table;
+            // save data to cache
+            cache()->put('compareWeek', [
+                'lastWeek' => $lastWeek,
+                'thisWeek' => $thisWeek,
+            ], 60 * 60 * 24);
+            return [
+                'lastWeek' => $lastWeek,
+                'thisWeek' => $thisWeek,
+            ];
+        } catch (\Throwable $th) {
+            return [
+                'lastWeek' => [],
+                'thisWeek' => [],
+            ];
+        }
     }
 
     /**
      * Compare this week with last week by event count
      * @return array
-     * @throws InvalidPeriod
      */
     private function compareWeekByEvent(): array
     {
-        // load data from cache if exists
-        if (cache()->has('compareWeekByEvent')) {
-            return cache()->get('compareWeekByEvent');
-        }
-        $lastWeek = LaravelGoogleAnalytics::dateRanges(Period::create(Carbon::today()->subDays(14), Carbon::today()->subDays(7)))
-            ->metrics('eventCount')
-            ->dimensions('dayOfWeek')
-            ->get()->table;
+        try {
+            // load data from cache if exists
+            if (cache()->has('compareWeekByEvent')) {
+                return cache()->get('compareWeekByEvent');
+            }
+            $lastWeek = LaravelGoogleAnalytics::dateRanges(Period::create(Carbon::today()->subDays(14), Carbon::today()->subDays(7)))
+                ->metrics('eventCount')
+                ->dimensions('dayOfWeek')
+                ->get()->table;
 
-        $thisWeek = LaravelGoogleAnalytics::dateRanges(Period::create(Carbon::today()->subDays(7), Carbon::today()))
-            ->metrics('eventCount')
-            ->dimensions('dayOfWeek')
-            ->get()->table;
-        // save data to cache
-        cache()->put('compareWeekByEvent', [
-            'lastWeek' => $lastWeek,
-            'thisWeek' => $thisWeek,
-        ], 60 * 60 * 24);
-        return [
-            'lastWeek' => $lastWeek,
-            'thisWeek' => $thisWeek,
-        ];
+            $thisWeek = LaravelGoogleAnalytics::dateRanges(Period::create(Carbon::today()->subDays(7), Carbon::today()))
+                ->metrics('eventCount')
+                ->dimensions('dayOfWeek')
+                ->get()->table;
+            // save data to cache
+            cache()->put('compareWeekByEvent', [
+                'lastWeek' => $lastWeek,
+                'thisWeek' => $thisWeek,
+            ], 60 * 60 * 24);
+            return [
+                'lastWeek' => $lastWeek,
+                'thisWeek' => $thisWeek,
+            ];
+        } catch (\Throwable $th) {
+            return [
+                'lastWeek' => [],
+                'thisWeek' => [],
+            ];
+        }
     }
 
     /**
@@ -179,30 +199,51 @@ class AnalyticsController extends Controller
      */
     public function getLocalAnalytics(): array
     {
-//         load data from cache if exists
-//        if (cache()->has('localAnalytics')) {
-//            return cache()->get('localAnalytics');
-//        }
-        $local = [
-            'users' => [
-                'total' => User::all()->count(),
-                'change' => User::whereDate('created_at', Carbon::today())->count() - User::whereDate('created_at', Carbon::today()->subDays(1))->count(),
-            ],
-            'lessons' => [
-                'total' => Lesson::all()->count(),
-                'change' => Lesson::whereDate('created_at', Carbon::today())->count() - Lesson::whereDate('created_at', Carbon::today()->subDays(1))->count(),
-            ],
-            'courses' => [
-                'total' => Course::all()->count(),
-                'change' => Course::whereDate('created_at', Carbon::today())->count() - Course::whereDate('created_at', Carbon::today()->subDays(1))->count(),
-            ],
-            'class.js' => [
-                'total' => Classes::all()->count(),
-                'change' => Classes::whereDate('created_at', Carbon::today())->count() - Classes::whereDate('created_at', Carbon::today()->subDays(1))->count(),
-            ],
-        ];
-        // save data to cache
-        cache()->put('localAnalytics', $local, 60 * 60 * 24);
-        return $local;
+        try {
+            // load data from cache if exists
+            if (cache()->has('localAnalytics')) {
+                return cache()->get('localAnalytics');
+            }
+            $local = [
+                'users' => [
+                    'total' => User::all()->count(),
+                    'change' => User::whereDate('created_at', Carbon::today())->count() - User::whereDate('created_at', Carbon::today()->subDays(1))->count(),
+                ],
+                'lessons' => [
+                    'total' => Lesson::all()->count(),
+                    'change' => Lesson::whereDate('created_at', Carbon::today())->count() - Lesson::whereDate('created_at', Carbon::today()->subDays(1))->count(),
+                ],
+                'courses' => [
+                    'total' => Course::all()->count(),
+                    'change' => Course::whereDate('created_at', Carbon::today())->count() - Course::whereDate('created_at', Carbon::today()->subDays(1))->count(),
+                ],
+                'classes' => [
+                    'total' => Classes::all()->count(),
+                    'change' => Classes::whereDate('created_at', Carbon::today())->count() - Classes::whereDate('created_at', Carbon::today()->subDays(1))->count(),
+                ],
+            ];
+            // save data to cache
+            cache()->put('localAnalytics', $local, 60 * 60 * 24);
+            return $local;
+        } catch (\Throwable $th) {
+            return [
+                'users' => [
+                    'total' => 0,
+                    'change' => 0,
+                ],
+                'lessons' => [
+                    'total' => 0,
+                    'change' => 0,
+                ],
+                'courses' => [
+                    'total' => 0,
+                    'change' => 0,
+                ],
+                'classes' => [
+                    'total' => 0,
+                    'change' => 0,
+                ],
+            ];
+        }
     }
 }

@@ -1,4 +1,4 @@
-import {adminSetService} from '../../../services/admin/lesson.service';
+import {adminLessonService} from '../../../services/admin/lesson.service';
 import overlay from '../../../overlay';
 
 let state = {
@@ -25,7 +25,7 @@ export default {
     actions: {
         index({commit}) {
             commit('indexRequest');
-            adminSetService.index()
+            adminLessonService.index()
                 .then(
                     lessons => {
                         commit('indexSuccess', lessons);
@@ -36,63 +36,43 @@ export default {
                 );
         },
         create({dispatch}, data) {
-            adminSetService.create(data)
+            return adminLessonService.create(data)
                 .then(
-                    sets => {
-                        dispatch('alert/success', 'Lesson created', {root: true});
-                        dispatch('index');
+                    response => {
+                        return response.id;
                     },
                     error => {
-                        dispatch('alert/error', error, {root: true});
+                        return 0;
                     }
                 );
         },
-        importSet({dispatch}, data) {
-            dispatch('alert/info', 'Lesson importing', {root: true});
-            overlay();
-            adminSetService.importSet(data)
+        importLesson({dispatch}, data) {
+            return adminLessonService.importLesson(data)
                 .then(
-                    sets => {
-                        dispatch('alert/success', 'Lesson imported', {root: true});
+                    res => {
+                        return res.id;
                     },
                     error => {
-                        dispatch('alert/error', error, {root: true});
-                    }
-                ).then(() => {
-                    overlay();
-                }
-            );
-        },
-        deleteSet({dispatch}, id) {
-            adminSetService.deleteSet(id)
-                .then(
-                    sets => {
-                        dispatch('alert/success', 'Lesson deleted', {root: true});
-                        dispatch('index');
-                    },
-                    error => {
-                        dispatch('alert/error', error, {root: true});
+                        return 0;
                     }
                 );
         },
-        exportSet({dispatch}, id) {
-            dispatch('alert/info', 'Lesson exporting', {root: true});
-            overlay();
-            adminSetService.exportSet(id)
+        deleteLesson({dispatch}, id) {
+            return adminLessonService.deleteLesson(id)
                 .then(
-                    sets => {
-                        dispatch('alert/success', 'Lesson exported', {root: true});
+                    response => {
+                        return true;
                     },
                     error => {
-                        dispatch('alert/error', error, {root: true});
+                        return false;
                     }
-                ).then(() => {
-                    overlay();
-                }
-            );
+                );
         },
-        getSet({dispatch}, id) {
-            return adminSetService.getSet(id)
+        exportLesson({dispatch}, id) {
+            return adminLessonService.exportLesson(id);
+        },
+        getLesson({dispatch}, id) {
+            return adminLessonService.getLesson(id)
                 .then(
                     sets => {
                         return sets;
@@ -104,15 +84,15 @@ export default {
                     }
                 );
         },
-        updateSet({dispatch}, data) {
-            adminSetService.updateSet(data)
+        updateLesson({dispatch}, data) {
+            return adminLessonService.updateLesson(data)
                 .then(
-                    sets => {
-                        dispatch('alert/success', 'Lesson updated', {root: true});
+                    response => {
                         dispatch('index');
+                        return true;
                     },
                     error => {
-                        dispatch('alert/error', error, {root: true});
+                        return false;
                     }
                 );
         }
