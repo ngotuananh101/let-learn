@@ -36,14 +36,13 @@ export default {
                 );
         },
         create({dispatch}, data) {
-            adminLessonService.create(data)
+            return adminLessonService.create(data)
                 .then(
-                    sets => {
-                        dispatch('alert/success', 'Lesson created', {root: true});
-                        dispatch('index');
+                    response => {
+                        return response.id;
                     },
                     error => {
-                        dispatch('alert/error', error, {root: true});
+                        return 0;
                     }
                 );
         },

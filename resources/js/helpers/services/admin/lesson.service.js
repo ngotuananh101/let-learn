@@ -22,7 +22,7 @@ function index() {
 
 function create(data) {
     data.type = 'general';
-    return fetch(`${config.apiUrl}/admin/set`, {
+    return fetch(`${config.apiUrl}/admin/lesson`, {
         method: 'POST',
         headers: authHeader(),
         body: JSON.stringify(data)

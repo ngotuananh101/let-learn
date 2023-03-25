@@ -8,9 +8,6 @@
                         <h5 class="mb-0">Add New Lesson</h5>
                     </div>
                     <div class="card-body">
-                        <label class="form-label mt-2 fs-6">Name</label>
-                        <argon-input id="name" type="text" name="name"
-                                     placeholder="Enter a name. Example:'MAE Chapter 1' "/>
                         <div class="row">
                             <div class="col-md-4 col-12">
                                 <label class="form-label mt-2 fs-6">Name</label>
@@ -83,24 +80,38 @@ export default {
         createLesson() {
             let name = document.getElementById('name').value;
             let description = document.getElementById('description').value;
-            let setDetail = [];
+            let detail = [];
             for (let i = 1; i <= this.count; i++) {
                 let card = document.getElementById('card' + i);
                 let term = card.getElementsByClassName('term')[0].value;
                 let definition = card.getElementsByClassName('definition')[0].value;
                 if (term !== '' && definition !== '') {
-                    setDetail.push({term: term, definition: definition});
+                    detail.push({term: term, definition: definition});
                 }
             }
-            if (name === '' || description === '' || setDetail.length < 3) {
-                alert('Please fill all fields and add at least 3 cards');
+            if (name === '' || description === '' || detail.length < 3) {
+                this.$root.$data.snackbar = {
+                    color: 'warning',
+                    message: 'Please fill in all fields and add at least 3 cards.',
+                };
             } else {
-                this.$store.dispatch('adminSet/create', {
+                this.$store.dispatch('adminLesson/create', {
                     name: name,
                     description: description,
-                    detail: setDetail
-                }).then(() => {
-                    this.$router.push({name: 'admin.lesson.list'});
+                    detail: detail
+                }).then((res) => {
+                    if(res !== 0){
+                        this.$root.$data.snackbar = {
+                            color: 'success',
+                            message: 'Lesson created successfully',
+                        };
+                        this.$router.push({name: 'admin.lesson.edit', params: {id: res}});
+                    }else{
+                        this.$root.$data.snackbar = {
+                            color: 'danger',
+                            message: 'Something went wrong. Please try again.',
+                        };
+                    }
                 });
             }
         }
