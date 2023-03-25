@@ -3,7 +3,7 @@ const home = [
         path: '/',
         name: 'home',
         component: () => import('../../layouts/Home.vue'),
-        redirect: {name: 'home.index'},
+        redirect: { name: 'home.index' },
         children: [
             {
                 path: '',
@@ -11,14 +11,39 @@ const home = [
                 component: () => import('../../pages/home/Index.vue'),
             },
             {
-                path: 'l/:id',
-                name: 'home.lesson.index',
-                component: () => import('../../pages/home/lesson/Lesson.vue'),
+                path: 'lesson',
+                children: [
+                    {
+                        path: ':id',
+                        name: 'home.lesson.index',
+                        component: () => import('../../pages/home/lesson/Lesson.vue'),
+                    },
+                    {
+                        path: ':id/edit',
+                        name: 'home.lesson.edit',
+                        component: () => import('../../pages/home/lesson/Edit.vue'),
+                    },
+                    {
+                        path: 'l/add',
+                        name: 'home.lesson.add',
+                        component: () => import('../../pages/home/lesson/Add.vue'),
+                    },
+                ],
             },
             {
-                path: 'c/:id',
-                name: 'home.course.index',
-                component: () => import('../../pages/home/course/Course.vue'),
+                path: 'course',
+                children: [
+                    {
+                        path: ':id',
+                        name: 'home.course.index',
+                        component: () => import('../../pages/home/course/Course.vue'),
+                    },
+                    {
+                        path: ':id/edit',
+                        name: 'home.course.edit',
+                        component: () => import('../../pages/home/course/Edit.vue'),
+                    },
+                ],
             },
             {
                 path: 'photoshop',
