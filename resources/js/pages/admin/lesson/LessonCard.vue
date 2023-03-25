@@ -10,6 +10,7 @@
         </div>
         <div class="rounded-bottom pt-2 p-3 bg-light" :id="'card'+title">
             <div class="row">
+                <input type="hidden" class="id" :value="data ? data.id : '0'">
                 <div class="col-4">
                     <label>Term</label>
                     <textarea class="form-control fs-6 term" rows="6">{{ data ? data.term : '' }}</textarea>
@@ -41,7 +42,10 @@ export default {
     methods: {
         // remove this card
         remove() {
-            this.$emit('remove', this.title);
+            this.$emit('remove', {
+                index: this.title,
+                id: this.data ? this.data.id : 0,
+            });
         },
     },
 };

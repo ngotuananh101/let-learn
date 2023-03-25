@@ -128,7 +128,7 @@
                         />
                     </div>
                     <div class="mt-4 col-lg-5 col-md-12 mt-lg-0">
-                        <default-doughnut-chart
+                        <doughnut-chart
                             v-if="this.analytics.browser"
                             id="top-browsers"
                             title="Top Browsers"
@@ -164,7 +164,7 @@
                         />
                     </div>
                     <div class="mt-4 col-lg-5 col-md-12 mt-lg-0">
-                        <default-doughnut-chart
+                        <doughnut-chart
                             v-if="this.analytics.country"
                             id="top-countries"
                             title="Top Countries"
@@ -183,8 +183,9 @@ import MiniStatisticsCard from "@/components/Cards/MiniStatisticsCard.vue";
 import GradientLineChart from "@/components/Charts/GradientLineChart.vue";
 import Carousel from "@/components/Carousel.vue";
 import StatsChart from "@/components/Charts/StatsChart.vue";
-import DefaultDoughnutChart from "@/components/Charts/DefaultDoughnutChart.vue";
+import DoughnutChart from "@/components/Charts/CountryAndBrowser.vue";
 import {mapActions, mapState} from "vuex";
+import overlay from "@/helpers/overlay";
 
 export default {
     name: "AdminDashboard",
@@ -193,7 +194,7 @@ export default {
         GradientLineChart,
         Carousel,
         StatsChart,
-        DefaultDoughnutChart,
+        DoughnutChart,
     },
     data() {
         return {
@@ -204,8 +205,11 @@ export default {
         return 'Admin Dashboard' + ' - ' + document.querySelector('meta[name="title"]').getAttribute('content');
     },
     beforeCreate() {
+        overlay();
         this.$store.dispatch('dashboard/getQuotes');
-        this.$store.dispatch('dashboard/getAnalytics');
+        this.$store.dispatch('dashboard/getAnalytics').then(() => {
+            overlay();
+        });
     },
     methods: {},
     computed: {

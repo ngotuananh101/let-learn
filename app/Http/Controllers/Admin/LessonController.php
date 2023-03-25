@@ -75,124 +75,115 @@ class LessonController extends Controller
                 'term_separator' => 'required_if:type,text|string',
                 'file' => 'required_if:type,file|file|mimes:xls,xlsx,csv',
             ]);
-            $set = auth()->user()->sets()->create([
+            $lesson = auth()->user()->lesson()->create([
                 'name' => $request->name,
                 'description' => $request->description,
-                'password' => $request->password,
+                'password' => null,
+                'is_public' => true,
             ]);
-            switch ($request->type) {
-                case 'general':
-                    $details = $request->detail;
-                    // request have more or equal 3 details
-                    if (count($details) >= 3) {
-                        // add lesson detail
-                        $set->setDetails()->createMany($details);
-                    } else {
-                        // delete lesson
-                        $set->delete();
-                        return response()->json([
-                            'status' => 'error',
-                            'status_code' => 400,
-                            'message' => 'Lesson must have more or equal 3 details'
-                        ], 400);
-                    }
-                    break;
-                case 'text':
-                    $raw_detail = explode($request->detail_separator, $request->raw_data);
-                    foreach ($raw_detail as $item) {
-                        try {
-                            $raw = explode($request->term_separator, $item);
-                            $term = $raw[0];
-                            $definition = $raw[1];
-                            $set->setDetails()->create([
-                                'term' => $term,
-                                'definition' => $definition
-                            ]);
-                        } catch (\Throwable $th) {
-                            continue;
+            try {
+                switch ($request->type) {
+                    case 'general':
+                        $details = $request->detail;
+                        // request have more or equal 3 details
+                        if (count($details) >= 3) {
+                            // add lesson detail
+                            $lesson->lessonDetail()->createMany($details);
+                        } else {
+                            // throw error
+                            throw new \Exception('Lesson must have more or equal 3 details');
                         }
-                    }
-                    break;
-                case 'file':
-                    $file = $request->file('file');
-                    $file_extension = $file->getClientOriginalExtension();
-                    if ($file_extension == 'xls' || $file_extension == 'xlsx') {
-                        $data = Excel::toArray((object)[], $file);
-                        // check data have more than 4 rows
-                        if (count($data[0]) > 4) {
-                            // check data have more than 2 columns
-                            if (count($data[0][0]) > 2) {
-                                foreach ($data[0] as $key => $item) {
-                                    if ($key >= 1) {
-                                        $set->setDetails()->create([
-                                            'term' => $item[1],
-                                            'definition' => $item[2]
-                                        ]);
+                        break;
+                    case 'text':
+                        $raw_detail = explode($request->detail_separator, $request->raw_data);
+                        if(count($raw_detail) < 3) {
+                            throw new \Exception('Lesson must have more or equal 3 details');
+                        }
+                        foreach ($raw_detail as $item) {
+                            try {
+                                $raw = explode($request->term_separator, $item);
+                                $term = $raw[0];
+                                $definition = $raw[1];
+                                $lesson->lessonDetail()->create([
+                                    'term' => $term,
+                                    'definition' => $definition
+                                ]);
+                            } catch (\Throwable $th) {
+                                continue;
+                            }
+                        }
+                        break;
+                    case 'file':
+                        $file = $request->file('file');
+                        $file_extension = $file->getClientOriginalExtension();
+                        if ($file_extension == 'xls' || $file_extension == 'xlsx') {
+                            $data = Excel::toArray((object)[], $file);
+                            // check data have more than 4 rows
+                            if (count($data[0]) > 4) {
+                                // check data have more than 2 columns
+                                if (count($data[0][0]) > 2) {
+                                    foreach ($data[0] as $key => $item) {
+                                        if ($key >= 2) {
+                                            $lesson->lessonDetail()->create([
+                                                'term' => $item[1],
+                                                'definition' => $item[2]
+                                            ]);
+                                        }
                                     }
+                                } else {
+                                    // throw error
+                                    throw new \Exception('File must have 3 columns ( no,term, definition,... )');
                                 }
                             } else {
-                                // delete lesson
-                                $set->delete();
-                                return response()->json([
-                                    'status' => 'error',
-                                    'status_code' => 400,
-                                    'message' => 'File must have more than 2 columns'
-                                ], 400);
+                                // throw error
+                                throw new \Exception('File must have more than 5 rows');
                             }
                         } else {
-                            // delete lesson
-                            $set->delete();
-                            return response()->json([
-                                'status' => 'error',
-                                'status_code' => 400,
-                                'message' => 'File must have more than 4 rows'
-                            ], 400);
-                        }
-                    } else {
-                        $csv = array_map('str_getcsv', file($file));
-                        // check data have more than 4 rows
-                        if (count($csv) > 4) {
-                            // check data have 2 columns
-                            if (count($csv[0]) > 2) {
-                                foreach ($csv as $key => $item) {
-                                    if ($key >= 1) {
-                                        $set->setDetails()->create([
-                                            'term' => $item[1],
-                                            'definition' => $item[2]
-                                        ]);
+                            $csv = array_map('str_getcsv', file($file));
+                            // check data have more than 4 rows
+                            if (count($csv) > 4) {
+                                // check data have 2 columns
+                                if (count($csv[0]) > 2) {
+                                    foreach ($csv as $key => $item) {
+                                        if ($key >= 2) {
+                                            $lesson->lessonDetail()->create([
+                                                'term' => $item[1],
+                                                'definition' => $item[2]
+                                            ]);
+                                        }
                                     }
+                                } else {
+                                    // throw error
+                                    throw new \Exception('File must have 3 columns ( no,term, definition,... )');
                                 }
                             } else {
-                                // delete lesson
-                                $set->delete();
-                                return response()->json([
-                                    'status' => 'error',
-                                    'status_code' => 400,
-                                    'message' => 'File must have more than 2 columns ( no,term, definition,... )'
-                                ], 400);
+                                // throw error
+                                throw new \Exception('File must have more than 5 rows');
                             }
-                        } else {
-                            // delete lesson
-                            $set->delete();
-                            return response()->json([
-                                'status' => 'error',
-                                'status_code' => 400,
-                                'message' => 'File must have more than 4 rows'
-                            ], 400);
                         }
-                    }
-                    break;
-            }
+                        break;
+                }
 
-            return response()->json([
-                'status' => 'success',
-                'status_code' => 200,
-                'message' => 'Lesson created successfully'
-            ], 200);
+                return response()->json([
+                    'status' => 'success',
+                    'status_code' => 200,
+                    'message' => 'Lesson created successfully',
+                    'id' => $lesson->id
+                ], 200);
+            } catch (\Throwable $th) {
+                // delete lesson
+                $lesson->delete();
+                return response()->json([
+                    'status' => 'error',
+                    'status_code' => 400,
+                    'message' => $th->getMessage()
+                ], 400);
+            }
 
         } catch (\Throwable $th) {
             return response()->json([
-                'status' => false,
+                'status' => 'error',
+                'status_code' => 500,
                 'message' => $th->getMessage()
             ], 500);
         }
@@ -207,21 +198,25 @@ class LessonController extends Controller
     public function show(int $id)
     {
         try {
-            $set = Lesson::findOrfail($id);
-            $setData = $set->setDetails()->get()->toArray();
-            if (empty($setData)) {
+            $lesson = Lesson::findOrfail($id);
+            $lessonData = $lesson->lessonDetail()->get()->toArray();
+            if (empty($lessonData)) {
                 return response()->json([
                     'status' => false,
                     'message' => 'Lesson is empty'
                 ], 400);
             }
             // write lesson data to file
-            $file_name = 'set_' . $id . '_' . date('Ymd_His') . '.csv';
-//            $file_path = storage_path('app/public/sets/' . $file_name);
-//            $file = fopen($file_path, 'w');
+            $file_name = 'lesson_' . $id . '_' . date('Ymd_His') . '.csv';
             $file = fopen($file_name, 'w');
+            fputcsv($file, ['name', $lesson->name]);
+            fputcsv($file, ['description', $lesson->description]);
+            fputcsv($file, ['public', $lesson->public]);
+            fputcsv($file, ['password', $lesson->password]);
+            fputcsv($file, ['created_at', $lesson->created_at]);
+            fputcsv($file, ['updated_at', $lesson->updated_at]);
             fputcsv($file, ['id', 'term', 'definition', 'image', 'audio', 'video', 'status', 'created_at', 'updated_at']);
-            foreach ($setData as $line) {
+            foreach ($lessonData as $line) {
                 fputcsv($file, $line);
             }
             fclose($file);
@@ -231,7 +226,6 @@ class LessonController extends Controller
             ];
             // download file
             return response()->download($file_name, $file_name, $headers)->deleteFileAfterSend(true);
-
         } catch (\Throwable $th) {
             return response()->json([
                 'status' => false,
@@ -290,28 +284,36 @@ class LessonController extends Controller
                 'is_public' => 'required|in:1,0',
                 'password' => 'nullable|string',
                 'data' => 'required|array',
+                'data.lessonDetail' => 'required|array',
+                'data.lessonDetail.*.id' => 'required|integer',
+                'data.lessonDetail.*.term' => 'required|string',
+                'data.lessonDetail.*.definition' => 'required|string',
+                'data.delete_id' => 'nullable|array',
             ]);
-
-            $set = Lesson::findOrFail($id);
-            $set->update([
+            // find lesson by id
+            $lesson = Lesson::findOrFail($id);
+            // update lesson
+            $lesson->update([
                 'name' => $request->name,
                 'description' => $request->description,
                 'status' => $request->status,
                 'is_public' => $request->is_public,
                 'password' => $request->password,
             ]);
-
-            // delete lesson details
-            $set->setDetails()->delete();
-
-            // create lesson details
-            foreach ($request->data as $item) {
-                $set->setDetails()->create([
-                    'term' => $item['term'],
-                    'definition' => $item['definition'],
-                ]);
+            // delete lesson detail
+            if (!empty($request->data['delete_id'])) {
+                $lesson->lessonDetail()->whereIn('id', $request->data['delete_id'])->delete();
             }
-
+            // update lesson detail
+            foreach ($request->data['lessonDetail'] as $item) {
+                $lesson->lessonDetail()->updateOrCreate(
+                    ['id' => $item['id']],
+                    [
+                        'term' => $item['term'],
+                        'definition' => $item['definition'],
+                    ]
+                );
+            }
             return response()->json([
                 'status' => 'success',
                 'status_code' => 200,
@@ -335,21 +337,13 @@ class LessonController extends Controller
     {
         try {
             // delete lesson by id
-            $set = Lesson::find($id);
-            if ($set) {
-                $set->delete();
-                return response()->json([
-                    'status' => 'success',
-                    'status_code' => 200,
-                    'message' => 'Lesson deleted successfully'
-                ], 200);
-            } else {
-                return response()->json([
-                    'status' => 'error',
-                    'status_code' => 404,
-                    'message' => 'Lesson not found'
-                ], 404);
-            }
+            $set = Lesson::findOrFail($id);
+            $set->delete();
+            return response()->json([
+                'status' => 'success',
+                'status_code' => 200,
+                'message' => 'Lesson deleted successfully'
+            ], 200);
         } catch (\Throwable $th) {
             return response()->json([
                 'status' => 'error',

@@ -28,7 +28,7 @@
                                         <div class="px-2 py-1 d-flex">
                                             <div>
                                                 <img v-if="type == 'browsers'" crossorigin="anonymous" :src="`https://raw.githubusercontent.com/alrra/browser-logos/main/src/${name.toLowerCase()}/${name.toLowerCase()}_32x32.png`" class="avatar avatar-sm me-2" alt="logo" />
-                                                <img v-else-if="type == 'countries'" crossorigin="anonymous" :src="`https://countryflagsapi.com/svg/${name.toLowerCase()}`" class="avatar avatar-sm me-2" alt="logo" />
+                                                <img v-else-if="type == 'countries'" crossorigin="anonymous" :src="`https://flagsapi.com/${name}/flat/64.png`" class="avatar avatar-sm me-2" alt="logo" />
                                             </div>
                                             <div class="d-flex flex-column justify-content-center">
                                                 <h6 class="mb-0 text-sm">{{ name }}</h6>

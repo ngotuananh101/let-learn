@@ -68,7 +68,7 @@ Route::middleware('auth:sanctum')->group(function () {
             Route::get('/', [SettingController::class, 'index']);
             Route::post('/{key}', [SettingController::class, 'update']);
         });
-        Route::resource('lesson', AdminLessonController::class)->only(['index', 'edit']);
+        Route::resource('lesson', AdminLessonController::class);
         Route::resource('folder', AdminFolderController::class);
         Route::resource('user', AdminUserController::class);
         Route::resource('role', AdminRoleController::class);

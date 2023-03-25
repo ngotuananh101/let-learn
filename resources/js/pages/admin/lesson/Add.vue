@@ -44,7 +44,7 @@
 <script>
 import {mapActions} from "vuex";
 import ArgonInput from "@/components/Argons/ArgonInput.vue";
-import SetCard from "@/pages/admin/lesson/SetCard.vue";
+import SetCard from "@/pages/admin/lesson/LessonCard.vue";
 import ArgonButton from "@/components/Argons/ArgonButton.vue";
 
 export default {
