@@ -12,7 +12,6 @@ class Classes extends Model
 {
     use HasFactory;
 
-    protected $table = 'class.js';
     protected $fillable = [
         'school_id',
         'name',

@@ -1,6 +1,5 @@
 <template>
     <div class="container pt-3">
-        <!-- Navbar -->
         <nav class="navbar navbar-expand-lg navbar-light bg-light border-radius-xl justify-content-between">
             <a class="navbar-brand" href="#">Back</a>
             <div class="justify-content-center" id="navbarNav">
@@ -23,12 +22,7 @@
                                 aria-selected="false" style="color: black; font-weight: bold">Members
                         </button>
                     </li>
-                    <li class="nav-item" role="presentation">
-                        <button class="nav-link" id="pills-score-tab" data-bs-toggle="pill"
-                                data-bs-target="#pills-score" type="button" role="tab" aria-controls="pills-contact"
-                                aria-selected="false" style="color: black; font-weight: bold">Score
-                        </button>
-                    </li>
+
                 </ul>
             </div>
             <div class="d-flex align-items-center">
@@ -123,8 +117,19 @@
                             >
                                 <hr/>
                                 <div class="card-body">
-                                    <p>{{ lesson.duration }}</p>
-                                    <p>{{ lesson.numQuestions }} questions</p>
+                                    <div class="row">
+                                        <div class="col-8">
+                                            <p>{{ lesson.duration }}</p>
+                                            <p>{{ lesson.numQuestions }} questions</p>
+                                        </div>
+                                        <div class="col-2">
+                                            <button class="btn btn-primary">Start</button>
+                                        </div>
+                                        <div class="col-2">
+                                            <button class="btn btn-primary" @click="viewExerciseResult(lesson.id)">Result</button>
+
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -133,11 +138,8 @@
             </div>
             <div class="tab-pane fade" id="pills-contact" role="tabpanel" aria-labelledby="pills-contact-tab">
                 <div class="container">
-                    <div class="row">
-                        <div class="col-12">
-                            <!-- Add button -->
-                            <button class="btn btn-primary position-fixed bottom-0 end-0 mt-3 ms-3" type="button">Add Student</button>
-                        </div>
+                    <div class="fixed-plugin">
+                        <a class="fixed-plugin-button  position-fixed p-3">Add</a>
                     </div>
                     <div class="row">
                         <div class="col-12">
@@ -202,57 +204,7 @@
                 </div>
 
             </div>
-            <div class="tab-pane fade" id="pills-score" role="tabpanel" aria-labelledby="pills-score-tab">
-                <div class="container">
-                    <table class="table">
-                        <thead>
-                        <tr>
-                            <th>
-                                <div class="dropdown">
-                                    <a class="btn btn-secondary dropdown-toggle" href="#" role="button"
-                                       id="dropdownMenuLink" data-bs-toggle="dropdown" aria-expanded="false">
-                                        Sort
-                                    </a>
-                                    <ul class="dropdown-menu" aria-labelledby="dropdownMenuLink">
-                                        <li><a class="dropdown-item" href="#">sort by name</a></li>
-                                        <li><a class="dropdown-item" href="#">sort by last name</a></li>
-                                    </ul>
-                                </div>
-                            </th>
-                            <th><router-link :to="{ name: 'exerciseDetail.js.index', params: { id: 'HCM_Test_1' }}">HCM Test 1</router-link></th>
-                            <th><a href="#">VNR Test 1</a></th>
-                            <th><a href="#">SSC Test 1</a></th>
-                        </tr>
-                        </thead>
-                        <tbody>
-                        <tr style="background-color: #f2f2f2;">
-                            <td>Average Score of class</td>
-                            <td>50/100</td>
-                            <td>50/100</td>
-                            <td>50/100</td>
-                        </tr>
-                        <tr>
-                            <td>Hai Long</td>
-                            <td>70/100</td>
-                            <td>80/100</td>
-                            <td>100/100</td>
-                        </tr>
-                        <tr>
-                            <td>Xuan Dat</td>
-                            <td>20/100</td>
-                            <td>20/100</td>
-                            <td>90/100</td>
-                        </tr>
-                        <tr>
-                            <td>Tuan Anh</td>
-                            <td>20/100</td>
-                            <td>20/100</td>
-                            <td>00/100</td>
-                        </tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
+
         </div>
     </div>
 </template>
@@ -303,6 +255,10 @@ export default {
                     lesson.showDetails = false;
                 }
             });
+        },
+        viewExerciseResult(exerciseId) {
+            const url = '/class/detail/' + exerciseId;
+            window.location.href = url;
         },
     }
 }
