@@ -71,11 +71,9 @@
         </div>
         <div class="row">
             <div class="col-12">
-                <!-- Add button -->
                 <button class="btn btn-primary position-fixed bottom-0 end-0 mt-3 ms-3" @click="reloadPage" type="button"><i class="fa-solid fa-arrow-right"></i></button>
             </div>
         </div>
-<!--        <button class="fa-sharp fa-solid fa-arrow-right btn btn-primary rounded-circle float-md-end" @click="reloadPage"></button>-->
     </div>
 
 
