@@ -21,8 +21,8 @@ class CourseController extends Controller
     {
         try {
             // Get the list of folders
-            $folders = Course::all();
-            $folders = $folders->map(function ($folder) {
+            $courses = Course::all();
+            $courses = $courses->map(function ($folder) {
                 return [
                     $folder->id,
                     $folder->name,
@@ -38,7 +38,7 @@ class CourseController extends Controller
             return response()->json([
                 'status' => 'success',
                 'status_code' => 200,
-                'data' => $folders
+                'data' => $courses
             ]);
         } catch (\Exception $e) {
             // Return json
@@ -117,14 +117,67 @@ class CourseController extends Controller
     }
 
     /**
-     * Display the specified resource.
+     * Display the specified resource by type.
      *
-     * @param int $id
-     * @return Response
+     * @param $data
+     * @param Request $request
+     * @return JsonResponse
      */
-    public function show($id)
+    public function show($data,Request $request): JsonResponse
     {
-        //
+        try{
+            $request->validate([
+                'type' => 'required|in:find_lesson',
+            ]);
+            return match($request->type) {
+                'find_lesson' => $this->findLesson($data),
+            };
+        }catch (\Exception $e) {
+            // Return json
+            return response()->json([
+                'status' => 'error',
+                'status_code' => 500,
+                'message' => $e->getMessage()
+            ]);
+        }
+    }
+
+    /**
+     * Find the lesson
+     *
+     * @param $data
+     * @return JsonResponse
+     */
+    private function findLesson($data): JsonResponse
+    {
+        try {
+            // find the lesson by name or description or id
+            $lesson = Lesson::where('name', 'like', '%' . $data . '%')
+                ->orWhere('description', 'like', '%' . $data . '%')
+                ->orWhere('id', 'like', '%' . $data . '%')
+                ->take(10)
+                ->get();
+            $lesson = $lesson->map(function ($lesson) {
+                return [
+                    $lesson->id,
+                    $lesson->name,
+                    $lesson->user->username,
+                ];
+            });
+            // Return json
+            return response()->json([
+                'status' => 'success',
+                'status_code' => 200,
+                'data' => $lesson
+            ]);
+        } catch (\Exception $e) {
+            // Return json
+            return response()->json([
+                'status' => 'error',
+                'status_code' => 500,
+                'message' => $e->getMessage()
+            ]);
+        }
     }
 
     /**
@@ -133,30 +186,22 @@ class CourseController extends Controller
      * @param int $id
      * @return JsonResponse
      */
-    public function edit($id)
+    public function edit(int $id): JsonResponse
     {
         try {
             // Get the folder details
-            $folder = Course::findOrFail($id);
-            // Get lesson in folder
-            $set = $folder->sets;
-            $set = $set->map(function ($set) {
+            $course = Course::findOrFail($id);
+            // Get lesson
+            $course->lessons->map(function ($lesson) {
                 return [
-                    $set->id,
-                    $set->name,
-                    $set->description,
-                    $set->user->username,
-                    $set->status,
+                    $lesson->user->username,
                 ];
             });
             // Return json
             return response()->json([
                 'status' => 'success',
                 'status_code' => 200,
-                'data' => [
-                    'folder' => $folder,
-                    'sets' => $set
-                ]
+                'data' => $course
             ], 200);
         } catch (\Exception $e) {
             // Return json
@@ -175,104 +220,112 @@ class CourseController extends Controller
      * @param int $id
      * @return JsonResponse
      */
-    public function update(Request $request, $id)
+    public function update(Request $request, int $id): JsonResponse
     {
         try {
             $request->validate([
-                'type' => 'required|in:update_folder,find_set,add_set,remove_set',
+                'type' => 'required|in:course,add_lesson',
             ]);
-            switch ($request->type) {
-                case 'update_folder':
-                    $request->validate([
-                        'name' => 'required|string',
-                        'description' => 'required|string',
-                        'is_public' => 'required|in:1,0',
-                        'status' => 'required|in:active,inactive',
-                        'password' => 'nullable',
-                    ]);
-                    // Update the folder
-                    $folder = Course::findOrFail($id);
-                    $folder->update([
-                        'name' => $request->name,
-                        'description' => $request->description,
-                        'is_public' => $request->is_public,
-                        'status' => $request->status,
-                        'password' => $request->password,
-                    ]);
-                    break;
-
-                case 'find_set':
-                    $request->validate([
-                        'search' => 'required|string',
-                    ]);
-                    // Find lesson
-                    $set = Lesson::where('name', 'like', '%' . $request->search . '%')
-                        ->orWhere('description', 'like', '%' . $request->search . '%')
-                        ->orWhere('id', 'like', '%' . $request->search . '%')
-                        ->orWhereHas('user', function ($query) use ($request) {
-                            $query->where('username', 'like', '%' . $request->search . '%');
-                        })
-                        ->get();
-                    $set = $set->map(function ($set) {
-                        return [
-                            'value' => $set->id,
-                            'label' => $set->id . ' - ' . $set->name . ' - ' . $set->user->username,
-                        ];
-                    });
-                    // Return json
-                    return response()->json([
-                        'status' => 'success',
-                        'status_code' => 200,
-                        'data' => $set
-                    ]);
-                    break;
-                case 'add_set':
-                    $request->validate([
-                        'set_id' => 'required|exists:sets,id',
-                    ]);
-                    // Add lesson to folder
-                    $folder = Course::findOrFail($id);
-                    $set = Lesson::findOrFail($request->set_id);
-                    $folder->sets()->attach($set);
-                    $data[] = [
-                        $set->id,
-                        $set->name,
-                        $set->description,
-                        $set->user->username,
-                        $set->status,
-                    ];
-
-                    return response()->json([
-                        'status' => 'success',
-                        'status_code' => 200,
-                        'data' => $data
-                    ]);
-
-                    break;
-                case 'remove_set':
-                    $request->validate([
-                        'set_ids' => 'required|array',
-                    ]);
-                    // Remove lesson from folder
-                    $folder = Course::findOrFail($id);
-                    $folder->sets()->detach($request->set_ids);
-                    break;
-            }
-
-            // Return json
-            return response()->json([
-                'status' => 'success',
-                'status_code' => 200,
-                'message' => 'Course updated successfully',
-            ]);
-
+            return match($request->type) {
+                'course' => $this->updateCourse($request, $id),
+                'add_lesson' => $this->addLesson($request, $id),
+            };
         } catch (\Exception $e) {
             // Return json
             return response()->json([
                 'status' => 'error',
                 'status_code' => 500,
                 'message' => $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * Update the course
+     *
+     * @param Request $request
+     * @param int $id
+     * @return JsonResponse
+     */
+    private function updateCourse(Request $request, int $id): JsonResponse
+    {
+        try {
+            // validate the request
+            $request->validate([
+                'name' => 'required|string',
+                'description' => 'required|string',
+                'is_public' => 'required|boolean',
+                'status' => 'required|in:active,inactive',
+                'password' => 'nullable',
             ]);
+
+            // Update the folder
+            $course = Course::findOrFail($id);
+            $course->update([
+                'name' => $request->name,
+                'description' => $request->description,
+                'is_public' => $request->is_public,
+                'status' => $request->status,
+                'password' => $request->password,
+            ]);
+            return response()->json([
+                'status' => 'success',
+                'status_code' => 200,
+                'message' => 'Course updated successfully',
+            ], 200);
+        } catch (\Exception $e) {
+            // Return json
+            return response()->json([
+                'status' => 'error',
+                'status_code' => 500,
+                'message' => $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * Add the lesson to the course
+     *
+     * @param Request $request
+     * @param int $id
+     * @return JsonResponse
+     */
+    private function addLesson(Request $request, int $id): JsonResponse
+    {
+        try {
+            // validate the request
+            $request->validate([
+                'lesson_ids' => 'required|array',
+            ]);
+            // get the course
+            $course = Course::findOrFail($id);
+            // add the lesson to the course if not exist
+            $course->lessons()->syncWithoutDetaching($request->lesson_ids);
+            // get the lessons
+            $lessons = $course->lessons->map(function ($lesson) {
+                return [
+                    $lesson->id,
+                    $lesson->name,
+                    $lesson->description,
+                    $lesson->user->username,
+                    $lesson->is_public,
+                    $lesson->updated_at,
+                    $lesson->status,
+                ];
+            });
+            // Return json
+            return response()->json([
+                'status' => 'success',
+                'status_code' => 200,
+                'data' => $lessons
+            ], 200);
+        } catch (\Exception $e) {
+            // Return json
+            return response()->json([
+                'status' => 'error',
+                'status_code' => 500,
+                'message' => $e->getMessage()
+            ], 500);
         }
     }
 
