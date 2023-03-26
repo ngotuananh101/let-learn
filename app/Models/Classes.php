@@ -11,7 +11,6 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 class Classes extends Model
 {
     use HasFactory;
-
     protected $fillable = [
         'school_id',
         'name',

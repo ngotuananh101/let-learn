@@ -68,7 +68,7 @@
                 </sidenav-collapse>
             </li>
             <li class="nav-item">
-                <sidenav-collapse @click="$router.push({ name: 'admin.folder.list' })" collapse-ref="" nav-text="Courses"
+                <sidenav-collapse @click="$router.push({ name: 'admin.course.list' })" collapse-ref="" nav-text="Courses"
                                   :class="getRoute() === 'folder' ? 'active' : ''">
                     <template #icon>
                         <i class="fa-regular fa-folder text-primary text-sm opacity-10"></i>

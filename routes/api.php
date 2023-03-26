@@ -5,7 +5,7 @@ use App\Http\Controllers\Auth\Authentication as Authentication;
 use App\Http\Controllers\Admin\AnalyticsController;
 use App\Http\Controllers\Admin\SettingController;
 use App\Http\Controllers\Admin\LessonController as AdminLessonController;
-use App\Http\Controllers\Admin\CourseController as AdminFolderController;
+use App\Http\Controllers\Admin\CourseController as AdminCourseController;
 use App\Http\Controllers\Admin\UserController as AdminUserController;
 use App\Http\Controllers\Admin\RoleController as AdminRoleController;
 use App\Http\Controllers\Admin\SchoolController as AdminSchoolController;
@@ -69,7 +69,7 @@ Route::middleware('auth:sanctum')->group(function () {
             Route::post('/{key}', [SettingController::class, 'update']);
         });
         Route::resource('lesson', AdminLessonController::class);
-        Route::resource('folder', AdminFolderController::class);
+        Route::resource('course', AdminCourseController::class);
         Route::resource('user', AdminUserController::class);
         Route::resource('role', AdminRoleController::class);
         Route::resource('school', AdminSchoolController::class);
