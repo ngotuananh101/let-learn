@@ -155,16 +155,13 @@ class CourseController extends Controller
             $lesson = Lesson::where('name', 'like', '%' . $data . '%')
                 ->orWhere('description', 'like', '%' . $data . '%')
                 ->orWhere('id', 'like', '%' . $data . '%')
+                ->take(10)
                 ->get();
             $lesson = $lesson->map(function ($lesson) {
                 return [
                     $lesson->id,
                     $lesson->name,
-                    $lesson->description,
                     $lesson->user->username,
-                    $lesson->is_public ? 'yes' : 'no',
-                    Carbon::parse($lesson->update_at)->format('m/d/Y, G:i:s A'),
-                    $lesson->status,
                 ];
             });
             // Return json
@@ -227,10 +224,11 @@ class CourseController extends Controller
     {
         try {
             $request->validate([
-                'type' => 'required|in:course',
+                'type' => 'required|in:course,add_lesson',
             ]);
             return match($request->type) {
                 'course' => $this->updateCourse($request, $id),
+                'add_lesson' => $this->addLesson($request, $id),
             };
         } catch (\Exception $e) {
             // Return json
@@ -274,6 +272,52 @@ class CourseController extends Controller
                 'status' => 'success',
                 'status_code' => 200,
                 'message' => 'Course updated successfully',
+            ], 200);
+        } catch (\Exception $e) {
+            // Return json
+            return response()->json([
+                'status' => 'error',
+                'status_code' => 500,
+                'message' => $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * Add the lesson to the course
+     *
+     * @param Request $request
+     * @param int $id
+     * @return JsonResponse
+     */
+    private function addLesson(Request $request, int $id): JsonResponse
+    {
+        try {
+            // validate the request
+            $request->validate([
+                'lesson_ids' => 'required|array',
+            ]);
+            // get the course
+            $course = Course::findOrFail($id);
+            // add the lesson to the course if not exist
+            $course->lessons()->syncWithoutDetaching($request->lesson_ids);
+            // get the lessons
+            $lessons = $course->lessons->map(function ($lesson) {
+                return [
+                    $lesson->id,
+                    $lesson->name,
+                    $lesson->description,
+                    $lesson->user->username,
+                    $lesson->is_public,
+                    $lesson->updated_at,
+                    $lesson->status,
+                ];
+            });
+            // Return json
+            return response()->json([
+                'status' => 'success',
+                'status_code' => 200,
+                'data' => $lessons
             ], 200);
         } catch (\Exception $e) {
             // Return json

@@ -71,7 +71,7 @@
                                         Remove
                                     </button>
                                     <button class="mb-0 btn btn-outline-success btn-sm"
-                                            @click="()=>{ 
+                                            @click="()=>{
                                                 this.find_lesson.clearStore();
                                                 this.modal_find_lesson.show();
                                             }">
@@ -124,8 +124,8 @@
                     </select>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn bg-gradient-success btn-sm" id="btnSubmit" disabled>
-                        Submit
+                    <button type="button" class="btn bg-gradient-success btn-sm" id="btnSubmit" @click="addLesson">
+                        Add
                     </button>
                     <button type="button" class="btn bg-gradient-secondary btn-sm"
                             data-bs-dismiss="modal" id="closeImport">
@@ -187,6 +187,7 @@ export default {
                 shouldSort: false,
                 allowHTML: true,
                 addItems: true,
+                searchResultLimit: 10,
             });
             this.$store.subscribe((mutation, state) => {
                 if (mutation.type === 'adminCourse/indexSuccess') {
@@ -253,7 +254,6 @@ export default {
             });
         },
         searchLesson(e) {
-            // wait for 500ms
             clearTimeout(this.find_lesson.timer);
             this.find_lesson.timer = setTimeout(() => {
                 this.$store.dispatch('adminCourse/searchLesson', e.detail.value).then((res) => {
@@ -261,22 +261,62 @@ export default {
                         this.find_lesson.setChoices(res.map(item => {
                             return {
                                 value: item[0],
-                                label: item[1],
+                                label: item[1] + ' - ' + item[2],
                                 selected: false,
                                 disabled: false,
-                                customProperties: {
-                                    description: item[2],
-                                    username: item[3],
-                                    is_public: item[4],
-                                    updated_at: item[5],
-                                    status: item[6],
-                                }
                             }
                         }), 'value', 'label', true);
                     }
                 });
             }, 500);
         },
+        addLesson(){
+            let ids = this.find_lesson.getValue(true);
+            if(ids.length > 0){
+                this.$root.$data.snackbar = {
+                    color: 'warning',
+                    message: 'Adding lesson...',
+                };
+                this.$store.dispatch('adminCourse/addLesson', {type: 'add_lesson', course_id: this.id, lesson_ids: ids}).then((res) => {
+                    if (res.length > 0) {
+                        this.$root.$data.snackbar = {
+                            color: 'success',
+                            message: 'Add lesson success!',
+                        };
+                        let lessons = res.map(item => {
+                            return [
+                                item[0],
+                                item[1],
+                                item[2],
+                                item[3],
+                                item[4] ? 'Yes' : 'No',
+                                new Date(item[5]).toLocaleString(),
+                                item[6]
+                            ]
+                        });
+                        this.lesson_table.rows().remove().draw();
+                        // add new data
+                        this.lesson_table.rows.add(lessons).draw();
+                    } else {
+                        this.$root.$data.snackbar = {
+                            color: 'danger',
+                            message: 'Add lesson failed!',
+                        };
+                    }
+                    setTimeout(() => {
+                        this.$root.$data.snackbar = null;
+                    }, 2000);
+                });
+            }else{
+                this.$root.$data.snackbar = {
+                    color: 'danger',
+                    message: 'Please select lesson!',
+                };
+                setTimeout(() => {
+                    this.$root.$data.snackbar = null;
+                }, 3000);
+            }
+        }
     }
 }
 </script>

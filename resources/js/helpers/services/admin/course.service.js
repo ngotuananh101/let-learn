@@ -6,7 +6,8 @@ export const adminCourseService = {
     index,
     getCourse,
     updateCourse,
-    searchLesson
+    searchLesson,
+    addLesson
 }
 
 function index() {
@@ -40,4 +41,12 @@ function searchLesson(keyword) {
         .then(data => {
             return data.data;
         });
+}
+
+function addLesson(data){
+    return fetch(`${config.apiUrl}/admin/course/${data.course_id}`, {
+        method: 'PUT',
+        headers: authHeader(),
+        body: JSON.stringify(data)
+    }).then(handleResponse);
 }

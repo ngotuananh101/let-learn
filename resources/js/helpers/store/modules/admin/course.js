@@ -63,6 +63,17 @@ export default {
                     }
                 );
         },
+        addLesson({commit}, lesson) {
+            return adminCourseService.addLesson(lesson)
+                .then(
+                    lessons => {
+                        return lessons.data;
+                    },
+                    error => {
+                        return [];
+                    }
+                );
+        },
     },
     getters: {
         courses: state => state.courses,
