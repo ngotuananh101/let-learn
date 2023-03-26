@@ -7,7 +7,10 @@ export const adminCourseService = {
     getCourse,
     updateCourse,
     searchLesson,
-    addLesson
+    addLesson,
+    removeLesson,
+    deleteCourse,
+    addCourse
 }
 
 function index() {
@@ -48,5 +51,27 @@ function addLesson(data){
         method: 'PUT',
         headers: authHeader(),
         body: JSON.stringify(data)
+    }).then(handleResponse);
+}
+
+function removeLesson(data){
+    return fetch(`${config.apiUrl}/admin/course/${data.course_id}`, {
+        method: 'PUT',
+        headers: authHeader(),
+        body: JSON.stringify(data)
+    }).then(handleResponse);
+}
+
+function deleteCourse(course_id) {
+    return fetch(`${config.apiUrl}/admin/course/${course_id}`, {method: 'DELETE', headers: authHeader()})
+        .then(handleResponse);
+}
+
+function addCourse(course) {
+    course.type = 'course';
+    return fetch(`${config.apiUrl}/admin/course`, {
+        method: 'POST',
+        headers: authHeader(),
+        body: JSON.stringify(course)
     }).then(handleResponse);
 }

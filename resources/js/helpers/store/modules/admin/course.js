@@ -74,6 +74,39 @@ export default {
                     }
                 );
         },
+        removeLesson({commit}, lesson) {
+            return adminCourseService.removeLesson(lesson)
+                .then(
+                    lessons => {
+                        return true;
+                    },
+                    error => {
+                        return false;
+                    }
+                );
+        },
+        delete({commit}, course_id) {
+            return adminCourseService.deleteCourse(course_id)
+                .then(
+                    course => {
+                        return true;
+                    },
+                    error => {
+                        return false;
+                    }
+                );
+        },
+        addCourse({commit}, course) {
+            return adminCourseService.addCourse(course)
+                .then(
+                    res => {
+                        return res.data;
+                    },
+                    error => {
+                        return false;
+                    }
+                );
+        },
     },
     getters: {
         courses: state => state.courses,
