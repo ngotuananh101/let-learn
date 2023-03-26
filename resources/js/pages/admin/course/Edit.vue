@@ -30,7 +30,8 @@
                             <div class="col-md-8 col-12">
                                 <label class="form-label mt-2 fs-6">Description</label>
                                 <argon-input id="description" type="text" name="description"
-                                             placeholder="Add a description..." :value="this.data.description" @input="input"/>
+                                             placeholder="Add a description..." :value="this.data.description"
+                                             @input="input"/>
                             </div>
                             <div class="col-md-4 col-6">
                                 <label class="form-label mt-2 fs-6">Status</label>
@@ -66,10 +67,15 @@
                             <div class="my-auto mt-4 ms-auto mt-lg-0">
                                 <div class="my-auto ms-auto">
                                     <button v-if="selected_id.length > 0"
-                                                 class="mb-0 me-3 btn btn-outline-danger btn-sm">-&nbsp;
+                                            class="mb-0 me-3 btn btn-outline-danger btn-sm">-&nbsp;
                                         Remove
                                     </button>
-                                    <button class="mb-0 btn btn-outline-success btn-sm" @click="()=>{ this.modal_find_lesson.show(); }">+&nbsp;
+                                    <button class="mb-0 btn btn-outline-success btn-sm"
+                                            @click="()=>{ 
+                                                this.find_lesson.clearStore();
+                                                this.modal_find_lesson.show();
+                                            }">
+                                        +&nbsp;
                                         Add Lesson
                                     </button>
                                 </div>
@@ -216,11 +222,11 @@ export default {
         publicChange() {
             this.data.is_public = !this.data.is_public;
         },
-        input(e){
-            if(e.target.type === 'checkbox'){
-                if(e.target.name === "status") this.data[e.target.name] = e.target.checked ? 'active' : 'inactive';
+        input(e) {
+            if (e.target.type === 'checkbox') {
+                if (e.target.name === "status") this.data[e.target.name] = e.target.checked ? 'active' : 'inactive';
                 else this.data[e.target.name] = e.target.checked;
-            }else{
+            } else {
                 this.data[e.target.name] = e.target.value;
             }
         },
@@ -230,12 +236,12 @@ export default {
                 message: 'Updating course...',
             };
             this.$store.dispatch('adminCourse/update', this.data).then((res) => {
-                if(res){
+                if (res) {
                     this.$root.$data.snackbar = {
                         color: 'success',
                         message: 'Update course success!',
                     };
-                }else{
+                } else {
                     this.$root.$data.snackbar = {
                         color: 'danger',
                         message: 'Update course failed!',
@@ -246,15 +252,27 @@ export default {
                 }, 2000);
             });
         },
-        searchLesson(e){
-            // remove old data
-            this.find_lesson.clearStore();
-            // // wait for 500ms
+        searchLesson(e) {
+            // wait for 500ms
             clearTimeout(this.find_lesson.timer);
             this.find_lesson.timer = setTimeout(() => {
                 this.$store.dispatch('adminCourse/searchLesson', e.detail.value).then((res) => {
-                    if(res){
-                        this.find_lesson
+                    if (res) {
+                        this.find_lesson.setChoices(res.map(item => {
+                            return {
+                                value: item[0],
+                                label: item[1],
+                                selected: false,
+                                disabled: false,
+                                customProperties: {
+                                    description: item[2],
+                                    username: item[3],
+                                    is_public: item[4],
+                                    updated_at: item[5],
+                                    status: item[6],
+                                }
+                            }
+                        }), 'value', 'label', true);
                     }
                 });
             }, 500);

@@ -164,6 +164,7 @@ class CourseController extends Controller
                     $lesson->user->username,
                     $lesson->is_public ? 'yes' : 'no',
                     Carbon::parse($lesson->update_at)->format('m/d/Y, G:i:s A'),
+                    $lesson->status,
                 ];
             });
             // Return json
