@@ -67,7 +67,8 @@
                             <div class="my-auto mt-4 ms-auto mt-lg-0">
                                 <div class="my-auto ms-auto">
                                     <button v-if="selected_id.length > 0"
-                                            class="mb-0 me-3 btn btn-outline-danger btn-sm">-&nbsp;
+                                            class="mb-0 me-3 btn btn-outline-danger btn-sm"
+                                            @click="this.removeLesson">-&nbsp;
                                         Remove
                                     </button>
                                     <button class="mb-0 btn btn-outline-success btn-sm"
@@ -297,10 +298,45 @@ export default {
                         this.lesson_table.rows().remove().draw();
                         // add new data
                         this.lesson_table.rows.add(lessons).draw();
+                        this.modal_find_lesson.hide();
                     } else {
                         this.$root.$data.snackbar = {
                             color: 'danger',
                             message: 'Add lesson failed!',
+                        };
+                    }
+                    setTimeout(() => {
+                        this.$root.$data.snackbar = null;
+                    }, 3000);
+                });
+            }else{
+                this.$root.$data.snackbar = {
+                    color: 'danger',
+                    message: 'Please select lesson!',
+                };
+                setTimeout(() => {
+                    this.$root.$data.snackbar = null;
+                }, 3000);
+            }
+        },
+        removeLesson(){
+            if(this.selected_id.length > 0){
+                this.$root.$data.snackbar = {
+                    color: 'warning',
+                    message: 'Removing lesson...',
+                };
+                this.$store.dispatch('adminCourse/removeLesson', {type: 'remove_lesson', course_id: this.id, lesson_ids: this.selected_id}).then((res) => {
+                    if (res) {
+                        this.$root.$data.snackbar = {
+                            color: 'success',
+                            message: 'Remove lesson success!',
+                        };
+                        // remove selected row
+                        this.lesson_table.rows('.selected').remove().draw();
+                    } else {
+                        this.$root.$data.snackbar = {
+                            color: 'danger',
+                            message: 'Remove lesson failed!',
                         };
                     }
                     setTimeout(() => {

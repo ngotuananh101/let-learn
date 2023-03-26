@@ -74,6 +74,17 @@ export default {
                     }
                 );
         },
+        removeLesson({commit}, lesson) {
+            return adminCourseService.removeLesson(lesson)
+                .then(
+                    lessons => {
+                        return true;
+                    },
+                    error => {
+                        return false;
+                    }
+                );
+        },
     },
     getters: {
         courses: state => state.courses,

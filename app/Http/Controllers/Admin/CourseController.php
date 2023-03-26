@@ -224,11 +224,12 @@ class CourseController extends Controller
     {
         try {
             $request->validate([
-                'type' => 'required|in:course,add_lesson',
+                'type' => 'required|in:course,add_lesson,remove_lesson',
             ]);
             return match($request->type) {
                 'course' => $this->updateCourse($request, $id),
                 'add_lesson' => $this->addLesson($request, $id),
+                'remove_lesson' => $this->removeLesson($request, $id),
             };
         } catch (\Exception $e) {
             // Return json
@@ -318,6 +319,40 @@ class CourseController extends Controller
                 'status' => 'success',
                 'status_code' => 200,
                 'data' => $lessons
+            ], 200);
+        } catch (\Exception $e) {
+            // Return json
+            return response()->json([
+                'status' => 'error',
+                'status_code' => 500,
+                'message' => $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * Remove the lesson from the course
+     *
+     * @param Request $request
+     * @param int $id
+     * @return JsonResponse
+     */
+    private function removeLesson(Request $request, int $id): JsonResponse
+    {
+        try {
+            // validate the request
+            $request->validate([
+                'lesson_ids' => 'required|array',
+            ]);
+            // get the course
+            $course = Course::findOrFail($id);
+            // remove the lesson from the course
+            $course->lessons()->detach($request->lesson_ids);
+            // Return json
+            return response()->json([
+                'status' => 'success',
+                'status_code' => 200,
+                'message' => 'Lesson removed successfully',
             ], 200);
         } catch (\Exception $e) {
             // Return json
