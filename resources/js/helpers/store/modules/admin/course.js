@@ -17,7 +17,7 @@ export default {
         indexFailure(state) {
             state.status = {};
             state.courses = [];
-        }
+        },
     },
     actions: {
         index({commit}) {
@@ -31,103 +31,38 @@ export default {
                     }
                 );
         },
-        add({commit}, folder) {
-            overlay();
-            return admincourseservice.add(folder)
+        getCourse({commit}, course_id) {
+            adminCourseService.getCourse(course_id).then(
+                course => {
+                    commit('indexSuccess', course);
+                },
+                error => {
+                    commit('indexSuccess', []);
+                }
+            );
+        },
+        update({dispatch}, course) {
+            return adminCourseService.updateCourse(course)
                 .then(
-                    folder => {
-                        overlay();
-                        return Promise.resolve(folder);
+                    course => {
+                        return true;
                     },
                     error => {
-                        overlay();
+                        return false;
+                    }
+                );
+        },
+        searchLesson({commit}, search) {
+            return adminCourseService.searchLesson(search)
+                .then(
+                    lessons => {
+                        return lessons;
+                    },
+                    error => {
                         return [];
                     }
                 );
         },
-        delete({commit}, folder_id) {
-            overlay();
-            admincourseservice.deleteFolder(folder_id).then(() => {
-                overlay();
-            });
-        },
-        getFolderById({commit}, folder_id) {
-            overlay();
-            return admincourseservice.getFolderById(folder_id)
-                .then(
-                    folder => {
-                        overlay();
-                        return Promise.resolve(folder);
-                    },
-                    error => {
-                        overlay();
-                        return {
-                            folder: {},
-                            sets: []
-                        }
-                    }
-                );
-        },
-        updateFolder({dispatch}, folder) {
-            overlay();
-            admincourseservice.updateFolder(folder)
-                .then(
-                    folder => {
-                        overlay();
-                        dispatch('alert/success', 'Course updated', {root: true});
-                    },
-                    error => {
-                        overlay();
-                        dispatch('alert/error', error, {root: true});
-                    }
-                );
-        },
-        findSetByName({commit}, data) {
-            overlay();
-            return admincourseservice.findSetByName(data)
-                .then(
-                    sets => {
-                        overlay();
-                        return Promise.resolve(sets);
-                    },
-                    error => {
-                        overlay();
-                        return [];
-                    }
-                );
-        },
-        addSetToFolder({dispatch}, data) {
-            overlay();
-            return admincourseservice.addSetToFolder(data)
-                .then(
-                    folder => {
-                        overlay();
-                        dispatch('alert/success', 'Lesson added to folder', {root: true});
-                        return Promise.resolve(folder);
-                    },
-                    error => {
-                        overlay();
-                        dispatch('alert/error', error, {root: true});
-                        return [];
-                    }
-                );
-        },
-        removeSetFromFolder({dispatch}, data) {
-            overlay();
-            return admincourseservice.removeSetFromFolder(data)
-                .then(
-                    folder => {
-                        overlay();
-                        dispatch('alert/success', 'Lesson removed from folder', {root: true});
-                        return Promise.resolve(folder);
-                    },
-                    error => {
-                        overlay();
-                        dispatch('alert/error', error, {root: true});
-                        return [];
-                    }
-                );
-        }
     },
     getters: {
         courses: state => state.courses,

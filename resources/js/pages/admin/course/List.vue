@@ -182,7 +182,11 @@ export default {
                     this.selected_id = null;
                 }
             });
-        }
+        },
+        edit(){
+            this.modal_option.hide();
+            this.$router.push({name: 'admin.course.edit', params: {id: this.selected_id}});
+        },
     },
 }
 </script>

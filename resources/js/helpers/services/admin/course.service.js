@@ -4,94 +4,40 @@ import handleResponse from './../handle-response';
 
 export const adminCourseService = {
     index,
-    add,
-    deleteFolder,
-    getFolderById,
-    updateFolder,
-    findSetByName,
-    addSetToFolder,
-    removeSetFromFolder
+    getCourse,
+    updateCourse,
+    searchLesson
 }
 
 function index() {
-    return fetch(`${config.apiUrl}/admin/folder`, {method: 'GET', headers: authHeader()})
+    return fetch(`${config.apiUrl}/admin/course`, {method: 'GET', headers: authHeader()})
         .then(handleResponse)
         .then(data => {
             return data.data;
         });
 }
 
-function add(folder) {
-    return fetch(`${config.apiUrl}/admin/folder`, {
-        method: 'POST',
+function getCourse(course_id) {
+    return fetch(`${config.apiUrl}/admin/course/${course_id}/edit`, {method: 'GET', headers: authHeader()})
+        .then(handleResponse)
+        .then(data => {
+            return data.data;
+        });
+}
+
+function updateCourse(course) {
+    course.type = 'course';
+    return fetch(`${config.apiUrl}/admin/course/${course.id}`, {
+        method: 'PUT',
         headers: authHeader(),
-        body: JSON.stringify(folder)
-    })
-        .then(handleResponse)
-        .then(data => {
-            return data.data;
-        });
-}
-
-function deleteFolder(folder_id) {
-    return fetch(`${config.apiUrl}/admin/folder/${folder_id}`, {
-        method: 'DELETE',
-        headers: authHeader()
+        body: JSON.stringify(course)
     }).then(handleResponse);
 }
 
-function getFolderById(folder_id) {
-    return fetch(`${config.apiUrl}/admin/folder/${folder_id}/edit`, {method: 'GET', headers: authHeader()})
+function searchLesson(keyword) {
+    return fetch(`${config.apiUrl}/admin/course/${keyword}?type=find_lesson`, {method: 'GET', headers: authHeader()})
         .then(handleResponse)
         .then(data => {
             return data.data;
         });
-}
-
-function updateFolder(folder) {
-    folder.type = 'update_folder';
-    return fetch(`${config.apiUrl}/admin/folder/${folder.id}`, {
-        method: 'PUT',
-        headers: authHeader(),
-        body: JSON.stringify(folder)
-    })
-        .then(handleResponse);
-}
-
-function findSetByName(data) {
-    data.type = 'find_set';
-    return fetch(`${config.apiUrl}/admin/folder/${data.folder_id}`, {
-        method: 'PUT',
-        headers: authHeader(),
-        body: JSON.stringify(data)
-    })
-        .then(handleResponse)
-        .then(data => {
-                return data.data;
-            }
-        );
-}
-
-function addSetToFolder(data) {
-    data.type = 'add_set';
-    return fetch(`${config.apiUrl}/admin/folder/${data.folder_id}`, {
-        method: 'PUT',
-        headers: authHeader(),
-        body: JSON.stringify(data)
-    })
-        .then(handleResponse)
-        .then(data => {
-                return data.data;
-            }
-        );
-}
-
-function removeSetFromFolder(data) {
-    data.type = 'remove_set';
-    return fetch(`${config.apiUrl}/admin/folder/${data.folder_id}`, {
-        method: 'PUT',
-        headers: authHeader(),
-        body: JSON.stringify(data)
-    })
-        .then(handleResponse);
 }

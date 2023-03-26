@@ -75,18 +75,18 @@ const admin = [
                 ]
             },
             {
-                path: 'folder',
-                name: 'admin.folder',
-                redirect: {name: 'admin.folder.list'},
+                path: 'course',
+                name: 'admin.course',
+                redirect: {name: 'admin.course.list'},
                 children: [
                     {
-                        path: 'list',
-                        name: 'admin.folder.list',
+                        path: '',
+                        name: 'admin.course.list',
                         component: () => import('../../pages/admin/course/List.vue'),
                     },
                     {
                         path: 'edit/:id',
-                        name: 'admin.folder.edit',
+                        name: 'admin.course.edit',
                         component: () => import('../../pages/admin/course/Edit.vue'),
                     }
                 ]
