@@ -96,6 +96,17 @@ export default {
                     }
                 );
         },
+        addCourse({commit}, course) {
+            return adminCourseService.addCourse(course)
+                .then(
+                    res => {
+                        return res.data;
+                    },
+                    error => {
+                        return false;
+                    }
+                );
+        },
     },
     getters: {
         courses: state => state.courses,

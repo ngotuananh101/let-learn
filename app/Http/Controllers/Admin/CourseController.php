@@ -72,39 +72,30 @@ class CourseController extends Controller
         $request->validate([
             'name' => 'required|string',
             'description' => 'required|string',
-            'is_public' => 'required|in:1,0',
-            'status' => 'required|in:active,inactive',
-            'password' => 'nullable',
         ]);
 
         try {
             // Create the folder
-            $folder = Course::create([
+            $course = auth()->user()->courses()->create([
                 'name' => $request->name,
                 'description' => $request->description,
-                'is_public' => $request->is_public,
-                'status' => $request->status,
-                'password' => $request->password,
-                'user_id' => auth()->user()->id,
+                'is_public' => true,
             ]);
-
-            $folder = [
-                $folder->id,
-                $folder->name,
-                $folder->description,
-                $folder->user->username,
-                $folder->is_public ? 'yes' : 'no',
-                Carbon::parse($folder->created_at)->format('d/m/Y'),
-                Carbon::parse($folder->updated_at)->format('d/m/Y'),
-                $folder->status,
-            ];
-
             // Return json
             return response()->json([
                 'status' => 'success',
                 'status_code' => 200,
                 'message' => 'Course created successfully',
-                'data' => $folder
+                'data' => [
+                    $course->id,
+                    $course->name,
+                    $course->description,
+                    $course->user->username,
+                    $course->is_public ? 'yes' : 'no',
+                    Carbon::parse($course->created_at)->format('d/m/Y'),
+                    Carbon::parse($course->updated_at)->format('d/m/Y'),
+                    $course->status,
+                ]
             ]);
         } catch (\Exception $e) {
             // Return json

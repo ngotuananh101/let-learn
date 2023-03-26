@@ -56,12 +56,12 @@
                     <div class="row">
                         <div class="col-5">
                             <label class="form-label mt-2">Name</label>
-                            <argon-input id="name" name="name" class="mb-2"
+                            <argon-input id="add_name" name="name" class="mb-2"
                                          placeholder="Enter name..." required/>
                         </div>
                         <div class="col-7">
                             <label class="form-label mt-2">Description</label>
-                            <argon-input id="description" name="description" class="mb-2"
+                            <argon-input id="add_description" name="description" class="mb-2"
                                          placeholder="Enter description..." required/>
                         </div>
                     </div>
@@ -71,7 +71,7 @@
                             data-bs-dismiss="modal" id="close_model">
                         Close
                     </button>
-                    <button type="button" class="btn bg-gradient-success btn-sm" id="btn-submit" @click="submit">
+                    <button type="button" class="btn bg-gradient-success btn-sm" id="btn-submit" @click="add">
                         Add
                     </button>
                 </div>
@@ -207,6 +207,21 @@ export default {
                             this.$swal('Error!', 'Something went wrong.', 'error');
                         }
                     });
+                }
+            });
+        },
+        add(){
+            let data = {
+                name: document.getElementById('add_name').value,
+                description: document.getElementById('add_description').value,
+            };
+            this.$store.dispatch('adminCourse/addCourse', data).then((res) => {
+                if(res){
+                    this.$swal('Success!', 'Course has been added.', 'success');
+                    this.modal_add.hide();
+                    this.table.row.add(res).draw(false);
+                }else{
+                    this.$swal('Error!', 'Something went wrong.', 'error');
                 }
             });
         },
