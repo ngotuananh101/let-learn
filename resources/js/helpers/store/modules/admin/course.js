@@ -85,6 +85,17 @@ export default {
                     }
                 );
         },
+        delete({commit}, course_id) {
+            return adminCourseService.deleteCourse(course_id)
+                .then(
+                    course => {
+                        return true;
+                    },
+                    error => {
+                        return false;
+                    }
+                );
+        },
     },
     getters: {
         courses: state => state.courses,

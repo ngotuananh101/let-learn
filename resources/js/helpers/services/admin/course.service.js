@@ -8,7 +8,8 @@ export const adminCourseService = {
     updateCourse,
     searchLesson,
     addLesson,
-    removeLesson
+    removeLesson,
+    deleteCourse
 }
 
 function index() {
@@ -58,4 +59,9 @@ function removeLesson(data){
         headers: authHeader(),
         body: JSON.stringify(data)
     }).then(handleResponse);
+}
+
+function deleteCourse(course_id) {
+    return fetch(`${config.apiUrl}/admin/course/${course_id}`, {method: 'DELETE', headers: authHeader()})
+        .then(handleResponse);
 }

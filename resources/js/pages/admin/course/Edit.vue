@@ -165,6 +165,7 @@ export default {
             selected_id: [],
             modal_find_lesson: null,
             find_lesson: null,
+            unsubscribe: null
         }
     },
     beforeMount() {
@@ -177,6 +178,8 @@ export default {
     },
     beforeUnmount() {
         this.lesson_table.destroy();
+        // stop the subscription
+        this.unsubscribe();
     },
     methods: {
         init() {
@@ -190,7 +193,7 @@ export default {
                 addItems: true,
                 searchResultLimit: 10,
             });
-            this.$store.subscribe((mutation, state) => {
+            this.unsubscribe = this.$store.subscribe((mutation, state) => {
                 if (mutation.type === 'adminCourse/indexSuccess') {
                     this.data = state.adminCourse.courses;
                     let lessons = this.data.lessons.map(item => {

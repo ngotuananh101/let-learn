@@ -187,6 +187,29 @@ export default {
             this.modal_option.hide();
             this.$router.push({name: 'admin.course.edit', params: {id: this.selected_id}});
         },
+        delete(){
+            this.$swal({
+                title: 'Are you sure?',
+                text: "You won't be able to revert this!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Yes, delete it!'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    this.$store.dispatch('adminCourse/delete', this.selected_id).then((res) => {
+                        if(res){
+                            this.$swal('Deleted!', 'Your file has been deleted.', 'success');
+                            this.table.row({selected: true}).remove().draw(false);
+                            this.modal_option.hide();
+                        }else{
+                            this.$swal('Error!', 'Something went wrong.', 'error');
+                        }
+                    });
+                }
+            });
+        },
     },
 }
 </script>
