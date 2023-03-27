@@ -12,6 +12,8 @@ import adminRole from "./modules/admin/role.js";
 import adminSchool from "./modules/admin/school.js";
 import home from "./modules/home.js";
 import learn from "./modules/learn";
+import lesson from "./modules/lesson.js";
+import course from "./modules/course.js";
 // import classes from "./modules/class.js";
 export default createStore({
     namespaced: true,
@@ -29,6 +31,8 @@ export default createStore({
         adminFolder,
         adminUser,
         adminRole,
-        adminSchool
+        adminSchool,
+        lesson,
+        course,
     },
 });

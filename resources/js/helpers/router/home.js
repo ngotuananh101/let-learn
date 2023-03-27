@@ -24,7 +24,7 @@ const home = [
                         component: () => import('../../pages/home/lesson/Edit.vue'),
                     },
                     {
-                        path: 'l/add',
+                        path: 'add',
                         name: 'home.lesson.add',
                         component: () => import('../../pages/home/lesson/Add.vue'),
                     },
