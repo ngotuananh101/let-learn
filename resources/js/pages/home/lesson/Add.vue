@@ -49,7 +49,7 @@
 
 <script>
 import ArgonInput from "@/components/Argons/ArgonInput.vue";
-import SetCard from "@/pages/admin/lesson/SetCard.vue";
+import SetCard from "@/pages/admin/lesson/LessonCard.vue";
 import ArgonButton from "@/components/Argons/ArgonButton.vue";
 
 export default {
@@ -93,8 +93,8 @@ export default {
             if (name === '' || description === '' || setDetail.length < 3) {
                 alert('Please fill all fields and add at least 3 cards');
             } else {
-                this.$store.dispatch('home/createLesson', { name: name, description: description, password: password, data: setDetail }).then(() => {
-                    this.$router.push({ name: 'home'});
+                this.$store.dispatch('lesson/createLesson', { name: name, description: description, password: password, data: setDetail }).then(() => {
+                    this.$router.push({ name: 'home.index'});
                 });
             }
         }

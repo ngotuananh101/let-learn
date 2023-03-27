@@ -157,17 +157,17 @@ export default {
         return "Home - " + document.getElementsByTagName("meta")["title"].content;
     },
     beforeMount() {
-        this.$store.dispatch('home/getLessonDetailRelearn', this.lesson_id).then(
+        this.$store.dispatch('lesson/getLessonDetailRelearn', this.lesson_id).then(
             relearn => {
                 this.relearns = relearn;
             }
         );
-        this.$store.dispatch('home/getLessonDetailNotLearn', this.lesson_id).then(
+        this.$store.dispatch('lesson/getLessonDetailNotLearn', this.lesson_id).then(
             notlearn => {
                 this.notlearns = notlearn;
             }
         );
-        this.$store.dispatch('home/getLessonInfo', this.lesson_id).then(
+        this.$store.dispatch('lesson/getLessonInfo', this.lesson_id).then(
             lesson => {
                 this.lesson = lesson;
             }
@@ -236,10 +236,10 @@ export default {
             }).then((result) => {
                 if (result.isConfirmed) {
                     let id = this.selected_id;
-                    this.$store.dispatch('home/deleteLesson', id).then(() => {
+                    this.$store.dispatch('lesson/deleteLesson', id).then(() => {
                         document.getElementById('edit-close').click();
                         this.$store.dispatch('home.index').then(() => {
-                            this.lessons = this.$store.getters['home/lessons'];
+                            this.lessons = this.$store.getters['lesson/lessons'];
                         });
                     });
                     // remove selected row
