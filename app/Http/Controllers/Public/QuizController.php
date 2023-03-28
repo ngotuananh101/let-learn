@@ -32,29 +32,149 @@ class QuizController extends Controller
         }
     }
 
-    public function show(Request $request,$id)
+    public function show(Request $request, $id)
     {
         try {
             $request->validate([
-                'type' => 'required|string|in:quiz,question,answer',
+                'type' => 'required|string|in:quiz,question,answer,grade',
             ]);
-            switch ($request->type) {
-                case 'quiz':
-                    $quiz = Quiz::with('questions')->findOrFail($id);
-                    return response()->json(['data' => $quiz]);
-                    break;
-                case 'question':
-                    $quiz = Quiz::with('questions')->findOrFail($id);
-                    //get question belong to quiz
-                    $questions = $quiz->questions;
-                    return response()->json(['data' => $questions]);
-                    break;
-                case 'answer':             
-                    $answers = Answer::where('quiz_id', $id)->get();
-                    return response()->json(['data' => $answers]);
-                    break;
-                default:
-                    break;
+
+            if (auth()->user()->role->name == 'teacher') {
+                switch ($request->type) {
+                    case 'quiz':
+                        $quiz = Quiz::with('questions')->findOrFail($id);
+                        return response()->json(['data' => $quiz]);
+                        break;
+                    case 'question':
+                        $quiz = Quiz::with('questions')->findOrFail($id);
+                        //get question belong to quiz
+                        $questions = $quiz->questions;
+                        return response()->json(['data' => $questions]);
+                        break;
+                    case 'answer': //for grade
+                        $quiz = Quiz::with('questions')->findOrFail($id);
+                        $answers = Answer::where('quiz_id', $id)->get();
+                        $sumPoints = 0;
+                        $answerData = [];
+                        //get answer_text and points from answer_text by summing the points
+                        // Loop through each answer and organize the data by user ID
+                        foreach ($answers as $answer) {
+                            $userId = $answer->user_id;
+                            $answerText = json_decode($answer->answer_text, true);
+                            if (!isset($answerData[$userId])) {
+                                $answerData[$userId] = [
+                                    'user_id' => $userId,
+                                    'quiz_id' => $quiz->id,
+                                    'answer_text' => [],
+                                    'total_points' => 0
+                                ];
+                            }
+                            $sumPoints = 0;
+
+                            foreach ($answerText as $answer) {
+                                $sumPoints += $answer['points'];
+                            }
+
+                            $answerData[$userId]['answer_text'] = $answerText;
+
+
+                            $answerData[$userId]['total_points'] = $sumPoints;
+                        }
+                        return response()->json([
+                            'data' => $answerData,
+                            'message' => 'Retrieve answer data successfully',
+                            'status' => 200
+                        ], 200);
+                        break;
+                    default:
+                        return response()->json([
+                            'status' => 'error',
+                            'status_code' => 400,
+                            'message' => 'Invalid type'
+                        ], 400);
+                        break;
+                }
+            } else if (auth()->user()->role->name == 'student') {
+                //check if value score_report of quiz is true
+                $quiz = Quiz::findOrFail($id);
+                if ($quiz->score_reporting == true) {
+                    switch ($request->type) {
+                        case 'quiz':
+                            $quiz = Quiz::with('questions')->find($id);
+                            $count_questions = $quiz->questions->count();
+                            $data = [
+                                'quiz_name' => $quiz->name,
+                                'quiz_description' => $quiz->description,
+                                'count_questions' => $count_questions,
+                            ];
+                            return response()->json(['data' => $data]);
+                            break;
+                        case 'question':
+                            $quiz = Quiz::with('questions')->findOrFail($id);
+                            $questions = $quiz->questions;
+                            //return only question and answer_options
+                            $questions = $questions->map(function ($question) {
+                                return [
+                                    'id' => $question->id,
+                                    'question' => $question->question,
+                                    'answer_option' => $question->answer_option,
+                                ];
+                            });
+                            return response()->json(['data' => $questions]);
+                            break;
+                        case 'answer':
+                            $quiz = Quiz::with('questions')->findOrFail($id);
+                            $quiz = Quiz::with('questions')->findOrFail($id);
+                            $answers = Answer::where('quiz_id', $id)->get();
+                            $sumPoints = 0;
+                            $answerData = [];
+                            $userId = auth()->id();
+                            //get answer_text and points from answer_text by summing the points
+                            // return only answer_text of auth user
+                            foreach ($answers as $answer) {
+                                if ($answer->user_id == $userId) {
+                                    $answerText = json_decode($answer->answer_text, true);
+                                    $answerData = [
+                                        'user_id' => $userId,
+                                        'quiz_id' => $quiz->id,
+                                        'answer_text' => $answerText,
+                                        'total_points' => 0
+                                    ];
+                                    $sumPoints = 0;
+
+                                    foreach ($answerText as $answer) {
+                                        $sumPoints += $answer['points'];
+                                    }
+
+                                    $answerData['total_points'] = $sumPoints;
+                                }
+                            }
+                            return response()->json([
+                                'data' => $answerData,
+                                'message' => 'Retrieve answer data successfully',
+                                'status' => 200
+                            ], 200);
+                        default:
+                            return response()->json([
+                                'status' => 'error',
+                                'status_code' => 400,
+                                'message' => 'Invalid type'
+                            ], 400);
+                            break;
+                    }
+                } else {
+                    return response()->json([
+                        'status' => 'error',
+                        'status_code' => 403,
+                        'message' => 'You are not authorized to view this quiz.'
+                    ], 403);
+                }
+            } else {
+                return response()->json([
+                    'status' => 'error',
+                    'status_code' => 400,
+                    'message' => 'Invalid role'
+                ], 400);
             }
         } catch (\Throwable $th) {
             return response()->json([
@@ -69,14 +189,55 @@ class QuizController extends Controller
     {
         try {
             $request->validate([
-                'type' => 'required|string|in:quiz,answer',
+                'type' => 'required|string|in:quiz,answer,import',
             ]);
+
+            // Check user role, allow only students to submit answers
+            if (auth()->user()->role->name == 'student' && $request->type != 'answer') {
+                return response()->json([
+                    'status' => 'error',
+                    'status_code' => 403,
+                    'message' => 'You are not authorized to create quizzes.'
+                ], 403);
+            }
             switch ($request->type) {
+                case 'import':
+                    $request->validate([
+                        'lesson_id' => 'required|integer',
+                    ]);
+
+                    $lesson_id = $request->lesson_id;
+
+                    // Call the learn method in the LessonController and get the response
+                    $lessonController = new LessonController();
+                    $response = $lessonController->learn($request, $lesson_id);
+                    dd($response);
+                    // Get the data from the response
+                    $data = $response->getData();
+                    // Check if the request was successful
+                    if ($response->getStatusCode() == 200) {
+                        // Get the lesson details from the data
+                        $lesson_name = $data->name;
+                        $lesson_description = $data->description;
+
+                        // Do something with the lesson details, like store them in a database or display them to the user
+                        // ...
+
+                        return response()->json(['message' => 'Lesson details retrieved successfully'], 200);
+                    } else {
+                        // Handle the error response
+                        $error_message = $data->message;
+
+                        // Do something with the error message, like log it or display it to the user
+                        // ...
+
+                        return response()->json(['message' => 'Error retrieving lesson details: ' . $error_message], $response->getStatusCode());
+                    }
                 case 'quiz':
                     $request->validate([
                         'name' => 'required|string|max:255',
                         'description' => 'required|string',
-                        'is_active' => 'nullable|boolean',
+                        'status' => 'required|in:pending,inactive',
                         'score_reporting' => 'nullable|boolean',
                         'questions' => 'required|array',
                         'questions.*.question' => 'required|string',
@@ -89,7 +250,7 @@ class QuizController extends Controller
                     $quiz = Quiz::create([
                         'name' => $request->input('name'),
                         'description' => $request->input('description'),
-                        'is_active' => $request->input('is_active', false),
+                        'status' => $request->input('status', 'inactive'),
                         'score_reporting' => $request->input('score_reporting', true),
                     ]);
 
@@ -246,7 +407,6 @@ class QuizController extends Controller
         }, $filename)->deleteFileAfterSend(true);
         // Return a success message
         return response()->json(['success' => true]);
-
     }
     //method to compare answer with correct answer
     public function compareAnswer($questionId, $correctAnswer, $answer)
@@ -274,20 +434,38 @@ class QuizController extends Controller
         }
         return false;
     }
-    
+
     public function update(Request $request, $id)
     {
         try {
+
             $request->validate([
                 'type' => 'required|string|in:quiz,updateQuestions,grade,addQuestion,addAnswer',
             ]);
+            if (auth()->user()->role->name == 'student') {
+                return response()->json([
+                    'status' => 'error',
+                    'status_code' => 403,
+                    'message' => 'You are not authorized to update.'
+                ], 403);
+            }
+            if (auth()->user()->role->name == 'teacher' && $request->type == 'quiz') {
+                return response()->json([
+                    'status' => 'error',
+                    'status_code' => 403,
+                    'message' => 'You are not authorized to update quiz.'
+                ], 403);
+            }
+
             switch ($request->type) {
                 case 'quiz':
                     $request->validate([
                         'name' => 'required|string|max:255',
                         'description' => 'required|string',
-                        'is_active' => 'nullable|boolean',
+                        'status' => 'required|in:active,pending,inactive',
                         'score_reporting' => 'nullable|boolean',
+                        'start_time' => 'nullable|date',
+                        'end_time' => 'nullable|date',
                     ]);
 
                     $quiz = Quiz::with('questions')->findOrFail($id);
@@ -295,8 +473,10 @@ class QuizController extends Controller
                     $quiz->update([
                         'name' => $request->input('name', $quiz->name),
                         'description' => $request->input('description', $quiz->description),
-                        'is_active' => $request->input('is_active', $quiz->is_active),
+                        'status' => $request->input('status', $quiz->status),
                         'score_reporting' => $request->input('score_reporting', $quiz->score_reporting),
+                        'start_time' => $request->input('start_time', $quiz->start_time),
+                        'end_time' => $request->input('end_time', $quiz->end_time),
                     ]);
 
                     return response()->json([
@@ -338,6 +518,7 @@ class QuizController extends Controller
                         'status' => 200
                     ], 200);
                     break;
+
                 case 'addQuestion':
                     $request->validate([
                         'questions' => 'required|array',
@@ -367,6 +548,7 @@ class QuizController extends Controller
                         'status' => 200
                     ], 200);
                     break;
+
                 case 'addAnswer':
                     $request->validate([
                         'answers' => 'required|array',
@@ -424,7 +606,6 @@ class QuizController extends Controller
                             }
                         }
                     }
-                    dd($sumPoints);
                     //get the total points of the quiz from question table
                     $maxPoints = Question::where('quiz_id', $quiz_id->id)->sum('points');
                     // Encode the updated array back to JSON format and save it as the new answer text
@@ -456,44 +637,75 @@ class QuizController extends Controller
             $request->validate([
                 'type' => 'required|string|in:quiz,question,answer',
             ]);
-            switch ($request->type) {
-                case 'quiz':
-                    $quiz = Quiz::findOrFail($id);
-                    $quiz->delete();
+            if (!in_array(auth()->user()->role->name, ['manager', 'teacher'])) {
+                return response()->json([
+                    'status' => 'error',
+                    'status_code' => 403,
+                    'message' => 'You are not authorized to delete.'
+                ], 403);
+            }
+            if (auth()->user()->role->name == 'manager') {
+                switch ($request->type) {
+                    case 'quiz':
+                        $quiz = Quiz::findOrFail($id);
+                        $quiz->delete();
 
-                    return response()->json([
-                        'message' => 'Delete quiz successfully',
-                        'status' => 200
-                    ], 200);
-                    break;
+                        return response()->json([
+                            'message' => 'Delete quiz successfully',
+                            'status' => 200
+                        ], 200);
+                        break;
 
-                case 'question':
-                    $request->validate([
-                        'question_id' => 'required|integer',
-                    ]);
-                    $question = Question::findOrFail($request->question_id);
-                    $question->delete();
+                    case 'question':
+                        $request->validate([
+                            'question_id' => 'required|integer',
+                        ]);
+                        $question = Question::findOrFail($request->question_id);
+                        $question->delete();
 
-                    return response()->json([
-                        'message' => 'Delete question successfully',
-                        'status' => 200
-                    ], 200);
-                    break;
-                case 'answer':
-                    $request->validate([
-                        'user_id' => 'required|integer',
-                    ]);
-                    $answer = Answer::where('quiz_id', $request->quiz_id)
-                        ->where('user_id', $request->user_id)
-                        ->firstOrFail();
-                    $answer->delete();
-                    return response()->json([
-                        'message' => 'Delete answer successfully',
-                        'status' => 200
-                    ], 200);
-                    break;
-                default:
-                    break;
+                        return response()->json([
+                            'message' => 'Delete question successfully',
+                            'status' => 200
+                        ], 200);
+                        break;
+                    case 'answer':
+                        $request->validate([
+                            'user_id' => 'required|integer',
+                        ]);
+                        $answer = Answer::where('quiz_id', $request->quiz_id)
+                            ->where('user_id', $request->user_id)
+                            ->firstOrFail();
+                        $answer->delete();
+                        return response()->json([
+                            'message' => 'Delete answer successfully',
+                            'status' => 200
+                        ], 200);
+                        break;
+                    default:
+                        break;
+                }
+            } else if (auth()->user()->role->name == 'teacher') {
+                switch ($request->type) {
+                    case 'quiz':
+                        $quiz = Quiz::findOrFail($id);
+                        // update the status of the quiz to in
+                        $quiz->update([
+                            'status' => 'inactive'
+                        ]);
+                        return response()->json([
+                            'message' => 'Delete quiz successfully',
+                            'status' => 200
+                        ], 200);
+                        break;
+                    default:
+                        break;
+                }
+            } else {
+                return response()->json([
+                    'status' => 'error',
+                    'status_code' => 403,
+                    'message' => 'You are not authorized to delete.'
+                ], 403);
             }
         } catch (\Throwable $th) {
             return response()->json([
