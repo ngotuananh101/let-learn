@@ -12,7 +12,9 @@ import ArgonDashboard from "./argon-dashboard";
 import {pageTitle} from 'vue-page-title';
 
 const appInstance = createApp(App);
-// appInstance.use(OneSignalVuePlugin, { appId: '1a3c6ac3-1e41-4338-bb97-99fb99ae5140' });
+appInstance.use(OneSignalVuePlugin, {
+    appId: '1a3c6ac3-1e41-4338-bb97-99fb99ae5140',
+})
 appInstance.use(store);
 appInstance.use(router);
 appInstance.use(VueTilt);

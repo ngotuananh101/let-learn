@@ -31,6 +31,7 @@ export default {
     },
     beforeMount() {
         this.index();
+        // abc 123
     },
     mounted() {
         if (this.meta) {
@@ -124,5 +125,4 @@ export default {
         box-shadow: 0 2.5em 0 0
     }
 }
-
 </style>

@@ -1,17 +1,17 @@
-import {adminSettingService} from '../../../services/admin/setting.service';
+import { adminSettingService } from "../../../services/admin/setting.service";
 
-const settings = JSON.parse(localStorage.getItem('settings')) || null;
-const state = settings ? {status: {index: true}, settings} : {status: {}, settings: []};
+const settings = JSON.parse(localStorage.getItem("settings")) || null;
+const state = settings ? { status: { index: true }, settings } : { status: {}, settings: [] };
 
 export default {
     namespaced: true,
     state: state,
     mutations: {
         indexRequest(state) {
-            state.status = {indexing: true};
+            state.status = { indexing: true };
         },
         indexSuccess(state, settings) {
-            state.status = {index: true};
+            state.status = { index: true };
             state.settings = settings;
         },
         indexFailure(state) {
@@ -19,37 +19,50 @@ export default {
             state.settings = [];
         },
         updateRequest(state) {
-            state.status = {updating: true};
+            state.status = { updating: true };
         },
         updateSuccess(state) {
-            state.status = {update: true};
+            state.status = { update: true };
         },
         updateFailure(state) {
             state.status = {};
         }
     },
     actions: {
-        index({commit}) {
-            commit('indexRequest');
+        index({ commit }) {
+            commit("indexRequest");
             adminSettingService.index()
                 .then(
                     settings => {
-                        commit('updateSuccess');
+                        commit("updateSuccess");
                     },
                     error => {
-                        commit('indexFailure', error);
+                        commit("indexFailure", error);
                     }
                 );
         },
-        update({commit}, data) {
-            commit('updateRequest');
-            adminSettingService.update(data.key, data.value)
+        update({ commit }, data) {
+            commit("updateRequest");
+            return adminSettingService.update(data.key, data.value)
                 .then(
                     settings => {
-                        commit('indexSuccess', settings);
+                        commit("indexSuccess", settings);
+                        return true;
                     },
                     error => {
-                        commit('updateFailure', error);
+                        commit("updateFailure", error);
+                        return false;
+                    }
+                );
+        },
+        sendNotification({ commit }, data) {
+            return adminSettingService.sendNotification(data)
+                .then(
+                    settings => {
+                        return true;
+                    },
+                    error => {
+                        return false;
                     }
                 );
         }
@@ -57,6 +70,6 @@ export default {
     getters: {
         settings: state => {
             return state.settings;
-        },
+        }
     }
-}
+};

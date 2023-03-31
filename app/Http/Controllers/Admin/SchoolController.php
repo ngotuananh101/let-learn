@@ -163,14 +163,13 @@ class SchoolController extends Controller
                             \Carbon\Carbon::parse($manager->updated_at)->format('d/m/Y'),
                         ];
                     }),
-                    'class.js' => $school->classes->map(function ($class) {
+                    'classes' => $school->classes->map(function ($class) {
                         return [
                             $class->id,
                             $class->name,
                             $class->description,
                             $class->start_date,
                             $class->end_date,
-                            $class->status,
                         ];
                     }),
                 ],

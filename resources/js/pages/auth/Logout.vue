@@ -1,9 +1,9 @@
 <template>
-    <div class="card-header text-center pt-4 pb-1">
-        <h4 class="font-weight-bolder mb-1">Loging Out</h4>
-        <p class="mb-0">
-            You are being logged out. Please wait...
-        </p>
+    <div class="card-header p-3 pb-0">
+        <h4 class="font-weight-bolder text-center">Logging Out</h4>
+    </div>
+    <div class="card-body pt-2">
+        <p class="text-center m-0"> Please wait while we log you out. </p>
     </div>
 </template>
 <script lang="js">
@@ -12,7 +12,7 @@ export default {
     name: "Auth Logout",
     created() {
         this.logout().then(() => {
-            location.href = '/auth/login';
+            this.$router.push({ name: 'auth.login' });
         });
     },
     methods: {

@@ -22,12 +22,12 @@
             </div>
             <div id="navbar" class="mt-2 collapse navbar-collapse mt-sm-0 me-md-0 me-sm-4">
                 <div class="pe-md-3 d-flex align-items-center ms-md-auto">
-                    <div class="input-group rounded-pill">
-                        <span class="input-group-text text-body">
-                            <i class="fas fa-search" aria-hidden="true"></i>
-                        </span>
-                        <input type="text" class="form-control" :placeholder="'Type here to search...'"/>
-                    </div>
+<!--                    <div class="input-group rounded-pill">-->
+<!--                        <span class="input-group-text text-body">-->
+<!--                            <i class="fas fa-search" aria-hidden="true"></i>-->
+<!--                        </span>-->
+<!--                        <input type="text" class="form-control" :placeholder="'Type here to search...'"/>-->
+<!--                    </div>-->
                 </div>
                 <ul class="navbar-nav justify-content-end">
                     <li class="nav-item d-flex align-items-center">
@@ -145,9 +145,6 @@ export default {
             let dir = this.$route.path.split("/")[1];
             return dir.charAt(0).toUpperCase() + dir.slice(1);
         }
-    },
-    created() {
-        this.minNav;
     },
     beforeUpdate() {
         this.toggleNavigationOnMobile();
