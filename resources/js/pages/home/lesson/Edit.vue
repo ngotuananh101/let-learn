@@ -91,7 +91,7 @@ export default {
             data: null,
             password_option: false,
             lesson_id: this.$route.params.id,
-            // delete_id: []
+            delete_id: []
         }
     },
     beforeMount() {
@@ -113,9 +113,9 @@ export default {
             this.data.detail = this.data.detail.filter((child, index) => index !== data.index - 1);
             this.children = this.children.filter((child, index) => index !== data.index - 1);
             this.count--;
-            // if (data.id !== 0) {
-            //     this.delete_id.push(data.id);
-            // }
+            if (data.id !== 0) {
+                this.delete_id.push(data.id);
+            }
         },
         publicChange() {
             this.password_option = !this.password_option;
@@ -126,30 +126,27 @@ export default {
             let status = document.getElementById('status').checked ? 'active' : 'inactive';
             let is_public = document.getElementById('is_public').checked ? 1 : 0;
             let password = document.getElementById('password') ? document.getElementById('password').value : '';
-            let detail = [];
+            let lessonDetail = [];
             for (let i = 1; i <= this.count; i++) {
                 let card = document.getElementById('card' + i);
                 let term = card.getElementsByClassName('term')[0].value;
                 let definition = card.getElementsByClassName('definition')[0].value;
                 let id = card.getElementsByClassName('id')[0].value;
                 if (term !== '' && definition !== '') {
-                    detail.push({
+                    lessonDetail.push({
                         id: id,
                         term: term,
                         definition: definition
                     });
                 }
             }
-            if (name === '' || description === '' || detail.length < 3) {
+            if (name === '' || description === '' || lessonDetail.length < 3) {
                 alert('Please fill all fields and add at least 3 cards');
             } else {
                 this.$root.$data.snackbar = {
                     color: 'warning',
                     message: 'Updating lesson...',
                 };
-                setTimeout(() => {
-                        this.$root.$data.snackbar = null;
-                    }, 3000);
                 this.$store.dispatch('lesson/updateLesson', {
                     id: this.lesson_id,
                     name: name,
@@ -158,10 +155,25 @@ export default {
                     is_public: is_public,
                     password: password,
                     data: {
-                        detail: detail,
-                        // delete_id: this.delete_id
+                        lessonDetail: lessonDetail,
+                        delete_id: this.delete_id
                     }
-                })
+                }).then((res) => {
+                    if (res) {
+                        this.$root.$data.snackbar = {
+                            color: 'success',
+                            message: 'Update lesson successfully!',
+                        };
+                    } else {
+                        this.$root.$data.snackbar = {
+                            color: 'danger',
+                            message: 'Update lesson failed!',
+                        };
+                    }
+                    setTimeout(() => {
+                        this.$root.$data.snackbar = null;
+                    }, 3000);
+                });
             }
         }
     },
