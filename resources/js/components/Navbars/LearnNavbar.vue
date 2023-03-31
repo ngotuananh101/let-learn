@@ -1,9 +1,9 @@
 <template>
-    <div class="w-100 bg-white container-fluid d-flex justify-content-between align-items-center py-3">
+    <div class="w-100 bg-white container-fluid d-flex justify-content-between align-items-center py-2">
         <a href="#" class="btn m-0 rounded-circle d-flex justify-content-center align-items-center" style="width: 2.5rem; height: 2.5rem;" onclick="window.history.back()">
             <i class="fa-solid fa-chevron-left"></i>
         </a>
-        <div class="fs-4 fw-bold">
+        <div class="fs-5 fw-bold">
             {{ title }}
         </div>
         <button class="btn m-0" @click="$emit('toggle-options'); toggleSettings()">
