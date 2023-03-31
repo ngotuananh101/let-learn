@@ -6,7 +6,7 @@
                     <h6 class="card-subtitle text-muted">{{ cardsCount.currentCardIndex + 1 }} /
                         {{ cardsCount.totalCards }}</h6>
                 </div>
-                <div @click="speak(this.data[currentCardIndex].definition)">
+                <div @click="speak">
                     <i class="fa-solid fa-volume fs-4"></i>
                 </div>
             </div>
@@ -78,9 +78,9 @@ export default {
             this.showSettings = !this.showSettings;
         },
         // text to speech
-        speak(text) {
+        speak() {
             const msg = new SpeechSynthesisUtterance();
-            msg.text = text;
+            msg.text = document.getElementById("text").innerHTML;
             window.speechSynthesis.speak(msg);
         },
         rotateCard(e) {
