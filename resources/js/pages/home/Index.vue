@@ -25,39 +25,52 @@
             <LessonCard :title="classes.name" :value="classes.classes_count + ' courses'" />
         </div>
     </div>
-    <a class="float" data-bs-toggle="modal" data-bs-target="#modal">
+    <a class="float" data-bs-toggle="modal" data-bs-target="#floatModal">
         <i class="fa fa-plus my-float">
         </i>
     </a>
-    <div class="modal" id="modal" data-bs-keyboard="false" tabindex="-1">
+    <div class="modal fade" id="floatModal" aria-hidden="false" aria-labelledby="exampleModalToggleLabel" tabindex="-1">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title">Create</h5>
+                    <h5 class="modal-title" id="exampleModalToggleLabel">Create</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
                     <div class="row">
                         <div class="col-lg-6 col-md-6 col-4">
                             <div class="card" style="width: 14rem;" @click="this.createLesson">
-                                <img src="https://www.flaticon.com/free-icon/lesson_1575305?term=lesson&page=1&position=5&origin=search&related_id=1575305"
-                                    class="card-img-top" alt="...">
+                                <img src="https://cdn-icons-png.flaticon.com/512/1575/1575305.png" class="card-img-top"
+                                    alt="...">
                                 <div class="card-body">
-                                    <p class="card-text">Create Lesson</p>
+                                    <p class="btn btn-success">Create lesson</p>
                                 </div>
                             </div>
                         </div>
                         <div class="col-lg-6 col-md-6 col-4">
-                            <div class="card" style="width: 14rem;" @click="this.createCourse">
-                                <img src="https://www.flaticon.com/free-icon/folder_3767084?term=folder&page=1&position=4&origin=search&related_id=3767084"
-                                    class="card-img-top" alt="...">
+                            <div class="card" style="width: 14rem;">
+                                <img src="https://cdn-icons-png.flaticon.com/512/2103/2103423.png" class="card-img-top"
+                                    alt="...">
                                 <div class="card-body">
-                                    <p class="card-text">Create Course</p>
+                                    <button class="btn btn-success" data-bs-target="#createCourse" data-bs-toggle="modal"
+                                        data-bs-dismiss="modal">Create course</button>
                                 </div>
                             </div>
                         </div>
                     </div>
-                    <!-- <div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal fade" id="createCourse" aria-hidden="true" aria-labelledby="exampleModalToggleLabel2" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalToggleLabel2">Create course</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div>
                         <label class="form-label mt-2 fs-6">Name</label>
                         <argon-input id="name" type="text" name="name"
                             placeholder="Enter a name. Example:'MAE Chapter 1' " />
@@ -66,10 +79,11 @@
                         <label class="form-label mt-2 fs-6">Description</label>
                         <argon-input id="description" type="text" name="description" placeholder="Add a description..." />
                     </div>
-                    <div class="col-xl-3 col-lg-4 col-sm-5">
-                                <argon-button color="success" variant="gradient" full-width class="my-2 btn-lg fs-6"
-                                    @click="this.createCourse">Create</argon-button>
-                    </div> -->
+                </div>
+                <div class="modal-footer">
+                    <argon-button color="success" @click="this.createCourse">Create</argon-button>
+                    <argon-button class="btn btn-secondary" data-bs-target="#floatModal" data-bs-toggle="modal"
+                        data-bs-dismiss="modal">Back</argon-button>
                 </div>
             </div>
         </div>
@@ -80,10 +94,11 @@
 import LessonCard from "@/components/Cards/LessonCard.vue";
 import InfoCard from "@/components/Cards/InfoCard.vue";
 import ArgonButton from "@/components/Argons/ArgonButton.vue";
+import ArgonInput from "@/components/Argons/ArgonInput.vue";
 
 export default {
     name: "HomePage",
-    components: { LessonCard, InfoCard, ArgonButton },
+    components: { LessonCard, InfoCard, ArgonButton, ArgonInput },
     data() {
         return {
             lessons: null,
@@ -119,17 +134,21 @@ export default {
         createLesson() {
             this.$router.push({ name: 'home.lesson.add' });
         },
-        //     createCourse() {
-        //         let name = document.getElementById('name').value;
-        //         let description = document.getElementById('description').value;
-        //         if (name === '' || description === '') {
-        //             alert('Please fill all fields and add at least 3 cards');
-        //         } else {
-        //             this.$store.dispatch('home/createCourse', { name: name, description: description }).then(() => {
-        //                 this.$router.push({ name: 'home.index' });
-        //             });
-        //         }
-        //     }
+        createCourse() {
+            let name = document.getElementById('name').value;
+            let description = document.getElementById('description').value;
+            if (name === '' || description === '') {
+                alert('Please fill all fields');
+            } else {
+                this.$store.dispatch('course/createCourse', { name: name, description: description }).then(() => {
+                    this.$router.push({ name: 'home.index' });
+                });
+                // Toggle the createCourseModal modal after a short delay
+                setTimeout(() => {
+                    $('#createCourseModal').modal('toggle');
+                }, 500);
+            }
+        }
     },
 };
 </script>
