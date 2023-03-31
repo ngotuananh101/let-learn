@@ -17,6 +17,14 @@
                     </template>
                 </sidenav-collapse>
             </li>
+            <li class="nav-item">
+                <sidenav-collapse @click="$router.push({ name: 'admin.notification' })" collapse-ref="" nav-text="Notification"
+                                  :class="getRoute() === 'notification' ? 'active' : ''">
+                    <template #icon>
+                        <i class="fa-regular fa-bell text-primary text-sm opacity-10"></i>
+                    </template>
+                </sidenav-collapse>
+            </li>
             <li class="mt-3 nav-item">
                 <h6 class="text-xs ps-4 text-uppercase font-weight-bolder opacity-6 ms-2">
                     Users
@@ -72,14 +80,6 @@
                                   :class="getRoute() === 'folder' ? 'active' : ''">
                     <template #icon>
                         <i class="fa-regular fa-folder text-primary text-sm opacity-10"></i>
-                    </template>
-                </sidenav-collapse>
-            </li>
-            <li class="nav-item">
-                <sidenav-collapse @click="$router.push({ name: 'admin.setting' })" collapse-ref="" nav-text="Class"
-                                  :class="getRoute() === 'class' ? 'active' : ''">
-                    <template #icon>
-                        <i class="fa-regular fa-screen-users text-primary text-sm opacity-10"></i>
                     </template>
                 </sidenav-collapse>
             </li>

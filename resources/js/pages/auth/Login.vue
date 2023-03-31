@@ -2,12 +2,12 @@
     <div class="card-header bg-transparent">
         <h5 class="text-dark text-center mt-2 mb-3">Sign in</h5>
         <div class="btn-wrapper text-center">
-            <a href="javascript:;" class="btn btn-neutral btn-icon btn-sm mb-0 me-2 my-2">
-                <img class="w-25" src="https://19403879-letlearn.s3-hcm-r1.longvan.net/images/facebook.svg" />
-                Facebook
+            <a href="javascript:;" class="btn btn-neutral btn-icon btn-sm mb-0 me-1">
+                <img class="w-30" src="/storage/images/logos/github.svg" />
+                Github
             </a>
-            <a href="javascript:;" class="btn btn-neutral btn-icon btn-sm mb-0 my-2">
-                <img class="w-30" src="https://19403879-letlearn.s3-hcm-r1.longvan.net/images/google.svg" />
+            <a href="javascript:;" class="btn btn-neutral btn-icon btn-sm mb-0">
+                <img class="w-30" src="/storage/images/logos/google.svg" />
                 Google
             </a>
         </div>
@@ -19,11 +19,11 @@
         <form role="form" class="text-start" @submit.prevent="handleSubmit">
             <div class="mb-3">
                 <argon-input id="email" type="text" name="email" placeholder="Email" aria-label="Email"
-                    isRequired />
+                             isRequired />
             </div>
             <div class="mb-3">
                 <argon-input id="password" type="password" name="password" placeholder="Password" aria-label="Password"
-                    isRequired />
+                             isRequired />
             </div>
             <argon-switch id="rememberMe" name="rememberMe">
                 Remember me
@@ -54,39 +54,30 @@ import { mapMutations, mapActions, mapState } from "vuex";
 import ArgonInput from "@/components/Argons/ArgonInput.vue";
 import ArgonSwitch from "@/components/Argons/ArgonSwitch.vue";
 import ArgonButton from "@/components/Argons/ArgonButton.vue";
+
 export default {
     name: "Auth Login",
     data() {
         return {
-            email: '',
-            password: '',
+            email: "",
+            password: "",
             rememberMe: false,
-            submitted: false,
-        }
+            submitted: false
+        };
     },
     title() {
-        return 'Login' + ' | ' +this.meta.meta.name;
-    },
-    computed: {
-        ...mapState(['account', 'app', 'meta'])
+        return "Login - " + document.querySelector("meta[name=\"title\"]").getAttribute("content");
     },
     components: {
         ArgonInput,
         ArgonSwitch,
-        ArgonButton,
+        ArgonButton
     },
     created() {
-        this.$store.state.app.hideConfigButton = true;
-        this.toggleDefaultLayout();
         this.logout();
     },
-    beforeUnmount() {
-        this.$store.state.app.hideConfigButton = false;
-        this.toggleDefaultLayout();
-    },
     methods: {
-        ...mapMutations(["toggleDefaultLayout", 'loginFailure']),
-        ...mapActions('account', ['login', 'logout']),
+        ...mapActions("account", ["login", "logout"]),
         handleSubmit(e) {
             this.submitted = true;
             this.email = e.target.email.value;
@@ -96,18 +87,18 @@ export default {
                 this.login({
                     email: this.email,
                     password: this.password,
-                    rememberMe: this.rememberMe,
+                    rememberMe: this.rememberMe
                 });
             } else {
                 this.$swal({
-                    title: 'Oops!',
-                    text: 'Please enter your email and password!',
-                    icon: 'error',
-                    confirmButtonText: 'OK'
+                    title: "Oops!",
+                    text: "Please enter your email and password!",
+                    icon: "error",
+                    confirmButtonText: "OK"
                 });
                 this.submitted = false;
             }
         }
-    },
+    }
 };
 </script>

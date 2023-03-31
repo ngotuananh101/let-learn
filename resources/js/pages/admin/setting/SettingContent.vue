@@ -8,7 +8,7 @@
                 <div class="col-6">
                     <label class="form-label mt-2">Site name</label>
                     <argon-input id="name" type="text" name="name" placeholder="Site name" :value="this.setting.name"
-                                 @keyup.enter="this.update"/>
+                                 @change="this.update"/>
                 </div>
                 <div class="col-6">
                     <label class="form-label mt-2">TimeZone</label>
@@ -26,8 +26,9 @@
                         id="description"
                         name="description"
                         class="multisteps-form__textarea mt-0"
+                        :rows="3"
                         placeholder="Description"
-                        @keyup.enter="this.update"
+                        @change="this.update"
                     />
                 </div>
                 <div class="col-12">
@@ -35,8 +36,10 @@
                     <argon-textarea
                         id="header"
                         name="header"
+                        :rows="8"
                         class="multisteps-form__textarea mt-0"
                         placeholder="Description"
+                        @change="this.update"
                     />
                 </div>
                 <div class="col-12">
@@ -49,8 +52,7 @@
                         :value="this.setting.keywords"
                         placeholder="Keywords separated by comma"
                         onfocus="focused(this)"
-                        onfocusout="defocused(this)"
-                        @keyup.enter="this.update"
+                        @change="this.update"
                     />
                 </div>
                 <div class="col-12">
@@ -120,14 +122,7 @@ export default {
     },
     data() {
         return {
-            setting: {
-                name: '',
-                timezone: '',
-                description: '',
-                keywords: '',
-                favicon: '',
-                logo: '',
-            },
+            setting: {},
         };
     },
     beforeMount() {
@@ -150,8 +145,9 @@ export default {
             updateSetting: 'adminSetting/update',
         }),
         update(e) {
+            console.log(e.target);
             let key = e.target.getAttribute('name');
-            let valuee = e.target.value;
+            let value= e.target.value;
             this.$root.$data.snackbar = {
                 color: 'warning',
                 message: 'Updating ' + key + '...',
@@ -163,22 +159,21 @@ export default {
                     document.getElementById(key + '-preview').src = e.target.result;
                 };
                 reader.readAsDataURL(file);
-                valuee = file;
+                value = file;
             }
-            this.updateSetting({key: key, value: valuee}).then(() => {
-                this.$root.$data.snackbar = {
+            this.updateSetting({key: key, value: value}).then((response) => {
+                if(response) this.$root.$data.snackbar = {
                     color: 'success',
                     message: 'Updated ' + key + ' successfully!',
                 };
-            }).catch(() => {
-                this.$root.$data.snackbar = {
+                else this.$root.$data.snackbar = {
                     color: 'danger',
                     message: 'Updated ' + key + ' failed!',
                 };
             }).then(() => {
                 setTimeout(() => {
                     this.$root.$data.snackbar = '';
-                }, 500);
+                }, 1000);
             });
         },
         setTimeZone() {
