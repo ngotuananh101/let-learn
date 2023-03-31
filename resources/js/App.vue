@@ -57,7 +57,6 @@ export default {
         closeSnackbar() {
             this.snackbar = "";
         },
-        // test webhook
     },
     computed: {
         ...mapState({
