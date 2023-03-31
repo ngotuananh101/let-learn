@@ -3,9 +3,10 @@
     <textarea
         :id="id"
         class="form-control"
+        :name="name"
         :rows="rows"
         :placeholder="placeholder"
-    ></textarea>
+    >{{ this.value }}</textarea>
     </div>
 </template>
 
@@ -24,6 +25,10 @@ export default {
         rows: {
             type: Number,
             default: 5,
+        },
+        name: {
+            type: String,
+            default: "",
         },
         value: {
             type: String,

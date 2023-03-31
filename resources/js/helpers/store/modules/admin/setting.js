@@ -43,13 +43,15 @@ export default {
         },
         update({commit}, data) {
             commit('updateRequest');
-            adminSettingService.update(data.key, data.value)
+            return adminSettingService.update(data.key, data.value)
                 .then(
                     settings => {
                         commit('indexSuccess', settings);
+                        return true;
                     },
                     error => {
                         commit('updateFailure', error);
+                        return false;
                     }
                 );
         }

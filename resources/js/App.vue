@@ -42,6 +42,9 @@ export default {
             this.meta.keywords ? document.querySelector('meta[name="keywords"]').setAttribute('content', this.meta.keywords) : '';
             // add html code to head
             this.meta.header ? document.querySelector('head').insertAdjacentHTML('beforeend', this.meta.header) : '';
+            // this.$OneSignal.init({
+            //     appId: this.meta.onesignal_app_id,
+            // });
         }
     },
     created() {

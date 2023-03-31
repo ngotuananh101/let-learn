@@ -71,8 +71,9 @@ class SettingController extends Controller
                 $file->move(public_path(), $filename);
             } else {
                 // update setting
-                $setting->value = $request->value;
-                $setting->save();
+                $setting->update([
+                    'value' => $request->value
+                ]);
             }
             // delete meta data from cache
             cache()->forget('meta_data');
@@ -98,9 +99,9 @@ class SettingController extends Controller
     {
         try {
             // Check if meta data exists in cache
-            if (cache()->has('meta_data')) {
-                $meta = cache()->get('meta_data');
-            } else {
+//            if (cache()->has('meta_data')) {
+//                $meta = cache()->get('meta_data');
+//            } else {
                 // get title, description, keywords
                 $meta_data = Setting::whereIn('key', ['name', 'description', 'keywords', 'header', 'onesignal_app_id'])->get();
                 // convert to key value pair
@@ -110,7 +111,7 @@ class SettingController extends Controller
                 // lesson meta data to cache
                 cache()->put('meta_data', $meta_data);
                 $meta = $meta_data;
-            }
+//            }
             return response()->json([
                 'status' => 'success',
                 'status_code' => 200,
