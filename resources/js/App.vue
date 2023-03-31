@@ -31,7 +31,7 @@ export default {
     },
     beforeMount() {
         this.index();
-        // abc
+        // abc 123
     },
     mounted() {
         if (this.meta) {
