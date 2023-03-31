@@ -18,7 +18,7 @@ const admin = [
             {
                 path: 'notification',
                 name: 'admin.notification',
-                component: () => import('../../pages/admin/setting/Setting.vue'),
+                component: () => import('../../pages/admin/notification/Index.vue'),
             },
             {
                 path: 'users',
