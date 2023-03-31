@@ -28,6 +28,7 @@ export default {
         return {
             snackbar: "",
         };
+        // test
     },
     beforeMount() {
         this.index();
