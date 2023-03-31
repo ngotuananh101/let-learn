@@ -41,8 +41,22 @@
                                              placeholder="Enter passord for this set"
                                              :value="this.data.lesson.password"/>
                             </div>
-                            <div class="col-12">
-                                <label class="form-label mt-2 fs-6">Detail</label>
+                            <div class="col-12 mt-3">
+                                <div class="d-lg-flex">
+                                    <div>
+                                        <h6 class="mb-0">Detail</h6>
+                                        <p class="mb-0 text-sm">Detail in this lesson</p>
+                                    </div>
+                                    <div class="my-auto mt-4 ms-auto mt-lg-0">
+                                        <div class="my-auto ms-auto">
+                                            <button type="button"
+                                                    class="mx-1 mb-0 btn btn-outline-success btn-sm"
+                                                    @click="this.switch">
+                                                Switch all term and definition
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
                                 <div v-for="(child, index) in children">
                                     <component :is="child" :title="index+1 + ''" :key="'setDetail'+index"
                                                @remove="this.removeCard"
@@ -181,6 +195,16 @@ export default {
                         this.$root.$data.snackbar = null;
                     }, 3000);
                 });
+            }
+        },
+        switch(){
+            // switch term and definition
+            for (let i = 1; i <= this.count; i++) {
+                let card = document.getElementById('card' + i);
+                let term = card.getElementsByClassName('term')[0].value;
+                let definition = card.getElementsByClassName('definition')[0].value;
+                card.getElementsByClassName('term')[0].value = definition;
+                card.getElementsByClassName('definition')[0].value = term;
             }
         }
     },

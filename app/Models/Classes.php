@@ -21,9 +21,15 @@ class Classes extends Model
         'updated_at',
     ];
 
-    // get school of a class.js
+    // get school of a class
     public function school(): BelongsTo
     {
         return $this->belongsTo(School::class, 'school_id', 'id');
+    }
+
+    // get member of a class
+    public function members(): BelongsToMany
+    {
+        return $this->belongsToMany(User::class, 'class_members', 'class_id', 'user_id');
     }
 }

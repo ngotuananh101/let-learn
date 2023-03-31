@@ -12,7 +12,7 @@
                             </div>
                             <div class="my-auto mt-4 ms-auto mt-lg-0">
                                 <div class="my-auto ms-auto">
-                                    <button v-if="checkPermission('admin.users.create')" type="button"
+                                    <button type="button"
                                             class="mx-1 mb-0 btn btn-outline-success btn-sm"
                                             data-bs-toggle="modal"
                                             data-bs-target="#userModal">
@@ -131,13 +131,13 @@
                     <p>You can select option for this Set</p>
                     <div class="row">
                         <div class="col-6">
-                            <button v-if="checkPermission('admin.users.edit')" type="button"
+                            <button type="button"
                                     class="w-100 mx-1 mb-0 btn bg-gradient-warning btn-sm" @click="this.update">
                                 Update
                             </button>
                         </div>
                         <div class="col-6">
-                            <button v-if="checkPermission('admin.users.delete')" type="button"
+                            <button type="button"
                                     class="w-100 mx-1 mb-0 btn bg-gradient-danger btn-sm" @click="this.destroy">
                                 Delete
                             </button>
