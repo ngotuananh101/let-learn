@@ -31,6 +31,7 @@ export default {
     },
     beforeMount() {
         this.index();
+        // abc
     },
     mounted() {
         if (this.meta) {
