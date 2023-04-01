@@ -402,14 +402,7 @@ class LessonController extends Controller
     public function update(Request $request, $id): JsonResponse
     {
         try {
-            $request->validate([
-                'name' => 'required|string',
-                'description' => 'string',
-                'status' => 'required|in:active,inactive',
-                'is_public' => 'required|in:1,0',
-                'password' => 'nullable|string',
-                'data' => 'required|array',
-            ]);
+            // get lesson
             $lesson = Lesson::findOrFail($id);
             // check lesson is deleted
             if ($lesson->status == 'inactive') {
@@ -419,35 +412,17 @@ class LessonController extends Controller
                     'message' => 'Lesson not found!'
                 ], 404);
             }
-            //check lesson is public
-            if ($lesson->is_public == 1) {
+            // check user is owner of lesson
+            if ($lesson->user_id != auth()->user()->id) {
                 return response()->json([
                     'status' => 'error',
-                    'status_code' => 400,
-                    'message' => 'Lesson is public!'
-                ], 400);
+                    'status_code' => 403,
+                    'message' => 'You are not owner of this lesson!'
+                ], 403);
             }
-            $lesson->name = $request->name;
-            $lesson->description = $request->description;
-            $lesson->status = $request->status;
-            $lesson->is_public = $request->is_public;
-            $lesson->password = $request->password;
-            $lesson->save();
-
-            $lesson->lessonDetail()->delete();
-
-            foreach ($request->data as $detail) {
-                $lesson->lessonDetail()->create([
-                    'term' => $detail['term'],
-                    'definition' => $detail['definition'],
-                ]);
-            }
-            // return json response
-            return response()->json([
-                'status' => 'success',
-                'status_code' => 200,
-                'message' => 'Update lesson successfully!',
-            ], 200);
+            // update lesson
+            $lessonController = new \App\Http\Controllers\Admin\LessonController();
+            return $lessonController->update($request, $id);
         } catch (\Throwable $th) {
             return response()->json([
                 'status' => 'error',

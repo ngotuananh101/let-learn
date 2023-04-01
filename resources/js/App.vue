@@ -67,7 +67,7 @@ export default {
 <style scoped>
 .notification {
     position: relative;
-    z-index: 9999;
+    z-index: 99999;
     top: 10px;
     right: 10px;
 }

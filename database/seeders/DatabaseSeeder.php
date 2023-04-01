@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Models\Setting;
 use Illuminate\Database\Seeder;
 use App\Models\User;
 use App\Models\Role;
@@ -142,6 +143,39 @@ class DatabaseSeeder extends Seeder
         ];
         foreach ($users as $user) {
             User::create($user);
+        };
+        $settings = [
+            [
+                'key' => 'name',
+                'value' => 'Let Learn',
+            ],
+            [
+                'key' => 'timezone',
+                'value' => 'Asia/Ho_Chi_Minh',
+            ],
+            [
+                'key' => 'description',
+                'value' => 'Let Learn is a platform for learning',
+            ],
+            [
+                'key' => 'header',
+                'value' => '<meta>Let Learn</meta>',
+            ],
+            [
+                'key' => 'keywords',
+                'value' => 'Let Learn, Learning, Platform, Online, Education, School, Teacher, Student, Class, Mark, Grade, Subject, Course, Lesson, Test, Exam, Quiz, Question, Answer, Homework, Assignment, Activity, Event, Announcement, Notification, Message, Chat, Forum, Blog, Post, Comment, Review, Rating, Vote, Poll, Survey'
+            ],
+            [
+                'key' => 'favicon',
+                'value' => '/favicon.ico',
+            ],
+            [
+                'key' => 'logo',
+                'value' => '/logo.png',
+            ]
+        ];
+        foreach ($settings as $setting) {
+            Setting::create($setting);
         }
     }
 }
