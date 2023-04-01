@@ -78,11 +78,6 @@ const home = [
                 component: () => import('../../pages/home/Setting.vue'),
             },
             {
-                path: 'flashcards',
-                name: 'home.flashcards',
-                component: () => import('../../pages/learn/Flashcards.vue'),
-            },
-            {
                 path: 'forum',
                 name: 'home.forum',
                 component: () => import('../../pages/home/Forum.vue'),
