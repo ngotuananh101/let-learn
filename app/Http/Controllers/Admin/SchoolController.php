@@ -114,9 +114,8 @@ class SchoolController extends Controller
                 $manager->role_id = Role::where('name', 'manager')->first()->id;
                 $manager->save();
             }
-            // attach manager to school with role manager
-            $school->managers()->attach($manager, ['position' => $request->manager['department']]);
-
+            // attach manager to school
+            $school->managers()->attach($manager->id);
             // Return json
             return response()->json([
                 'status' => 'success',
@@ -144,7 +143,7 @@ class SchoolController extends Controller
     {
         try {
             $request->validate([
-                'type' => 'required|in:all,managers,teachers,students,search_user,class.js',
+                'type' => 'required|in:all,managers,teachers,students,search_user,class',
                 'keyword' => 'required_if:type,search_user|string',
             ]);
             // get school
@@ -173,7 +172,7 @@ class SchoolController extends Controller
                         ];
                     }),
                 ],
-                'class.js' => $school->classes->map(function ($class) {
+                'class' => $school->classes->map(function ($class) {
                     return [
                         $class->id,
                         $class->name,

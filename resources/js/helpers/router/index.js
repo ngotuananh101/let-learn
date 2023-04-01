@@ -5,6 +5,7 @@ import home from "./home";
 import store from "../store";
 import learn from "./learn";
 import classes from "./class";
+import manage from "./manage";
 
 const error = [
     {
@@ -14,7 +15,7 @@ const error = [
     }
 ];
 
-const routes = [...home, ...admin, ...auth,...learn, ...classes,...error];
+const routes = [...home, ...admin,...manage, ...auth,...learn, ...classes,...error];
 
 const router = createRouter({
     history: createWebHistory(),
@@ -47,6 +48,13 @@ router.beforeEach((to, from, next) => {
             }
             // check if user is admin
             if (to.path.includes('admin') && !store.getters['account/isAdmin']) {
+                return next({
+                    path: "/",
+                });
+            }
+
+            // check if user is manager
+            if (to.path.includes('manage') && !store.getters['account/isAdmin']) {
                 return next({
                     path: "/",
                 });

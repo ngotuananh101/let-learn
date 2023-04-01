@@ -14,6 +14,7 @@ return new class extends Migration {
     {
         Schema::create('posts', function (Blueprint $table) {
             $table->id();
+            $table->string('slug');
             $table->foreignId('user_id')->constrained();
             $table->foreignId('class_id')->nullable()->constrained();
             $table->string('name');
@@ -21,6 +22,7 @@ return new class extends Migration {
             $table->enum('status', ['active', 'pending', 'inactive'])->default('inactive');
             $table->integer('score_reporting')->default(0);
             $table->string('tags');
+            $table->integer('views')->default(0);
             $table->timestamps();
         });
     }

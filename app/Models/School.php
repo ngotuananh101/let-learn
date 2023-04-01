@@ -25,9 +25,9 @@ class School extends Model
     ];
 
     // get all manager in a school
-    public function managers(): BelongsToMany
+    public function managers(): HasMany
     {
-        return $this->belongsToMany(User::class, 'school_managers', 'school_id', 'user_id')->withPivot('position');
+        return $this->hasMany(User::class, 'school_id', 'id');
     }
 
     // get all student in a school
