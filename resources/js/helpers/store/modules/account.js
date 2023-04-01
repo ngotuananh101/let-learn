@@ -61,6 +61,10 @@ export default {
                             setTimeout(() => {
                                 router.push({name: 'admin'})
                             }, 1000);
+                        }else if (user.data.permissions.some(permission => permission.name === 'manager.dashboard')) {
+                            setTimeout(() => {
+                                router.push({name: 'manage'})
+                            }, 1000);
                         } else {
                             setTimeout(() => {
                                 router.push({name: 'home'})

@@ -77,11 +77,6 @@ const home = [
                 name: 'home.setting',
                 component: () => import('../../pages/home/Setting.vue'),
             },
-            {
-                path: 'flashcards',
-                name: 'home.flashcards',
-                component: () => import('../../pages/learn/Flashcards.vue'),
-            }
         ],
     },
 ];

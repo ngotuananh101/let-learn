@@ -18,7 +18,6 @@ class Classes extends Model
         'start_date',
         'end_date',
         'status',
-        'updated_at',
     ];
 
     // get school of a class

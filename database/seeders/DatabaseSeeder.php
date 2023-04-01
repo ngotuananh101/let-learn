@@ -2,6 +2,8 @@
 
 namespace Database\Seeders;
 
+use App\Models\Classes;
+use App\Models\School;
 use App\Models\Setting;
 use Illuminate\Database\Seeder;
 use App\Models\User;
@@ -17,6 +19,25 @@ class DatabaseSeeder extends Seeder
      * @return void
      */
     public function run()
+    {
+        // seed the roles
+        $this->runRole();
+        // seed the permissions
+        $this->runPermission();
+        // seed the users
+        $this->runUser();
+        // seed the settings
+        $this->runSetting();
+        // seed the schools
+        $this->runSchool();
+    }
+
+    /**
+     * Seed the role for the application.
+     *
+     * @return void
+     */
+    public function runRole()
     {
         // seed the roles
         $roles = [
@@ -48,8 +69,15 @@ class DatabaseSeeder extends Seeder
         foreach ($roles as $role) {
             Role::create($role);
         }
+    }
 
-        // seed the permissions
+    /**
+     * Seed the permission for the application.
+     *
+     * @return void
+     */
+    private function runPermission()
+    {
         $permissions = [
             // permissions in admin page
             [
@@ -70,48 +98,22 @@ class DatabaseSeeder extends Seeder
             ],
             // permissions in manager of school
             [
-                'name' => 'manager.super',
-                'description' => 'Give all permissions of school to user',
-            ],
-            [
                 'name' => 'manager.dashboard',
                 'description' => 'Require to access any manager page',
-            ],
-            [
-                'name' => 'manager.info',
-                'description' => 'Require to update info of school',
-            ],
-            [
-                'name' => 'manager.user',
-                'description' => 'Require to manage users of school',
-            ],
-            [
-                'name' => 'manager.class.js',
-                'description' => 'Require to manage class.js of school',
-            ],
-            [
-                'name' => 'manager.student',
-                'description' => 'Require to manage students of school',
-            ],
-            [
-                'name' => 'manager.teacher',
-                'description' => 'Require to manage teachers of school',
-            ],
-            [
-                'name' => 'manager.mark',
-                'description' => 'Require to manage marks of school',
             ],
         ];
         foreach ($permissions as $permission) {
             Permission::create($permission);
         }
-
         // attach permissions to roles
         $role = Role::where('name', 'super')->first();
         $role->permissions()->attach(Permission::all());
         $role = Role::where('name', 'admin')->first();
         $role->permissions()->attach(Permission::where('name', 'like', 'admin.%')->get());
-        // seed the users
+    }
+
+    private function runUser()
+    {
         $users = [
             [
                 'role_id' => 1, // 'super
@@ -144,6 +146,10 @@ class DatabaseSeeder extends Seeder
         foreach ($users as $user) {
             User::create($user);
         };
+    }
+
+    private function runSetting()
+    {
         $settings = [
             [
                 'key' => 'name',
@@ -177,5 +183,30 @@ class DatabaseSeeder extends Seeder
         foreach ($settings as $setting) {
             Setting::create($setting);
         }
+    }
+
+    private function runSchool()
+    {
+        // Fake school
+        $school = School::factory(1)->create();
+        // Fake school manager
+        $manager = User::factory(1)->create([
+            'role_id' => 4, // 'manager
+            'school_id' => 1,
+        ]);
+        // Fake class
+        $class = Classes::factory(1)->create([
+            'school_id' => 1,
+        ]);
+        // Fake teacher
+        $teacher = User::factory(5)->create([
+            'role_id' => 5, // 'teacher
+            'school_id' => 1,
+        ]);
+        // Fake student
+        $student = User::factory(10)->create([
+            'role_id' => 6, // 'student
+            'school_id' => 1,
+        ]);
     }
 }
