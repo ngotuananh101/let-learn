@@ -8,7 +8,7 @@ return [
     |--------------------------------------------------------------------------
     |
     | The following language lines contain the default error messages used by
-    | the validator class. Some of these rules have multiple versions such
+    | the validator class.js. Some of these rules have multiple versions such
     | as the size rules. Feel free to tweak each of these messages here.
     |
     */
@@ -110,7 +110,7 @@ return [
     'password' => [
         'letters' => 'The :attribute must contain at least one letter.',
         'mixed' => 'The :attribute must contain at least one uppercase and one lowercase letter.',
-        'numbers' => 'The :attribute must contain at least one number.',
+        '' => 'The :attribute must contain at least one number.',
         'symbols' => 'The :attribute must contain at least one symbol.',
         'uncompromised' => 'The given :attribute has appeared in a data leak. Please choose a different :attribute.',
     ],
