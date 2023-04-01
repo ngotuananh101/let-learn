@@ -36,11 +36,21 @@ class LessonController extends Controller
                 $lessonDetails = LessonDetail::whereIn('id', $relearn)->get();
             }
             if ($mixDetails) {
-                $notLearn = LessonDetail::where('lesson_id', $lesson_id)->whereNotIn('id', $learned)->whereNotIn('id', $relearn)->inRandomOrder()->take(8 - count($lessonDetails))->get();
-                $lessonDetails = $lessonDetails->merge($notLearn);
+                //if learned and relearn lesson details are empty
+                if (count($learned) === 0 && count($relearn) === 0) {
+                    $lessonDetails = LessonDetail::where('lesson_id', $lesson_id)->inRandomOrder()->take(8)->get();
+                } else {
+                    $notLearn = LessonDetail::where('lesson_id', $lesson_id)->whereNotIn('id', $learned)->whereNotIn('id', $relearn)->inRandomOrder()->take(8 - count($lessonDetails))->get();
+                    $lessonDetails = $lessonDetails->merge($notLearn);
+                }
             } else {
-                $notLearn=LessonDetail::where('lesson_id', $lesson_id)->whereNotIn('id', $learned)->whereNotIn('id', $relearn)->take(8 - count($lessonDetails))->get();
-                $lessonDetails = $lessonDetails->merge($notLearn);
+                //if learned and relearn lesson details are empty
+                if (count($learned) === 0 && count($relearn) === 0) {
+                    $lessonDetails = LessonDetail::where('lesson_id', $lesson_id)->take(8)->get();
+                } else {
+                    $notLearn = LessonDetail::where('lesson_id', $lesson_id)->whereNotIn('id', $learned)->whereNotIn('id', $relearn)->take(8 - count($lessonDetails))->get();
+                    $lessonDetails = $lessonDetails->merge($notLearn);
+                }
             }
             $response = ['lesson_id' => $lesson_id, 'lesson_details' => []];
             foreach ($lessonDetails as $lessonDetail) {
@@ -105,27 +115,41 @@ class LessonController extends Controller
                     else {
                         $question = $term;
                         $correct_answer = trim($definition);
+                        
                         //get current $response and get the and $answers of other lessonDetail except true/false
                         $otherAnswers = $response['lesson_details'];
                         $otherAnswers = array_filter($otherAnswers, function ($item) {
                             return count($item['answers']) > 2;
                         });
-                        //get random 3 answers from other otherAnswers
-                        $otherAnswers = array_map(function ($item) {
-                            return $item['answers'];
-                        }, $otherAnswers);
-                        $otherAnswers = array_merge(...$otherAnswers);
-                        shuffle($otherAnswers);
-                        $otherAnswers = array_slice($otherAnswers, 0, 3);
-
-                        //add correct answer to otherAnswers
-                        array_push($otherAnswers, $correct_answer);
-                        // shuffle the answer options
-                        shuffle($otherAnswers);
-                        // lesson the answer options to the shuffled $otherAnswers
-                        $answers = $otherAnswers;
+                    
+                        //check if there are enough answers in other answers or not
+                        if (count($otherAnswers) >= 3) {
+                            //get random 3 answers from other otherAnswers
+                            $otherAnswers = array_map(function ($item) {
+                                return $item['answers'];
+                            }, $otherAnswers);
+                            $otherAnswers = array_merge(...$otherAnswers);
+                            shuffle($otherAnswers);
+                            $otherAnswers = array_slice($otherAnswers, 0, 3);
+                    
+                            //add correct answer to otherAnswers
+                            array_push($otherAnswers, $correct_answer);
+                            // shuffle the answer options
+                            shuffle($otherAnswers);
+                            // lesson the answer options to the shuffled $otherAnswers
+                            $answers = $otherAnswers;
+                        } else {
+                            //if there are not enough answers in other answers, generate random answers
+                            $answers = [$correct_answer];
+                            while (count($answers) < 4) {
+                                $randomAnswer = LessonDetail::inRandomOrder()->first();
+                                if (!in_array($randomAnswer->definition, $answers)) {
+                                    array_push($answers, trim($randomAnswer->definition));
+                                }
+                            }
+                            shuffle($answers);
+                        }
                     }
-
                 } catch (\Throwable $th) {
                     return response()->json([
                         'status' => 'error',
@@ -535,6 +559,165 @@ class LessonController extends Controller
                     'progress' => ($countLearned / $countLessonDetail) * 100 . '%',
                 ]
             ], 200);
+        } catch (\Throwable $th) {
+            return response()->json([
+                'status' => 'error',
+                'status_code' => 500,
+                'message' => $th->getMessage()
+            ], 500);
+        }
+    }
+    public function learnForImport(Request $request, $lesson_id)
+    {
+        try {
+            $reverse = $request->input('reverse', false); //request reverse term and definition
+            $mixAnswers = $request->input('mix_answers', false); //request mix answer part
+            $mixDetails = $request->input('mix_details', false); //request mix lesson details
+            
+            $lesson = Lesson::findOrFail($lesson_id);
+            //get learned lesson details from learn table
+            $learn = Learn::where('user_id', auth()->user()->id)->where('lesson_id', $lesson_id)->first();
+            //get id of learned lesson details
+            $learned = $learn ? explode(',', $learn->learned) : [];
+            //get id of relearn lesson details
+            $relearn = $learn ? explode(',', $learn->relearn) : [];
+            // $lessonDetails = LessonDetail::where('lesson_id', $lesson_id)->whereNotIn('id', $learned)->whereNotIn('id', $relearn);
+            $lessonDetails = [];
+            //get relearn lesson details
+            if ($relearn) {
+                $lessonDetails = LessonDetail::whereIn('id', $relearn)->get();
+            }
+            if ($mixDetails) {
+                //if learned and relearn lesson details are empty
+                if (count($learned) === 0 && count($relearn) === 0) {
+                    $lessonDetails = LessonDetail::where('lesson_id', $lesson_id)->inRandomOrder()->get();
+                } else {
+                    $notLearn = LessonDetail::where('lesson_id', $lesson_id)->whereNotIn('id', $learned)->whereNotIn('id', $relearn)->inRandomOrder()->get();
+                    $lessonDetails = $lessonDetails->merge($notLearn);
+                }
+            } else {
+                //if learned and relearn lesson details are empty
+                if (count($learned) === 0 && count($relearn) === 0) {
+                    $lessonDetails = LessonDetail::where('lesson_id', $lesson_id)->get();
+                } else {
+                    $notLearn = LessonDetail::where('lesson_id', $lesson_id)->whereNotIn('id', $learned)->whereNotIn('id', $relearn)->get();
+                    $lessonDetails = $lessonDetails->merge($notLearn);
+                }
+            }
+            $response = ['lesson_id' => $lesson_id, 'lesson_details' => []];
+            foreach ($lessonDetails as $lessonDetail) {
+                try {
+                    $term = $lessonDetail->term;
+                    $definition = $lessonDetail->definition;
+                    if ($reverse) {
+                        $temp = $term;
+                        $term = $definition;
+                        $definition = $temp;
+                    }
+                    $answers = [];
+                    // replace special characters with a space character
+                    $term = preg_replace('/[\n\r\t]+/', ' ', $term);
+
+                    // check if the term is a multiple choice question
+                    if (preg_match('/^(.*?)\s*[A-Ma-m]\.\s*(.*)/is', $term, $matches)) {
+                        $question = trim($matches[1]);
+                        $options_str = $matches[2];
+
+                        // split the options into arrays
+                        $options = preg_split('/\s*[a-m]\.\s*/i', $options_str, -1, PREG_SPLIT_NO_EMPTY);
+                        $answers = array_map('trim', $options);
+
+                        // determine the correct answer
+                        switch (trim($definition)) {
+                            case 'A':
+                                $correct_answer = $answers[0];
+                                break;
+                            case 'B':
+                                $correct_answer = $answers[1];
+                                break;
+                            case 'C':
+                                $correct_answer = $answers[2];
+                                break;
+                            case 'D':
+                                $correct_answer = $answers[3];
+                                break;
+                            default:
+                                $correct_answer = '';
+                                break;
+                        }
+
+                        $correct_answer = trim($correct_answer);
+                        if ($mixAnswers) {
+                            shuffle($answers);
+                        }
+                    }
+                    // check if the term is a true/false question
+                    else if (preg_match('/^(.*)\s*[a-z]\.\s*(True|False)/is', $term, $matches)) {
+                        $question = trim($matches[1]);
+                        $answers = array_map('trim', [$matches[2], $matches[3]]);
+
+                        // determine the correct answer
+                        $correct_answer = ($definition === 'True') ? 'True' : 'False';
+
+                        if ($mixAnswers) {
+                            shuffle($answers);
+                        }
+                    }
+                    // if the term is neither multiple choice nor true/false
+                    else {
+                        $question = $term;
+                        $correct_answer = trim($definition);
+                        
+                        //get current $response and get the and $answers of other lessonDetail except true/false
+                        $otherAnswers = $response['lesson_details'];
+                        $otherAnswers = array_filter($otherAnswers, function ($item) {
+                            return count($item['answers']) > 2;
+                        });
+                    
+                        //check if there are enough answers in other answers or not
+                        if (count($otherAnswers) >= 3) {
+                            //get random 3 answers from other otherAnswers
+                            $otherAnswers = array_map(function ($item) {
+                                return $item['answers'];
+                            }, $otherAnswers);
+                            $otherAnswers = array_merge(...$otherAnswers);
+                            shuffle($otherAnswers);
+                            $otherAnswers = array_slice($otherAnswers, 0, 3);
+                    
+                            //add correct answer to otherAnswers
+                            array_push($otherAnswers, $correct_answer);
+                            // shuffle the answer options
+                            shuffle($otherAnswers);
+                            // lesson the answer options to the shuffled $otherAnswers
+                            $answers = $otherAnswers;
+                        } else {
+                            //if there are not enough answers in other answers, generate random answers
+                            $answers = [$correct_answer];
+                            while (count($answers) < 4) {
+                                $randomAnswer = LessonDetail::inRandomOrder()->first();
+                                if (!in_array($randomAnswer->definition, $answers)) {
+                                    array_push($answers, trim($randomAnswer->definition));
+                                }
+                            }
+                            shuffle($answers);
+                        }
+                    }
+                } catch (\Throwable $th) {
+                    return response()->json([
+                        'status' => 'error',
+                        'status_code' => 500,
+                        'message' => $th->getMessage()
+                    ], 500);
+                }
+                $response['lesson_details'][] = [
+                    'id' => $lessonDetail->id,
+                    'question' => $question,
+                    'answers' => $answers,
+                    'correct_answer' => $correct_answer ?? '',
+                    'relearn' => in_array($lessonDetail->id, $relearn) ? true : false
+                ];
+            }
+            return response()->json($response);
         } catch (\Throwable $th) {
             return response()->json([
                 'status' => 'error',
