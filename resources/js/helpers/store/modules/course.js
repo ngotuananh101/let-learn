@@ -39,11 +39,16 @@ export default {
                     }
                 );
         },
-        deleteCourse({ commit }, course_id) {
-            overlay();
-            courseService.deleteCourse(course_id).then(() => {
-                overlay();
-            });
+        deleteCourse({ dispatch }, course_id) {
+            courseService.deleteCourse(course_id).then(
+                courses => {
+                    dispatch('alert/success', 'Course deleted', { root: true });
+                    dispatch('index');
+                },
+                error => {
+                    dispatch('alert/error', error, { root: true });
+                }
+            );
         },
         getCourseInfo({ dispatch }, course_id) {
             return courseService.getCourseInfo(course_id)

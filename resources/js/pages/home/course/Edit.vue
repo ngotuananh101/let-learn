@@ -85,7 +85,7 @@ export default {
                 };
                 setTimeout(() => {
                     this.$root.$data.snackbar = null;
-                }, 3000);
+                }, 1000);
                 this.$store.dispatch('course/updateCourse', {
                     id: this.course_id,
                     name: name,
@@ -93,9 +93,8 @@ export default {
                     status: status,
                     is_public: is_public,
                 });
-                // this.$store.push({name: 'home.course.index', params: {id: this.course_id} });
+                this.$router.push({ name: 'home.course.index', params: { id: this.course_id } });
             }
-            // this.$store.push({name: 'home.course.index', params: {id: this.course_id} });
         }
     },
 }

@@ -37,7 +37,9 @@
                                 aria-expanded="false">
                             </button>
                             <ul class="dropdown-menu">
-                                <router-link :to="{ name: 'home.lesson.edit', params: { id: lesson_id } }"><li><a class="dropdown-item" href="#">Edit</a></li></router-link>
+                                <router-link :to="{ name: 'home.lesson.edit', params: { id: lesson_id } }">
+                                    <li><a class="dropdown-item" href="#">Edit</a></li>
+                                </router-link>
                                 <li><a class="dropdown-item" @click="this.delete">Delete</a></li>
                             </ul>
                         </div>
@@ -61,18 +63,19 @@
                 </div>
                 <div class="col-md-6 col-12">
                     <router-link :to="{ name: 'learn.quiz.index', params: { id: lesson_id } }">
-                    <div class="card">
-                        <div class="card-body p-3 row">
-                            <div class="col-8">
-                                <h5 class="card-title mb-0">Learn</h5>
-                                <p class="card-text text-sm">Study with MC, T/F, and other questions</p>
-                            </div>
-                            <div class="col-4">
-                                <img src="https://cdn-icons-png.flaticon.com/512/4207/4207247.png" class="img-fluid" alt="">
+                        <div class="card">
+                            <div class="card-body p-3 row">
+                                <div class="col-8">
+                                    <h5 class="card-title mb-0">Learn</h5>
+                                    <p class="card-text text-sm">Study with MC, T/F, and other questions</p>
+                                </div>
+                                <div class="col-4">
+                                    <img src="https://cdn-icons-png.flaticon.com/512/4207/4207247.png" class="img-fluid"
+                                        alt="">
+                                </div>
                             </div>
                         </div>
-                    </div>
-                </router-link>
+                    </router-link>
                 </div>
                 <div class="col-md-6 col-12 pt-3">
                     <div class="card">
@@ -95,7 +98,8 @@
                                 <p class="card-text text-sm">Report lesson problem to admin</p>
                             </div>
                             <div class="col-4">
-                                <img src="https://cdn-icons-png.flaticon.com/512/10209/10209878.png" class="img-fluid" alt="">
+                                <img src="https://cdn-icons-png.flaticon.com/512/10209/10209878.png" class="img-fluid"
+                                    alt="">
                             </div>
                         </div>
                     </div>
@@ -235,15 +239,8 @@ export default {
                 cancelButtonText: "No, cancel!",
             }).then((result) => {
                 if (result.isConfirmed) {
-                    let id = this.selected_id;
-                    this.$store.dispatch('lesson/deleteLesson', id).then(() => {
-                        document.getElementById('edit-close').click();
-                        this.$store.dispatch('home.index').then(() => {
-                            this.lessons = this.$store.getters['lesson/lessons'];
-                        });
-                    });
-                    // remove selected row
-                    this.table.rows({ selected: true }).remove().draw();
+                    this.$store.dispatch('lesson/deleteLesson', this.lesson_id);
+                    this.$store.push({ name: 'home.index' });
                     // close modal
                     document.getElementById('edit-close').click();
                 }
@@ -266,5 +263,4 @@ export default {
     font: normal normal normal 14px/1 FontAwesome;
     border: none;
     vertical-align: middle;
-}
-</style>
+}</style>
