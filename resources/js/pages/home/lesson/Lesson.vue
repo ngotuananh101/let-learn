@@ -68,7 +68,7 @@
                                 <p class="card-text text-sm">Study with MC, T/F, and other questions</p>
                             </div>
                             <div class="col-4">
-                                <img src="https://cdn-icons-png.flaticon.com/512/5484/5484383.png" class="img-fluid" alt="">
+                                <img src="https://cdn-icons-png.flaticon.com/512/4207/4207247.png" class="img-fluid" alt="">
                             </div>
                         </div>
                     </div>
@@ -82,7 +82,7 @@
                                 <p class="card-text text-sm">Create a test for this lesson</p>
                             </div>
                             <div class="col-4">
-                                <img src="https://cdn-icons-png.flaticon.com/512/5484/5484383.png" class="img-fluid" alt="">
+                                <img src="https://cdn-icons-png.flaticon.com/512/3068/3068553.png" class="img-fluid" alt="">
                             </div>
                         </div>
                     </div>
@@ -95,7 +95,7 @@
                                 <p class="card-text text-sm">Report lesson problem to admin</p>
                             </div>
                             <div class="col-4">
-                                <img src="https://cdn-icons-png.flaticon.com/512/5484/5484383.png" class="img-fluid" alt="">
+                                <img src="https://cdn-icons-png.flaticon.com/512/10209/10209878.png" class="img-fluid" alt="">
                             </div>
                         </div>
                     </div>

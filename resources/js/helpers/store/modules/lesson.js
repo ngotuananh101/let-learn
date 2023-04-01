@@ -82,14 +82,13 @@ export default {
                 );
         },
         updateLesson({ dispatch }, data) {
-            lessonService.updateLesson(data)
+            return lessonService.updateLesson(data)
                 .then(
-                    lessons => {
-                        dispatch('alert/success', 'Lesson updated', { root: true });
-                        dispatch('index');
+                    response => {
+                        return true;
                     },
                     error => {
-                        dispatch('alert/error', error, { root: true });
+                        return false;
                     }
                 );
         },
