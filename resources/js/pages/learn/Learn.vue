@@ -27,6 +27,7 @@
                 <div class="d-none" id="next">
                     <button
                         class="btn btn-primary"
+                        @keyup.enter="nextQuestion"
                         @click="nextQuestion"
                     >
                         Next Question
