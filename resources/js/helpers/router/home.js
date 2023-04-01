@@ -77,6 +77,11 @@ const home = [
                 name: 'home.setting',
                 component: () => import('../../pages/home/Setting.vue'),
             },
+            {
+                path: 'forum',
+                name: 'home.forum',
+                component: () => import('../../pages/home/Forum.vue'),
+            }
         ],
     },
 ];

@@ -1,11 +1,11 @@
 <template>
     <div class="row">
         <h2>{{ course ? course.name : 'loading' }}</h2>
-        <div class="col-12 p-3 row align-items-center ">
+        <div class="col-12 mb-3 row align-items-center justify-content-center">
             <div class="col-2">
                 <argon-avatar
                     img="https://gcavocats.ca/wp-content/uploads/2018/09/man-avatar-icon-flat-vector-19152370-1.jpg"
-                    alt="Avatar" size="lg" circular />
+                    alt="Avatar" size="md" circular />
             </div>
             <div class="col-6">
                 <h6 class="m-0">{{ this.user.email }}</h6>
@@ -58,7 +58,6 @@ export default {
             lessons: null,
             course_id: this.$route.params.id,
             course: null,
-            selected_id: null,
             user: JSON.parse(localStorage.getItem('user')),
         }
     },
@@ -81,7 +80,7 @@ export default {
         ...mapActions({
             getLesson: "course/getLessonByCourseId",
         }),
-        delete(){
+        delete() {
             this.$swal({
                 icon: "question",
                 title: "Are you sure?",
@@ -91,11 +90,8 @@ export default {
                 cancelButtonText: "No, cancel!",
             }).then((result) => {
                 if (result.isConfirmed) {
-                    let id = this.selected_id;
-                    this.$store.dispatch('course/deleteCourse', id);
-                    // remove selected row
-                    this.table.rows({selected: true}).remove().draw();
-                    this.$store.push({name: 'home.index'});
+                    this.$store.dispatch('course/deleteCourse', this.course_id);
+                    this.$store.push({ name: 'home.index' });
                     // close modal
                     document.getElementById('edit-close').click();
                 }

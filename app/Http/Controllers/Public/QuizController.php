@@ -204,41 +204,83 @@ class QuizController extends Controller
                 case 'import':
                     $request->validate([
                         'lesson_id' => 'required|integer',
-                    ]);
+                        'name' => 'required|string|max:255',
+                        'description' => 'required|string',
+                        'status' => 'nullable|in:pending,inactive',
+                        'score_reporting' => 'nullable|boolean',
+                        'start_time' => 'nullable|date|after_or_equal:today',
+                        'end_time' => 'nullable|date|after:start_date',
+                        'quantity' => 'nullable|integer',
 
+                    ]);
                     $lesson_id = $request->lesson_id;
 
                     // Call the learn method in the LessonController and get the response
                     $lessonController = new LessonController();
-                    $response = $lessonController->learn($request, $lesson_id);
-                    dd($response);
+                    $response = $lessonController->learnForImport($request, $lesson_id);
                     // Get the data from the response
-                    $data = $response->getData();
+                    
+                    $quantity = $request->input('quantity', 20);
                     // Check if the request was successful
                     if ($response->getStatusCode() == 200) {
-                        // Get the lesson details from the data
-                        $lesson_name = $data->name;
-                        $lesson_description = $data->description;
+                        $data = $response->getData();
+                        //check input quantity 
+                        // store data to new quiz
+                        $quiz = Quiz::create([
+                            'name' => $request->input('name'),
+                            'description' => $request->input('description'),
+                            'status' => $request->input('status', 'inactive'),
+                            'score_reporting' => $request->input('score_reporting', true),
+                            'start_time' => $request->input('start_time'),
+                            'end_time' => $request->input('end_time')
+                        ]);
+                        //set data to question
+                        // Add questions to the quiz from the $data, split part "lesson_details" from the $data
 
-                        // Do something with the lesson details, like store them in a database or display them to the user
-                        // ...
 
-                        return response()->json(['message' => 'Lesson details retrieved successfully'], 200);
+                        $lesson_details = $data->lesson_details;
+                        $total_questions_added = 0;
+                        foreach ($lesson_details as $questions) {
+                            if($total_questions_added >= $quantity){
+                                break; // Stop adding more questions
+                            }
+                            $question = new Question([
+                                'question' => $questions->question,
+                                'is_multiple_choice' => true,
+                                'answer_option' => json_encode($questions->answers),
+                                'correct_answer' => $questions->correct_answer,
+                                'points' => 1,
+                            ]);
+                            
+                            $quiz->questions()->save($question);
+                            $total_questions_added++;
+                        }
+
+                        return response()->json([
+                            'status' => 'success',
+                            'status_code' => 200,
+                            'message' => 'Quiz created successfully',
+                            'data' => $quiz
+                        ], 200);
+
+                        //return response()->json(['message' => 'Lesson details retrieved successfully'], 200);
                     } else {
-                        // Handle the error response
-                        $error_message = $data->message;
-
-                        // Do something with the error message, like log it or display it to the user
-                        // ...
-
-                        return response()->json(['message' => 'Error retrieving lesson details: ' . $error_message], $response->getStatusCode());
+                        // return error message
+                        return response()->json([
+                            'status' => 'error',
+                            'status_code' => 400,
+                            'message' => 'Lesson details could not be retrieved'
+                        ], 400);
                     }
+                    break;
                 case 'quiz':
                     $request->validate([
                         'name' => 'required|string|max:255',
                         'description' => 'required|string',
                         'status' => 'required|in:pending,inactive',
                         'score_reporting' => 'nullable|boolean',
+                        'start_time' => 'required|date|after_or_equal:today',
+                        'end_time' => 'nullable|date|after:start_date',
                         'questions' => 'required|array',
                         'questions.*.question' => 'required|string',
                         'questions.*.is_multiple_choice' => 'nullable|boolean',
@@ -252,6 +294,8 @@ class QuizController extends Controller
                         'description' => $request->input('description'),
                         'status' => $request->input('status', 'inactive'),
                         'score_reporting' => $request->input('score_reporting', true),
+                        'start_time' => $request->input('start_time'),
+                        'end_time' => $request->input('end_time')
                     ]);
 
                     //create questions collection and map the questions to the newly created quiz id
