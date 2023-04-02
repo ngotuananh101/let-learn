@@ -1,202 +1,144 @@
 <template>
-    <div class="card">
-    <div class="container p-5">
-        <h1>Forum F17 from VOZ</h1>
-        <form @submit.prevent="askQuestion" class="mb-3">
-            <div class="input-group">
-                <input v-model="newQuestion" placeholder="Ask a question..." class="form-control">
-                <button type="submit" class="btn btn-primary">Submit</button>
+    <div class="container mt-4">
+        <div class="card p-4">
+            <h3>Ask question</h3>
+            <form @submit.prevent="onSubmit">
+                <div class="input-group mb-3">
+                    <span class="input-group-text" id="inputGroup-sizing-default">Title of question: </span>
+                    <input type="text" class="form-control" id="questionTitle" v-model="newQuestion.title">
+                </div>
+                <div class="input-group mb-3">
+                    <span class="input-group-text" id="inputGroup-sizing-default">Tag: </span>
+                    <input type="text" class="form-control" id="questionTopic" v-model="newQuestion.topic">
+                </div>
+                <div class="form-floating">
+                    <textarea class="form-control" id="questionContent" rows="5"
+                              v-model="newQuestion.content"></textarea>
+                    <label for="floatingTextarea2">Question</label>
+                </div>
+                <button type="submit" class="btn btn-primary mt-2">Submit</button>
+            </form>
+        </div>
+        <div class="card mt-3">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h1>Questions</h1>
             </div>
-        </form>
 
-        <div v-for="(question, index) in questions" :key="index" class="card my-3">
             <div class="card-body">
-                <h2 class="card-title">{{ question.title }}</h2>
-                <p class="card-text">{{ question.body }}</p>
-                <button @click="toggleAnswer(index)" class="btn btn-secondary mr-2">Answer</button>
-                <div v-if="question.showAnswer" class="mt-3">
-                    <form @submit.prevent="answerQuestion(index)" class="mb-3">
-                        <div class="input-group">
-                            <input v-model="newAnswer" placeholder="Enter your answer..." class="form-control">
-                            <button type="submit" class="btn btn-primary">Submit</button>
+                <div v-for="question in questions" :key="question.id" class="mb-3">
+                    <div class="row">
+                        <div class="col-1">
+                            <div class="vote-count text-2xl">{{ question.votes }} <i class="fa-regular fa-thumbs-up"></i></div>
+                            <div class="answer-count">{{ question.answers }} answers</div>
+                            <div class="view-count">{{ question.views }} views</div>
                         </div>
-                    </form>
-
-                    <ul class="list-unstyled mt-3">
-                        <li v-for="(answer, answerIndex) in question.answers.sort((a, b) => b.likes - a.likes)" :key="answerIndex" class="card my-3">
-                            <div class="card-body row align-items-center">
-                                <div class="col-md-1 d-none d-md-block">
-                                    <div class="rounded-circle bg-secondary text-white d-flex align-items-center justify-content-center" style="width: 50px; height: 50px;">
-                                        <span>{{ answer.user.charAt(0).toUpperCase() }}</span>
-                                    </div>
-                                </div>
-                                <div class="col-md-10">
-                                    <h5 class="card-title">{{ answer.user }}</h5>
-                                    <div v-if="!answer.isEditing">
-                                        <p class="card-text">{{ answer.body }}</p>
-                                    </div>
-                                    <div v-if="answer.isEditing">
-                                        <form @submit.prevent="saveAnswer(index, answerIndex)">
-                                            <div class="input-group">
-                                                <input v-model="answer.newBody" placeholder="Edit your answer..." class="form-control">
-                                                <button type="submit" class="btn btn-primary">Save</button>
-                                            </div>
-                                            <span class="text-danger">{{ answer.error }}</span>
-                                        </form>
-                                    </div>
-                                </div>
-                                <div class="col-md-1">
-                                    <div class="dropdown d-inline-block">
-                                        <button class="btn btn-secondary dropdown-toggle" type="button" id="answer-options-{{ index }}-{{ answerIndex }}" data-bs-toggle="dropdown" aria-expanded="false">
-                                            <i class="fas fa-ellipsis-v"></i>
-                                        </button>
-                                        <ul class="dropdown-menu" aria-labelledby="answer-options-{{ index }}-{{ answerIndex }}">
-                                            <a class="dropdown-item" href="#" @click.prevent="editAnswer(index, answerIndex)">Edit</a>
-                                            <a class="dropdown-item" href="#" @click.prevent="confirmDeleteAnswer(index, answerIndex)">Delete</a>
-                                        </ul>
-                                    </div>
-                                </div>
+                        <div class="col-9">
+                            <div>
+                                <router-link :to="{ name: 'home.forumdetail' }">
+                                    <div class="question-title font-weight-bold text-2xl">{{ question.title }}</div>
+                                </router-link>
                             </div>
-
-                            <div class="card-footer d-flex justify-content-between align-items-center">
-                                <button @click="rateAnswer(question, answer)" class="btn btn-link"><i class="fa-regular fa-thumbs-up"></i></button>
-                                <div>Vote: {{ answer.likes }}</div>
+                            <div class="topic text-info">{{ question.topic }}</div>
+                            <div class="question-content">{{ question.content }}</div>
+                        </div>
+                        <div class="col-2">
+                            <div class="user-info">
+                                <img :src="question.avatar" class="me-2 rounded-circle" width="30" height="30" alt="">
+                                <span class="user-name">{{ question.user }}</span>
                             </div>
-                        </li>
-                    </ul>
+                        </div>
+                        <hr class="mt-2">
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
+
     </div>
 </template>
 
 <script>
-import 'bootstrap/dist/css/bootstrap.min.css';
-
 export default {
     data() {
         return {
-            newQuestion: '',
-            newAnswer: '',
             questions: [
                 {
-                    title: 'What is Vue.js?',
-                    body: 'I am new to Vue.js and want to learn more about it.',
-                    showAnswer: false,
-                    answers: [
-                        {
-                            user: 'John Doe',
-                            body: 'Vue.js is a progressive JavaScript framework that makes it easy to build dynamic and responsive web applications. It uses a virtual DOM and reactive data binding to provide high performance and flexibility, and has a rich set of built-in features such as component-based architecture, modular development, and simple syntax.',
-                            likes: 2,
-                            isEditing: false,
-                            newBody: '',
-                            error: ''
-                        },
-                        {
-                            user: 'Jane Smith',
-                            body: 'I agree with John. Vue.js is a great choice for building modern web applications. It has a low learning curve and is easy to integrate with other libraries and tools.',
-                            likes: 1,
-                            isEditing: false,
-                            newBody: '',
-                            error: ''
-                        }
-                    ]
+                    id: 1,
+                    title: "How do I install Vue.js?",
+                    topic: "Vue.js",
+                    content: "I'm new to Vue.js and I'm not sure how to install it on my computer. Can someone please provide me with instructions?",
+                    user: "John Doe",
+                    avatar: "https://randomuser.me/api/portraits/men/1.jpg",
+                    votes: 4,
+                    answers: 2,
+                    views: 10
                 },
                 {
-                    title: 'Chưa biết câu trả lời',
-                    body: 'Sao bạn Long lại pờ rồ phô mai que thế nhỉ?',
-                    showAnswer: false,
-                    answers: [
-                        {
-                            user: 'DatDX',
-                            body: 'Chưa thể lý giải luôn á',
-                            likes: 3,
-                            isEditing: false,
-                            newBody: '',
-                            error: ''
-                        },
-                        {
-                            user: 'AnhNT',
-                            body: '10 điểm cho Long',
-                            likes: 3,
-                            isEditing: false,
-                            newBody: '',
-                            error: ''
-                        },
-                    ]
+                    id: 2,
+                    title: "What is the best way to learn JavaScript?",
+                    topic: "JavaScript",
+                    content: "I've been trying to learn JavaScript but I'm finding it really difficult. What is the best way to learn JavaScript for a beginner?",
+                    user: "Jane Smith",
+                    avatar: "https://randomuser.me/api/portraits/women/2.jpg",
+                    votes: 2,
+                    answers: 1,
+                    views: 5
                 },
                 {
-                    title: 'What are some good resources for learning Vue.js?',
-                    body: 'I want to learn more about Vue.js but don\'t know where to start. What are some good tutorials or courses to get started with?',
-                    showAnswer: false,
-                    answers: [
-                        {
-                            user: 'Bob Johnson',
-                            body: 'There are many great resources available online for learning Vue.js. Some of my favorites include the official documentation, the Vue Mastery video courses, and the "Vue.js 2 - The Complete Guide" course on Udemy.',
-                            likes: 3,
-                            isEditing: false,
-                            newBody: '',
-                            error: ''
-                        }
-                    ]
+                    id: 3,
+                    title: "What is the best way to learn PHP?",
+                    topic: "PHP",
+                    content: "I've been trying to learn JavaScript but I'm finding it really difficult. What is the best way to learn JavaScript for a beginner?",
+                    user: "Jane Madison",
+                    avatar: "https://randomuser.me/api/portraits/women/3.jpg",
+                    votes: 6,
+                    answers: 1,
+                    views: 5
                 },
-            ]
+                {
+                    id: 5,
+                    title: "What is the best way to learn C#?",
+                    topic: "C#",
+                    content: "I've been trying to learn JavaScript but I'm finding it really difficult. What is the best way to learn JavaScript for a beginner? I i die you still love me",
+                    user: "Andrew Taste",
+                    avatar: "https://randomuser.me/api/portraits/men/3.jpg",
+                    votes: 1,
+                    answers: 1,
+                    views: 5
+                },
+
+            ],
+            newQuestion: {
+                title: "",
+                topic: "",
+                content: "",
+                user: "Anonymous",
+                avatar: "https://randomuser.me/api/portraits/men/5.jpg",
+                votes: 0,
+                answers: 0,
+                views: 0
+            }
         };
     },
     methods: {
-        askQuestion() {
-            this.questions.push({
-                title: this.newQuestion,
-                body: '',
-                showAnswer: false,
-                answers: []
-            });
-            this.newQuestion = '';
-        },
-        toggleAnswer(index) {
-            this.questions[index].showAnswer = !this.questions[index].showAnswer;
-        },
-        answerQuestion(index) {
-            if (this.newAnswer.trim() !== '') {
-                this.questions[index].answers.push({
-                    user: 'Anonymous',
-                    body: this.newAnswer,
-                    likes: 0,
-                    isEditing: false,
-                    newBody: '',
-                    error: ''
-                });
-                this.newAnswer = '';
-                this.toggleAnswer(index);
-            }
-        },
-        rateAnswer(question, answer) {
-            answer.likes++;
-        },
-        editAnswer(questionIndex, answerIndex) {
-            const answer = this.questions[questionIndex].answers[answerIndex];
-            answer.isEditing = true;
-            answer.newBody = answer.body; // set newBody to current body for easier editing
-        },
-        confirmDeleteAnswer(questionIndex, answerIndex) {
-            if (confirm('Are you sure you want to delete this answer?')) {
-                this.deleteAnswer(questionIndex, answerIndex);
-            }
-        },
-        deleteAnswer(questionIndex, answerIndex) {
-            this.questions[questionIndex].answers.splice(answerIndex, 1);
-        },
-        saveAnswer(questionIndex, answerIndex) {
-            const answer = this.questions[questionIndex].answers[answerIndex];
-            if (answer.newBody.trim() === '') {
-                answer.error = "Answer cannot be empty";
+        onSubmit() {
+            //validate the form
+            if (!this.newQuestion.title || !this.newQuestion.topic || !this.newQuestion.content) {
+                alert("Please fill in all fields.");
                 return;
             }
-            answer.body = answer.newBody;
-            answer.isEditing = false;
-            answer.error = '';
-        }
+            // handle form submission
+            // add the new question to the questions array
+            this.questions.push(Object.assign({}, this.newQuestion, {id: this.questions.length + 1}));
+            // reset the form
+            this.newQuestion.title = "";
+            this.newQuestion.topic = "";
+            this.newQuestion.content = "";
+            // close the modal
+            $("#askQuestionModal").modal("hide");
+        },
     }
-};
+}
 </script>
+
+<style>
+</style>
