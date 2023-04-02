@@ -8,23 +8,32 @@
                     <div class="card-body">
                         <div v-for="(answer, index) in answers" :key="index">
                             <div class="row">
-                                <div class="col-md-2">
+                                <div class="col-md-1">
                                     <div class="text-center">
-                                        <button class="btn btn-sm btn-outline-success" @click="upvoteAnswer(index)">
-                                            {{ answer.upvote }}
-                                        </button>
-                                        <button class="btn btn-sm btn-outline-danger" @click="downvoteAnswer(index)">
-                                            {{ answer.downvote }}
-                                        </button>
-                                        <div>{{ answer.count }}</div>
+                                        <div class="row">
+                                            <div class="col-md-12">
+                                                <button class="btn btn-sm btn-outline-success" @click="upvoteAnswer(index)">
+                                                    {{ answer.upvote }}
+                                                </button>
+                                                <div class="col-md- justify-content-end align-items-center">
+                                                    <div>{{ answer.count }}</div>
+                                                </div>
+                                                <button class="btn btn-sm btn-outline-danger mt-2" @click="downvoteAnswer(index)">
+                                                    {{ answer.downvote }}
+                                                </button>
+                                            </div>
+
+                                        </div>
+
+
                                     </div>
                                 </div>
-                                <div class="col-md-8">
+                                <div class="col-md-9 m-lg-2 d-flex align-items-center">
                                     <div>{{ answer.text }}</div>
                                 </div>
-                                <div class="col-md-2">
+                                <div class="col-md-1">
                                     <div class="text-center">
-                                        <img :src="answer.avatar" class="rounded-circle" alt="avatar"
+                                        <img :src="answer.avatar" class="rounded-circle d-flex align-items-center" alt="avatar"
                                              style="width: 50px;">
                                         <div>{{ answer.username }}</div>
                                     </div>

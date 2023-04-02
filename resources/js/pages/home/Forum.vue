@@ -19,7 +19,7 @@
                 <button type="submit" class="btn btn-primary mt-2">Submit</button>
             </form>
         </div>
-        <div class="card">
+        <div class="card mt-3">
             <div class="card-header d-flex justify-content-between align-items-center">
                 <h1>Questions</h1>
             </div>
@@ -28,17 +28,17 @@
                 <div v-for="question in questions" :key="question.id" class="mb-3">
                     <div class="row">
                         <div class="col-1">
-                            <div class="vote-count">{{ question.votes }} <i class="fa-regular fa-thumbs-up"></i></div>
+                            <div class="vote-count text-2xl">{{ question.votes }} <i class="fa-regular fa-thumbs-up"></i></div>
                             <div class="answer-count">{{ question.answers }} answers</div>
                             <div class="view-count">{{ question.views }} views</div>
                         </div>
                         <div class="col-9">
                             <div>
                                 <router-link :to="{ name: 'home.forumdetail' }">
-                                    <div class="question-title">{{ question.title }}</div>
+                                    <div class="question-title font-weight-bold text-2xl">{{ question.title }}</div>
                                 </router-link>
                             </div>
-                            <div class="topic">{{ question.topic }}</div>
+                            <div class="topic text-info">{{ question.topic }}</div>
                             <div class="question-content">{{ question.content }}</div>
                         </div>
                         <div class="col-2">
@@ -121,6 +121,11 @@ export default {
     },
     methods: {
         onSubmit() {
+            //validate the form
+            if (!this.newQuestion.title || !this.newQuestion.topic || !this.newQuestion.content) {
+                alert("Please fill in all fields.");
+                return;
+            }
             // handle form submission
             // add the new question to the questions array
             this.questions.push(Object.assign({}, this.newQuestion, {id: this.questions.length + 1}));
@@ -131,48 +136,9 @@ export default {
             // close the modal
             $("#askQuestionModal").modal("hide");
         },
-        askQuestion() {
-            // validate the form
-            if (!this.newQuestion.title || !this.newQuestion.topic || !this.newQuestion.content) {
-                alert("Please fill in all fields.");
-                return;
-            }
-            // show the confirmation modal
-            $("#askQuestionModal").modal("show");
-        }
     }
 }
 </script>
 
 <style>
-.vote-count {
-    font-size: 24px;
-    font-weight: bold;
-}
-
-.answer-count, .view-count {
-    font-size: 14px;
-    color: #999;
-}
-
-.question-title {
-    font-size: 18px;
-    font-weight: bold;
-}
-
-.topic {
-    font-size: 14px;
-    color: #999;
-    margin-bottom: 5px;
-}
-
-.question-content {
-    margin-top: 10px;
-}
-
-.user-info {
-    margin-top: 10px;
-    font-size: 14px;
-    color: #999;
-}
 </style>
