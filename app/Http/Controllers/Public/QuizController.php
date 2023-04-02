@@ -39,20 +39,42 @@ class QuizController extends Controller
                 'type' => 'required|string|in:quiz,question,answer,grade',
             ]);
 
-            if (auth()->user()->role->name == 'teacher') {
+            if (auth()->user()->role->name == 'user') {
                 switch ($request->type) {
                     case 'quiz':
                         $quiz = Quiz::with('questions')->findOrFail($id);
+                        //if quiz is not exist or quiz is not active
+                        if (!$quiz || $quiz->status == false) {
+                            return response()->json([
+                                'status' => 'error',
+                                'status_code' => 400,
+                                'message' => 'Quiz is not exist or quiz is not active'
+                            ], 400);
+                        }
                         return response()->json(['data' => $quiz]);
                         break;
                     case 'question':
                         $quiz = Quiz::with('questions')->findOrFail($id);
+                        if (!$quiz || $quiz->status == false) {
+                            return response()->json([
+                                'status' => 'error',
+                                'status_code' => 400,
+                                'message' => 'Quiz is not exist or quiz is not active'
+                            ], 400);
+                        }
                         //get question belong to quiz
                         $questions = $quiz->questions;
                         return response()->json(['data' => $questions]);
                         break;
                     case 'answer': //for grade
                         $quiz = Quiz::with('questions')->findOrFail($id);
+                        if (!$quiz || $quiz->status == false) {
+                            return response()->json([
+                                'status' => 'error',
+                                'status_code' => 400,
+                                'message' => 'Quiz is not exist or quiz is not active'
+                            ], 400);
+                        }
                         $answers = Answer::where('quiz_id', $id)->get();
                         $sumPoints = 0;
                         $answerData = [];
@@ -101,6 +123,13 @@ class QuizController extends Controller
                     switch ($request->type) {
                         case 'quiz':
                             $quiz = Quiz::with('questions')->find($id);
+                            if (!$quiz || $quiz->status == false) {
+                                return response()->json([
+                                    'status' => 'error',
+                                    'status_code' => 400,
+                                    'message' => 'Quiz is not exist or quiz is not active'
+                                ], 400);
+                            }
                             $count_questions = $quiz->questions->count();
                             $data = [
                                 'quiz_name' => $quiz->name,
@@ -111,6 +140,13 @@ class QuizController extends Controller
                             break;
                         case 'question':
                             $quiz = Quiz::with('questions')->findOrFail($id);
+                            if (!$quiz || $quiz->status == false) {
+                                return response()->json([
+                                    'status' => 'error',
+                                    'status_code' => 400,
+                                    'message' => 'Quiz is not exist or quiz is not active'
+                                ], 400);
+                            }
                             $questions = $quiz->questions;
                             //return only question and answer_options
                             $questions = $questions->map(function ($question) {
@@ -124,7 +160,13 @@ class QuizController extends Controller
                             break;
                         case 'answer':
                             $quiz = Quiz::with('questions')->findOrFail($id);
-                            $quiz = Quiz::with('questions')->findOrFail($id);
+                            if (!$quiz || $quiz->status == false) {
+                                return response()->json([
+                                    'status' => 'error',
+                                    'status_code' => 400,
+                                    'message' => 'Quiz is not exist or quiz is not active'
+                                ], 400);
+                            }
                             $answers = Answer::where('quiz_id', $id)->get();
                             $sumPoints = 0;
                             $answerData = [];
