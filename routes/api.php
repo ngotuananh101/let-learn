@@ -85,13 +85,14 @@ Route::middleware('auth:sanctum')->group(function () {
 //        Route::resource('folder', ManagerFolderController::class.js);
 //    })->middleware(['permissions:manager.dashboard']);
 
+
     // Route lesson
     Route::prefix('lesson')->group(function () {
-        Route::post('/quiz', [QuizController::class, 'store']);
-        Route::get('/quiz/{id}', [QuizController::class, 'show']);
-        Route::put('/quiz/{id}', [QuizController::class, 'update']);
-        Route::delete('/quiz/{id}', [QuizController::class, 'destroy']);
-        Route::get('/quiz/export/{id}/', [QuizController::class, 'exportToExcel']);
+        // Route::post('/quiz', [QuizController::class, 'store']);
+        // Route::get('/quiz/{id}', [QuizController::class, 'show']);
+        // Route::put('/quiz/{id}', [QuizController::class, 'update']);
+        // Route::delete('/quiz/{id}', [QuizController::class, 'destroy']);
+        // Route::get('/quiz/export/{id}/', [QuizController::class, 'exportToExcel']);
         Route::get('/learn/{id}', [LessonController::class, 'learn']);
         Route::post('/', [LessonController::class, 'store']);
         Route::get('/{id}', [LessonController::class, 'show']);
@@ -112,4 +113,15 @@ Route::middleware('auth:sanctum')->group(function () {
     });
     // Route user
     Route::resource('user', UserController::class)->only(['show', 'update', 'destroy']);
+
+    // Router Post
+    Route::resource('post', PostController::class);
+    // Route Quiz
+    Route::prefix('quiz')->group(function () {
+        Route::post('/', [QuizController::class, 'store']);
+        Route::get('/{id}', [QuizController::class, 'show']);
+        Route::put('/{id}', [QuizController::class, 'update']);
+        Route::delete('/{id}', [QuizController::class, 'destroy']);
+        Route::get('/export/{id}/', [QuizController::class, 'exportToExcel']);
+    });
 });
