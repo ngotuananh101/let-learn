@@ -1,4 +1,4 @@
-// Base class.js
+// Base class
 //
 // Easily usable on <ul>, <ol>, or <div>.
 
@@ -27,7 +27,7 @@
 // Interactive list items
 //
 // Use anchor or button elements instead of `li`s or `div`s to create interactive
-// list items. Includes an extra `.active` modifier class.js for selected items.
+// list items. Includes an extra `.active` modifier class for selected items.
 
 .list-group-item-action {
   width: 100%; // For `<button>`s (anchors become 100% by default though)
@@ -159,7 +159,7 @@
 // scss-docs-start list-group-modifiers
 // List group contextual variants
 //
-// Add modifier class.js to change text and background color on individual items.
+// Add modifier class to change text and background color on individual items.
 // Organizationally, this must come after the `:hover` states.
 
 @each $state, $value in $theme-colors {

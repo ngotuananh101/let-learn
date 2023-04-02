@@ -430,7 +430,7 @@ export default {
             this.class_table = this.$refs.class_table.dt();
             this.class_table.clear();
             this.class_table.rows.add(classes).draw();
-            // handle event for class.js table
+            // handle event for class table
             this.class_table.on("select", (e, dt, type, indexes) => {
                 if (type === "row") {
                     this.selected_class = this.class_table.rows(indexes).data().toArray()[0];

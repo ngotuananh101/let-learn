@@ -56,7 +56,7 @@ Align icon and text
 -------------------------------- */
 
 .icon-text-aligner {
-  /* add this class.js to parent element that contains icon + text */
+  /* add this class to parent element that contains icon + text */
   display: flex;
   align-items: center;
 }

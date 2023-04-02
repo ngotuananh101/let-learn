@@ -110,7 +110,7 @@
     <div v-if="lesson" class="mt-4">
         <h7>{{ lesson.description }}</h7>
     </div>
-    <!-- <h5 class.js="mt-4">Number of terms in this lesson: {{ cardsCount.totalCards }}</h5> -->
+    <!-- <h5 class="mt-4">Number of terms in this lesson: {{ cardsCount.totalCards }}</h5> -->
     <div class="mt-4" v-if="relearns">
         <h6>Relearn: {{ relearns.length }}</h6>
         <div class="row mt-4">

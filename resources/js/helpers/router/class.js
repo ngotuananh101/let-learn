@@ -5,7 +5,7 @@ const classes = [
         children: [
             {
                 path: ':id',
-                name: 'class.js.index',
+                name: 'class.index',
                 component: () => import('../../pages/home/class/Class.vue'),
             },
     ]

@@ -68,7 +68,7 @@
 // scss-docs-end responsive-breakpoints
 
 // Allow for dropdowns to go bottom up (aka, dropup-menu)
-// Just add .dropup after the standard .dropdown class.js and you're set.
+// Just add .dropup after the standard .dropdown class and you're set.
 .dropup {
   .dropdown-menu[data-bs-popper] {
     top: auto;

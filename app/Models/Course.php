@@ -44,7 +44,7 @@ class Course extends Model
         return $this->belongsToMany(Lesson::class, 'courses_lesson', 'courses_id', 'lesson_id');
     }
 
-    // Get class.js belong to folder
+    // Get class belong to folder
     public function classes(): BelongsToMany
     {
         return $this->belongsToMany(Classes::class, 'class_folder', 'folder_id', 'class_id');

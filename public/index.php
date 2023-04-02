@@ -25,9 +25,9 @@ if (file_exists($maintenance = __DIR__.'/../storage/framework/maintenance.php'))
 | Register The Auto Loader
 |--------------------------------------------------------------------------
 |
-| Composer provides a convenient, automatically generated class.js loader for
+| Composer provides a convenient, automatically generated class loader for
 | this application. We just need to utilize it! We'll simply require it
-| into the script here so we don't need to manually load our class.js.
+| into the script here so we don't need to manually load our class.
 |
 */
 

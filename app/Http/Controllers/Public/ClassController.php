@@ -21,7 +21,7 @@ class ClassController extends Controller
                 return response()->json([
                     'status' => 'error',
                     'status_code' => 400,
-                    'message' => 'User is already assigned as a teacher in this class.js!',
+                    'message' => 'User is already assigned as a teacher in this class!',
                 ], 400);
             }
             // Check if user is already assigned as a student
@@ -29,16 +29,16 @@ class ClassController extends Controller
                 return response()->json([
                     'status' => 'error',
                     'status_code' => 400,
-                    'message' => 'User is already assigned as a student in this class.js!',
+                    'message' => 'User is already assigned as a student in this class!',
                 ], 400);
             }
-            // Add teacher to class.js
+            // Add teacher to class
             $class->teachers()->attach($request->user_id);
 
             return response()->json([
                 'status' => 'success',
                 'status_code' => 200,
-                'message' => 'Teacher added successfully to class.js!',
+                'message' => 'Teacher added successfully to class!',
             ], 200);
         } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $ex) {
             if ($ex->getModel() === Classes::class) {
@@ -63,24 +63,24 @@ class ClassController extends Controller
         }
     }
 
-    //deleted Teacher  from class.js
+    //deleted Teacher  from class
     public function deleteTeacher($class_id, $teacher_id)
     {
         try {
             $class = Classes::findOrFail($class_id);
-            // Check if dont have that teacher in class.js
+            // Check if dont have that teacher in class
             if (!$class->teachers()->find($teacher_id)) {
                 return response()->json([
                     'status' => 'error',
                     'status_code' => 400,
-                    'message' => 'Teacher is not assigned to this class.js!',
+                    'message' => 'Teacher is not assigned to this class!',
                 ], 400);
             }
             $class->teachers()->detach($teacher_id);
             return response()->json([
                 'status' => 'success',
                 'status_code' => 200,
-                'message' => 'Teacher deleted successfully from class.js!',
+                'message' => 'Teacher deleted successfully from class!',
             ], 200);
         } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $ex) {
             if ($ex->getModel() === Classes::class) {
@@ -99,24 +99,24 @@ class ClassController extends Controller
         }
     }
 
-    //Delete Student from class.js
+    //Delete Student from class
     public function deleteStudent($class_id, $student_id)
     {
         try {
             $class = Classes::findOrFail($class_id);
-            // Check if dont have that student in class.js
+            // Check if dont have that student in class
             if (!$class->students()->find($student_id)) {
                 return response()->json([
                     'status' => 'error',
                     'status_code' => 400,
-                    'message' => 'Student is not assigned to this class.js!',
+                    'message' => 'Student is not assigned to this class!',
                 ], 400);
             }
             $class->students()->detach($student_id);
             return response()->json([
                 'status' => 'success',
                 'status_code' => 200,
-                'message' => 'Student deleted successfully from class.js!',
+                'message' => 'Student deleted successfully from class!',
             ], 200);
         } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $ex) {
             if ($ex->getModel() === Classes::class) {
@@ -135,24 +135,24 @@ class ClassController extends Controller
         }
     }
 
-    //Delete Lesson from class.js
+    //Delete Lesson from class
     public function deleteSet($class_id, $set_id)
     {
         try {
             $class = Classes::findOrFail($class_id);
-            // Check if dont have that lesson in class.js
+            // Check if dont have that lesson in class
             if (!$class->sets()->find($set_id)) {
                 return response()->json([
                     'status' => 'error',
                     'status_code' => 400,
-                    'message' => 'Lesson is not assigned to this class.js!',
+                    'message' => 'Lesson is not assigned to this class!',
                 ], 400);
             }
             $class->sets()->detach($set_id);
             return response()->json([
                 'status' => 'success',
                 'status_code' => 200,
-                'message' => 'Lesson deleted successfully from class.js!',
+                'message' => 'Lesson deleted successfully from class!',
             ], 200);
         } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $ex) {
             if ($ex->getModel() === Classes::class) {
@@ -171,24 +171,24 @@ class ClassController extends Controller
         }
     }
 
-    //Delete folder from class.js
+    //Delete folder from class
     public function deleteFolder($class_id, $folder_id)
     {
         try {
             $class = Classes::findOrFail($class_id);
-            // Check if dont have that folder in class.js
+            // Check if dont have that folder in class
             if (!$class->folders()->find($folder_id)) {
                 return response()->json([
                     'status' => 'error',
                     'status_code' => 400,
-                    'message' => 'Course is not assigned to this class.js!',
+                    'message' => 'Course is not assigned to this class!',
                 ], 400);
             }
             $class->folders()->detach($folder_id);
             return response()->json([
                 'status' => 'success',
                 'status_code' => 200,
-                'message' => 'Course deleted successfully from class.js!',
+                'message' => 'Course deleted successfully from class!',
             ], 200);
         } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $ex) {
             if ($ex->getModel() === Classes::class) {
@@ -216,7 +216,7 @@ class ClassController extends Controller
                 return response()->json([
                     'status' => 'error',
                     'status_code' => 400,
-                    'message' => 'User is already assigned as a teacher in this class.js!',
+                    'message' => 'User is already assigned as a teacher in this class!',
                 ], 400);
             }
             // Check if user is already assigned as a student
@@ -224,17 +224,17 @@ class ClassController extends Controller
                 return response()->json([
                     'status' => 'error',
                     'status_code' => 400,
-                    'message' => 'User is already assigned as a student in this class.js!',
+                    'message' => 'User is already assigned as a student in this class!',
                 ], 400);
             }
 
-            // Add student to class.js
+            // Add student to class
             $class->students()->attach($request->user_id);
 
             return response()->json([
                 'status' => 'success',
                 'status_code' => 200,
-                'message' => 'Student added successfully to class.js!',
+                'message' => 'Student added successfully to class!',
             ], 200);
         } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $ex) {
             if ($ex->getModel() === Classes::class) {
@@ -273,7 +273,7 @@ class ClassController extends Controller
                     return response()->json([
                         'status' => 'error',
                         'status_code' => 400,
-                        'message' => 'Course already exists in this class.js!'
+                        'message' => 'Course already exists in this class!'
                     ], 400);
                 }
                 $folder = Course::findOrFail($folder_id);
@@ -286,7 +286,7 @@ class ClassController extends Controller
                     'password' => 'nullable|string',
 
                 ]);
-                // Create a new folder and associate it with the class.js
+                // Create a new folder and associate it with the class
                 $folder = new Course();
                 $folder->user_id = $request->user()->id;
                 $folder->name = $request->name;
@@ -301,7 +301,7 @@ class ClassController extends Controller
             return response()->json([
                 'status' => 'success',
                 'status_code' => 200,
-                'message' => 'Course added successfully to class.js!',
+                'message' => 'Course added successfully to class!',
             ], 200);
         } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $ex) {
             return response()->json([
@@ -327,13 +327,13 @@ class ClassController extends Controller
                 return response()->json([
                     'status' => 'error',
                     'status_code' => 400,
-                    'message' => 'Lesson is already in this class.js!',
+                    'message' => 'Lesson is already in this class!',
                 ], 400);
             }
             $class->sets()->attach($set->id);
             return response()->json([
-                'message' => 'Lesson added successfully to the class.js',
-                'class.js' => $class,
+                'message' => 'Lesson added successfully to the class',
+                'class' => $class,
                 'lesson' => $set
             ], 200);
         } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $ex) {
@@ -380,7 +380,7 @@ class ClassController extends Controller
     public function create()
     {
         try {
-            return view('class.js.create');
+            return view('class.create');
         } catch (\Throwable $th) {
             return response()->json([
                 'status' => 'error',
@@ -415,7 +415,7 @@ class ClassController extends Controller
             return response()->json([
                 'status' => 'success',
                 'status_code' => 200,
-                'message' => 'Create class.js successfully!',
+                'message' => 'Create class successfully!',
             ], 200);
         } catch (\Throwable $th) {
             return response()->json([
@@ -453,7 +453,7 @@ class ClassController extends Controller
                 'status_code' => 200,
                 'message' => 'Get lesson successfully!',
                 'data' => [
-                    'class.js' => $class,
+                    'class' => $class,
                     'sets' => $sets,
                     'folders' => $folders,
                     'students' => $students,
@@ -480,7 +480,7 @@ class ClassController extends Controller
         try {
             $class = Classes::findOrFail($id);
 
-            return view('class.js.edit', compact('class'));
+            return view('class.edit', compact('class'));
         } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $ex) {
             return response()->json([
                 'status' => 'error',
@@ -522,7 +522,7 @@ class ClassController extends Controller
 
             return response()->json([
                 'message' => 'Class updated successfully',
-                'class.js' => $class
+                'class' => $class
             ], 200);
         } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $ex) {
             return response()->json([

@@ -73,16 +73,16 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::resource('user', AdminUserController::class);
         Route::resource('role', AdminRoleController::class);
         Route::resource('school', AdminSchoolController::class);
-        //Route::resource('class.js', AdminClassController::class.js);
+        //Route::resource('class', AdminClassController::class);
     })->middleware(['permissions:admin.dashboard']);
 
     // Route for school
 //    Route::prefix('school')->group(function () {
-//        Route::resource('user', ManagerUserController::class.js)->only(['index', 'store']);
-//        Route::resource('class.js', ManagerClassController::class.js);
-//        Route::resource('school', ManagerSchoolController::class.js)->only(['show', 'update']);
-//        Route::resource('lesson', ManagerSetController::class.js);
-//        Route::resource('folder', ManagerFolderController::class.js);
+//        Route::resource('user', ManagerUserController::class)->only(['index', 'store']);
+//        Route::resource('class', ManagerClassController::class);
+//        Route::resource('school', ManagerSchoolController::class)->only(['show', 'update']);
+//        Route::resource('lesson', ManagerSetController::class);
+//        Route::resource('folder', ManagerFolderController::class);
 //    })->middleware(['permissions:manager.dashboard']);
 
     // Route lesson
