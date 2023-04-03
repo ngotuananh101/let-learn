@@ -39,21 +39,24 @@ class PostController extends Controller
             switch ($request->type) {
                 case 'post':
                     $request->validate([
-                        'class_id' => 'required|integer',
-                        'name' => 'required|string|max:255',
-                        'description' => 'required|string|max:1000',
+                        'class_id' => 'nullable|integer',
+                        'title' => 'required|string|max:255',
+                        'content' => 'nullable|string|max:1000',
                         'status' => 'nullable|in:active,pending,inactive',
                         'score_reporting' => 'nullable|in:0,1',
                         'tags' => 'nullable|string',
+                        'views' => 'nullable|integer',
                     ]);
+
                     $post = new Post();
                     $post->user_id = auth()->user()->id;
-                    $post->class_id = $request->input('class_id');
-                    $post->name = $request->input('name');
-                    $post->description = $request->input('description');
+                    $post->class_id = $request->input('class_id', null);
+                    $post->title = $request->input('title');
+                    $post->content = $request->input('content', $request->input('title'));
                     $post->status = $request->input('status', 'inactive');
                     $post->score_reporting = $request->input('score_reporting', 0);
                     $post->tags = $request->input('tags');
+                    $post->views = $request->input('views', 0);
                     $post->save();
 
                     return response()->json(['message' => 'Post created', 'post' => $post], 200);
@@ -62,6 +65,7 @@ class PostController extends Controller
                     $request->validate([
                         'post_id' => 'required|integer',
                         'comment' => 'required|string',
+                        'status' => 'nullable|in:active,pending,inactive',
                     ]);
 
                     $comment = new Comment();
@@ -69,7 +73,7 @@ class PostController extends Controller
                     $comment->user_id = auth()->user()->id;
                     $comment->post_id = $request->input('post_id');
                     $comment->comment = $request->input('comment');
-                    $comment->status = $request->input('status');
+                    $comment->status = $request->input('status', 'inactive');
                     $comment->save();
 
                     return response()->json(['message' => 'Comment created', 'comment' => $comment], 200);
@@ -94,6 +98,8 @@ class PostController extends Controller
     {
         //get post by id
         $post = Post::findOrFail($id);
+        //get title, content, tags, views, created_at
+        $post = $post->only(['title', 'content', 'tags', 'views', 'created_at']);
         //get comments by post id
         $comments = Comment::where('post_id', $id)->get();
         //get user by user_id of post and comments
@@ -101,16 +107,25 @@ class PostController extends Controller
         $comments->each(function ($comment) {
             $comment->user;
         });
-        //get class by class_id of post
-        $class = $post->class;
+        //if post has class_id, get class by class_id
+        if ($post->class_id) {
+            $class = $post->class->only(['name']);
+        } else {
+            $class = null;
+        }
 
-        return response()->json([
+        $data = [
             'post' => $post,
             'comments' => $comments,
             'user' => $user,
-            'class' => $class,
-        ], 200);
+            'class' => $class ?? null,
+        ];
 
+        return response()->json([
+            'status' => 'success',
+            'status_code' => 200,
+            'data' => $data
+        ], 200);
     }
 
     /**
@@ -130,34 +145,49 @@ class PostController extends Controller
             $request->validate([
                 'type' => 'required|string|in:post,comment',
             ]);
-            
+
             switch ($request->type) {
                 case 'post':
                     $request->validate([
-                        'class_id' => 'required|integer',
-                        'name' => 'required|string|max:255',
-                        'description' => 'required|string|max:1000',
+                        'class_id' => 'nullable|integer',
+                        'title' => 'required|string|max:255',
+                        'content' => 'nullable|string|max:1000',
                         'status' => 'nullable|in:active,pending,inactive',
                         'score_reporting' => 'nullable|in:0,1',
                         'tags' => 'nullable|string',
                     ]);
-                    
-                    $post = Post::findOrFail($id);
-                    $userRole = auth()->user()->role->name;
-                    if (($userRole == 'teacher') || ($userRole == 'student' && auth()->user()->id == $post->user_id)){
-                    $post->user_id = auth()->user()->id;
-                    $post->class_id = $request->input('class_id', $post->class_id);
-                    $post->name = $request->input('name');
-                    $post->description = $request->input('description');
-                    $post->status = $request->input('status');
-                    $post->score_reporting = $request->input('score_reporting');
-                    $post->tags = $request->input('tags');
-                    $post->save();
 
-                    return response()->json(['message' => 'Post updated', 'post' => $post], 200);
-                    }
-                    else{
-                        return response()->json(['message' => 'You are not authorized to update this post'], 403);
+                    $post = Post::findOrFail($id);
+                    //check if class_id of post is null or not
+
+                    $userRole = auth()->user()->role->name;
+                    if ($post->class_id) {
+                        //if class_id is not null, check if user is teacher or student of the class
+                        if (($userRole == 'teacher') || ($userRole == 'student' && auth()->user()->id == $post->user_id)) {
+                            $post->user_id = auth()->user()->id;
+                            $post->class_id = $request->input('class_id', $post->class_id);
+                            $post->title = $request->input('title', $post->title);
+                            $post->content = $request->input('content', $post->content);
+                            $post->status = $request->input('status', $post->status);
+                            $post->score_reporting = $request->input('score_reporting', $post->score_reporting);
+                            $post->tags = $request->input('tags');
+                            $post->save();
+
+                            return response()->json(['message' => 'Post updated', 'post' => $post], 200);
+                        } else {
+                            return response()->json(['message' => 'You are not authorized to update this post'], 403);
+                        }
+                    } else {
+                        //for case post is not in class
+                        $post->user_id = auth()->user()->id;
+                        $post->title = $request->input('title', $post->title);
+                        $post->content = $request->input('content', $post->content);
+                        $post->status = $request->input('status', $post->status);
+                        $post->score_reporting = $request->input('score_reporting', $post->score_reporting);
+                        $post->tags = $request->input('tags');
+                        $post->save();
+
+                        return response()->json(['message' => 'Post updated', 'post' => $post], 200);
                     }
                     break;
                 case 'comment':
@@ -167,18 +197,31 @@ class PostController extends Controller
                         'status' => 'nullable|in:active,pending,inactive',
                     ]);
                     $comment = Comment::findOrFail($request->input('comment_id'));
-                    $userRole = auth()->user()->role->name;
-                    if (($userRole == 'teacher') || ($userRole == 'student' && auth()->user()->id == $comment->user_id)) {                    
-                    $comment->user_id = $request->input('user_id');
-                    //post_id is $id
-                    $comment->post_id = $id;
-                    $comment->comment = $request->input('comment', $comment->comment);
-                    $comment->status = $request->input('status', $comment->status);
-                    $comment->save();
+                    //check if post contains comment_id has class_id or not
 
-                    return response()->json(['message' => 'Comment updated', 'comment' => $comment], 200);
+                    $userRole = auth()->user()->role->name;
+                    if ($comment->post->class_id) {
+                        if (($userRole == 'teacher') || ($userRole == 'student' && auth()->user()->id == $comment->user_id)) {
+                            $comment->user_id = $request->input('user_id');
+                            //post_id is $id
+                            $comment->post_id = $id;
+                            $comment->comment = $request->input('comment', $comment->comment);
+                            $comment->status = $request->input('status', $comment->status);
+                            $comment->save();
+
+                            return response()->json(['message' => 'Comment updated', 'comment' => $comment], 200);
+                        } else {
+                            return response()->json(['message' => 'You are not authorized to update this comment'], 403);
+                        }
                     } else {
-                        return response()->json(['message' => 'You are not authorized to update this comment'], 403);
+                        $comment->user_id = $request->input('user_id');
+                        //post_id is $id
+                        $comment->post_id = $id;
+                        $comment->comment = $request->input('comment', $comment->comment);
+                        $comment->status = $request->input('status', $comment->status);
+                        $comment->save();
+
+                        return response()->json(['message' => 'Comment updated', 'comment' => $comment], 200);
                     }
                     break;
             }
@@ -202,15 +245,21 @@ class PostController extends Controller
                 case 'post':
                     $post = Post::findOrFail($id);
                     $userRole = auth()->user()->role->name;
-                    if (($userRole == 'teacher') || ($userRole == 'student' && auth()->user()->id == $post->user_id)) {
+                    if ($post->class_id) {
+
+                        if (($userRole == 'teacher') || ($userRole == 'student' && auth()->user()->id == $post->user_id)) {
+                            $post->delete();
+                            return response()->json(['message' => 'Post deleted'], 200);
+                        } else {
+                            return response()->json([
+                                'status' => 'error',
+                                'status_code' => 403,
+                                'message' => 'You are not authorized to delete this post'
+                            ], 403);
+                        }
+                    } else {
                         $post->delete();
                         return response()->json(['message' => 'Post deleted'], 200);
-                    } else {
-                        return response()->json([
-                            'status' => 'error',
-                            'status_code' => 403,
-                            'message' => 'You are not authorized to delete this post'
-                        ], 403);
                     }
                     break;
                 case 'comment':
@@ -219,15 +268,20 @@ class PostController extends Controller
                     ]);
                     $comment = Comment::findOrFail($request->input('comment_id'));
                     $userRole = auth()->user()->role->name;
-                    if (($userRole == 'teacher') || ($userRole == 'student' && auth()->user()->id == $comment->user_id)) {
+                    if ($comment->post->class_id) { //check if post contains comment_id has class_id or not
+                        if (($userRole == 'teacher') || ($userRole == 'student' && auth()->user()->id == $comment->user_id)) {
+                            $comment->delete();
+                            return response()->json(['message' => 'Comment deleted'], 200);
+                        } else {
+                            return response()->json([
+                                'status' => 'error',
+                                'status_code' => 403,
+                                'message' => 'You are not authorized to delete this comment'
+                            ], 403);
+                        }
+                    } else {
                         $comment->delete();
                         return response()->json(['message' => 'Comment deleted'], 200);
-                    } else {
-                        return response()->json([
-                            'status' => 'error',
-                            'status_code' => 403,
-                            'message' => 'You are not authorized to delete this comment'
-                        ], 403);
                     }
                     break;
             }

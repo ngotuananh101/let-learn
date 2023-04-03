@@ -17,8 +17,8 @@ return new class extends Migration {
             $table->string('slug');
             $table->foreignId('user_id')->constrained();
             $table->foreignId('class_id')->nullable()->constrained();
-            $table->string('name');
-            $table->text('description');
+            $table->string('title');
+            $table->text('content');
             $table->enum('status', ['active', 'pending', 'inactive'])->default('inactive');
             $table->integer('score_reporting')->default(0);
             $table->string('tags');
