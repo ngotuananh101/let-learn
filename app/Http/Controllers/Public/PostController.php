@@ -78,6 +78,9 @@ class PostController extends Controller
 
                     return response()->json(['message' => 'Comment created', 'comment' => $comment], 200);
                     break;
+                default:
+                    return response()->json(['message' => 'Invalid type'], 400);
+                    break;
             }
         } catch (\Throwable $th) {
             return response()->json([
@@ -163,7 +166,7 @@ class PostController extends Controller
                     $userRole = auth()->user()->role->name;
                     if ($post->class_id) {
                         //if class_id is not null, check if user is teacher or student of the class
-                        if (($userRole == 'teacher') || ($userRole == 'student' && auth()->user()->id == $post->user_id)) {
+                        if (($userRole == 'teacher'&& auth()->user()->id == $post->user_id) || ($userRole == 'student' && auth()->user()->id == $post->user_id)) {
                             $post->user_id = auth()->user()->id;
                             $post->class_id = $request->input('class_id', $post->class_id);
                             $post->title = $request->input('title', $post->title);
@@ -179,15 +182,19 @@ class PostController extends Controller
                         }
                     } else {
                         //for case post is not in class
-                        $post->user_id = auth()->user()->id;
-                        $post->title = $request->input('title', $post->title);
-                        $post->content = $request->input('content', $post->content);
-                        $post->status = $request->input('status', $post->status);
-                        $post->score_reporting = $request->input('score_reporting', $post->score_reporting);
-                        $post->tags = $request->input('tags');
-                        $post->save();
+                        if(auth()->user()->id == $post->user_id){
+                            $post->user_id = auth()->user()->id;
+                            $post->title = $request->input('title', $post->title);
+                            $post->content = $request->input('content', $post->content);
+                            $post->status = $request->input('status', $post->status);
+                            $post->score_reporting = $request->input('score_reporting', $post->score_reporting);
+                            $post->tags = $request->input('tags');
+                            $post->save();
 
-                        return response()->json(['message' => 'Post updated', 'post' => $post], 200);
+                            return response()->json(['message' => 'Post updated', 'post' => $post], 200);
+                        }else{
+                            return response()->json(['message' => 'You are not authorized to update this post'], 403);
+                        }
                     }
                     break;
                 case 'comment':
@@ -201,7 +208,7 @@ class PostController extends Controller
 
                     $userRole = auth()->user()->role->name;
                     if ($comment->post->class_id) {
-                        if (($userRole == 'teacher') || ($userRole == 'student' && auth()->user()->id == $comment->user_id)) {
+                        if (($userRole == 'teacher' && auth()->user()->id == $comment->user_id) || ($userRole == 'student' && auth()->user()->id == $comment->user_id)) {
                             $comment->user_id = $request->input('user_id');
                             //post_id is $id
                             $comment->post_id = $id;
@@ -214,15 +221,23 @@ class PostController extends Controller
                             return response()->json(['message' => 'You are not authorized to update this comment'], 403);
                         }
                     } else {
-                        $comment->user_id = $request->input('user_id');
-                        //post_id is $id
-                        $comment->post_id = $id;
-                        $comment->comment = $request->input('comment', $comment->comment);
-                        $comment->status = $request->input('status', $comment->status);
-                        $comment->save();
+                        if(auth()->user()->id == $comment->user_id){
+                            $comment->user_id = $request->input('user_id');
+                            //post_id is $id
+                            $comment->post_id = $id;
+                            $comment->comment = $request->input('comment', $comment->comment);
+                            $comment->status = $request->input('status', $comment->status);
+                            $comment->save();
 
-                        return response()->json(['message' => 'Comment updated', 'comment' => $comment], 200);
+                            return response()->json(['message' => 'Comment updated', 'comment' => $comment], 200);
+                        }else{
+                            return response()->json(['message' => 'You are not authorized to update this comment'], 403);
+                        }
                     }
+                    break;
+
+                default:
+                    return response()->json(['message' => 'Invalid type'], 400);
                     break;
             }
         } catch (\Throwable $th) {
@@ -258,8 +273,16 @@ class PostController extends Controller
                             ], 403);
                         }
                     } else {
-                        $post->delete();
-                        return response()->json(['message' => 'Post deleted'], 200);
+                        if (auth()->user()->id == $post->user_id) {
+                            $post->delete();
+                            return response()->json(['message' => 'Post deleted'], 200);
+                        } else {
+                            return response()->json([
+                                'status' => 'error',
+                                'status_code' => 403,
+                                'message' => 'You are not authorized to delete this post'
+                            ], 403);
+                        }
                     }
                     break;
                 case 'comment':
@@ -269,7 +292,7 @@ class PostController extends Controller
                     $comment = Comment::findOrFail($request->input('comment_id'));
                     $userRole = auth()->user()->role->name;
                     if ($comment->post->class_id) { //check if post contains comment_id has class_id or not
-                        if (($userRole == 'teacher') || ($userRole == 'student' && auth()->user()->id == $comment->user_id)) {
+                        if (($userRole == 'teacher') || ($userRole == 'student') && (auth()->user()->id == $comment->user_id)) {
                             $comment->delete();
                             return response()->json(['message' => 'Comment deleted'], 200);
                         } else {
@@ -280,9 +303,20 @@ class PostController extends Controller
                             ], 403);
                         }
                     } else {
-                        $comment->delete();
-                        return response()->json(['message' => 'Comment deleted'], 200);
+                        if(auth()->user()->id == $comment->user_id){
+                            $comment->delete();
+                            return response()->json(['message' => 'Comment deleted'], 200);
+                        }else{
+                            return response()->json([
+                                'status' => 'error',
+                                'status_code' => 403,
+                                'message' => 'You are not authorized to delete this comment'
+                            ], 403);
+                        }
                     }
+                    break;
+                default:
+                    return response()->json(['message' => 'Invalid type'], 400);
                     break;
             }
         } catch (\Throwable $th) {
