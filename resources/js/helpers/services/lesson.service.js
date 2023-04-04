@@ -9,7 +9,8 @@ export const lessonService = {
     createLesson,
     updateLesson,
     deleteLesson,
-    getLessonInfoToEdit
+    getLessonInfoToEdit,
+    importLesson
 }
 //show lesson detail of relearn
 function showLessonDetailRelearn(lesson_id) {
@@ -23,7 +24,6 @@ function showLessonDetailRelearn(lesson_id) {
         }
         );
 }
-
 //show lesson detail of not learn
 function showLessonDetailNotLearn(lesson_id) {
     console.log(lesson_id);
@@ -36,7 +36,6 @@ function showLessonDetailNotLearn(lesson_id) {
         }
         );
 }
-
 //show lesson info
 function getLessonInfo(lesson_id) {
     console.log(lesson_id);
@@ -77,5 +76,15 @@ function deleteLesson(lesson_id) {
     return fetch(`${config.apiUrl}/lesson/${lesson_id}`, {
         method: 'DELETE',
         headers: authHeader()
+    }).then(handleResponse);
+}
+//import lesson
+function importLesson(data) {
+    let headers = authHeader();
+    delete headers['Content-Type'];
+    return fetch(`${config.apiUrl}/lesson/import`, {
+        method: 'POST',
+        headers: headers,
+        body: data
     }).then(handleResponse);
 }

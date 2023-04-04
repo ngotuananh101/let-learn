@@ -14,6 +14,11 @@ const learn = [
                 path: ':id',
                 name: 'learn.quiz.index',
                 component: () => import('../../pages/learn/Learn.vue'),
+            },
+            {
+                path: 'test/:id',
+                name: 'learn.test.index',
+                component: () => import('../../pages/learn/Test.vue'),
             }
         ]
     },
