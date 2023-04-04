@@ -104,5 +104,16 @@ export default {
                     }
                 );
         },
+        importLesson({dispatch}, data) {
+            return lessonService.importLesson(data)
+                .then(
+                    res => {
+                        return res.id;
+                    },
+                    error => {
+                        return 0;
+                    }
+                );
+        },
     }
 }

@@ -78,17 +78,20 @@
                     </router-link>
                 </div>
                 <div class="col-md-6 col-12 pt-3">
-                    <div class="card">
-                        <div class="card-body p-3 row">
-                            <div class="col-8">
-                                <h5 class="card-title mb-0">Test</h5>
-                                <p class="card-text text-sm">Create a test for this lesson</p>
-                            </div>
-                            <div class="col-4">
-                                <img src="https://cdn-icons-png.flaticon.com/512/3068/3068553.png" class="img-fluid" alt="">
+                    <router-link :to="{ name: 'learn.test.index', params: { id: lesson_id } }">
+                        <div class="card">
+                            <div class="card-body p-3 row">
+                                <div class="col-8">
+                                    <h5 class="card-title mb-0">Test</h5>
+                                    <p class="card-text text-sm">Create a test for this lesson</p>
+                                </div>
+                                <div class="col-4">
+                                    <img src="https://cdn-icons-png.flaticon.com/512/3068/3068553.png" class="img-fluid"
+                                        alt="">
+                                </div>
                             </div>
                         </div>
-                    </div>
+                    </router-link>
                 </div>
                 <div class="col-md-6 col-12 pt-3">
                     <div class="card">
@@ -263,4 +266,5 @@ export default {
     font: normal normal normal 14px/1 FontAwesome;
     border: none;
     vertical-align: middle;
-}</style>
+}
+</style>
