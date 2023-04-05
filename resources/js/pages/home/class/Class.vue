@@ -268,6 +268,7 @@
 import DataTable from 'datatables.net-vue3'
 import DataTablesLib from 'datatables.net-bs5';
 import 'datatables.net-select';
+import {mapActions} from "vuex";
 
 DataTable.use(DataTablesLib);
 export default {
@@ -276,6 +277,7 @@ export default {
     },
     data() {
         return {
+            quizs: null,
             lessons: [
                 {
                     title: 'Java - Lesson 1',
@@ -314,6 +316,14 @@ export default {
             ],
         };
     },
+    beforeMount() {
+        this.$store.dispatch("classes/getQuiz").then(
+            quiz => {
+                console.log(quiz);
+                this.quizs = quiz;
+            }
+        );
+    },
     mounted() {
         // Initialize CKEditor on the message input field
         ClassicEditor.create(document.querySelector('#message-input'))
@@ -330,6 +340,9 @@ export default {
         }, 100);
     },
     methods: {
+        ...mapActions({
+            getQuiz: "classes/getQuiz",
+        }),
         onSubmit() {
             // Handle form submission here
         },
