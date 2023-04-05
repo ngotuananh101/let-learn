@@ -115,6 +115,7 @@ export default {
     methods: {
         ...mapActions({
             getLearn: 'learn/getLearn'
+
         }),
         checkAnswer(index) {
             if (this.answered) {

@@ -86,7 +86,7 @@ const home = [
                 path: 'forum_detail',
                 name: 'home.forumdetail',
                 component: () => import('../../pages/home/ForumDetail.vue'),
-            }
+            },
         ],
     },
 ];

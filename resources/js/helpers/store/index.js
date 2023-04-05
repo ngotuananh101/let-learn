@@ -14,7 +14,9 @@ import home from "./modules/home.js";
 import learn from "./modules/learn";
 import lesson from "./modules/lesson.js";
 import course from "./modules/course.js";
-// import classes from "./modules/class.js";
+import classes from "./modules/classes.js";
+
+
 export default createStore({
     namespaced: true,
     modules: {
@@ -24,7 +26,7 @@ export default createStore({
         alert,
         home,
         learn,
-        // classes,
+        classes,
         dashboard,
         adminSetting,
         adminLesson,
