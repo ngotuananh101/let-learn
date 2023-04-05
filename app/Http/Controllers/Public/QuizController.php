@@ -6,6 +6,7 @@ use App\Exports\ExportAnswerData;
 use App\Exports\ExportQuizData;
 use App\Http\Controllers\Controller;
 use App\Models\Answer;
+use App\Models\Classes;
 use App\Models\Quiz;
 use App\Models\Question;
 use App\Models\User;
@@ -36,11 +37,17 @@ class QuizController extends Controller
     {
         try {
             $request->validate([
-                'type' => 'required|string|in:quiz,question,answer,grade',
+                'type' => 'required|string|in:all,quiz,question,answer,grade',
+                'class_id' => 'required_if:type,all|nullable|integer|exists:classes,id',
             ]);
 
             if (auth()->user()->role->name == 'user') {
                 switch ($request->type) {
+                    case 'all':
+                        $class = Classes::with('quizzes')->findOrFail($request->class_id);
+                        $quizzes = $class->quizzes;
+                        return response()->json(['data' => $quizzes]);
+                        break;
                     case 'quiz':
                         $quiz = Quiz::with('questions')->findOrFail($id);
                         //if quiz is not exist or quiz is not active

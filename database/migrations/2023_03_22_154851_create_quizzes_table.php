@@ -15,6 +15,7 @@ return new class extends Migration
     {
         Schema::create('quizzes', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('class_id')->constrained('classes')->onDelete('cascade');
             $table->string('name');
             $table->text('description');
             $table->enum('status', ['active','pending', 'inactive'])->default('inactive'); //status: active, pending, inactive
