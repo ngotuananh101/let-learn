@@ -26,7 +26,7 @@ class UserController extends Controller
     {
         try {
             $request->validate([
-                'type' => 'string|in:info,lesson,course,search,recent,detail,learn,detail_split',
+                'type' => 'string|in:info,lesson,course,search,recent,detail,learn,detail_split,test',
             ]);
             // $user = User::findOrFail($id);
             // check user is user login
@@ -293,7 +293,23 @@ class UserController extends Controller
                     $lessonController = new LessonController();
                     return $lessonController->learn($request, $lesson_id);
                     break;
-
+                case 'test':
+                    //same with learn but get from method learnForImport
+                    $request->validate([
+                        'lesson_id' => 'required|integer',
+                        'quantity' => 'nullable|integer',
+                    ]);
+                    $lesson_id = $request->lesson_id;
+                    $lessonController = new LessonController();
+                    $quantity = $request->quantity ? $request->quantity : 10;
+                    $data = $lessonController->learnForImport($request, $lesson_id)->getData();
+                    return response()->json([
+                        'status' => 'success',
+                        'status_code' => 200,
+                        'message' => 'Get lesson successfully!',
+                        'data' => $data
+                    ], 200);
+                    break;
                 default:
                     return response()->json([
                         'status' => 'error',

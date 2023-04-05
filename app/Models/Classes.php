@@ -31,4 +31,10 @@ class Classes extends Model
     {
         return $this->belongsToMany(User::class, 'class_members', 'class_id', 'user_id');
     }
+
+    //get quizzes of a class
+    public function quizzes(): HasMany
+    {
+        return $this->hasMany(Quiz::class, 'class_id', 'id');
+    }
 }
