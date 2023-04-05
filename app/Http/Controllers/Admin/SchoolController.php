@@ -311,21 +311,21 @@ class SchoolController extends Controller
                     //     $request->merge([
                     //         'school_id' => $school->id
                     //     ]);
-                    //     // call class.js controller
-                    //     $class.js = new ClassController();
+                    //     // call class controller
+                    //     $class = new ClassController();
                     //     // call store method
-                    //     return $class.js->store($request);
+                    //     return $class->store($request);
                     //     break;
                     // case 'remove_class':
                     //     $request->validate([
-                    //         'class_id' => 'required|exists:class.js,id',
+                    //         'class_id' => 'required|exists:class,id',
                     //     ]);
-                    //     // find class.js
-                    //     $class.js = Classes::findOrFail($request->class_id);
-                    //     // check if class.js is in school
-                    //     if ($school->class.js->contains($class.js)) {
-                    //         // delete class.js
-                    //         $class.js->delete();
+                    //     // find class
+                    //     $class = Classes::findOrFail($request->class_id);
+                    //     // check if class is in school
+                    //     if ($school->class->contains($class)) {
+                    //         // delete class
+                    //         $class->delete();
                     //     }else{
                     //         throw new \Exception('Class is not in school');
                     //     }

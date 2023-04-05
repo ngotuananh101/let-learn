@@ -570,6 +570,7 @@ class LessonController extends Controller
     public function learnForImport(Request $request, $lesson_id)
     {
         try {
+            $quantity = $request->input('quantity', 20); //request quantity of lesson details
             $reverse = $request->input('reverse', false); //request reverse term and definition
             $mixAnswers = $request->input('mix_answers', false); //request mix answer part
             $mixDetails = $request->input('mix_details', false); //request mix lesson details
@@ -583,24 +584,24 @@ class LessonController extends Controller
             $relearn = $learn ? explode(',', $learn->relearn) : [];
             // $lessonDetails = LessonDetail::where('lesson_id', $lesson_id)->whereNotIn('id', $learned)->whereNotIn('id', $relearn);
             $lessonDetails = [];
-            //get relearn lesson details
+            //get relearn lesson details by quantity
             if ($relearn) {
                 $lessonDetails = LessonDetail::whereIn('id', $relearn)->get();
             }
             if ($mixDetails) {
                 //if learned and relearn lesson details are empty
                 if (count($learned) === 0 && count($relearn) === 0) {
-                    $lessonDetails = LessonDetail::where('lesson_id', $lesson_id)->inRandomOrder()->get();
+                    $lessonDetails = LessonDetail::where('lesson_id', $lesson_id)->inRandomOrder()->take($quantity)->get();
                 } else {
-                    $notLearn = LessonDetail::where('lesson_id', $lesson_id)->whereNotIn('id', $learned)->whereNotIn('id', $relearn)->inRandomOrder()->get();
+                    $notLearn = LessonDetail::where('lesson_id', $lesson_id)->whereNotIn('id', $learned)->whereNotIn('id', $relearn)->inRandomOrder()->take($quantity - count($lessonDetails))->get();
                     $lessonDetails = $lessonDetails->merge($notLearn);
                 }
             } else {
                 //if learned and relearn lesson details are empty
                 if (count($learned) === 0 && count($relearn) === 0) {
-                    $lessonDetails = LessonDetail::where('lesson_id', $lesson_id)->get();
+                    $lessonDetails = LessonDetail::where('lesson_id', $lesson_id)->take($quantity)->get();
                 } else {
-                    $notLearn = LessonDetail::where('lesson_id', $lesson_id)->whereNotIn('id', $learned)->whereNotIn('id', $relearn)->get();
+                    $notLearn = LessonDetail::where('lesson_id', $lesson_id)->whereNotIn('id', $learned)->whereNotIn('id', $relearn)->take($quantity - count($lessonDetails))->get();
                     $lessonDetails = $lessonDetails->merge($notLearn);
                 }
             }
