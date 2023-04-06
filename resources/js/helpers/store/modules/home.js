@@ -35,5 +35,15 @@ export default {
                     },
                 );
         },
+        getQuiz({commit}, id) {
+            console.log(id);
+            return homeService.loadQuizByClassId(id)
+                .then(
+                    quiz => {
+                        return Promise.resolve(quiz);
+                    },
+                );
+        },
+
     }
 }

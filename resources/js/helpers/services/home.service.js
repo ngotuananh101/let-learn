@@ -6,6 +6,7 @@ import handleResponse from './handle-response';
 export const homeService = {
     loadLesson,
     loadCourse,
+    loadQuizByClassId,
 }
 
 function loadLesson() {
@@ -27,4 +28,13 @@ function loadCourse() {
             return data.data;
         });
 }
+function loadQuizByClassId(class_id) {
+    return fetch(`${config.apiUrl}/quiz/${class_id}?type=all`, {method: 'GET', headers: authHeader()})
+        .then(handleResponse)
+        .then(data => {
+            console.log(data);
+            return data.data;
+        });
+}
+
 
