@@ -6,16 +6,15 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
-class Comment extends Model
+class CommentVote extends Model
 {
     use HasFactory;
 
     protected $fillable = [
         'user_id',
         'post_id',
-        'comment',
-        'status',
-        'votes',
+        'comment_id',
+        'vote_status',
     ];
 
     // get user
@@ -24,16 +23,9 @@ class Comment extends Model
         return $this->belongsTo(User::class);
     }
 
-    // get class
-    public function class(): BelongsTo
+    // get comment
+    public function comment(): BelongsTo
     {
-        return $this->belongsTo(Classes::class);
+        return $this->belongsTo(Comment::class);
     }
-
-    // get post
-    public function post(): BelongsTo
-    {
-        return $this->belongsTo(Post::class);
-    }
-
 }
