@@ -18,13 +18,21 @@ export default {
         }
     },
     actions: {
-        getQuiz() {
-            return classService.loadQuizByClassId()
+        getQuiz({commit}, id) {
+            console.log(id);
+            return classService.loadQuizByClassId(id)
                 .then(
                     quiz => {
                         return Promise.resolve(quiz);
                     },
                 );
         },
+        doQuiz({commit}, id) {
+            return classService.doQuiz(id)
+                .then(doquiz => {
+                    commit('setDoQuiz', doquiz);
+                    return Promise.resolve(doquiz);
+                });
+        }
     }
 }

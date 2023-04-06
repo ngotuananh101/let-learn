@@ -99,7 +99,7 @@
                 </div>
             </div>
             <div class="tab-pane fade" id="pills-profile" role="tabpanel" aria-labelledby="pills-profile-tab">
-                <div class="card my-4  mx-md-12" v-for="(lesson, index) in lessons" :key="index">
+                <div class="card my-4  mx-md-12" v-for="(lesson, index) in quizs" :key="index">
                     <div class="row">
                         <div class="col">
                             <div
@@ -108,7 +108,7 @@
                                 @click="toggleLessonDetails(index)"
                                 style="color: black; font-weight: bold"
                             >
-                                {{ lesson.title }}
+                                {{ lesson.name }}
                             </div>
                             <div
                                 :id="'lesson-detail-' + index"
@@ -119,14 +119,16 @@
                                 <div class="card-body">
                                     <div class="row">
                                         <div class="col-8">
-                                            <p>{{ lesson.duration }}</p>
-                                            <p>{{ lesson.numQuestions }} questions</p>
+                                            <p>{{ lesson.description }}</p>
+                                            <p>Start time: {{ lesson.start_time }}</p>
+                                            <p>End time: {{ lesson.end_time }}</p>
+                                            <p>Number of question: {{ numQuestions }}</p>
+                                            <p>Score: {{ lesson.score_reporting }}</p>
                                         </div>
                                         <div class="col-2">
                                             <button class="btn btn-primary">Start</button>
                                         </div>
                                         <div class="col-2">
-<!--                                            <button class="btn btn-primary" @click="viewExerciseResult(lesson.id)">Result</button>-->
                                             <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal">
                                                 Result
                                             </button>
@@ -183,6 +185,7 @@
                                                 </div>
 
                                             </div>
+
                                         </div>
                                     </div>
                                 </div>
@@ -277,27 +280,10 @@ export default {
     },
     data() {
         return {
-            quizs: null,
-            lessons: [
-                {
-                    title: 'Java - Lesson 1',
-                    duration: '30 min',
-                    numQuestions: '25',
-                    showDetails: false,
-                },
-                {
-                    title: 'Java - Lesson 2',
-                    duration: '40 min',
-                    numQuestions: '25',
-                    showDetails: false,
-                },
-                {
-                    title: 'Java - Lesson 3',
-                    duration: '30 min',
-                    numQuestions: '25',
-                    showDetails: false,
-                },
-            ],
+            id: this.$route.params.id,
+            quizs: [],
+            doquizs:[],
+            showDetails: false,
             table: null,
             results: [
                 { id: 1, name: "Vu Hai Long", score: "80", time: "15:34", status: "submitted" },
@@ -317,12 +303,17 @@ export default {
         };
     },
     beforeMount() {
-        this.$store.dispatch("classes/getQuiz").then(
+        this.$store.dispatch("classes/getQuiz", this.id).then(
             quiz => {
-                console.log(quiz);
                 this.quizs = quiz;
+
             }
         );
+        // this.$store.dispatch("classes/doQuiz", ).then(
+        //     doquiz => {
+        //         this.doquizs = doquiz;
+        //     }
+        // );
     },
     mounted() {
         // Initialize CKEditor on the message input field
@@ -339,6 +330,14 @@ export default {
             }
         }, 100);
     },
+    computed: {
+        numQuestions() {
+            return this.doquizs.filter(q => q.id).length;
+        },
+        quizId() {
+            return this.quizs.id;
+        },
+    },
     methods: {
         ...mapActions({
             getQuiz: "classes/getQuiz",
@@ -347,14 +346,15 @@ export default {
             // Handle form submission here
         },
         toggleLessonDetails(index) {
-            this.lessons.forEach((lesson, i) => {
+            this.quizs.forEach((quiz, i) => {
                 if (i === index) {
-                    lesson.showDetails = !lesson.showDetails;
+                    quiz.showDetails = !quiz.showDetails;
                 } else {
-                    lesson.showDetails = false;
+                    quiz.showDetails = false;
                 }
             });
         },
+
         viewExerciseResult(exerciseId) {
             const url = '/class/detail/' + exerciseId;
             window.location.href = url;
