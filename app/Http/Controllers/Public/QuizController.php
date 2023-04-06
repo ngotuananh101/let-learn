@@ -38,20 +38,31 @@ class QuizController extends Controller
         try {
             $request->validate([
                 'type' => 'required|string|in:all,quiz,question,answer,grade',
-                'class_id' => 'required_if:type,all|nullable|integer|exists:classes,id',
+                //'class_id' => 'required_if:type,all|nullable|integer|exists:classes,id',
             ]);
 
             if (auth()->user()->role->name == 'user') {
                 switch ($request->type) {
                     case 'all':
-                        $class = Classes::with('quizzes')->findOrFail($request->class_id);
+                        $class = Classes::with('quizzes')->findOrFail($id);
                         $quizzes = $class->quizzes;
-                        return response()->json(['data' => $quizzes]);
+                        $count_questions = 0;
+                        foreach ($quizzes as $quiz) {
+                            $count_questions += $quiz->questions->count();
+                        }
+                        $data = [
+                            'class_name' => $class->name,
+                            'class_description' => $class->description,                            
+                            'count_quizzes' => $quizzes->count(),
+                            'count_questions' => $count_questions,
+                            'quizzes' => $quizzes
+                        ];
+                        return response()->json(['data' => $data]);
                         break;
                     case 'quiz':
                         $quiz = Quiz::with('questions')->findOrFail($id);
                         //if quiz is not exist or quiz is not active
-                        if (!$quiz || $quiz->status == false) {
+                        if (!$quiz || $quiz->status == 'inactive') {
                             return response()->json([
                                 'status' => 'error',
                                 'status_code' => 400,
@@ -62,20 +73,21 @@ class QuizController extends Controller
                         break;
                     case 'question':
                         $quiz = Quiz::with('questions')->findOrFail($id);
-                        if (!$quiz || $quiz->status == false) {
+                        if (!$quiz || $quiz->status == 'inactive') {
                             return response()->json([
                                 'status' => 'error',
                                 'status_code' => 400,
                                 'message' => 'Quiz is not exist or quiz is not active'
                             ], 400);
                         }
+
                         //get question belong to quiz
                         $questions = $quiz->questions;
                         return response()->json(['data' => $questions]);
                         break;
                     case 'answer': //for grade
                         $quiz = Quiz::with('questions')->findOrFail($id);
-                        if (!$quiz || $quiz->status == false) {
+                        if (!$quiz || $quiz->status == 'inactive') {
                             return response()->json([
                                 'status' => 'error',
                                 'status_code' => 400,
@@ -128,9 +140,23 @@ class QuizController extends Controller
                 $quiz = Quiz::findOrFail($id);
                 if ($quiz->score_reporting == true) {
                     switch ($request->type) {
+                        case 'all':
+                            $class = Classes::with('quizzes')->findOrFail($request->class_id);
+                            $quizzes = $class->quizzes->where('status', 'active');
+                            $count_questions = 0;
+                            foreach ($quizzes as $quiz) {
+                                $count_questions += $quiz->questions->count();
+                            }
+                            $data = [
+                                'class_name' => $class->name,
+                                'class_description' => $class->description,                                
+                                'count_quizzes' => $quizzes->count(),
+                                'count_questions' => $count_questions,
+                            ];
+                            break;
                         case 'quiz':
                             $quiz = Quiz::with('questions')->find($id);
-                            if (!$quiz || $quiz->status == false) {
+                            if (!$quiz || $quiz->status == 'inactive') {
                                 return response()->json([
                                     'status' => 'error',
                                     'status_code' => 400,
@@ -147,7 +173,7 @@ class QuizController extends Controller
                             break;
                         case 'question':
                             $quiz = Quiz::with('questions')->findOrFail($id);
-                            if (!$quiz || $quiz->status == false) {
+                            if (!$quiz || $quiz->status == 'inactive') {
                                 return response()->json([
                                     'status' => 'error',
                                     'status_code' => 400,
@@ -167,7 +193,7 @@ class QuizController extends Controller
                             break;
                         case 'answer':
                             $quiz = Quiz::with('questions')->findOrFail($id);
-                            if (!$quiz || $quiz->status == false) {
+                            if (!$quiz || $quiz->status == 'inactive') {
                                 return response()->json([
                                     'status' => 'error',
                                     'status_code' => 400,
@@ -268,7 +294,7 @@ class QuizController extends Controller
                     $lessonController = new LessonController();
                     $response = $lessonController->learnForImport($request, $lesson_id);
                     // Get the data from the response
-                    
+
                     $quantity = $request->input('quantity', 20);
                     // Check if the request was successful
                     if ($response->getStatusCode() == 200) {
@@ -278,7 +304,7 @@ class QuizController extends Controller
                         $quiz = Quiz::create([
                             'name' => $request->input('name'),
                             'description' => $request->input('description'),
-                            'status' => $request->input('status', 'inactive'),
+                            'status' => $request->input('status', 'pending'),
                             'score_reporting' => $request->input('score_reporting', true),
                             'start_time' => $request->input('start_time'),
                             'end_time' => $request->input('end_time')
@@ -290,7 +316,7 @@ class QuizController extends Controller
                         $lesson_details = $data->lesson_details;
                         $total_questions_added = 0;
                         foreach ($lesson_details as $questions) {
-                            if($total_questions_added >= $quantity){
+                            if ($total_questions_added >= $quantity) {
                                 break; // Stop adding more questions
                             }
                             $question = new Question([
@@ -300,7 +326,7 @@ class QuizController extends Controller
                                 'correct_answer' => $questions->correct_answer,
                                 'points' => 1,
                             ]);
-                            
+
                             $quiz->questions()->save($question);
                             $total_questions_added++;
                         }
@@ -324,6 +350,7 @@ class QuizController extends Controller
                     break;
                 case 'quiz':
                     $request->validate([
+                        'class_id' => 'required|integer',
                         'name' => 'required|string|max:255',
                         'description' => 'required|string',
                         'status' => 'required|in:pending,inactive',
@@ -339,9 +366,10 @@ class QuizController extends Controller
                     ]);
 
                     $quiz = Quiz::create([
+                        'class_id' => $request->input('class_id'),
                         'name' => $request->input('name'),
                         'description' => $request->input('description'),
-                        'status' => $request->input('status', 'inactive'),
+                        'status' => $request->input('status', 'pending'),
                         'score_reporting' => $request->input('score_reporting', true),
                         'start_time' => $request->input('start_time'),
                         'end_time' => $request->input('end_time')
