@@ -8,6 +8,7 @@ export const learnService = {
     updateResult
 }
 const user = JSON.parse(localStorage.getItem('user'));
+console.log(user)
 
 function getLessons(lesson_id) {
     const requestOptions = {
