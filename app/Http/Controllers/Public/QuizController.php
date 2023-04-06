@@ -46,16 +46,15 @@ class QuizController extends Controller
                     case 'all':
                         $class = Classes::with('quizzes')->findOrFail($id);
                         $quizzes = $class->quizzes;
-                        $count_questions = 0;
+                        
+                        //count number of questions in each quiz
                         foreach ($quizzes as $quiz) {
-                            $count_questions += $quiz->questions->count();
+                            $quiz->count_questions = $quiz->questions->count();
                         }
                         $data = [
-                            'class_name' => $class->name,
-                            'class_description' => $class->description,                            
+                            'class_name' => $class->name,                           
                             'count_quizzes' => $quizzes->count(),
-                            'count_questions' => $count_questions,
-                            'quizzes' => $quizzes
+                            'quizzes' => $quizzes,
                         ];
                         return response()->json(['data' => $data]);
                         break;
@@ -143,15 +142,14 @@ class QuizController extends Controller
                         case 'all':
                             $class = Classes::with('quizzes')->findOrFail($request->class_id);
                             $quizzes = $class->quizzes->where('status', 'active');
-                            $count_questions = 0;
+                            //count number of questions in each quiz
                             foreach ($quizzes as $quiz) {
-                                $count_questions += $quiz->questions->count();
+                                $quiz->count_questions = $quiz->questions->count();
                             }
                             $data = [
                                 'class_name' => $class->name,
-                                'class_description' => $class->description,                                
                                 'count_quizzes' => $quizzes->count(),
-                                'count_questions' => $count_questions,
+                                'quizzes' => $quizzes->only('id', 'name', 'description', 'count_questions'),
                             ];
                             break;
                         case 'quiz':
