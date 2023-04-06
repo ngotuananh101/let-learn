@@ -41,18 +41,20 @@ class QuizController extends Controller
                 //'class_id' => 'required_if:type,all|nullable|integer|exists:classes,id',
             ]);
 
-            if (auth()->user()->role->name == 'teacher') {
+            if (auth()->user()->role->name == 'user') {
                 switch ($request->type) {
                     case 'all':
                         $class = Classes::with('quizzes')->findOrFail($id);
                         $quizzes = $class->quizzes;
-
+                        $members = $class->members;
                         //count number of questions in each quiz
                         foreach ($quizzes as $quiz) {
                             $quiz->count_questions = $quiz->questions->count();
                         }
                         $data = [
                             'class_name' => $class->name,
+                            //if don't have member, count_members = 0
+                            'members' => $members ? $members->count() : 0,
                             'count_quizzes' => $quizzes->count(),
                             'quizzes' => $quizzes,
                         ];
@@ -134,12 +136,13 @@ class QuizController extends Controller
                         ], 400);
                         break;
                 }
-            } else if (auth()->user()->role->name == 'user') {
+            } else if (auth()->user()->role->name == 'student') {
                 //check if value score_report of quiz is true               
                 switch ($request->type) {
                     case 'all':
                         $class = Classes::with('quizzes')->findOrFail($id);
                         $quizzes = $class->quizzes->where('status', 'active');
+                        $members = $class->members;
                         //count number of questions in each quiz
                         foreach ($quizzes as $quiz) {
                             $quiz->count_questions = $quiz->questions->count();
@@ -148,7 +151,7 @@ class QuizController extends Controller
                         $data = [
                             'class_name' => $class->name,
                             'count_quizzes' => $quizzes->count(),
-                            //not show questions of quiz
+                            'members' => $members ? $members->count() : 0,
                             'quizzes' => $quizzes->makeHidden('questions'),
                         ];
                         return response()->json(['data' => $data]);
