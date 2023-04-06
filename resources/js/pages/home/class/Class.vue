@@ -306,7 +306,6 @@ export default {
         this.$store.dispatch("classes/getQuiz", this.id).then(
             quiz => {
                 this.quizs = quiz;
-
             }
         );
         // this.$store.dispatch("classes/doQuiz", ).then(
