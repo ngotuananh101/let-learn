@@ -38,15 +38,26 @@ class QuizController extends Controller
         try {
             $request->validate([
                 'type' => 'required|string|in:all,quiz,question,answer,grade',
-                'class_id' => 'required_if:type,all|nullable|integer|exists:classes,id',
+                //'class_id' => 'required_if:type,all|nullable|integer|exists:classes,id',
             ]);
 
             if (auth()->user()->role->name == 'user') {
                 switch ($request->type) {
                     case 'all':
-                        $class = Classes::with('quizzes')->findOrFail($request->class_id);
+                        $class = Classes::with('quizzes')->findOrFail($id);
                         $quizzes = $class->quizzes;
-                        return response()->json(['data' => $quizzes]);
+                        $count_questions = 0;
+                        foreach ($quizzes as $quiz) {
+                            $count_questions += $quiz->questions->count();
+                        }
+                        $data = [
+                            'class_name' => $class->name,
+                            'class_description' => $class->description,                            
+                            'count_quizzes' => $quizzes->count(),
+                            'count_questions' => $count_questions,
+                            'quizzes' => $quizzes
+                        ];
+                        return response()->json(['data' => $data]);
                         break;
                     case 'quiz':
                         $quiz = Quiz::with('questions')->findOrFail($id);
@@ -132,7 +143,16 @@ class QuizController extends Controller
                         case 'all':
                             $class = Classes::with('quizzes')->findOrFail($request->class_id);
                             $quizzes = $class->quizzes->where('status', 'active');
-                            return response()->json(['data' => $quizzes]);
+                            $count_questions = 0;
+                            foreach ($quizzes as $quiz) {
+                                $count_questions += $quiz->questions->count();
+                            }
+                            $data = [
+                                'class_name' => $class->name,
+                                'class_description' => $class->description,                                
+                                'count_quizzes' => $quizzes->count(),
+                                'count_questions' => $count_questions,
+                            ];
                             break;
                         case 'quiz':
                             $quiz = Quiz::with('questions')->find($id);
