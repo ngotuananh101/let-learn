@@ -22,6 +22,7 @@ use App\Http\Controllers\Public\CourseController;
 use App\Http\Controllers\Public\ClassController;
 use App\Http\Controllers\Public\UserController;
 use App\Http\Controllers\Public\QuizController;
+use App\Http\Controllers\Public\PostController;
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -116,7 +117,12 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::resource('user', UserController::class)->only(['show', 'update', 'destroy']);
 
     // Router Post
-    Route::resource('post', PostController::class);
+    Route::prefix('post')->group(function () {
+        Route::post('/', [PostController::class, 'store']);
+        Route::get('/{id}', [PostController::class, 'show']);
+        Route::put('/{id}', [PostController::class, 'update']);
+        Route::delete('/{id}', [PostController::class, 'destroy']);
+    });
     // Route Quiz
     Route::prefix('quiz')->group(function () {
         Route::post('/', [QuizController::class, 'store']);
