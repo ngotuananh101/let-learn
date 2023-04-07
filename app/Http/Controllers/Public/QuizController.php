@@ -84,6 +84,10 @@ class QuizController extends Controller
 
                         //get question belong to quiz
                         $questions = $quiz->questions;
+                        foreach ($questions as $question) {
+                            $answer_options = json_decode($question->answer_option);
+                            $question->answer_option = $answer_options;
+                        }
                         return response()->json(['data' => $questions]);
                         break;
                     case 'answer': //for grade
@@ -188,7 +192,7 @@ class QuizController extends Controller
                             return [
                                 'id' => $question->id,
                                 'question' => $question->question,
-                                'answer_option' => $question->answer_option,
+                                'answer_option' => json_decode($question->answer_option),
                             ];
                         });
                         return response()->json(['data' => $questions]);
