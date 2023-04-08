@@ -89,9 +89,14 @@ const home = [
             },
             {
                 path: 'class/:id',
-                name: 'home.class1',
+                name: 'home.class',
                 component: () => import('../../pages/home/Classes.vue'),
             },
+            {
+                path: '/quiz/:id',
+                name: 'home.quiz',
+                component: () => import('../../pages/home/Quiz.vue')
+            }
         ],
     },
 ];

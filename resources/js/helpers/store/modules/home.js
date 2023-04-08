@@ -1,5 +1,4 @@
 import { homeService } from '../../services/home.service';
-import lesson from './admin/lesson';
 
 let state = { status: {}, user: null };
 export default {
@@ -44,6 +43,14 @@ export default {
                     },
                 );
         },
+        doQuiz({ commit }, id) {
+            return homeService.doQuiz(id)
+                .then(
+                    question => {
+                        return Promise.resolve(question);
+                    },
+                );
+        }
 
     }
 }

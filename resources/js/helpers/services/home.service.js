@@ -7,6 +7,7 @@ export const homeService = {
     loadLesson,
     loadCourse,
     loadQuizByClassId,
+    doQuiz,
 }
 
 function loadLesson() {
@@ -30,6 +31,14 @@ function loadCourse() {
 }
 function loadQuizByClassId(class_id) {
     return fetch(`${config.apiUrl}/quiz/${class_id}?type=all`, {method: 'GET', headers: authHeader()})
+        .then(handleResponse)
+        .then(data => {
+            console.log(data);
+            return data.data;
+        });
+}
+function doQuiz(quiz_id) {
+    return fetch(`${config.apiUrl}/quiz/${quiz_id}?type=question`, {method: 'GET', headers: authHeader()})
         .then(handleResponse)
         .then(data => {
             console.log(data);
