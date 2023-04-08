@@ -39,7 +39,10 @@ export default {
                         return null;
                     }
                 );
-        }
+        },
+        getTest({commit}, id) {
+            return learnService.getTest(id);
+        },
     },
     getters: {
         lessons(state) {

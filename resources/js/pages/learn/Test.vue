@@ -1,41 +1,46 @@
 <template>
     <div class="container" v-if="questions && !show_result">
-        <div class="card p-3">
-            <div class="card-body">
-                <p>Question</p>
-                <h5 class="card-title text-sans-serif pb-5">{{ questions[currentQuestion].question }}</h5>
-                <div class="row">
-                    <div
-                        class="col-md-6 pb-3"
-                        v-for="(ans, index) in  questions[currentQuestion].answers"
-                        :key="index"
-                        @click="checkAnswer(index)"
-                    >
-                        <div
-                            class="card ans-card" :id="'answer-' + index"
-                        >
-                            <div class="card-body d-flex align-items-center">
-                <span
-                    class="card-text p-2 rounded-circle d-flex justify-content-center align-items-center"
-                    :style="'width: 2rem; height: 2rem; background-color:'+ bg[index]"
-                >{{ ans_icon[index] }}</span>
-                                <p class="card-text ps-2">{{ ans }}</p>
+        <div class="row">
+            <div class="card p-3 col-7 mx-5">
+                <div class="card-body">
+                    <p>Question</p>
+                    <h5 class="card-title text-sans-serif pb-5">{{ questions[currentQuestion].question }}</h5>
+                    <div class="row">
+                        <div class="col-md-6 pb-3" v-for="(ans, index) in  questions[currentQuestion].answers" :key="index"
+                            @click="checkAnswer(index)">
+                            <div class="card ans-card" :id="'answer-' + index">
+                                <div class="card-body d-flex align-items-center">
+                                    <span
+                                        class="card-text p-2 rounded-circle d-flex justify-content-center align-items-center"
+                                        :style="'width: 2rem; height: 2rem; background-color:' + bg[index]">{{
+                                            ans_icon[index]
+                                        }}</span>
+                                    <p class="card-text ps-2">{{ ans }}</p>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
-                <div class="d-none" id="next">
-                    <button
-                        class="btn btn-primary"
-                        @keyup.enter="nextQuestion"
-                        @click="nextQuestion"
-                    >
-                        Next Question
-                    </button>
-                    <div>
-                        <p v-if="isCorrectAnswer" class="congrat">Congratulations!</p>
-                        <p v-else class="encourage">Don't give up! Keep trying!</p>
-                    </div>
+            </div>
+
+            <div class="card col-4">
+                <div class="card-body">
+                    <!-- create a table containing pagination of questions -->
+                    <p>Question</p>
+                    <table class="table table-borderless">
+                        <tbody>
+                            <tr v-for="n in Math.ceil(questions.length / 5)" :key="n">
+                                <td v-for="m in 5" :key="m">
+                                    <button class="rounded-circle"
+                                        :class="{ 'btn-primary': questions[(n - 1) * 5 + m - 1].isSelected !== null }"
+                                        @click="changeQuestion((n - 1) * 5 + m - 1)">
+                                        {{ (n - 1) * 5 + m }}
+                                    </button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <button @click="finishTest">Finish Test</button>
                 </div>
             </div>
         </div>
@@ -43,14 +48,17 @@
     <div class="container mx-md-5" v-if="show_result">
         <h2>Learn Results</h2>
         <p>You answered {{ numCorrectAnswers }} out of {{ questions.length }} questions correctly.</p>
+        <h3>Your score: {{ numCorrectAnswers / questions.length * 10 }}</h3>
         <h3>Correct Answers:</h3>
         <div class="row row-cols-1 g-4 p-3">
             <template v-for="(question, index) in questions">
-                <div :key="'correct_' + index" v-if="question.isCorrect && question.count_answered <= 1" class="col">
+                <!-- Check if the user's selected answer is correct -->
+                <div :key="'correct_' + index" v-if="question.isCorrect == true" class="col">
                     <div class="card text-dark bg-light">
                         <div class="card-body">
                             <h5 class="card-title">{{ question.question }}</h5>
-                            <p class="card-text text-success">Your answer: {{ question.correct_answer }}</p>
+                            <p class="card-text text-success">Correct answer: {{ question.answers[question.isSelected] }}
+                            </p>
                         </div>
                     </div>
                 </div>
@@ -58,54 +66,57 @@
         </div>
         <h3 class="p-3">Incorrect Answers:</h3>
         <div class="row row-cols-1 g-4 p-3">
-            <template v-for="(answer, index) in userAnswers">
-                <div :key="'incorrect_' + index" v-if="!answer.isCorrect" class="col">
+            <template v-for="(question, index) in questions">
+                <!-- Check if the user's selected answer is not correct -->
+                <div :key="'incorrect_' + index" v-if="question.isCorrect == false" class="col">
                     <div class="card text-dark bg-light">
                         <div class="card-body">
-                            <h5 class="card-title">{{ answer.question }}</h5>
-                            <p class="card-text text-danger">Your answer: {{ answer.selectedAnswer }}</p>
-                            <p class="card-text text-success">Correct answer: {{ questions.find(q => q.question === answer.question).correct_answer }}</p>
+                            <h5 class="card-title">{{ question.question }}</h5>
+                            <p class="card-text text-danger">Your answer: {{ question.answers[question.isSelected] }}
+                            </p>
+                            <p class="card-text text-success">Correct answer: {{ question.correct_answer }}
+                            </p>
                         </div>
+                        <!-- <div class="card-body" v-if="question.isSelected === null">
+                            <h5 class="card-title">{{ question.question }}</h5>
+                            <p class="card-text text-danger">Your answer: You have not selected an answer
+                            </p>
+                            <p class="card-text text-success">Correct answer: {{ questions[currentQuestion].correct_answer
+                            }}
+                            </p>
+                        </div> -->
                     </div>
                 </div>
             </template>
         </div>
-        <div class="row">
-            <div class="col-12">
-                <button class="btn btn-primary position-fixed bottom-0 end-0 mt-3 ms-3" @click="reloadPage" type="button"><i class="fa-solid fa-arrow-right"></i></button>
-            </div>
-        </div>
     </div>
-
-
-
 </template>
 
 <script>
-import {mapActions} from "vuex";
+import { mapActions } from "vuex";
 
 export default {
-    name: "Self-Learning",
+    name: "Self-Testing",
     data() {
         return {
             id: this.$route.params.id,
             questions: null,
             currentQuestion: 0,
-            isCorrectAnswer: false,
-            answered: false,
-            show_result: false,
             bg: ['rgb(219, 238, 255)', 'rgb(253, 240, 227)', 'rgb(230, 223, 242)', 'rgb(235, 242, 223)'],
             ans_icon: ['A', 'B', 'C', 'D'],
-            progress: 0,
-            userAnswers: []
+            userAnswers: [],
+            show_result: false
         };
     },
-
     created() {
-        // get id from params
-        this.getLearn(this.id).then(detail => {
-            this.questions = detail;
-        });
+        this.$store.dispatch("learn/getTest", this.id).then(
+            question => {
+                this.questions = question.map(q => ({
+                    ...q,
+                    isSelected: null,
+                    isCorrect: false
+                }));
+            });
     },
     computed: {
         numCorrectAnswers() {
@@ -114,102 +125,65 @@ export default {
     },
     methods: {
         ...mapActions({
-            getLearn: 'learn/getLearn'
+            getTest: 'learn/getTest'
         }),
+        //remove the bg-secondary class from all answers when the user selects a new question
+        changeQuestion(index) {
+            this.currentQuestion = index;
+            const answers = document.getElementsByClassName("ans-card");
+            for (let i = 0; i < answers.length; i++) {
+                answers[i].classList.remove("bg-secondary");
+            }
+        },
+
         checkAnswer(index) {
-            if (this.answered) {
-                return;
-            } else {
-                this.answered = true;
-                let selectedAnswerIndex = index;
-                const selectedAnswer = this.questions[this.currentQuestion].answers[selectedAnswerIndex];
-                let element = document.getElementById('answer-' + index);
-                if (selectedAnswer === this.questions[this.currentQuestion].correct_answer) {
-                    // if (1===1) {
-                    element.classList.add('bg-success');
-                    this.isCorrectAnswer = true;
-                } else {
-                    element.classList.add('bg-danger');
-                    this.isCorrectAnswer = false;
-                }
+    // Remove the "bg-secondary" class from all answers
+    const answers = document.getElementsByClassName("ans-card");
+    // Get the current question object
+    const question = this.questions[this.currentQuestion];
+    for (let i = 0; i < answers.length; i++) {
+        answers[i].classList.remove("bg-secondary");
+    }
+    // Add the "bg-secondary" class to the selected answer
+    document.getElementById("answer-" + index).classList.add("bg-secondary");
+    // Set the selected answer for the current question
+    question.isSelected = index;
+    // Compare the selected answer with the correct answer
+    if (index === -1) {
+        question.isCorrect = null; // mark question as unanswered
+    } else if (question.answers[index] === question.correct_answer) {
+        question.isCorrect = true;
+    } else {
+        question.isCorrect = false;
+    }
+},
+
+
+        finishTest() {
+            this.show_result = true;
+            this.questions.forEach(question => {
                 this.userAnswers.push({
-                    question: this.questions[this.currentQuestion].question,
-                    selectedAnswer: selectedAnswer,
-                    isCorrect: this.isCorrectAnswer
+                    question: question.question,
+                    selectedAnswer: question.answers[question.isSelected],
+                    isCorrect: question.answers[question.isCorrect]
                 });
-                if (this.currentQuestion === this.questions.length - 1) {
-                    this.$emit('change-progress', 100);
-                    let incorrect_answers = this.questions.filter(q => !q.isCorrect).map(q => q.id);
-                    let correct_answers = this.questions.filter(q => q.isCorrect).map(q => q.id);
-                    this.$store.dispatch('learn/updateResult', {
-                        lesson_id: this.id,
-                        learned: correct_answers,
-                        relearn: incorrect_answers
-                    }).then((res) => {
-                        this.show_result = true;
-                    });
-                } else {
-                    document.getElementById('next').classList.remove('d-none');
-                }
-            }
-        },
-
-        nextQuestion() {
-            this.answered = false;
-            document.getElementById('next').classList.add('d-none');
-            let ans_cards = document.getElementsByClassName('ans-card');
-            for (let i = 0; i < ans_cards.length; i++) {
-                ans_cards[i].classList.remove('bg-success');
-                ans_cards[i].classList.remove('bg-danger');
-            }
-
-            if (this.currentQuestion === this.questions.length - 1) {
-                this.show_result = true;
-            } else {
-                if (this.questions[this.currentQuestion].count_answered === 1) {
-                    this.currentQuestion++;
-                    this.progress = Math.round((this.currentQuestion / this.questions.length) * 100);
-                    this.$emit('change-progress', this.progress);
-                }else{
-                    this.questions[this.currentQuestion].count_answered ? this.questions[this.currentQuestion].count_answered++ : this.questions[this.currentQuestion].count_answered = 1;
-                    this.questions[this.currentQuestion].isCorrect = this.isCorrectAnswer;
-                    if (this.isCorrectAnswer) {
-                        this.currentQuestion++;
-                        this.progress = Math.round((this.currentQuestion / this.questions.length) * 100);
-                        this.$emit('change-progress', this.progress);
-                    } else {
-                        // move answer to the end of the array
-                        this.questions.push(this.questions[this.currentQuestion]);
-                        this.questions.splice(this.currentQuestion, 1);
-                    }
-                }
-            }
-        },
-        reloadPage() {
-            location.reload();
+            });
         }
+
     },
 };
 </script>
 
 <style scoped>
-.answered {
-    background-color: #ffc107;
-    color: white;
-}
-
-.not-answered {
-    background-color: #dc3545;
-    color: white;
-}
-
-.congrat {
+.rounded-circle {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    border: 1px solid #007bff;
+    background-color: #fff;
+    color: #007bff;
     font-weight: bold;
-    color: green;
-}
-
-.encourage {
-    font-weight: bold;
-    color: red;
+    font-size: 1.2rem;
+    margin: 5px;
 }
 </style>
