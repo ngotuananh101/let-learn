@@ -5,7 +5,8 @@ import {authHeader} from '../auth-header';
 export const learnService = {
     getLessons,
     getLearn,
-    updateResult
+    updateResult,
+    getTest
 }
 const user = JSON.parse(localStorage.getItem('user'));
 
@@ -45,5 +46,18 @@ function updateResult(data) {
         .then(handleResponse)
         .then(data => {
             return data;
+        });
+}
+
+function getTest(lesson_id) {
+    const requestOptions = {
+        method: 'GET',
+        headers: authHeader(),
+    };
+    return fetch(`${config.apiUrl}/user/${user.id}/?type=test&lesson_id=${lesson_id}&reverse=true&quantity=20`, requestOptions)
+        .then(handleResponse)
+        .then(data => {
+            console.log(data);
+            return data.data.lesson_details;
         });
 }
