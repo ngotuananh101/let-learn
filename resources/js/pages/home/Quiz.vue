@@ -144,10 +144,10 @@ export default {
             // Add the "bg-secondary" class to the selected answer
             document.getElementById("answer-" + index).classList.add("bg-secondary");
 
-            // Move to the next question if all questions have been answered
-            if (this.questions.every(q => q.isSelected !== null)) {
-                this.finishTest();
-            }
+            // Move to the finish test if all questions have been answered
+            // if (this.questions.every(q => q.isSelected !== null)) {
+            //     this.finishTest();
+            // }
         },
         finishTest() {
             this.show_result = true;

@@ -156,6 +156,16 @@
                                             </router-link>
                                         </button>
                                     </div>
+                                    <div class="col">
+                                        <button type="button"
+                                                class="btn btn-primary">
+                                            <router-link
+                                                :to="'/essay/' + quiz.id"
+                                            >
+                                                Essay
+                                            </router-link>
+                                        </button>
+                                    </div>
                                 </div>
                             </div>
                         </div>
