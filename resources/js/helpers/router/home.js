@@ -96,7 +96,12 @@ const home = [
                 path: '/quiz/:id',
                 name: 'home.quiz',
                 component: () => import('../../pages/home/Quiz.vue')
-            }
+            },
+            {
+                path: '/essay/:id',
+                name: 'home.essay',
+                component: () => import('../../pages/home/Essay.vue')
+            },
         ],
     },
 ];
