@@ -1,0 +1,7 @@
+@import url(./nucleo-svg.css);
+@import url(./nucleo-icons.css);
+
+.ck.ck-content.ck-editor__editable{
+    min-height: 250px !important;
+    max-height: 500px !important;
+}
