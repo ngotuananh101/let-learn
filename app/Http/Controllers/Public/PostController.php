@@ -126,17 +126,27 @@ class PostController extends Controller
      */
     public function show($id)
     {
+        try{
         //get post by id
         $post = Post::findOrFail($id);
+        //if post not found, return 404
+        if (!$post || $post->status != 'active') {
+            return response()->json([
+                'status' => 'error',
+                'status_code' => 404,
+                'message' => 'Post not found'
+            ], 404);
+        }
+        
         //get title, content, tags, views, created_at
-        $post = $post->only(['title', 'content', 'tags', 'views', 'created_at']);
+        $post = $post;
         //get comments by post id
         $comments = Comment::where('post_id', $id)->get();
         //get user by user_id of post and comments
-        $user = $post->user;
-        $comments->each(function ($comment) {
-            $comment->user;
-        });
+        // $user = $post->user;
+        // $comments->each(function ($comment) {
+        //     $comment->user;
+        // });
         //if post has class_id, get class by class_id
         if ($post->class_id) {
             $class = $post->class->only(['name']);
@@ -146,8 +156,7 @@ class PostController extends Controller
 
         $data = [
             'post' => $post,
-            'comments' => $comments,
-            'user' => $user,
+            'comments' => $comments,            
             'class' => $class ?? null,
         ];
 
@@ -156,6 +165,13 @@ class PostController extends Controller
             'status_code' => 200,
             'data' => $data
         ], 200);
+        } catch (\Throwable $th) {
+            return response()->json([
+                'status' => 'error',
+                'status_code' => 500,
+                'message' => $th->getMessage()
+            ], 500);
+        }
     }
 
     /**
