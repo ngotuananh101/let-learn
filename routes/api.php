@@ -37,4 +37,13 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::resource('lesson', 'App\Http\Controllers\Admin\LessonController');
         Route::resource('course', 'App\Http\Controllers\Admin\CourseController');
     });
+    Route::group(['prefix' => 'public'], function () {
+        Route::get('home', 'App\Http\Controllers\Public\HomeController@index');
+    });
+    Route::group(['middleware' => ['permission:user.default'], 'prefix' => 'user'], function () {
+        Route::resource('user', 'App\Http\Controllers\Public\UserController');        
+        Route::resource('class', 'App\Http\Controllers\Public\ClassController');
+        Route::resource('lesson', 'App\Http\Controllers\Public\LessonController');
+        Route::resource('course', 'App\Http\Controllers\Public\CourseController');
+    });
 });
