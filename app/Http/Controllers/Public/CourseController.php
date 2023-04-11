@@ -14,27 +14,20 @@ use PhpParser\Node\Stmt\TryCatch;
 
 class CourseController extends Controller
 {
-    public function index()
-    {
-        try {
-            return response()->json(Course::all()->load(['user', 'school', 'class']), 200);
-        } catch (\Throwable $th) {
-            return response()->json([
-                'message' => $th->getMessage(),
-                'status' => 'error'
-            ], 400);
-        }
-    }
-
-    public function store(Request $request)
+    /**
+     * Allow user add course to his account
+     * @param Request $request
+     * @return JsonResponse
+     */
+    public function store(Request $request): JsonResponse
     {
         try {
             $request->validate([
                 'name' => 'required',
                 'description' => 'required',
             ]);
-            $course = auth()->user()->courses()->create($request->all());
-            return response()->json($course->load(['user', 'school', 'class']), 201);
+            auth()->user()->courses()->create($request->all());
+            return response()->json('Course created successfully', 201);
         } catch (\Throwable $th) {
             return response()->json([
                 'message' => $th->getMessage(),
@@ -43,6 +36,12 @@ class CourseController extends Controller
         }
     }
 
+    /**
+     * Allow user to get specific course info
+     * @param Request $request
+     * @param $id
+     * @return JsonResponse
+     */
     public function show(Request $request, $id): JsonResponse
     {
         try {
@@ -52,7 +51,13 @@ class CourseController extends Controller
             switch ($request->input('type')) {
                 case 'info':
                     $course = Course::findOrFail($id);
-                    return response()->json($course->load(['lessons']), 200);
+                    // check if user is owner of the course
+                    if ($course->user_id != auth()->user()->id)
+                        return response()->json([
+                            'message' => 'You are not authorized to view this course',
+                            'status' => 'error'
+                        ], 400);
+                    return response()->json($course->load(['user', 'school', 'class']), 200);
                     break;
                 case 'lessons':
                     $request->validate([
