@@ -71,6 +71,12 @@ class LessonController extends Controller
     {
         try {
             $lesson = Lesson::findOrFail($id)->load(['details']);
+            //check if lesson status is active and lesson is not private
+            if ($lesson->status != 'active' && $lesson->password != null)
+                return response()->json([
+                    'message' => 'Lesson is not allowed to be viewed',
+                    'status' => 'error'
+                ], 400);
             return response()->json([
                 'lesson' => $lesson,
             ], 200);
@@ -134,15 +140,34 @@ class LessonController extends Controller
     {
         try {
             $lesson = Lesson::findOrFail($id);
-            // Soft delete lesson
-            $lesson->update([
-                'status' => 'inactive'
-            ]);
-            return response()->json([
-                'status' => 'success',
-                'status_code' => 200,
-                'message' => 'Delete lesson successfully!',
-            ], 200);
+            //check auth user is owner of lesson
+            // if lesson is inactive then delete
+
+            if ($lesson->user_id != auth()->user()->id) {
+                return response()->json([
+                    'status' => 'error',
+                    'status_code' => 403,
+                    'message' => 'You are not owner of this lesson!'
+                ], 403);
+            }
+            if ($lesson->status == 'inactive') {
+                $lesson->delete();
+                return response()->json([
+                    'status' => 'success',
+                    'status_code' => 200,
+                    'message' => 'Delete lesson successfully!',
+                ], 200);
+            } else {
+                // Soft delete lesson if lesson is active
+                $lesson->update([
+                    'status' => 'inactive'
+                ]);
+                return response()->json([
+                    'status' => 'success',
+                    'status_code' => 200,
+                    'message' => 'Delete lesson successfully!',
+                ], 200);
+            }
         } catch (\Throwable $th) {
             return response()->json([
                 'status' => 'error',

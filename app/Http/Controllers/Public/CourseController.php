@@ -51,10 +51,10 @@ class CourseController extends Controller
             switch ($request->input('type')) {
                 case 'info':
                     $course = Course::findOrFail($id);
-                    // check if user is owner of the course
-                    if ($course->user_id != auth()->user()->id)
+                    // check if course status is active and course is not private
+                    if ($course->status != 'active' && $course->password != null)
                         return response()->json([
-                            'message' => 'You are not authorized to view this course',
+                            'message' => 'Course is not allowed to be viewed',
                             'status' => 'error'
                         ], 400);
                     return response()->json($course->load(['user', 'school', 'class']), 200);
@@ -169,11 +169,20 @@ class CourseController extends Controller
                     'message' => 'You are not authorized to delete this course',
                     'status' => 'error'
                 ], 400);
-            $course->delete();
-            return response()->json([
-                'message' => 'Course deleted successfully',
-                'status' => 'success'
-            ], 200);
+            if ($course->status == 'active') {
+                //soft delete course
+                $course->update(['status' => 'inactive']);
+                return response()->json(['message' => 'Course soft deleted successfully', 'status' => 'success'], 200);
+            } else {
+                //if course has lessons, remove them from course first then delete course
+                if ($course->lessons()->count() > 0)
+                    $course->lessons()->detach();
+                $course->delete();
+                return response()->json([
+                    'message' => 'Course deleted successfully',
+                    'status' => 'success'
+                ], 200);
+            }
         } catch (\Throwable $th) {
             return response()->json([
                 'message' => $th->getMessage(),
