@@ -15,19 +15,6 @@ use function PHPSTORM_META\type;
 
 class LessonController extends Controller
 {
-    public function index(): JsonResponse
-    {
-        try {
-            $lessons = Lesson::all()->load(['school', 'classes']);
-            return response()->json([
-                'lessons' => $lessons,
-            ], 200);
-        } catch (\Exception $e) {
-            return response()->json([
-                'message' => $e->getMessage(),
-            ], 400);
-        }
-    }
     /**
      * Store a newly created resource in storage.
      *

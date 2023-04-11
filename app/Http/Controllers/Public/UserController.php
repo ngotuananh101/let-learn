@@ -17,6 +17,7 @@ use function PHPSTORM_META\type;
 
 class UserController extends Controller
 {
+
     /**
      * Display the specified resource.
      *
@@ -27,7 +28,7 @@ class UserController extends Controller
     {
         try {
             $request->validate([
-                'type' => 'string|in:info,lesson,course,search,recent,detail,learn,detail_split,test',
+                'type' => 'string|in:info,lesson,course,search,recent,detail,detail_split',
             ]);
             // $user = User::findOrFail($id);
             // check user is user login
@@ -42,8 +43,8 @@ class UserController extends Controller
                 case 'info':
                     //show all information of user
                     $user = $request->user();
-                    //check user is active
-                    if ($user->status == 0) {
+                    //check user is active 
+                    if ($user->status != 'active') {
                         return response()->json([
                             'status' => 'error',
                             'status_code' => 401,
@@ -285,7 +286,63 @@ class UserController extends Controller
                         ]
                     ], 200);
                     break;
-                case 'learn':
+                // case 'learn':
+                //     $request->validate([
+                //         'lesson_id' => 'required|integer',
+                //     ]);
+                //     $lesson_id = $request->lesson_id;
+                //     //call to learn method from LessonController
+                //     $lessonController = new LessonController();
+                //     return $lessonController->learn($request, $lesson_id);
+                //     break;
+                // case 'test':
+                //     //same with learn but get from method learnForImport
+                //     $request->validate([
+                //         'lesson_id' => 'required|integer',
+                //         'quantity' => 'nullable|integer',
+                //     ]);
+                //     $lesson_id = $request->lesson_id;
+                //     $lessonController = new LessonController();
+                //     $quantity = $request->quantity ? $request->quantity : 10;
+                //     $data = $lessonController->learnForImport($request, $lesson_id)->getData();
+                //     return response()->json([
+                //         'status' => 'success',
+                //         'status_code' => 200,
+                //         'message' => 'Get lesson successfully!',
+                //         'data' => $data
+                //     ], 200);
+                //     break;
+                default:
+                    return response()->json([
+                        'status' => 'error',
+                        'message' => 'Type is not valid',
+                    ], 400);
+                    break;
+            }
+        } catch (\Throwable $th) {
+            return response()->json([
+                'status' => 'error',
+                'status_code' => 500,
+                'message' => $th->getMessage()
+            ], 500);
+        }
+    }
+
+    public function store(Request $request){
+        try{
+            $request->validate([
+                'type' => 'string|in:learn,test',
+            ]);
+            //check if user is not login
+            if(!$request->user()){
+                return response()->json([
+                    'status' => 'error',
+                    'status_code' => 401,
+                    'message' => 'You are not logged in'
+                ], 401);
+            }
+            switch ($request->type) {
+                case 'learn': 
                     $request->validate([
                         'lesson_id' => 'required|integer',
                     ]);
@@ -294,8 +351,6 @@ class UserController extends Controller
                     $lessonController = new LessonController();
                     return $lessonController->learn($request, $lesson_id);
                     break;
-                case 'test':
-                    //same with learn but get from method learnForImport
                     $request->validate([
                         'lesson_id' => 'required|integer',
                         'quantity' => 'nullable|integer',
@@ -326,7 +381,6 @@ class UserController extends Controller
             ], 500);
         }
     }
-
 
     /**
      * Update the specified resource in storage.
