@@ -83,6 +83,11 @@ class LessonController extends Controller
             if ($request->query('type') == 'export') {
                 //use export function
                 return $this->export($request, $id);
+            } else { // not type export, dont except other type
+                return response()->json([
+                    'message' => 'Type is valid',
+                    'status' => 'error'
+                ], 400);
             }
         } catch (\Throwable $th) {
             return response()->json([
@@ -274,45 +279,58 @@ class LessonController extends Controller
                     $term = $lessonDetail->term;
                     $definition = $lessonDetail->definition;
                     if ($reverse) {
-                        $temp = $term;
-                        $term = $definition;
-                        $definition = $temp;
+                        // check if the term and definition are not empty before swapping them
+                        if (!empty($term) && !empty($definition)) {
+                            $temp = $term;
+                            $term = $definition;
+                            $definition = $temp;
+                        } else {
+                            // if either term or definition is empty, set the response accordingly
+                            return response()->json([
+                                'status' => 'error',
+                                'status_code' => 500,
+                                'message' => 'One or both of the term and definition are empty.'
+                            ], 500);
+                        }
                     }
                     $answers = [];
                     // replace special characters with a space character
                     $term = preg_replace('/[\n\r\t]+/', ' ', $term);
 
                     // check if the term is a multiple choice question
-                    if (preg_match('/^(.*?)\s*[A-Ma-m]\.\s*(.*)/is', $term, $matches)) {
+                    if (preg_match('/^(.*?)\s*[A-Ma-m](\.|\))\s*(.*)/is', $term, $matches)) {
+                        //if question is not end with ? 
                         $question = trim($matches[1]);
-                        $options_str = $matches[2];
+                        $options_str = $matches[3];
 
                         // split the options into arrays
-                        $options = preg_split('/\s*[a-m]\.\s*/i', $options_str, -1, PREG_SPLIT_NO_EMPTY);
+                        //options_str can be A. option1 B. option2 C. option3 D. option4  or A option1 B option2 C option3 D option4
+                        // if (preg_match('/[a-z]\.\s*/is', $options_str)) { 
+                        //     $answers = preg_split('/\s*[a-z]\.\s*/is', $options_str);
+                        // } else {
+                        //     $answers = preg_split('/\s*[a-z]\s*/is', $options_str);
+                        // }
+                        $options = preg_split('/\s*[A-Ma-m](\.|\))\s*/i', $options_str, -1, PREG_SPLIT_NO_EMPTY);
                         $answers = array_map('trim', $options);
 
                         // determine the correct answer
-                        switch (trim($definition)) {
-                            case 'A':
-                                $correct_answer = $answers[0];
-                                break;
-                            case 'B':
-                                $correct_answer = $answers[1];
-                                break;
-                            case 'C':
-                                $correct_answer = $answers[2];
-                                break;
-                            case 'D':
-                                $correct_answer = $answers[3];
-                                break;
-                            default:
-                                $correct_answer = '';
-                                break;
+                        $correct_answers = [];
+                        foreach ($answers as $index => $answer) {
+                            $expected_answer_key = strtoupper(chr(65 + $index));
+                            if (strpos(trim($definition), $expected_answer_key) === 0) {
+                                $correct_answers[] = $answer;
+                            }
                         }
 
-                        $correct_answer = trim($correct_answer);
                         if ($mixAnswers) {
+                            //if mix answer is true, 
                             shuffle($answers);
+                        }
+                        $correct_answers = array_map('trim', $correct_answers);
+                        if(count($correct_answers) === 0) {
+                        $answers = array_map('trim', $options);
+                        // determine the correct answer
+                            $correct_answers = trim($definition);
                         }
                     }
                     // check if the term is a true/false question
@@ -321,7 +339,7 @@ class LessonController extends Controller
                         $answers = array_map('trim', [$matches[2], $matches[3]]);
 
                         // determine the correct answer
-                        $correct_answer = ($definition === 'True') ? 'True' : 'False';
+                        $correct_answers = ($definition === 'True') ? ['True'] : ['False'];
 
                         if ($mixAnswers) {
                             shuffle($answers);
@@ -330,7 +348,7 @@ class LessonController extends Controller
                     // if the term is neither multiple choice nor true/false
                     else {
                         $question = $term;
-                        $correct_answer = trim($definition);
+                        $correct_answers = trim($definition);
 
                         //get current $response and get the and $answers of other lessonDetail except true/false
                         $otherAnswers = $response['lesson_details'];
@@ -349,14 +367,14 @@ class LessonController extends Controller
                             $otherAnswers = array_slice($otherAnswers, 0, 3);
 
                             //add correct answer to otherAnswers
-                            array_push($otherAnswers, $correct_answer);
+                            array_push($otherAnswers, $correct_answers);
                             // shuffle the answer options
                             shuffle($otherAnswers);
                             // lesson the answer options to the shuffled $otherAnswers
                             $answers = $otherAnswers;
                         } else {
                             //if there are not enough answers in other answers, generate random answers
-                            $answers = [$correct_answer];
+                            $answers = [$correct_answers];
                             while (count($answers) < 4) {
                                 $randomAnswer = LessonDetail::inRandomOrder()->first();
                                 if (!in_array($randomAnswer->definition, $answers)) {
@@ -377,7 +395,7 @@ class LessonController extends Controller
                     'id' => $lessonDetail->id,
                     'question' => $question,
                     'answers' => $answers,
-                    'correct_answer' => $correct_answer ?? '',
+                    'correct_answers' => $correct_answers,
                     'relearn' => in_array($lessonDetail->id, $relearn) ? true : false
                 ];
             }
@@ -434,45 +452,55 @@ class LessonController extends Controller
                     $term = $lessonDetail->term;
                     $definition = $lessonDetail->definition;
                     if ($reverse) {
-                        $temp = $term;
-                        $term = $definition;
-                        $definition = $temp;
+                        // check if the term and definition are not empty before swapping them
+                        if (!empty($term) && !empty($definition)) {
+                            $temp = $term;
+                            $term = $definition;
+                            $definition = $temp;
+                        } else {
+                            // if either term or definition is empty, set the response accordingly
+                            return response()->json([
+                                'status' => 'error',
+                                'status_code' => 500,
+                                'message' => 'One or both of the term and definition are empty.'
+                            ], 500);
+                        }
                     }
                     $answers = [];
                     // replace special characters with a space character
                     $term = preg_replace('/[\n\r\t]+/', ' ', $term);
 
                     // check if the term is a multiple choice question
-                    if (preg_match('/^(.*?)\s*[A-Ma-m]\.\s*(.*)/is', $term, $matches)) {
+                    if (preg_match('/^(.*?)\s*[A-Ma-m](\.|\))\s*(.*)/is', $term, $matches)) {
+                        //if question is not end with ? 
                         $question = trim($matches[1]);
-                        $options_str = $matches[2];
+                        $options_str = $matches[3];
 
                         // split the options into arrays
-                        $options = preg_split('/\s*[a-m]\.\s*/i', $options_str, -1, PREG_SPLIT_NO_EMPTY);
+                        //options_str can be A. option1 B. option2 C. option3 D. option4  or A option1 B option2 C option3 D option4
+                        // if (preg_match('/[a-z]\.\s*/is', $options_str)) { 
+                        //     $answers = preg_split('/\s*[a-z]\.\s*/is', $options_str);
+                        // } else {
+                        //     $answers = preg_split('/\s*[a-z]\s*/is', $options_str);
+                        // }
+                        $options = preg_split('/\s*[A-Ma-m](\.|\))\s*/i', $options_str, -1, PREG_SPLIT_NO_EMPTY);
                         $answers = array_map('trim', $options);
 
                         // determine the correct answer
-                        switch (trim($definition)) {
-                            case 'A':
-                                $correct_answer = $answers[0];
-                                break;
-                            case 'B':
-                                $correct_answer = $answers[1];
-                                break;
-                            case 'C':
-                                $correct_answer = $answers[2];
-                                break;
-                            case 'D':
-                                $correct_answer = $answers[3];
-                                break;
-                            default:
-                                $correct_answer = '';
-                                break;
+                        $correct_answers = [];
+                        foreach ($answers as $index => $answer) {
+                            $expected_answer_key = strtoupper(chr(65 + $index)); 
+                            if (strpos(trim($definition), $expected_answer_key) === 0) {
+                                $correct_answers[] = $answer;
+                            }
                         }
-
-                        $correct_answer = trim($correct_answer);
                         if ($mixAnswers) {
                             shuffle($answers);
+                        }
+                        $correct_answers = array_map('trim', $correct_answers);
+                        if(count($correct_answers) === 0) {                           
+                            // if the correct answer is not found, set the response accordingly
+                            $correct_answers = trim($definition);
                         }
                     }
                     // check if the term is a true/false question
@@ -481,7 +509,7 @@ class LessonController extends Controller
                         $answers = array_map('trim', [$matches[2], $matches[3]]);
 
                         // determine the correct answer
-                        $correct_answer = ($definition === 'True') ? 'True' : 'False';
+                        $correct_answers = ($definition === 'True') ? ['True'] : ['False'];
 
                         if ($mixAnswers) {
                             shuffle($answers);
@@ -490,7 +518,7 @@ class LessonController extends Controller
                     // if the term is neither multiple choice nor true/false
                     else {
                         $question = $term;
-                        $correct_answer = trim($definition);
+                        $correct_answers = trim($definition);
 
                         //get current $response and get the and $answers of other lessonDetail except true/false
                         $otherAnswers = $response['lesson_details'];
@@ -509,14 +537,14 @@ class LessonController extends Controller
                             $otherAnswers = array_slice($otherAnswers, 0, 3);
 
                             //add correct answer to otherAnswers
-                            array_push($otherAnswers, $correct_answer);
+                            array_push($otherAnswers, $correct_answers);
                             // shuffle the answer options
                             shuffle($otherAnswers);
                             // lesson the answer options to the shuffled $otherAnswers
                             $answers = $otherAnswers;
                         } else {
                             //if there are not enough answers in other answers, generate random answers
-                            $answers = [$correct_answer];
+                            $answers = [$correct_answers];
                             while (count($answers) < 4) {
                                 $randomAnswer = LessonDetail::inRandomOrder()->first();
                                 if (!in_array($randomAnswer->definition, $answers)) {
@@ -537,7 +565,7 @@ class LessonController extends Controller
                     'id' => $lessonDetail->id,
                     'question' => $question,
                     'answers' => $answers,
-                    'correct_answer' => $correct_answer ?? '',
+                    'correct_answers' => $correct_answers,
                     'relearn' => in_array($lessonDetail->id, $relearn) ? true : false
                 ];
             }

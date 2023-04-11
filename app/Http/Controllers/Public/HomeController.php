@@ -33,8 +33,8 @@ class HomeController extends Controller
             return response()->json([
                 //dont load lessons and courses
                 'user' => $user,
-                'lessons' => $lessons,
-                'courses' => $courses,
+                'lessons_home' => $lessons,
+                'courses_home' => $courses,
             ]);
         } catch (\Throwable $th) {
             //throw $th;
