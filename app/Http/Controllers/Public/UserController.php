@@ -457,8 +457,8 @@ class UserController extends Controller
                 case 'learned':
                     $request->validate([
                         'lesson_id' => 'required|integer',
-                        'learned' => 'required|array',
-                        'relearn' => 'required|array',
+                        'learned' => 'required|string',
+                        'relearn' => 'required|string',
                     ]);
                     //update learned and relearn of user
                     $user = $request->user();
