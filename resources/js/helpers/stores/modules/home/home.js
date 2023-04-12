@@ -28,6 +28,18 @@ export default {
                     }
                 );
         },
+        getLearn({commit}, id) {
+            commit('request');
+            homeService.loadLearn(id)
+                .then(
+                    response => {
+                        commit('requestSuccess', response);
+                    },
+                    error => {
+                        commit('requestFailure', error);
+                    }
+                );
+        }
 
     },
     getters: {

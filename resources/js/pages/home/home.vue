@@ -64,12 +64,12 @@ export default {
     name: 'home',
     data() {
         return {
-            user : JSON.parse(localStorage.getItem('user')),
             unsubscribe: null,
             lessons: [],
             courses: [],
             other_lesson: [],
             other_course: [],
+            flashcards: [],
         }
     },
     created() {
@@ -86,6 +86,7 @@ export default {
         });
         this.$store.dispatch("home/getHome");
     },
+
 
 
 }

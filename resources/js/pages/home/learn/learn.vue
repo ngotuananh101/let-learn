@@ -1,13 +1,13 @@
 <template>
-    <div class="container" v-if="questions && !show_result">
+    <div class="container" v-if="lesson_details && !show_result">
         <div class="card p-3">
             <div class="card-body">
                 <p>Question</p>
-                <h5 class="card-title text-sans-serif pb-5">{{ questions[currentQuestion].question }}</h5>
+                <h5 class="card-title text-sans-serif pb-5">{{ lesson_details[currentQuestion].question }}</h5>
                 <div class="row">
                     <div
                         class="col-md-6 pb-3"
-                        v-for="(ans, index) in  questions[currentQuestion].answers"
+                        v-for="(ans, index) in  lesson_details[currentQuestion].answers"
                         :key="index"
                         @click="checkAnswer(index)"
                     >
@@ -42,10 +42,10 @@
     </div>
     <div class="container mx-md-5" v-if="show_result">
         <h2>Learn Results</h2>
-        <p>You answered {{ numCorrectAnswers }} out of {{ questions.length }} questions correctly.</p>
+        <p>You answered {{ numCorrectAnswers }} out of {{ lesson_details.length }} questions correctly.</p>
         <h3>Correct Answers:</h3>
         <div class="row row-cols-1 g-4 p-3">
-            <template v-for="(question, index) in questions">
+            <template v-for="(question, index) in lesson_details">
                 <div :key="'correct_' + index" v-if="question.isCorrect && question.count_answered <= 1" class="col">
                     <div class="card text-dark bg-light">
                         <div class="card-body">
@@ -64,7 +64,7 @@
                         <div class="card-body">
                             <h5 class="card-title">{{ answer.question }}</h5>
                             <p class="card-text text-danger">Your answer: {{ answer.selectedAnswer }}</p>
-                            <p class="card-text text-success">Correct answer: {{ questions.find(q => q.question === answer.question).correct_answer }}</p>
+                            <p class="card-text text-success">Correct answer: {{ lesson_details.find(q => q.question === answer.question).correct_answer }}</p>
                         </div>
                     </div>
                 </div>
@@ -85,26 +85,11 @@
 import {mapActions} from "vuex";
 
 export default {
-    name: "learn",
+    name: "Self-Learning",
     data() {
         return {
-            // id: this.$route.params.id,
-            questions: [
-                {
-                    question: "What is the capital of France?",
-                    answers: ["Paris", "Berlin", "London", "Madrid"],
-                    correct_answer: "Paris",
-                    count_answered: 0,
-                    isCorrect: false
-                },
-                {
-                    question: "Which country has the largest population?",
-                    answers: ["USA", "China", "Russia", "India"],
-                    correct_answer: "China",
-                    count_answered: 0,
-                    isCorrect: false
-                }
-            ],
+            id: this.$route.params.id,
+            lesson_details: [],
             currentQuestion: 0,
             isCorrectAnswer: false,
             answered: false,
@@ -116,31 +101,36 @@ export default {
         };
     },
 
-    // created() {
-    //     // get id from params
-    //     this.getLearn(this.id).then(detail => {
-    //         this.questions = detail;
-    //     });
-    // },
+    created() {
+        this.unsubscribe = this.$store.subscribe((mutation) => {
+            if (mutation.type === "home/request") {
+            } else if (mutation.type === "home/requestSuccess") {
+                this.lesson_details = mutation.payload;
+                console.log(this.lesson_details);
+            } else if (mutation.type === "home/requestFailure") {
+            }
+        });
+        this.$store.dispatch("home/getLearn", this.id);
+    },
     computed: {
         numCorrectAnswers() {
-            return this.questions.filter(q => q.isCorrect).length;
+            return this.lesson_details.filter(q => q.isCorrect).length;
         }
     },
     methods: {
-        // ...mapActions({
-        //     getLearn: 'learn/getLearn'
-        //
-        // }),
+        ...mapActions({
+            getLearn: 'home/getLearn'
+
+        }),
         checkAnswer(index) {
             if (this.answered) {
                 return;
             } else {
                 this.answered = true;
                 let selectedAnswerIndex = index;
-                const selectedAnswer = this.questions[this.currentQuestion].answers[selectedAnswerIndex];
+                const selectedAnswer = this.lesson_details[this.currentQuestion].answers[selectedAnswerIndex];
                 let element = document.getElementById('answer-' + index);
-                if (selectedAnswer === this.questions[this.currentQuestion].correct_answer) {
+                if (selectedAnswer === this.lesson_details[this.currentQuestion].correct_answer) {
                     // if (1===1) {
                     element.classList.add('bg-success');
                     this.isCorrectAnswer = true;
@@ -149,21 +139,15 @@ export default {
                     this.isCorrectAnswer = false;
                 }
                 this.userAnswers.push({
-                    question: this.questions[this.currentQuestion].question,
+                    question: this.lesson_details[this.currentQuestion].question,
                     selectedAnswer: selectedAnswer,
                     isCorrect: this.isCorrectAnswer
                 });
-                if (this.currentQuestion === this.questions.length - 1) {
+                if (this.currentQuestion === this.lesson_details.length - 1) {
                     this.$emit('change-progress', 100);
-                    let incorrect_answers = this.questions.filter(q => !q.isCorrect).map(q => q.id);
-                    let correct_answers = this.questions.filter(q => q.isCorrect).map(q => q.id);
-                    this.$store.dispatch('learn/updateResult', {
-                        lesson_id: this.id,
-                        learned: correct_answers,
-                        relearn: incorrect_answers
-                    }).then((res) => {
-                        this.show_result = true;
-                    });
+                    let incorrect_answers = this.lesson_details.filter(q => !q.isCorrect).map(q => q.id);
+                    let correct_answers = this.lesson_details.filter(q => q.isCorrect).map(q => q.id);
+                    this.show_result = true;
                 } else {
                     document.getElementById('next').classList.remove('d-none');
                 }
@@ -179,24 +163,24 @@ export default {
                 ans_cards[i].classList.remove('bg-danger');
             }
 
-            if (this.currentQuestion === this.questions.length - 1) {
+            if (this.currentQuestion === this.lesson_details.length - 1) {
                 this.show_result = true;
             } else {
-                if (this.questions[this.currentQuestion].count_answered === 1) {
+                if (this.lesson_details[this.currentQuestion].count_answered === 1) {
                     this.currentQuestion++;
-                    this.progress = Math.round((this.currentQuestion / this.questions.length) * 100);
+                    this.progress = Math.round((this.currentQuestion / this.lesson_details.length) * 100);
                     this.$emit('change-progress', this.progress);
                 }else{
-                    this.questions[this.currentQuestion].count_answered ? this.questions[this.currentQuestion].count_answered++ : this.questions[this.currentQuestion].count_answered = 1;
-                    this.questions[this.currentQuestion].isCorrect = this.isCorrectAnswer;
+                    this.lesson_details[this.currentQuestion].count_answered ? this.lesson_details[this.currentQuestion].count_answered++ : this.lesson_details[this.currentQuestion].count_answered = 1;
+                    this.lesson_details[this.currentQuestion].isCorrect = this.isCorrectAnswer;
                     if (this.isCorrectAnswer) {
                         this.currentQuestion++;
-                        this.progress = Math.round((this.currentQuestion / this.questions.length) * 100);
+                        this.progress = Math.round((this.currentQuestion / this.lesson_details.length) * 100);
                         this.$emit('change-progress', this.progress);
                     } else {
                         // move answer to the end of the array
-                        this.questions.push(this.questions[this.currentQuestion]);
-                        this.questions.splice(this.currentQuestion, 1);
+                        this.lesson_details.push(this.lesson_details[this.currentQuestion]);
+                        this.lesson_details.splice(this.currentQuestion, 1);
                     }
                 }
             }
