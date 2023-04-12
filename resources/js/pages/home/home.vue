@@ -1,4 +1,3 @@
-
 <template>
     <div class="my-4">
         <div class="card">
@@ -10,57 +9,89 @@
     <div class="mt-5">
         <div class="row">
             <h3>Lesson</h3>
-            <div class="col-lg-4 col-md-6 col-12" v-for="lesson in lessons">
+            <div class="col-lg-4 col-md-6 col-12" v-for="lesson in lessons" :key="lesson.id">
                 <router-link :to="`/lesson/${lesson.id}`">
                     <div class="card mt-4">
                         <div class="card-body">
-                            <p class="card-text text-primary">{{ lesson.name }}</p>
-                            <p class="card-text">Quantity: {{ lesson.detail_count }}</p>
-                            <p class="card-text">Author: {{ lesson.username }}</p>
+                            <p class="card-text text-primary">Title: {{ lesson.description }}</p>
+                            <p class="card-text">Author: {{ lesson.name }}</p>
                         </div>
                     </div>
                 </router-link>
             </div>
         </div>
-        <div class="row">
+        <div class="row mt-5">
             <h3>Course</h3>
-            <div class="col-lg-4 col-md-6 col-12" v-for="course in courses">
+            <div class="col-lg-4 col-md-6 col-12" v-for="course in courses" :key="course.id">
                 <router-link :to="`/course/${course.id}`">
-                    <LessonCard :title="course.name" :value="course.lesson_count + ' lessons'"
-                                :description="course.username"/>
+                    <div class="card mt-4">
+                        <div class="card-body">
+                            <p class="card-text text-primary">Title: {{ course.description }}</p>
+                            <p class="card-text">Author: {{ course.name }}</p>
+                        </div>
+                    </div>
                 </router-link>
             </div>
         </div>
-        <div v-if="classes" class="row">
-            <h2>Class</h2>
-            <div class="col-lg-4 col-md-6 col-12" v-for="classes in classes">
-                <LessonCard :title="classes.name" :value="classes.classes_count + ' courses'"/>
+        <div class="row mt-5">
+            <h3>Other Lessons</h3>
+            <div class="col-lg-4 col-md-6 col-12" v-for="ol in other_lesson" :key="ol.id">
+                <div class="card mt-4">
+                    <div class="card-body">
+                        <p class="card-text text-primary">Title: {{ ol.description }}</p>
+                        <p class="card-text">Author: {{ ol.name }}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row mb-5 mt-5">
+            <h3>Other Courses</h3>
+            <div class="col-lg-4 col-md-6 col-12" v-for="other_courses in other_course" :key="other_courses.id">
+                <div class="card mt-4">
+                    <div class="card-body">
+                        <p class="card-text text-primary">Title: {{ other_courses.description }}</p>
+                        <p class="card-text">Author: {{ other_courses.name }}</p>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
 </template>
 
+
 <script>
-import { Modal } from "bootstrap";
 export default {
     name: 'home',
     data() {
         return {
+            user : JSON.parse(localStorage.getItem('user')),
             unsubscribe: null,
             lessons: [],
             courses: [],
-            classes: []
+            other_lesson: [],
+            other_course: [],
         }
     },
     created() {
-        this.$store.dispatch("home/getHome").then(
-            lesson => {
-                console.log(lesson);
-                this.lessons = lesson;
+        this.unsubscribe = this.$store.subscribe((mutation) => {
+            if (mutation.type === "home/request") {
+            } else if (mutation.type === "home/requestSuccess") {
+                this.lessons = mutation.payload.lessons;
+                this.courses = mutation.payload.courses;
+                this.other_lesson = mutation.payload.other_lesson;
+                console.log(this.other_lesson);
+                this.other_course = mutation.payload.other_course;
+            } else if (mutation.type === "home/requestFailure") {
             }
-        );
+        });
+        this.$store.dispatch("home/getHome");
     },
 
 
 }
 </script>
+<style scoped>
+.card {
+    flex: 1;
+}
+</style>

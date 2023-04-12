@@ -14,7 +14,7 @@ function loadHome() {
     return fetch(`/api/public/home`, requestOptions)
         .then(handleResponse)
         .then(data => {
-            console.log(data.user);
-            return data.user;
+            console.log(data);
+            return data;
         });
 }

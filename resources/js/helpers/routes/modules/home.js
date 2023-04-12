@@ -3,6 +3,7 @@ const home = [
         path: "/",
         name: "home",
         component: () => import("../../../layouts/home.vue"),
+        redirect: { name: "home.home" },
         meta: {
             requiresAuth: true,
         },

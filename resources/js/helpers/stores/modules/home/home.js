@@ -1,40 +1,30 @@
 import {homeService} from '../../../services/home/home.services';
-import {notificationService} from "@/helpers/services/admin/notification.service";
-import handleResponse from "@/helpers/other/handle-response";
-
-function getUser() {
-    let userData = localStorage.getItem('userData');
-    if (userData) {
-        return JSON.parse(userData);
-    } else {
-        return null;
-    }
-}
-const userData = getUser();
-let state = {
-    status: {loggedIn: !!userData},
-    userData: userData
-};
 export default {
     namespaced: true,
-    state: state,
+    state: {
+        homeData: {},
+    },
     mutations: {
+        request(state) {
+            state.homeData = {};
+        },
         requestSuccess(state, data) {
-            state.status = {};
+            state.homeData = data;
         },
         requestFailure(state, error) {
             state.status = {};
         },
     },
     actions: {
-        getHome() {
-            return homeService.loadHome()
+        getHome({commit}) {
+            commit('request');
+            homeService.loadHome()
                 .then(
                     response => {
-                        return response;
+                        commit('requestSuccess', response);
                     },
                     error => {
-                        return error;
+                        commit('requestFailure', error);
                     }
                 );
         },
