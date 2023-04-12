@@ -26,13 +26,12 @@
 
 
 <script>
-import { mapActions, mapGetters } from "vuex";
 
 export default {
     name: "flash_card",
     data() {
         return {
-            // id: this.$route.params.id,
+            id: this.$route.params.id,
             data: [
                 {
                     "id": 10003,
@@ -66,13 +65,17 @@ export default {
         };
     },
 
-    mounted() {
-        // get id from params
-        // this.getLessons(this.id).then(data => {
-        //     this.data = data.detail;
-        //     this.updateTitle(data.lesson.name);
-        //     document.getElementById("text").innerHTML = this.data[this.currentCardIndex].definition;
-        // });
+    created() {
+        this.unsubscribe = this.$store.subscribe((mutation) => {
+            if (mutation.type === "home/request") {
+            } else if (mutation.type === "home/requestSuccess") {
+                this.data = mutation.payload.data();
+                console.log(this.data);
+                // document.getElementById("text").innerHTML = this.data[this.currentCardIndex].definition;
+            } else if (mutation.type === "home/requestFailure") {
+            }
+        });
+        this.$store.dispatch("home/getLearn", this.id);
     },
     methods: {
         // ...mapActions({

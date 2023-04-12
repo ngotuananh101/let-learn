@@ -3,11 +3,11 @@
         <div class="card p-3">
             <div class="card-body">
                 <p>Question</p>
-                <h5 class="card-title text-sans-serif pb-5">{{ questions[currentQuestion].question }}</h5>
+                <h5 class="card-title text-sans-serif pb-5">{{ lesson_details[currentQuestion].question }}</h5>
                 <div class="row">
                     <div
                         class="col-md-6 pb-3"
-                        v-for="(ans, index) in  questions[currentQuestion].answers"
+                        v-for="(ans, index) in  lesson_details[currentQuestion].answers"
                         :key="index"
                         @click="checkAnswer(index)"
                     >
@@ -78,33 +78,18 @@
     </div>
 
 
-
 </template>
 
 <script>
 import {mapActions} from "vuex";
 
 export default {
-    name: "learn",
+    name: "Self-Learning",
     data() {
         return {
-            // id: this.$route.params.id,
-            questions: [
-                {
-                    question: "What is the capital of France?",
-                    answers: ["Paris", "Berlin", "London", "Madrid"],
-                    correct_answer: "Paris",
-                    count_answered: 0,
-                    isCorrect: false
-                },
-                {
-                    question: "Which country has the largest population?",
-                    answers: ["USA", "China", "Russia", "India"],
-                    correct_answer: "China",
-                    count_answered: 0,
-                    isCorrect: false
-                }
-            ],
+            id: this.$route.params.id,
+            lesson_details: [],
+            questions: [],
             currentQuestion: 0,
             isCorrectAnswer: false,
             answered: false,
@@ -116,22 +101,27 @@ export default {
         };
     },
 
-    // created() {
-    //     // get id from params
-    //     this.getLearn(this.id).then(detail => {
-    //         this.questions = detail;
-    //     });
-    // },
+    created() {
+        this.unsubscribe = this.$store.subscribe((mutation) => {
+            if (mutation.type === "home/request") {
+            } else if (mutation.type === "home/requestSuccess") {
+                this.lesson_details = mutation.payload;
+                console.log(this.lesson_details);
+            } else if (mutation.type === "home/requestFailure") {
+            }
+        });
+        this.$store.dispatch("home/getLearn", this.id);
+    },
     computed: {
         numCorrectAnswers() {
             return this.questions.filter(q => q.isCorrect).length;
         }
     },
     methods: {
-        // ...mapActions({
-        //     getLearn: 'learn/getLearn'
-        //
-        // }),
+        ...mapActions({
+            getLearn: 'home/getLearn'
+
+        }),
         checkAnswer(index) {
             if (this.answered) {
                 return;
@@ -157,13 +147,7 @@ export default {
                     this.$emit('change-progress', 100);
                     let incorrect_answers = this.questions.filter(q => !q.isCorrect).map(q => q.id);
                     let correct_answers = this.questions.filter(q => q.isCorrect).map(q => q.id);
-                    this.$store.dispatch('learn/updateResult', {
-                        lesson_id: this.id,
-                        learned: correct_answers,
-                        relearn: incorrect_answers
-                    }).then((res) => {
-                        this.show_result = true;
-                    });
+                    this.show_result = true;
                 } else {
                     document.getElementById('next').classList.remove('d-none');
                 }
