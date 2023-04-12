@@ -36,7 +36,7 @@ export default {
                 ]).then((results) => {
                     if (results[0].status === "fulfilled" && results[1].status === "fulfilled" && results[2].status === "fulfilled" && results[3].status === "fulfilled" && results[4].status === "fulfilled" && results[5].status === "fulfilled") {
                         commit("success", {
-                            quotes: results[0].value.data,
+                            quotes: results[0].value,
                             analytics: {
                                 duration: results[1].value,
                                 sessions: results[2].value,

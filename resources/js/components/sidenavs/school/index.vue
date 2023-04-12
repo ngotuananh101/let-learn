@@ -16,16 +16,13 @@
                 class="top-0 p-3 cursor-pointer fas fa-times text-secondary opacity-5 position-absolute end-0 d-none d-xl-none"
                 aria-hidden="true"
             ></i>
-            <router-link class="m-0 navbar-brand" to="/">
+            <router-link class="m-0 navbar-brand" to="/school">
                 <img
-                    :src="darkMode || sidebarType === 'bg-default'
-              ? '/logo-white.png'
-              : '/logo.png'
-          "
+                    :src="school.logo"
                     class="navbar-brand-img h-100"
-                    alt="logo"
+                    alt="school logo"
                 />
-                <span class="ms-2 font-weight-bold">Let Learn</span>
+                <span class="ms-2 font-weight-bold">{{ school.name }}</span>
             </router-link>
         </div>
         <hr class="mt-0 horizontal dark"/>
@@ -33,16 +30,35 @@
     </aside>
 </template>
 <script>
-import SidenavList from "@/components/sidenavs/admin/items.vue";
+import SidenavList from "./items.vue";
 import {mapState} from "vuex";
-
+import store from "../../../helpers/stores";
 export default {
-    name: "Index",
+    name: "School Sidenav",
     components: {
         SidenavList
     },
     data() {
-        return {};
+        return {
+            school: {
+                name: "School manager",
+                logo: "logo.png",
+            },
+        };
+    },
+    beforeMount() {
+        let school = store.getters['user/userData'].info.school;
+        if (school) {
+            this.school = {
+                name: school.name,
+                logo: school.logo,
+            };
+        }else{
+            this.school = {
+                name: "School",
+                logo: "logo.png",
+            };
+        }
     },
     computed: {
         ...mapState({

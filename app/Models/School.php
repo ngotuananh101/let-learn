@@ -41,4 +41,20 @@ class School extends Model
     {
         return $this->hasMany(Classes::class);
     }
+
+    /**
+     * Get the course for the school.
+     */
+    public function courses(): HasMany
+    {
+        return $this->hasMany(Course::class);
+    }
+
+    /**
+     * Get the lesson for the school.
+     */
+    public function lessons(): HasMany
+    {
+        return $this->hasMany(Lesson::class);
+    }
 }

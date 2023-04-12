@@ -1,5 +1,5 @@
 <template>
-    <div class="card card-carousel overflow-hidden p-0 h-100">
+    <div class="card card-carousel overflow-hidden p-0 h-100" :class="this.class" :style="this.style">
         <div
             id="carouselExampleCaptions"
             class="carousel slide h-100"
@@ -17,12 +17,13 @@
             backgroundSize: 'cover',
           }"
                 >
+                    <span class="mask bg-gradient-dark opacity-5"></span>
                     <div
                         class="carousel-caption d-none d-md-block bottom-0 text-start start-0 ms-5"
                     >
-                        <h5 class="text-white mb-1">{{ title }}</h5>
+                        <h3 class="text-white mb-1">{{ title }}</h3>
                         <p>-----</p>
-                        <p>
+                        <p class="fs-5">
                             {{ description }}
                         </p>
                     </div>
@@ -66,6 +67,16 @@ export default {
                 background: String,
             },
             default: () => [],
+        },
+        class: {
+            type: String,
+            default: "",
+        },
+        style: {
+            type: Object,
+            default: () => {
+                return {};
+            }
         },
     },
 };

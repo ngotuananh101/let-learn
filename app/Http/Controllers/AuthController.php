@@ -54,7 +54,7 @@ class AuthController extends Controller
                 $token = $user->createToken(name: 'authToken' . $user->id,expiresAt: $expiresAt);
                 $user->role->permissions;
                 return response()->json([
-                    'info' => $user,
+                    'info' => $user->load('school'),
                     'access_token' => $token->plainTextToken,
                 ]);
             }

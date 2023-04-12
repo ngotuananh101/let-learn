@@ -120,9 +120,9 @@
     </div>
 </template>
 <script>
-import SidenavItem from "@/components/sidenavs/sidenav-item.vue";
-import SidenavCollapse from "@/components/sidenavs/sidenav-collapse.vue";
-import SidenavCollapseItem from "@/components/sidenavs/sidenav-collapse-item.vue";
+import SidenavItem from "../../../components/sidenavs/sidenav-item.vue";
+import SidenavCollapse from "../../../components/sidenavs/sidenav-collapse.vue";
+import SidenavCollapseItem from "../../../components/sidenavs/sidenav-collapse-item.vue";
 
 export default {
     name: "SidenavList",
