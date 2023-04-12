@@ -23,7 +23,7 @@ function loadLearn(id) {
     const requestOptions = {
         method: 'POST',
         headers: authHeader(),
-        body: JSON.stringify({lesson_id: id})
+        body: JSON.stringify({lesson_id: id, reverse: 1, mix_details: 1, mix_answers: 0})
     };
     return fetch(`/api/user/main?type=learn`, requestOptions)
         .then(handleResponse)
