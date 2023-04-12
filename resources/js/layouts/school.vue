@@ -11,10 +11,9 @@
 </template>
 <script>
 import {mapState} from "vuex";
-import sidenav from "../components/sidenavs/admin/index.vue";
-import navbar from "../components/navbars/admin-navbar.vue";
+import sidenav from "../components/sidenavs/school/index.vue";
+import navbar from "../components/navbars/school-navbar.vue";
 import configurator from "../components/configurator.vue";
-
 export default {
     name: "School Dashboard",
     components: {
@@ -32,5 +31,8 @@ export default {
             hideConfigButton: (state) => state.config.hideConfigButton,
         }),
     },
+    beforeMount() {
+        this.$store.dispatch('school/get', this.$route.params.slug);
+    }
 };
 </script>

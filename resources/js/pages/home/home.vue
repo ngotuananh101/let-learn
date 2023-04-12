@@ -1,3 +1,4 @@
+
 <template>
     <div class="my-4">
         <div class="card">
@@ -38,7 +39,9 @@
         </div>
     </div>
 </template>
+
 <script>
+import { Modal } from "bootstrap";
 export default {
     name: 'home',
     data() {
@@ -61,6 +64,3 @@ export default {
 
 }
 </script>
-<style lang="">
-
-</style>

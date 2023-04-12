@@ -5,6 +5,7 @@ const home = [
         component: () => import('../../../layouts/home.vue'),
         meta: {
             requiresAuth: true,
+
         },
         children: [
             {
@@ -34,6 +35,7 @@ const home = [
             }
     ],
     },
+
 ];
 
 export default home;
