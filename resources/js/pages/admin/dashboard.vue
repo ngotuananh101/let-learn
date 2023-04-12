@@ -205,9 +205,9 @@ export default {
         setQuote() {
             this.data.quotes = this.data.quotes.map((item) => {
                 return {
-                    img: 'https://source.unsplash.com/800x450/?nature',
-                    title: `“${item.quoteAuthor}”`,
-                    description: `“${item.quoteText}”`,
+                    img: 'https://source.unsplash.com/800x600/?nature,water',
+                    title: item.author,
+                    description: item.content,
                     icon: {
                         component: 'ni ni-camera-compact text-dark',
                         background: 'bg-white'

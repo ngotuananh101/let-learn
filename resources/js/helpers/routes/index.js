@@ -35,10 +35,15 @@ router.beforeEach((to, from, next) => {
                     next({name: 'home'});
                 }
             } else if (to.matched.some(route => route.meta?.requiresManage)) {
-                console.log('required manage');
                 // Check if user is manager
                 if (permissions.filter(permission => (permission.name === 'admin.dashboard' || permission.name === 'admin.super' || permission.name === 'manager.dashboard')).length > 0) {
-                    next();
+                    if (permissions.filter(permission => (permission.name === 'admin.dashboard' || permission.name === 'admin.super')).length > 0){
+                        next();
+                    }else if (permissions.filter(permission => (permission.name === 'manager.dashboard')).length > 0 && userData.info.school.slug === to.params.slug) {
+                        next();
+                    }else{
+                        next({name: 'home'});
+                    }
                 } else {
                     next({name: 'home'});
                 }

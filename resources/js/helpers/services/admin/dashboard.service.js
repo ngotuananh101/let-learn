@@ -7,7 +7,7 @@ export const dashboardService = {
 };
 
 function quotes() {
-    return fetch('https://quote-garden.onrender.com/api/v3/quotes?limit=3')
+    return fetch('https://api.quotable.io/quotes/random?limit=5&minLength=100')
         .then(handleResponse)
         .then(quotes => {
                 return quotes;

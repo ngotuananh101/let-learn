@@ -9,7 +9,7 @@ jobs:
     name: Send message
     runs-on: ubuntu-latest
     steps:
-      - name: send telegram message to ponta notification
+      - name: send telegram message
         uses: appleboy/telegram-action@master
         with:
           to: ${{ secrets.TELEGRAM_TO }}

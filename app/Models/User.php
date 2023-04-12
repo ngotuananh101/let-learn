@@ -59,6 +59,14 @@ class User extends Authenticatable implements MustVerifyEmail
     }
 
     /**
+     * Get the school that owns the user.
+     */
+    public function school(): BelongsTo
+    {
+        return $this->belongsTo(School::class);
+    }
+
+    /**
      * Check if the user has any of the given permissions.
      */
     public function hasAnyPermission(array $permissions): bool
