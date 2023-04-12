@@ -48,6 +48,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::group(['middleware' => ['permission:user.default'], 'prefix' => 'user'], function () {
         Route::resource('user', 'App\Http\Controllers\Public\UserController');
         Route::resource('class', 'App\Http\Controllers\Public\ClassController');
+        Route::resource('main', 'App\Http\Controllers\Public\UserController');        
         Route::resource('lesson', 'App\Http\Controllers\Public\LessonController');
         Route::resource('course', 'App\Http\Controllers\Public\CourseController');
     });
