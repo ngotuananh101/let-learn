@@ -43,44 +43,19 @@ export default {
     name: 'home',
     data() {
         return {
+            unsubscribe: null,
             lessons: [],
             courses: [],
             classes: []
         }
     },
     created() {
-        this.lessons = [
-            {
-                id: 1,
-                name: 'Lesson 1',
-                detail_count: 10,
-                username: 'admin'
-            },
-            {
-                id: 2,
-                name: 'Lesson 2',
-                detail_count: 10,
-                username: 'admin'
-            },
-            {
-                id: 3,
-                name: 'Lesson 3',
-                detail_count: 10,
-                username: 'admin'
-            },
-            {
-                id: 4,
-                name: 'Lesson 4',
-                detail_count: 10,
-                username: 'admin'
-            },
-            {
-                id: 5,
-                name: 'Lesson 5',
-                detail_count: 10,
-                username: 'admin'
-            },
-        ]
+        this.$store.dispatch("home/getHome").then(
+            lesson => {
+                console.log(lesson);
+                this.lessons = lesson;
+            }
+        );
     },
 
 

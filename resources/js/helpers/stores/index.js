@@ -9,11 +9,13 @@ import adminRole from "./modules/admin/role";
 import adminSchool from "./modules/admin/school";
 import adminLesson from "./modules/admin/lesson";
 import adminCourse from "./modules/admin/course";
+import home from "./modules/home/home";
 
 const store = createStore({
     modules: {
         config,
         user,
+        home,
         adminDashboard,
         adminSettings,
         adminNotification,
