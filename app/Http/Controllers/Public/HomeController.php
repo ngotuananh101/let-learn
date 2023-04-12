@@ -16,25 +16,22 @@ class HomeController extends Controller
         try {
             //get user
             $user = auth()->user();
-            //if user have no lessons or not enough 6 lesson, load current user lessons and remaining random active lessons
-            if ($user->lessons->count() < 6 ) {
-                $lessons = $user->lessons->merge(Lesson::where('status', 'active')->inRandomOrder()->limit(6 - ($user->lessons->count()))->get());
-            }
-            $lessons = $lessons->map(function ($lesson) {
-                return $lesson->makeHidden('password');
-            });
-            //if user have no courses or not enough 6 courses, load current user courses and remaining random active courses
-            if ($user->courses->count() < 6) {
-                $courses = $user->courses->merge(Course::where('status', 'active')->inRandomOrder()->limit(6 - ($user->courses->count()))->get());
-            }
-            $courses = $courses->map(function ($course) {
-                return $course->makeHidden('password');
-            });
             return response()->json([
-                //dont load lessons and courses
-                'user' => $user,
-                'lessons_home' => $lessons,
-                'courses_home' => $courses,
+                // get random 6 lessons
+                'lessons' => $user->lessons->where('status', 'active')->take(6),
+                'courses' => $user->courses->where('status', 'active')->take(6),
+                'other_lesson' => Lesson::where('user_id', '!=', $user->id)
+                    ->where('status', 'active')
+                    ->where('password', null)
+                    ->inRandomOrder()
+                    ->take(6)
+                    ->get(),
+                'other_course' => Course::where('user_id', '!=', $user->id)
+                    ->where('status', 'active')
+                    ->where('password', null)
+                    ->inRandomOrder()
+                    ->take(6)
+                    ->get(),
             ]);
         } catch (\Throwable $th) {
             //throw $th;

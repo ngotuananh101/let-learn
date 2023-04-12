@@ -7,26 +7,26 @@ const home = [
             requiresAuth: true,
         }
     },
-    {
-        path: 'lesson',
-        children: [
-            {
-                path: ':id',
-                name: 'lesson.index',
-                component: () => import('../../../pages/lesson/Lesson.vue'),
-            },
-            // {
-            //     path: ':id/edit',
-            //     name: 'lesson.edit',
-            //     component: () => import('../../pages/lesson/Edit.vue'),
-            // },
-            // {
-            //     path: 'add',
-            //     name: 'lesson.add',
-            //     component: () => import('../../pages/lesson/Add.vue'),
-            // },
-        ],
-    },
+    // {
+    //     path: 'lesson',
+    //     children: [
+    //         // {
+    //         //     path: ':id',
+    //         //     name: 'lesson.index',
+    //         //     component: () => import('../../../pages/lesson/Lesson.vue'),
+    //         // },
+    //         // {
+    //         //     path: ':id/edit',
+    //         //     name: 'lesson.edit',
+    //         //     component: () => import('../../pages/lesson/Edit.vue'),
+    //         // },
+    //         // {
+    //         //     path: 'add',
+    //         //     name: 'lesson.add',
+    //         //     component: () => import('../../pages/lesson/Add.vue'),
+    //         // },
+    //     ],
+    // },
     // {
     //     path: 'course',
     //     children: [
