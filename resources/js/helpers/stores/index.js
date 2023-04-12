@@ -9,6 +9,7 @@ import adminRole from "./modules/admin/role";
 import adminSchool from "./modules/admin/school";
 import adminLesson from "./modules/admin/lesson";
 import adminCourse from "./modules/admin/course";
+import home from "./modules/home/home";
 import schoolDashboard from "./modules/school/dashboard";
 import school from "./modules/school/school";
 import schoolUser from "./modules/school/user";
@@ -17,6 +18,7 @@ const store = createStore({
     modules: {
         config,
         user,
+        home,
         adminDashboard,
         adminSettings,
         adminNotification,
