@@ -5,7 +5,9 @@ import readXlsxFile from "read-excel-file";
 export const lessonService = {
     importExcelFile,
     addLesson,
-    // updateLesson
+    deleteLesson,
+    getLessonById,
+    updateLesson,
 };
 
 function importExcelFile(formData) {
@@ -47,16 +49,42 @@ function addLesson(lesson) {
         });
 }
 
-// function updateLesson(lesson) {
-//     const requestOptions = {
-//         method: 'PUT',
-//         headers: authHeader(),
-//         body: JSON.stringify(lesson)
-//     };
+function deleteLesson(id) {
+    const requestOptions = {
+        method: "DELETE",
+        headers: authHeader(),
+    };
 
-//     return fetch(`/api/admin/lesson/${lesson.id}`, requestOptions)
-//         .then(handleResponse)
-//         .then(lesson => {
-//             return lesson;
-//         });
-// }
+    return fetch(`/api/user/lesson/${id}`, requestOptions)
+        .then(handleResponse)
+        .then((lesson) => {
+            return lesson;
+        });
+}
+
+function getLessonById(id) {
+    const requestOptions = {
+        method: 'GET',
+        headers: authHeader()
+    };
+
+    return fetch(`/api/admin/lesson/${id}`, requestOptions)
+        .then(handleResponse)
+        .then(lesson => {
+            return lesson;
+        });
+}
+
+function updateLesson(lesson) {
+    const requestOptions = {
+        method: 'PUT',
+        headers: authHeader(),
+        body: JSON.stringify(lesson)
+    };
+
+    return fetch(`/api/admin/lesson/${lesson.id}`, requestOptions)
+        .then(handleResponse)
+        .then(lesson => {
+            return lesson;
+        });
+}

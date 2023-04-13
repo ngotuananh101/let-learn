@@ -1,4 +1,4 @@
-import { lessonService } from "../../../services/home/lesson.service";
+import { lessonService } from "../../../services/home/lesson.services";
 
 const state = {
     lessonData: {},
@@ -52,16 +52,38 @@ export default {
                 }
             );
         },
-        // updateLesson({commit}, lesson) {
-        //     commit("request");
-        //     lessonService.updateLesson(lesson).then(
-        //         lesson => {
-        //             commit("success", lesson);
-        //         },
-        //         error => {
-        //             commit("failure", error);
-        //         }
-        //     )
-        // }
+        deleteLesson({ commit }, id) {
+            commit("request");
+            lessonService.deleteLesson(id).then(
+                (lesson) => {
+                    commit("success", lesson);
+                },
+                (error) => {
+                    commit("failure", error);
+                }
+            );
+        },
+        getLessonById({ commit }, id) {
+            commit("request");
+            lessonService.getLessonById(id).then(
+                (lesson) => {
+                    commit("success", lesson);
+                },
+                (error) => {
+                    commit("failure", error);
+                }
+            );
+        },
+        updateLesson({ commit }, lesson) {
+            commit("request");
+            lessonService.updateLesson(lesson).then(
+                (lesson) => {
+                    commit("success", lesson);
+                },
+                (error) => {
+                    commit("failure", error);
+                }
+            );
+        },
     },
 };

@@ -24,26 +24,24 @@
                                 <input id="password" name="password" class="form-control" type="text" placeholder="Password"
                                     v-model="this.lesson.password" />
                             </div>
-                        </div>
-                        <div class="col-md-2 col-6">
-                            <button class="btn btn-primary w-100 mt-4" @click="import_lesson_modal.show">
-                                Import Lesson
-                            </button>
-                        </div>
-                        <div class="col-12">
-                            <div v-for="(child, index) in cards">
-                                <component :is="child" :data="details[index]" @remove="removeCard"></component>
-                            </div>
-                        </div>
-                        <div class="row justify-content-end">
                             <div class="col-md-2 col-6">
+                                <button class="btn btn-primary w-100 mt-3" @click="import_lesson_modal.show">
+                                    Import Lesson
+                                </button>
+                            </div>
+                            <div class="col-12">
+                                <div v-for="(child, index) in cards">
+                                    <component :is="child" :data="details[index]" @remove="removeCard"></component>
+                                </div>
+                            </div>
+                            <div class="col-6">
                                 <button class="btn btn-lg btn-primary mt-3 w-100" @click="addCard">
                                     Add Card
                                 </button>
                             </div>
-                            <div class="col-md-2 col-6">
-                                <button class="btn btn-lg btn-success mt-3 w-100" @click="addLesson">
-                                    Create
+                            <div class="col-6">
+                                <button class="btn btn-lg btn-success mt-3 w-100" @click="updateLesson">
+                                    Save
                                 </button>
                             </div>
                         </div>
@@ -52,7 +50,6 @@
             </div>
         </div>
     </div>
-
     <div class="modal fade" id="importModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
         aria-labelledby="staticBackdropLabel" aria-hidden="true">
         <div class="modal-dialog modal-lg mt-lg-10">
@@ -111,15 +108,17 @@ import LessonDetailCard from "../../components/cards/lesson-detail-card.vue";
 import { markRaw } from "vue";
 
 export default {
-    name: "Add",
+    name: "EditLesson",
     components: {
         LessonDetailCard
     },
     title() {
-        return "Add Lesson";
+        return "Edit Lesson";
     },
     data() {
         return {
+            id: this.$route.params.id,
+            unsubscribe: null,
             lesson: {
                 name: '',
                 description: '',
@@ -131,34 +130,41 @@ export default {
             type: 'get',
             details: [],
             cards: null,
+            removed_ids: [],
         };
     },
     created() {
         this.unsubscribe = this.$store.subscribe((mutation) => {
             if (mutation.type === 'lesson/request') {
-                if (this.type === 'import') {
+                if (this.type === 'get') {
+                    this.$root.showSnackbar('Loading lesson info...', 'info');
+                }
+                else if (this.type === 'import') {
                     this.$root.showSnackbar('Importing lesson...', 'info');
-                } else if (this.type === 'addLesson') {
-                    this.$root.showSnackbar('Adding lesson...', 'info');
+                } else if (this.type === 'update') {
+                    this.$root.showSnackbar('Updating lesson...', 'info');
                 }
             } else if (mutation.type === 'lesson/success') {
-                if (this.type === 'import') {
+                if (this.type === 'get' && this.id) {
+                    this.$root.showSnackbar('Load lesson info successfully', 'success');
+                    let data = mutation.payload.lesson;
+                    this.init(data);
+                } else if (this.type === 'import') {
                     this.$root.showSnackbar('Import lesson successfully', 'success');
                     this.details = mutation.payload;
                     this.cards = markRaw(this.details.map((detail, index) => {
                         return LessonDetailCard;
                     }));
                     this.import_lesson_modal.hide();
-                } else if (this.type === 'addLesson') {
-                    this.$root.showSnackbar('Add lesson successfully', 'success');
+                } else if (this.type === 'update') {
+                    this.$root.showSnackbar('Update lesson successfully', 'success');
+                    this.$router.push({ name: 'lesson.index' });
                 }
             } else if (mutation.type === 'lesson/failure') {
                 this.$root.showSnackbar(mutation.payload, 'danger');
             }
         });
-    },
-    mounted() {
-        this.init();
+        this.$store.dispatch('lesson/getLessonById', this.id);
     },
     beforeUnmount() {
         this.unsubscribe();
@@ -166,7 +172,7 @@ export default {
         this.import_lesson_modal.dispose();
     },
     methods: {
-        init() {
+        init(data) {
             const bootstrap = this.$store.state.config.bootstrap;
             this.import_lesson_modal = new bootstrap.Modal(document.getElementById('importModal'), {
                 show: true,
@@ -174,29 +180,23 @@ export default {
             this.import_lesson_modal._element.addEventListener('hidden.bs.modal', () => {
                 if (this.importFile) {
                     this.file = null;
-
                 } else {
                     document.getElementById('raw_data').value = '';
                 }
             });
-            // init 3 cards
-            this.details = [
-                {
-                    index: 0,
-                    term: '',
-                    definition: '',
-                },
-                {
-                    index: 1,
-                    term: '',
-                    definition: '',
-                },
-                {
-                    index: 2,
-                    term: '',
-                    definition: '',
-                },
-            ];
+            this.lesson = {
+                name: data.name,
+                description: data.description,
+                password: '',
+            };
+            this.details = data.details.map((detail, index) => {
+                return {
+                    index: index,
+                    id: detail.id,
+                    term: detail.term,
+                    definition: detail.definition,
+                };
+            });
             this.cards = markRaw(this.details.map((detail, index) => {
                 return LessonDetailCard;
             }));
@@ -206,6 +206,9 @@ export default {
             this.details = this.details.filter((detail) => {
                 return detail.index !== data.data.index;
             });
+            if (data.data.id) {
+                this.removed_ids.push(data.data.id);
+            }
             this.cards = markRaw(this.details.map((detail, index) => {
                 return LessonDetailCard;
             }));
@@ -214,6 +217,7 @@ export default {
             // add new card
             this.details.push({
                 index: this.details.length,
+                id: 0,
                 term: '',
                 definition: '',
             });
@@ -226,6 +230,12 @@ export default {
         },
         import() {
             this.type = 'import';
+            // put all current lesson details id to removed_ids
+            this.details.forEach((detail) => {
+                if (detail.id !== 0) {
+                    this.removed_ids.push(detail.id);
+                }
+            });
             if (this.importFile) {
                 if (this.file === null) {
                     this.$root.showSnackbar('Please select a file', 'danger');
@@ -253,6 +263,7 @@ export default {
                         }
                         this.details.push({
                             index: index,
+                            id: 0,
                             term: term_definition[0],
                             definition: term_definition[1],
                         });
@@ -267,15 +278,17 @@ export default {
                 }
             }
         },
-        addLesson() {
-            this.type = 'add';
-            this.$store.dispatch('lesson/addLesson', {
+        updateLesson() {
+            this.type = 'update';
+            let data = {
+                id: this.id,
                 name: this.lesson.name,
                 description: this.lesson.description,
                 password: this.lesson.password,
                 details: this.details,
-            });
-            this.$router.push({ name: 'home.home' });
+                removed_ids: this.removed_ids,
+            };
+            this.$store.dispatch('lesson/updateLesson', data);
         }
     }
 };

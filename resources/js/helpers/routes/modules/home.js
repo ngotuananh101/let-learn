@@ -40,6 +40,11 @@ const home = [
                 component: () => import("../../../pages/lesson/Lesson.vue"),
             },
             {
+                path: ":id/edit",
+                name: "lesson.edit",
+                component: () => import("../../../pages/lesson/Edit.vue"),
+            },
+            {
                 path: "add",
                 name: "lesson.add",
                 component: () => import("../../../pages/lesson/Add.vue"),
@@ -83,6 +88,11 @@ const home = [
                 name: "course.index",
                 component: () => import("../../../pages/course/Course.vue"),
             },
+            {
+                path: ":id/edit",
+                name: "course.edit",
+                component: () => import("../../../pages/course/Edit.vue"),
+            }
         ],
     },
 ];
