@@ -25,6 +25,25 @@ const home = [
                 component: () =>
                     import("../../../pages/home/option/setting.vue"),
             },
+        ],
+    },
+    {
+        path: "/lesson",
+        name: "lesson",
+        meta: {
+            requiresAuth: true,
+        },
+        children: [
+            {
+                path: ":id",
+                name: "lesson.index",
+                component: () => import("../../../pages/lesson/Lesson.vue"),
+            },
+            {
+                path: "add",
+                name: "lesson.add",
+                component: () => import("../../../pages/lesson/Add.vue"),
+            },
             {
                 path: "learn/:id",
                 name: "home.learn",
@@ -50,6 +69,20 @@ const home = [
                 name: "home.forum",
                 component: () => import("../../../pages/home/forum/forum.vue"),
             }
+        ],
+    },
+    {
+        path: "/course",
+        name: "course",
+        meta: {
+            requiresAuth: true,
+        },
+        children: [
+            {
+                path: ":id",
+                name: "course.index",
+                component: () => import("../../../pages/course/Course.vue"),
+            },
         ],
     },
 ];
