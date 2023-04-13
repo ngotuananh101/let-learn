@@ -1,4 +1,5 @@
 <template>
+    <div class="container pt-5">
     <div class="card" id="card">
         <div class="card-header">
             <div class="d-flex justify-content-between align-items-center">
@@ -22,6 +23,7 @@
         <button class="btn btn-outline-warning col-sm-3 col-5" @click="previousCard">Previous</button>
         <button class="btn btn-outline-success col-sm-3 col-5" @click="nextCard">Next</button>
     </div>
+    </div>
 </template>
 
 
@@ -32,33 +34,7 @@ export default {
     data() {
         return {
             id: this.$route.params.id,
-            data: [
-                {
-                    "id": 10003,
-                    "question":
-                        "QN=2 Chính sách thống trị của thực dân Pháp ở Việt Nam và Đông Dương có nội dung cơ bản là:",
-                    "answers": [
-                        "Tự do nhân quyền",
-                        "Tăng cường sức mạnh cho giai cấp công nhân",
-                        "Nhân Quyền",
-                        "Tự do nhân quyền"
-                    ],
-                    "correct_answer": "Nhân Quyền"
-                },
-                {
-                    "id": 10004,
-                    "question":
-                        "QN=2 Chính sách thống trị của thực dân Pháp ở Việt Nam và Đông Dương có nội dung cơ bản là:",
-                    "answers": [
-                        "Tự do nhân quyền",
-                        "Đạo đức",
-                        "Tạo cơ sở thành lập Đảng Cộng sản Việt Nam",
-                        "Tự do nhân quyền"
-                    ],
-                    "correct_answer": "Đạo đức"
-                }
-            ],
-
+            data: null,
             currentCardIndex: 0,
             currentSide: "front",
             showSettings: false // add showSettings data property
@@ -67,42 +43,39 @@ export default {
 
     created() {
         this.unsubscribe = this.$store.subscribe((mutation) => {
-            if (mutation.type === "home/request") {
-            } else if (mutation.type === "home/requestSuccess") {
-                this.data = mutation.payload.data();
+            if (mutation.type === "learn/request") {
+            } else if (mutation.type === "learn/requestSuccess") {
+                this.data = mutation.payload;
                 console.log(this.data);
-                // document.getElementById("text").innerHTML = this.data[this.currentCardIndex].definition;
-            } else if (mutation.type === "home/requestFailure") {
+                document.getElementById("text").innerHTML = this.data.notLearn[this.currentCardIndex].definition;
+            } else if (mutation.type === "learn/requestFailure") {
             }
         });
-        this.$store.dispatch("home/getLearn", this.id);
+        this.$store.dispatch("learn/getFlashCard", this.id);
     },
     methods: {
-        // ...mapActions({
-        //     getLessons: "learn/getLessons"
-        // }),
         updateTitle(title) {
             this.$emit("change-title", title);
         },
         nextCard() {
             console.log(this.currentCardIndex);
-            if (this.currentCardIndex < this.data.length-1) {
+            if (this.currentCardIndex < this.data.notLearn.length-1) {
                 this.currentCardIndex++;
-                this.$emit("change-progress", Math.round((this.currentCardIndex / this.data.length) * 100));
+                this.$emit("change-progress", Math.round((this.currentCardIndex / this.data.notLearn.length) * 100));
             } else {
                 this.currentCardIndex = 0;
                 this.$emit("change-progress", 0);
             }
-            document.getElementById("text").innerHTML = this.data[this.currentCardIndex].definition;
+            document.getElementById("text").innerHTML = this.data.notLearn[this.currentCardIndex].definition;
         },
         previousCard() {
             if (this.currentCardIndex > 0) {
                 this.currentCardIndex--;
-                this.$emit("change-progress", Math.round((this.currentCardIndex / this.data.length) * 100));
+                this.$emit("change-progress", Math.round((this.currentCardIndex / this.data.notLearn.length) * 100));
             } else {
-                this.currentCardIndex = this.data.length - 1;
+                this.currentCardIndex = this.data.notLearn.length - 1;
             }
-            document.getElementById("text").innerHTML = this.data[this.currentCardIndex].definition;
+            document.getElementById("text").innerHTML = this.data.notLearn[this.currentCardIndex].definition;
         },
         toggleSettings() { // add toggleSettings method
             this.showSettings = !this.showSettings;
@@ -117,11 +90,11 @@ export default {
             let card = document.getElementById("card");
             if (this.currentSide === "front") {
                 card.classList.add("rotate");
-                document.getElementById("text").innerHTML = this.data[this.currentCardIndex].term;
+                document.getElementById("text").innerHTML = this.data.notLearn[this.currentCardIndex].term;
                 this.currentSide = "back";
             } else {
                 card.classList.remove("rotate");
-                document.getElementById("text").innerHTML = this.data[this.currentCardIndex].definition;
+                document.getElementById("text").innerHTML = this.data.notLearn[this.currentCardIndex].definition;
                 this.currentSide = "front";
             }
         }
@@ -130,7 +103,7 @@ export default {
         cardsCount() { // add cardsCount computed property
             return {
                 currentCardIndex: this.currentCardIndex,
-                totalCards: this.data ? this.data.length : 0
+                totalCards: this.data ? this.data.notLearn.length : 0
             };
         }
     }
@@ -145,5 +118,8 @@ export default {
 }
 .rotate {
     transform: rotateY(360deg);
+}
+.card-text{
+    white-space: pre-line;
 }
 </style>

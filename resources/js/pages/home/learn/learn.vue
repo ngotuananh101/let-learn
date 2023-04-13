@@ -1,5 +1,5 @@
 <template>
-    <div class="container" v-if="lesson_details && !show_result">
+    <div class="container pt-8" v-if="lesson_details && !show_result">
         <div class="card p-3">
             <div class="card-body">
                 <p>Question</p>
@@ -40,7 +40,7 @@
             </div>
         </div>
     </div>
-    <div class="container mx-md-5" v-if="show_result">
+    <div class="container mx-md-5 pt-5" v-if="show_result">
         <h2>Learn Results</h2>
         <p>You answered {{ numCorrectAnswers }} out of {{ lesson_details.length }} questions correctly.</p>
         <h3>Correct Answers:</h3>
@@ -89,7 +89,7 @@ export default {
     data() {
         return {
             id: this.$route.params.id,
-            lesson_details: [],
+            lesson_details: null,
             currentQuestion: 0,
             isCorrectAnswer: false,
             answered: false,
@@ -103,14 +103,14 @@ export default {
 
     created() {
         this.unsubscribe = this.$store.subscribe((mutation) => {
-            if (mutation.type === "home/request") {
-            } else if (mutation.type === "home/requestSuccess") {
+            if (mutation.type === "learn/request") {
+            } else if (mutation.type === "learn/requestSuccess") {
                 this.lesson_details = mutation.payload;
                 console.log(this.lesson_details);
-            } else if (mutation.type === "home/requestFailure") {
+            } else if (mutation.type === "learn/requestFailure") {
             }
         });
-        this.$store.dispatch("home/getLearn", this.id);
+        this.$store.dispatch("learn/getLearn", this.id);
     },
     computed: {
         numCorrectAnswers() {
@@ -119,7 +119,7 @@ export default {
     },
     methods: {
         ...mapActions({
-            getLearn: 'home/getLearn'
+            getLearn: 'learn/getLearn'
 
         }),
         checkAnswer(index) {

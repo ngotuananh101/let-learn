@@ -13,12 +13,14 @@ import home from "./modules/home/home";
 import schoolDashboard from "./modules/school/dashboard";
 import school from "./modules/school/school";
 import schoolUser from "./modules/school/user";
+import learn from "./modules/home/learn";
 
 const store = createStore({
     modules: {
         config,
         user,
         home,
+        learn,
         adminDashboard,
         adminSettings,
         adminNotification,
