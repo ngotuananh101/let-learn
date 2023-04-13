@@ -273,7 +273,7 @@ class LessonController extends Controller
                     $lessonDetails = $lessonDetails->merge($notLearn);
                 }
             }
-            //$lessonDetails = $lessonDetails->where('id', 19);
+            //$lessonDetails = $lessonDetails->where('id', 51);
             $response = ['lesson_id' => $lesson_id, 'lesson_details' => []];
             foreach ($lessonDetails as $lessonDetail) {
                 try {
@@ -307,6 +307,14 @@ class LessonController extends Controller
                         //check if $options might be missing any options like A, B, C, D
 
                         $answers = array_map('trim', $options);
+                        if (count($answers) < 2) {
+                            // if the number of options is less than 4, then the options are missing
+                            return response()->json([
+                                'status' => 'error',
+                                'status_code' => 500,
+                                'message' => 'Please recheck the options for the question "' . $question . '"' . ' in the lesson "' . $lesson->name . '" ,question_id: ' . $lessonDetail->id
+                            ], 500);
+                        }
                         //count characters of definition
                         $count = strlen($definition);
                         //if count > 1, then correct answer include more than 1 option
@@ -540,6 +548,14 @@ class LessonController extends Controller
                         //check if $options might be missing any options like A, B, C, D
 
                         $answers = array_map('trim', $options);
+                        if (count($answers) < 2) {
+                            // if the number of options is less than 4, then the options are missing
+                            return response()->json([
+                                'status' => 'error',
+                                'status_code' => 500,
+                                'message' => 'Please recheck the options for the question "' . $question . '"' . ' in the lesson "' . $lesson->name . '" ,question_id: ' . $lessonDetail->id
+                            ], 500);
+                        }
                         //count characters of definition
                         $count = strlen($definition);
                         //if count > 1, then correct answer include more than 1 option
