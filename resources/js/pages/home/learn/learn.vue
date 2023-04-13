@@ -89,7 +89,7 @@ export default {
     data() {
         return {
             id: this.$route.params.id,
-            lesson_details: [],
+            lesson_details: null,
             currentQuestion: 0,
             isCorrectAnswer: false,
             answered: false,
@@ -106,7 +106,6 @@ export default {
             if (mutation.type === "home/request") {
             } else if (mutation.type === "home/requestSuccess") {
                 this.lesson_details = mutation.payload;
-                console.log(this.lesson_details);
             } else if (mutation.type === "home/requestFailure") {
             }
         });
