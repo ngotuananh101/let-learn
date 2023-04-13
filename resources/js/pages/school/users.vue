@@ -78,19 +78,20 @@
                                 </li>
                                 <li>
                                     <a class="dropdown-item border-radius-md text-success" href="#"
-                                       @click="this.user_modal.show()">
+                                       @click="showFormAddUser">
                                         Add user</a
                                     >
                                 </li>
                                 <li>
                                     <a class="dropdown-item border-radius-md text-success" href="#"
+                                       @click="showFormImportUser"
                                     >Import user</a
                                     >
                                 </li>
                             </ul>
                         </div>
                     </div>
-                    <div class="p-3 mt-2 card-body" style="min-height: 83vh; max-height: unset;">
+                    <div class="p-3 mt-2 card-body" style="min-height: 80vh; max-height: unset;">
                         <div id="v-pills-tabContent" class="tab-content">
                             <div
                                 id="manager"
@@ -257,10 +258,47 @@
             </div>
         </div>
     </div>
+    <div class="modal fade" id="importUserModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
+         aria-labelledby="staticBackdropLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-xl">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h1 class="modal-title fs-5" id="staticBackdropLabel">Import User</h1>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-12">
+                            <label class="form-label mt-3">Accept only .xlsx file ( <a href="https://s3-hcm-r1.longvan.net/19403879-letlearn/template/user_template.xlsx">template</a> )</label>
+                            <input
+                                id="user_file"
+                                name="user_file"
+                                class="form-control"
+                                type="file"
+                                placeholder="Input file"
+                                accept=".xlsx"
+                                @change="this.showPreview"
+                            />
+                        </div>
+                    </div>
+                    <h6 class="mt-4 mb-0">Preview (read-only)</h6>
+                    <div class="table-responsive">
+                        <table id="import_preview_datatable" class="table table-flush"></table>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-success" @click="this.importUser">
+                        Import
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
 </template>
 <script>
 import {DataTable, exportCSV} from "simple-datatables";
 import setNavPills from "../../helpers/other/nav-pills";
+import readXlsxFile from 'read-excel-file'
 
 export default {
     name: "User",
@@ -293,6 +331,11 @@ export default {
                 password_confirmation: null,
             },
             user_modal: null,
+            importUser_modal: null,
+            import_file: null,
+            import_preview_datatable: null,
+            import_preview_data: null,
+            unsubscribe: null,
         };
     },
     created() {
@@ -300,9 +343,57 @@ export default {
             if (mutation.type === 'schoolUser/request') {
 
             } else if (mutation.type === 'schoolUser/success') {
-                this.data = mutation.payload;
-                if (this.type == 'get') {
+                if (this.type === 'get') {
+                    this.data = mutation.payload;
                     this.init();
+                }
+                else if (this.type === 'add') {
+                    this.$root.showSnackbar('Add user successfully', 'success');
+                    let user = mutation.payload.user;
+                    if (user.role_id === '4') {
+                        this.data.manager.push(user);
+                        this.manager_datatable.rows.add([
+                            user.id,
+                            user.name,
+                            user.username,
+                            user.email,
+                            new Date(user.created_at).toLocaleString(),
+                            user.status,
+                        ]);
+                    } else if (user.role_id === '5') {
+                        this.data.teacher.push(user);
+                        this.teacher_datatable.rows.add([
+                            user.id,
+                            user.name,
+                            user.username,
+                            user.email,
+                            new Date(user.created_at).toLocaleString(),
+                            user.status,
+                        ]);
+                    } else if (user.role_id === '6') {
+                        this.data.student.push(user);
+                        this.student_datatable.rows.add([
+                            user.id,
+                            user.name,
+                            user.username,
+                            user.email,
+                            new Date(user.created_at).toLocaleString(),
+                            user.status,
+                        ]);
+                    }
+                    this.user_modal.hide();
+                }
+                else if (this.type === 'update') {
+                    this.$root.showSnackbar('Update user successfully', 'success');
+                    location.reload();
+                }
+                else if (this.type === 'delete') {
+                    this.$root.showSnackbar('Delete user successfully', 'success');
+                    location.reload();
+                }
+                else if (this.type === 'add_multiple') {
+                    this.$root.showSnackbar('Import user successfully', 'success');
+                    location.reload();
                 }
             } else if (mutation.type === 'schoolUser/failure') {
                 this.$root.showSnackbar(mutation.payload, 'danger');
@@ -432,7 +523,7 @@ export default {
             });
             this.user_modal._element.addEventListener('hidden.bs.modal', () => {
                 this.selected_row = null;
-                this.type = 'add';
+                this.type = 'get';
                 this.user = {
                     id: null,
                     role_id: null,
@@ -446,13 +537,26 @@ export default {
                     password_confirmation: null,
                 }
             });
-            this.type = 'add';
+            this.importUser_modal = new bootstrap.Modal(document.getElementById('importUserModal'), {
+                keyboard: false
+            });
+            this.import_preview_datatable = new DataTable("#import_preview_datatable", {
+                data: {
+                    headings: ['No.', 'Name', 'Username', 'Email', 'Role', 'Date of birth', 'Password'],
+                },
+            });
+            this.importUser_modal._element.addEventListener('hidden.bs.modal', () => {
+                this.import_preview_datatable.data.data = [];
+                this.import_preview_datatable.refresh();
+                document.getElementById('user_file').value = '';
+            });
         },
         export(type) {
+            // get current timestamp
+            const timestamp = new Date().getTime();
             const data = {
-                filename: `${type}-export`,
+                filename: `${type}-export-${timestamp}`,
             }
-            console.log(type);
             if (type === 'manager') {
                 exportCSV(this.manager_datatable, data);
             } else if (type === 'teacher') {
@@ -461,9 +565,56 @@ export default {
                 exportCSV(this.student_datatable, data);
             }
         },
-        import() {
-
-        }
+        showFormAddUser() {
+            this.type = 'add';
+            this.user_modal.show();
+        },
+        showFormImportUser() {
+            this.importUser_modal.show();
+        },
+        showPreview(event) {
+            let file = event.target.files[0];
+            // check file is excel or not
+            if (file.type !== 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' && file.type !== 'application/wps-office.xlsx') {
+                this.$root.showSnackbar('Accept only excel file', 'danger');
+            } else {
+                readXlsxFile(file).then((rows) => {
+                    rows.splice(0, 2);
+                    this.import_preview_datatable.data.data = [];
+                    this.import_preview_data = [];
+                    rows.forEach((row, index) => {
+                        this.import_preview_data.push(row);
+                        this.import_preview_datatable.rows.add(row);
+                    });
+                });
+            }
+        },
+        importUser() {
+            this.type = 'add_multiple';
+            let data = {
+                school_slug: this.$route.params.slug,
+                type: 'multiple',
+                users: this.import_preview_data,
+            }
+            this.$store.dispatch('schoolUser/store', data);
+        },
+        addUser() {
+            this.type = 'add';
+            this.user.type = 'one';
+            this.user.school_slug = this.$route.params.slug;
+            this.$store.dispatch('schoolUser/store', this.user);
+        },
+        updateUser(){
+            this.type = 'update';
+            this.user.school_slug = this.$route.params.slug;
+            this.$store.dispatch('schoolUser/update', this.user);
+        },
+        deleteUser() {
+            if(confirm('Are you sure you want to delete this user?')){
+                this.type = 'delete';
+                this.$store.dispatch('schoolUser/destroy', this.user.id);
+            }
+        },
     }
 };
 </script>

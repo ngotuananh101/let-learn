@@ -156,7 +156,7 @@ class NotificationController extends Controller
     }
 
     /**
-     * Delete a notification.
+     * Delete forum notification.
      */
     public function destroy($id): JsonResponse
     {

@@ -13,6 +13,30 @@ export default {
                     dashboard => commit('success', dashboard),
                     error => commit('failure', error)
                 );
+        },
+        store({commit}, data) {
+            commit('request');
+            userService.store(data)
+                .then(
+                    dashboard => commit('success', dashboard),
+                    error => commit('failure', error)
+                );
+        },
+        update({commit}, data) {
+            commit('request');
+            userService.update(data)
+                .then(
+                    dashboard => commit('success', dashboard),
+                    error => commit('failure', error)
+                );
+        },
+        destroy({commit}, user_id) {
+            commit('request');
+            userService.destroy(user_id)
+                .then(
+                    dashboard => commit('success', dashboard),
+                    error => commit('failure', error)
+                );
         }
     },
     mutations: {
