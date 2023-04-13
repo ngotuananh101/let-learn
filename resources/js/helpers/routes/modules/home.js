@@ -39,6 +39,16 @@ const home = [
                 path: "test/:id",
                 name: "home.test",
                 component: () => import("../../../pages/home/learn/test.vue"),
+            },
+            {
+                path: "forum_detail/:id",
+                name: "home.forum_detail",
+                component: () => import("../../../pages/home/forum/forum_detail.vue"),
+            },
+            {
+                path: "forum",
+                name: "home.forum",
+                component: () => import("../../../pages/home/forum/forum.vue"),
             }
         ],
     },
