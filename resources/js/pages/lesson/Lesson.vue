@@ -116,19 +116,22 @@
         <h5 class="mt-4">Description</h5>
         <p>{{ data.lesson.description }}</p>
     </div>
-
-    <div class="card mb-3">
-        <h6>Relearn: {{ data.relearn.length}}</h6>
-        <div class="card-body" v-for="relearn in relearns">
-            <h5 class="card-title">{{ relearn.term }}</h5>
-            <p class="card-text">{{ relearn.definition }}</p>
+    <h6>Relearn: {{ data.relearn.length }}</h6>
+    <div class="col-12" v-for="relearn in relearns">
+        <div class="card mt-4">
+            <div class="card-body">
+                <p class="card-text text-success">{{ relearn.term }}</p>
+                <p class="card-text">{{ relearn.definition }}</p>
+            </div>
         </div>
     </div>
-    <div class="card mb-3">
-        <h6>NotLearn: {{ data.notLearn.length }}</h6>
-        <div class="card pt-5 " v-for="notLearn in notLearns">
-            <h5 class="card-title">{{ notLearn.term }}</h5>
-            <p class="card-text">{{ notLearn.definition }}</p>
+    <h6>NotLearn: {{ data.notLearn.length }}</h6>
+    <div class="col-12" v-for="notLearn in notLearns">
+        <div class="card mt-4">
+            <div class="card-body">
+                <p class="card-text text-success">{{ notLearn.term }}</p>
+                <p class="card-text">{{ notLearn.definition }}</p>
+            </div>
         </div>
     </div>
 </template>

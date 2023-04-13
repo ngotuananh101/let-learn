@@ -52,39 +52,6 @@ export default {
                 }
             );
         },
-        getLessonInfor({ commit }, id) {
-            commit("request");
-            lessonService.getLessonInfor(id).then(
-                (lesson) => {
-                    commit("success", lesson);
-                },
-                (error) => {
-                    commit("failure", error);
-                }
-            );
-        },
-        showLessonDetailRelearn({ commit }, id) {
-            commit("request");
-            lessonService.showLessonDetailRelearn(id).then(
-                (relearns) => {
-                    commit("success", relearns);
-                },
-                (error) => {
-                    commit("failure", error);
-                }
-            );
-        },
-        showLessonDetailNotLearn({ commit }, id) {
-            commit("request");
-            lessonService.showLessonDetailNotLearn(id).then(
-                (notLearns) => {
-                    commit("success", notLearns);
-                },
-                (error) => {
-                    commit("failure", error);
-                }
-            );
-        },
         // updateLesson({commit}, lesson) {
         //     commit("request");
         //     lessonService.updateLesson(lesson).then(

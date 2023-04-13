@@ -5,9 +5,6 @@ import readXlsxFile from "read-excel-file";
 export const lessonService = {
     importExcelFile,
     addLesson,
-    getLessonInfor,
-    showLessonDetailRelearn,
-    showLessonDetailNotLearn,
     // updateLesson
 };
 
@@ -47,48 +44,6 @@ function addLesson(lesson) {
         .then(handleResponse)
         .then((lesson) => {
             return lesson;
-        });
-}
-
-function getLessonInfor(id) {
-    const requestOptions = {
-        method: "GET",
-        headers: authHeader(),
-    };
-
-    return fetch(`/api/user/lesson/${id}`, requestOptions)
-        .then(handleResponse)
-        .then((data) => {
-            return data.lesson;
-        });
-}
-
-//show lesson detail of relearn
-function showLessonDetailRelearn(id) {
-    const requestOptions = {
-        method: 'POST',
-        headers: authHeader(),
-        body: JSON.stringify({lesson_id: id})
-    };
-    return fetch(`/api/user/main?type=detail_split`, requestOptions)
-        .then(handleResponse)
-        .then(data => {
-            console.log(data.data.relearns);
-            return data.data.relearn;
-        });
-}
-
-//show lesson detail of not learn
-function showLessonDetailNotLearn(id) {
-    const requestOptions = {
-        method: 'POST',
-        headers: authHeader(),
-        body: JSON.stringify({lesson_id: id})
-    };
-    return fetch(`/api/user/main?type=detail_split`, requestOptions)
-        .then(handleResponse)
-        .then(data => {
-            return data.data.notLearn;
         });
 }
 
