@@ -131,4 +131,7 @@ export default {
     height: 3rem;
     margin-right: 1rem;
 }
+.card-title{
+    white-space: pre-line;
+}
 </style>

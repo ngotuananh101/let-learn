@@ -116,7 +116,7 @@
 
 <script>
 export default {
-    name: "Setting",
+    name: "setting",
 };
 </script>
 
