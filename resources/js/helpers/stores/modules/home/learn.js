@@ -39,8 +39,19 @@ export default {
                         commit('requestFailure', error);
                     }
                 );
+        },
+        getTest({commit}, id) {
+            commit('request');
+            learnService.loadTest(id)
+                .then(
+                    response => {
+                        commit('requestSuccess', response);
+                    },
+                    error => {
+                        commit('requestFailure', error);
+                    }
+                );
         }
-
     },
     getters: {
         userData: state => {
