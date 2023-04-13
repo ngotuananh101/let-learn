@@ -66,15 +66,14 @@ function getLessonInfor(id) {
 //show lesson detail of relearn
 function showLessonDetailRelearn(id) {
     const requestOptions = {
-        method: "POST",
+        method: 'POST',
         headers: authHeader(),
-        body: JSON.stringify({ lesson_id: id }),
+        body: JSON.stringify({lesson_id: id})
     };
-
-    return fetch(`api/user/main?type=detail_split`, requestOptions)
+    return fetch(`/api/user/main?type=detail_split`, requestOptions)
         .then(handleResponse)
-        .then((data) => {
-            console.log(data);
+        .then(data => {
+            console.log(data.data.relearns);
             return data.data.relearn;
         });
 }
@@ -82,14 +81,13 @@ function showLessonDetailRelearn(id) {
 //show lesson detail of not learn
 function showLessonDetailNotLearn(id) {
     const requestOptions = {
-        method: "POST",
+        method: 'POST',
         headers: authHeader(),
-        body: JSON.stringify({ lesson_id: id }),
+        body: JSON.stringify({lesson_id: id})
     };
-
-    return fetch(`api/user/main?type=detail_split`, requestOptions)
+    return fetch(`/api/user/main?type=detail_split`, requestOptions)
         .then(handleResponse)
-        .then((data) => {
+        .then(data => {
             return data.data.notLearn;
         });
 }

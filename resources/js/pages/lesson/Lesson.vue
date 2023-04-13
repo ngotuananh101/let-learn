@@ -1,25 +1,32 @@
 <template>
     <div class="row mt-3">
         <div class="col-md-7 col-12">
-            <div class="flashcards-container">
-                <section class="card-container">
-                    <div class="card d-flex justify-content-center align-items-center p-md-5 p-3"
-                        style="min-height: 50vh; max-height: 50vh;" @click="rotateCard">
-                        <p id="card-title" class="fs-6" style="white-space: pre-line;"></p>
+            <div class="container pt-5">
+                <div class="card" id="card">
+                    <div class="card-header">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <h6 class="card-subtitle text-muted">{{ cardsCount.currentCardIndex + 1 }} /
+                                    {{ cardsCount.totalCards }}</h6>
+                            </div>
+                        </div>
                     </div>
-                </section>
-                <!-- add card count display -->
-                <div class="d-flex justify-content-between align-items-center mt-3">
-                    <button @click="previousCard" class="btn">Previous</button>
-                    <div class="card-count w-100 text-center">{{ cardsCount.currentCardIndex + 1 }} / {{
-                        cardsCount.totalCards }}</div>
-                    <button @click="nextCard" class="btn">Next</button>
+                    <div class="card-body" style="height: 50vh; max-height: 70vh;" @click="rotateCard">
+                        <div class="h-100 d-flex justify-content-center align-items-center">
+                            <p class="card-text fs-4" id="text"></p>
+                        </div>
+                    </div>
+                    <h5 class="card-footer"></h5>
+                </div>
+                <div class="mt-3 mx-1 row justify-content-between">
+                    <button class="btn btn-outline-warning col-sm-3 col-5" @click="previousCard">Previous</button>
+                    <button class="btn btn-outline-success col-sm-3 col-5" @click="nextCard">Next</button>
                 </div>
             </div>
         </div>
         <div class="col-md-5 col-12">
             <div class="row">
-                <!-- <h2>{{ lesson ? lesson.name : 'loading' }}</h2> -->
+                <h2>{{ data.lesson.name }}</h2>
                 <div class="col-12 mb-3 row align-items-center justify-content-center">
                     <div class="col-2">
                         <img src="https://gcavocats.ca/wp-content/uploads/2018/09/man-avatar-icon-flat-vector-19152370-1.jpg"
@@ -27,11 +34,7 @@
                     </div>
                     <div class="col-6">
                         <p class="m-0">
-                            <!--get user name-->
-                            <!-- {{ lesson ? lesson.user.name : 'loading' }}
-                            {{ this.user.email_verified_at
-                                ? "verified"
-                                : "unverified" }} -->
+                            <!--Show username-->
                         </p>
                     </div>
                     <div class="col-4 p-0">
@@ -108,41 +111,26 @@
             </div>
         </div>
     </div>
-    <div v-if="lesson" class="mt-4">
+    <div class="mt-4">
         <!--show the lesson's description by lesson id -->
         <h5 class="mt-4">Description</h5>
-        <p>{{ lesson.description }}</p>
+        <p>{{ data.lesson.description }}</p>
     </div>
-    <!-- <h5 class.js="mt-4">Number of terms in this lesson: {{ cardsCount.totalCards }}</h5> -->
-    <!-- <div class="mt-4" v-if="relearns">
-        <h6>Relearn: {{ relearns.length }}</h6>
-        <div class="row mt-4">
-            <div class="col-12" v-for="relearn in relearns">
-                <LessonCard :title="relearn.term" :value="relearn.definition" />
-            </div>
-        </div>
-    </div> -->
-    <!-- <div class="card w-75">
+
+    <div class="card mb-3">
+        <h6>Relearn: {{ data.relearn.length}}</h6>
         <div class="card-body" v-for="relearn in relearns">
             <h5 class="card-title">{{ relearn.term }}</h5>
             <p class="card-text">{{ relearn.definition }}</p>
         </div>
-    </div> -->
-    <div class="card mb-3" v-if="relearns">
-        <div class="card-body" v-for="relearn in relearns" :key="lesson_id">
-            <h5 class="card-title">{{ relearn.term }}</h5>
-            <p class="card-text">{{ relearn.definition }}</p>
+    </div>
+    <div class="card mb-3">
+        <h6>NotLearn: {{ data.notLearn.length }}</h6>
+        <div class="card pt-5 " v-for="notLearn in notLearns">
+            <h5 class="card-title">{{ notLearn.term }}</h5>
+            <p class="card-text">{{ notLearn.definition }}</p>
         </div>
     </div>
-    <!-- <div class="mt-4" v-if="notlearns">
-        <h6>Not learn: {{ notlearns.length }}</h6>
-        <h6>Not learn: 100</h6>
-        <div class="row mt-4">
-            <div class="col-12" v-for="notlearn in notlearns">
-                <LessonCard :title="notlearn.term" :value="notlearn.definition" />
-            </div>
-        </div>
-    </div> -->
 </template>
 
 <script>
@@ -156,9 +144,11 @@ export default {
         return {
             id: this.$route.params.id,
             user: JSON.parse(localStorage.getItem("user")),
-            lesson: null,
+            data: null,
+            currentCardIndex: 0,
+            currentSide: "front",
             relearns: null,
-            notlearns: null,
+            notLearns: null,
         };
     },
     title() {
@@ -171,46 +161,61 @@ export default {
     },
     created() {
         this.unsubscribe = this.$store.subscribe((mutation) => {
-            if (mutation.type === "lesson/request") {
-            } else if (mutation.type === "lesson/requestSuccess") {
-                this.lesson = mutation.payload.lesson;
-                this.relearns = mutation.payload.relearn;
-                this.notlearns = mutation.payload.notlearn;
-            } else if (mutation.type === "lesson/requestFailure") {
+            if (mutation.type === "learn/request") {
+            } else if (mutation.type === "learn/requestSuccess") {
+                this.data = mutation.payload;
+                this.relearns = this.data.relearn = mutation.payload.relearn;
+                this.notLearns = this.data.notLearn = mutation.payload.notLearn;
+                console.log(this.notLearns);
+                document.getElementById("text").innerHTML = this.data.notLearn[this.currentCardIndex].definition;
+            } else if (mutation.type === "learn/requestFailure") {
             }
         });
-        this.$store.dispatch("lesson", this.id);
+        this.$store.dispatch("learn/getFlashCard", this.id);
+
+        // this.unsubscribe = this.$store.subscribe((mutation) => {
+        //     if (mutation.type === "lesson/request") {
+        //     } else if (mutation.type === "lesson/requestSuccess") {
+        //         this.data.relearns = mutation.payload.relearns;
+        //         this.data.notLearns = mutation.payload.notLearns;
+        //         console.log(this.data);
+        //         document.getElementById("text").innerHTML = this.data.notLearn[this.currentCardIndex].definition;
+        //     } else if (mutation.type === "lesson/requestFailure") {
+        //     }
+        // });
+        // this.$store.dispatch("lesson/showLessonDetailRelearn", this.id);
+        // this.$store.dispatch("lesson/showLessonDetailNotLearn", this.id);
     },
     methods: {
-        // ...mapActions("lesson", ["getLesson"]),
-        // ...mapActions("card", ["getCards"]),
+        updateTitle(title) {
+            this.$emit("change-title", title);
+        },
         nextCard() {
             console.log(this.currentCardIndex);
-            if (this.currentCardIndex < this.data.length - 1) {
+            if (this.currentCardIndex < this.data.notLearn.length - 1) {
                 this.currentCardIndex++;
             } else {
                 this.currentCardIndex = 0;
             }
-            document.getElementById("text").innerHTML = this.data[this.currentCardIndex].definition;
+            document.getElementById("text").innerHTML = this.data.notLearn[this.currentCardIndex].definition;
         },
         previousCard() {
             if (this.currentCardIndex > 0) {
                 this.currentCardIndex--;
-                this.$emit("change-progress", Math.round((this.currentCardIndex / this.data.length) * 100));
             } else {
-                this.currentCardIndex = this.data.length - 1;
+                this.currentCardIndex = this.data.notLearn.length - 1;
             }
-            document.getElementById("text").innerHTML = this.data[this.currentCardIndex].definition;
+            document.getElementById("text").innerHTML = this.data.notLearn[this.currentCardIndex].definition;
         },
         rotateCard(e) {
             let card = document.getElementById("card");
             if (this.currentSide === "front") {
                 card.classList.add("rotate");
-                document.getElementById("text").innerHTML = this.data[this.currentCardIndex].term;
+                document.getElementById("text").innerHTML = this.data.notLearn[this.currentCardIndex].term;
                 this.currentSide = "back";
             } else {
                 card.classList.remove("rotate");
-                document.getElementById("text").innerHTML = this.data[this.currentCardIndex].definition;
+                document.getElementById("text").innerHTML = this.data.notLearn[this.currentCardIndex].definition;
                 this.currentSide = "front";
             }
         }
@@ -219,7 +224,7 @@ export default {
         cardsCount() { // add cardsCount computed property
             return {
                 currentCardIndex: this.currentCardIndex,
-                totalCards: this.data ? this.data.length : 0
+                totalCards: this.data ? this.data.notLearn.length : 0
             };
         }
     }
@@ -230,10 +235,13 @@ export default {
 .card {
     transition: all 0.3s;
     transform-style: preserve-3d;
-    flex: 1;
 }
 
 .rotate {
     transform: rotateY(360deg);
+}
+
+.card-text {
+    white-space: pre-line;
 }
 </style>

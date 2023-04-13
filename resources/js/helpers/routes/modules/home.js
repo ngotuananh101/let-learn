@@ -25,21 +25,6 @@ const home = [
                 component: () =>
                     import("../../../pages/home/option/setting.vue"),
             },
-            {
-                path: "learn/:id",
-                name: "home.learn",
-                component: () => import("../../../pages/home/learn/learn.vue"),
-            },
-            {
-                path: "flashcard/:id",
-                name: "home.flashcard",
-                component: () => import("../../../pages/home/learn/flash_card.vue"),
-            },
-            {
-                path: "test/:id",
-                name: "home.test",
-                component: () => import("../../../pages/home/learn/test.vue"),
-            }
         ],
     },
     {
@@ -59,6 +44,21 @@ const home = [
                 name: "lesson.add",
                 component: () => import("../../../pages/lesson/Add.vue"),
             },
+            {
+                path: "learn/:id",
+                name: "home.learn",
+                component: () => import("../../../pages/home/learn/learn.vue"),
+            },
+            {
+                path: "flashcard/:id",
+                name: "home.flashcard",
+                component: () => import("../../../pages/home/learn/flash_card.vue"),
+            },
+            {
+                path: "test/:id",
+                name: "home.test",
+                component: () => import("../../../pages/home/learn/test.vue"),
+            }
         ],
     },
     {

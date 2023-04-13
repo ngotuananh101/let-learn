@@ -21,6 +21,7 @@ const store = createStore({
         config,
         user,
         home,
+        lesson,
         learn,
         adminDashboard,
         adminSettings,
@@ -33,7 +34,6 @@ const store = createStore({
         school,
         schoolDashboard,
         schoolUser,
-        lesson,
     },
 });
 

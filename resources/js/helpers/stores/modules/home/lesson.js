@@ -66,8 +66,8 @@ export default {
         showLessonDetailRelearn({ commit }, id) {
             commit("request");
             lessonService.showLessonDetailRelearn(id).then(
-                (relearn) => {
-                    commit("success", relearn);
+                (relearns) => {
+                    commit("success", relearns);
                 },
                 (error) => {
                     commit("failure", error);
@@ -77,8 +77,8 @@ export default {
         showLessonDetailNotLearn({ commit }, id) {
             commit("request");
             lessonService.showLessonDetailNotLearn(id).then(
-                (notLearn) => {
-                    commit("success", notLearn);
+                (notLearns) => {
+                    commit("success", notLearns);
                 },
                 (error) => {
                     commit("failure", error);
