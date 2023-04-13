@@ -1,24 +1,24 @@
-import {homeService} from '../../../services/home/home.services';
+import {learnService} from '../../../services/home/learn.services';
 export default {
     namespaced: true,
     state: {
-        homeData: {},
+        learnData: {},
     },
     mutations: {
         request(state) {
-            state.homeData = {};
+            state.learnData = {};
         },
         requestSuccess(state, data) {
-            state.homeData = data;
+            state.learnData = data;
         },
         requestFailure(state, error) {
             state.status = {};
         },
     },
     actions: {
-        getHome({commit}) {
+        getFlashCard({commit}, id) {
             commit('request');
-            homeService.loadHome()
+            learnService.loadFlashCard(id)
                 .then(
                     response => {
                         commit('requestSuccess', response);
@@ -28,7 +28,18 @@ export default {
                     }
                 );
         },
-
+        getLearn({commit}, id) {
+            commit('request');
+            learnService.loadLearn(id)
+                .then(
+                    response => {
+                        commit('requestSuccess', response);
+                    },
+                    error => {
+                        commit('requestFailure', error);
+                    }
+                );
+        }
 
     },
     getters: {
