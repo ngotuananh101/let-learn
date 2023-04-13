@@ -13,6 +13,7 @@ import home from "./modules/home/home";
 import schoolDashboard from "./modules/school/dashboard";
 import school from "./modules/school/school";
 import schoolUser from "./modules/school/user";
+import lesson from "./modules/home/lesson";
 import learn from "./modules/home/learn";
 
 const store = createStore({
@@ -20,6 +21,7 @@ const store = createStore({
         config,
         user,
         home,
+        lesson,
         learn,
         adminDashboard,
         adminSettings,
