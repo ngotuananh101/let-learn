@@ -13,8 +13,9 @@
                 <router-link :to="`/lesson/${lesson.id}`">
                     <div class="card mt-4">
                         <div class="card-body">
-                            <p class="card-text text-primary">Title: {{ lesson.description }}</p>
-                            <p class="card-text">Author: {{ lesson.name }}</p>
+                            <p class="card-text text-primary">Title: {{ lesson.name }}</p>
+                            <p class="card-text">Author: {{ lesson.number_of_detail }}</p>
+                            <p class="card-text">Author: {{ lesson.author }}</p>
                         </div>
                     </div>
                 </router-link>
@@ -26,8 +27,9 @@
                 <router-link :to="`/course/${course.id}`">
                     <div class="card mt-4">
                         <div class="card-body">
-                            <p class="card-text text-primary">Title: {{ course.description }}</p>
-                            <p class="card-text">Author: {{ course.name }}</p>
+                            <p class="card-text text-primary">Title: {{ course.name }}</p>
+                            <p class="card-text">Quantity: {{ course.number_of_lesson }}</p>
+                            <p class="card-text">Author: {{ course.description }}</p>
                         </div>
                     </div>
                 </router-link>
@@ -38,8 +40,9 @@
             <div class="col-lg-4 col-md-6 col-12" v-for="ol in other_lesson" :key="ol.id">
                 <div class="card mt-4">
                     <div class="card-body">
-                        <p class="card-text text-primary">Title: {{ ol.description }}</p>
-                        <p class="card-text">Author: {{ ol.name }}</p>
+                        <p class="card-text text-primary">Title: {{ ol.name }}</p>
+                        <p class="card-text">Quantity: {{ ol.number_of_detail }}</p>
+                        <p class="card-text">Author: {{ ol.description }}</p>
                     </div>
                 </div>
             </div>
@@ -49,8 +52,9 @@
             <div class="col-lg-4 col-md-6 col-12" v-for="other_courses in other_course" :key="other_courses.id">
                 <div class="card mt-4">
                     <div class="card-body">
-                        <p class="card-text text-primary">Title: {{ other_courses.description }}</p>
-                        <p class="card-text">Author: {{ other_courses.name }}</p>
+                        <p class="card-text text-primary">Title: {{ other_courses.name }}</p>
+                        <p class="card-text">Quantity: {{ other_courses.number_of_lesson }}</p>
+                        <p class="card-text">Author: {{ other_courses.description }}</p>
                     </div>
                 </div>
             </div>
@@ -69,7 +73,6 @@ export default {
             courses: [],
             other_lesson: [],
             other_course: [],
-            flashcards: [],
         }
     },
     created() {
