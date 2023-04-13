@@ -1,6 +1,6 @@
 import handleResponse from '../../other/handle-response';
 import authHeader from '../../other/auth-header';
-import {config} from "vue-gtag";
+
 
 export const homeService = {
     loadHome,
@@ -17,4 +17,5 @@ function loadHome() {
             console.log(data);
             return data;
         });
-}
+};
+

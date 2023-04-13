@@ -29,6 +29,7 @@ export default {
                 );
         },
 
+
     },
     getters: {
         userData: state => {
