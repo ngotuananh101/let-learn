@@ -38,6 +38,39 @@ const home = [
             },
         ],
     },
+    {
+        path: "/lesson",
+        name: "lesson",
+        meta: {
+            requiresAuth: true,
+        },
+        children: [
+            {
+                path: ":id",
+                name: "lesson.index",
+                component: () => import("../../../pages/lesson/Lesson.vue"),
+            },
+            {
+                path: "add",
+                name: "lesson.add",
+                component: () => import("../../../pages/lesson/Add.vue"),
+            },
+        ],
+    },
+    {
+        path: "/course",
+        name: "course",
+        meta: {
+            requiresAuth: true,
+        },
+        children: [
+            {
+                path: ":id",
+                name: "course.index",
+                component: () => import("../../../pages/course/Course.vue"),
+            },
+        ],
+    },
 ];
 
 export default home;
