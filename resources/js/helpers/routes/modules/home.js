@@ -33,9 +33,13 @@ const home = [
             {
                 path: "flashcard/:id",
                 name: "home.flashcard",
-                component: () =>
-                    import("../../../pages/home/learn/flash_card.vue"),
+                component: () => import("../../../pages/home/learn/flash_card.vue"),
             },
+            {
+                path: "test/:id",
+                name: "home.test",
+                component: () => import("../../../pages/home/learn/test.vue"),
+            }
         ],
     },
 ];
