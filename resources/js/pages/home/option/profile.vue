@@ -19,21 +19,21 @@
             <nav>
                 <div class="nav nav-tabs" id="nav-tab" role="tablist">
                     <button class="nav-link active" id="nav-home-tab" data-bs-toggle="tab" data-bs-target="#nav-home" type="button" role="tab" aria-controls="nav-home" aria-selected="true">Lesson</button>
-                    <button class="nav-link" id="nav-profile-tab" data-bs-toggle="tab" data-bs-target="#nav-profile" type="button" role="tab" aria-controls="nav-profile" aria-selected="false">Profile</button>
-                    <button class="nav-link" id="nav-contact-tab" data-bs-toggle="tab" data-bs-target="#nav-contact" type="button" role="tab" aria-controls="nav-contact" aria-selected="false">Contact</button>
+                    <button class="nav-link" id="nav-profile-tab" data-bs-toggle="tab" data-bs-target="#nav-profile" type="button" role="tab" aria-controls="nav-profile" aria-selected="false">Course</button>
+                    <button class="nav-link" id="nav-contact-tab" data-bs-toggle="tab" data-bs-target="#nav-contact" type="button" role="tab" aria-controls="nav-contact" aria-selected="false">Class</button>
                 </div>
             </nav>
             <div class="tab-content" id="nav-tabContent">
                 <div class="tab-pane fade show active pt-3 pb-3" id="nav-home" role="tabpanel" aria-labelledby="nav-home-tab">
                     <div class="row">
                         <h3>Lesson</h3>
-                        <div class="col-lg-4 col-md-6 col-12" v-for="lesson in lessons" :key="lesson.id">
+                        <div class="col-lg-4 col-md-6 col-12" v-for="lesson in lessons?.length ? lessons : []" :key="lesson.id">
                             <router-link :to="`/lesson/${lesson.id}`">
                                 <div class="card mt-4">
                                     <div class="card-body">
                                         <p class="card-text text-primary">Title: {{ lesson.name }}</p>
-                                        <p class="card-text">Author: {{ lesson.lesson_count }}</p>
-                                        <p class="card-text">Author: {{ lesson.username }}</p>
+                                        <p class="card-text">Quantity: {{ lesson.number_of_detail }}</p>
+                                        <p class="card-text">Author: {{ lesson.author }}</p>
                                     </div>
                                 </div>
                             </router-link>
@@ -48,8 +48,8 @@
                                 <div class="card mt-4">
                                     <div class="card-body">
                                         <p class="card-text text-primary">Title: {{ course.name }}</p>
-                                        <p class="card-text">Author: {{ course.lesson_count }}</p>
-                                        <p class="card-text">Author: {{ course.username }}</p>
+                                        <p class="card-text">Quantity: {{ course.number_of_detail }}</p>
+                                        <p class="card-text">Author: {{ course.author }}</p>
                                     </div>
                                 </div>
                             </router-link>
@@ -64,8 +64,6 @@
                                 <div class="card mt-4">
                                     <div class="card-body">
                                         <p class="card-text text-primary">Title: {{ classs.name }}</p>
-                                        <p class="card-text">Author: {{ classs.lesson_count }}</p>
-                                        <p class="card-text">Author: {{ classs.username }}</p>
                                     </div>
                                 </div>
                             </router-link>
@@ -95,9 +93,11 @@ export default {
     data() {
         return {
             user: null,
-            lessons: null,
-            courses: null,
-            classes: null
+            data: [],
+            lessons: [],
+            courses: [],
+            classes: [],
+            schools: [],
         };
     },
     created() {
@@ -105,13 +105,16 @@ export default {
         this.unsubscribe = this.$store.subscribe((mutation) => {
             if (mutation.type === "home/request") {
             } else if (mutation.type === "home/requestSuccess") {
-                this.lessons = mutation.payload;
-                console.log(this.lessons);
+                this.data = mutation.payload;
+                this.lessons = this.data.lessons;
+                this.courses = this.data.courses;
+                this.classes = this.data.classes;
+                this.schools = this.data.schools;
+                console.log(this.data);
             } else if (mutation.type === "home/requestFailure") {
             }
         });
-        console.log(this.user.id);
-        this.$store.dispatch("home/getLessonByUserId", this.user.id);
+        this.$store.dispatch("home/getUserInformation");
     },
 };
 </script>

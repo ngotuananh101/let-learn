@@ -5,8 +5,7 @@ import authHeader from '../../other/auth-header';
 export const homeService = {
     loadHome,
     loadClassDetail,
-    loadLessonByUserId,
-    loadCourseByUserId
+    loadUserInformation,
 };
 
 function loadHome() {
@@ -21,29 +20,17 @@ function loadHome() {
             return data;
         });
 };
-function loadLessonByUserId(id) {
+function loadUserInformation() {
     const requestOptions = {
         method: 'GET',
-        headers: authHeader(),
+        headers: authHeader()
     };
-    return fetch(`/api/student/main/${id}?type=lesson`, requestOptions).then(handleResponse).then(
-        data => {
+    return fetch(`/api/public/information`, requestOptions)
+        .then(handleResponse)
+        .then(data => {
             console.log(data);
-            return data.data;
-        }
-    )
-}
-function loadCourseByUserId(id) {
-    const requestOptions = {
-        method: 'GET',
-        headers: authHeader(),
-    };
-    return fetch(`/api/student/main/${id}?type=course`, requestOptions).then(handleResponse).then(
-        data => {
-            console.log(data);
-            return data.data;
-        }
-    )
+            return data;
+        });
 }
 function loadClassDetail(id) {
     const requestOptions = {

@@ -28,23 +28,9 @@ export default {
                     }
                 );
         },
-        getLessonByUserId({commit}, id) {
+        getUserInformation({commit}) {
             commit('request');
-            console.log(id);
-            homeService.loadLessonByUserId(id)
-                .then(
-                    response => {
-                        commit('requestSuccess', response);
-                    },
-                    error => {
-                        commit('requestFailure', error);
-                    }
-                );
-        },
-        getCourseByUserId({commit}, id) {
-            commit('request');
-            console.log(id);
-            homeService.loadCourseByUserId(id)
+            homeService.loadUserInformation()
                 .then(
                     response => {
                         commit('requestSuccess', response);
