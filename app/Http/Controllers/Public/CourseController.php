@@ -57,7 +57,7 @@ class CourseController extends Controller
                             'message' => 'Course is not allowed to be viewed',
                             'status' => 'error'
                         ], 400);
-                    return response()->json($course->load(['user', 'school', 'class']), 200);
+                    return response()->json($course->load(['lessons']), 200);
                     break;
                 case 'lessons':
                     $request->validate([

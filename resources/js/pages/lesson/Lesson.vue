@@ -1,7 +1,7 @@
 <template>
     <div class="row mt-3">
         <div class="col-md-7 col-12">
-            <div class="container pt-5">
+            <div class="container">
                 <div class="card" id="card">
                     <div class="card-header">
                         <div class="d-flex justify-content-between align-items-center">
@@ -26,26 +26,26 @@
         </div>
         <div class="col-md-5 col-12">
             <div class="row">
-                <h2>{{ data.lesson.name }}</h2>
+                <!-- <h2>{{ data.lesson.name }}</h2> -->
                 <div class="col-12 mb-3 row align-items-center justify-content-center">
                     <div class="col-2">
                         <img src="https://gcavocats.ca/wp-content/uploads/2018/09/man-avatar-icon-flat-vector-19152370-1.jpg"
-                            class="rounded-circle" alt="Avatar" style="width: 150px" size="md" circular />
+                            class="rounded-circle" alt="Avatar" style="width: 150px" />
                     </div>
                     <div class="col-6">
-                        <p class="m-0">
-                            <!--Show username-->
-                        </p>
+                        <!-- <p class="m-0">
+                            Show username
+                        </p> -->
                     </div>
-                    <div class="col-4 p-0">
-                        <div class="dropdown float-end">
+                    <div class="col-4">
+                        <div class="dropdown show">
                             <button class="btn btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown"
                                 aria-expanded="false"></button>
                             <ul class="dropdown-menu">
                                 <router-link :to="{ name: 'lesson.edit', params: { id: id } }">
                                     <li><a class="dropdown-item" href="#">Edit</a></li>
                                 </router-link>
-                                <li><a class="dropdown-item" @click="delete">Delete</a></li>
+                                <li><a class="dropdown-item" @click="deleteLesson">Delete</a></li>
                             </ul>
                         </div>
                     </div>
@@ -120,9 +120,10 @@
     <div class="mt-4">
         <!--show the lesson's description by lesson id -->
         <h5 class="mt-4">Description</h5>
-        <p>{{ data.lesson.description }}</p>
+        <!-- <p>{{ data.lesson.description }}</p> -->
     </div>
-    <h6>Relearn: {{ data.relearn.length }}</h6>
+    <!-- <h6>Relearn: {{ data.relearn.length }}</h6> -->
+    <h6>Relearn: </h6>
     <div class="col-12" v-for="relearn in relearns">
         <div class="card mt-4">
             <div class="card-body">
@@ -131,7 +132,8 @@
             </div>
         </div>
     </div>
-    <h6>NotLearn: {{ data.notLearn.length }}</h6>
+    <!-- <h6>NotLearn: {{ data.notLearn.length }}</h6> -->
+    <h6>NotLearn: </h6>
     <div class="col-12" v-for="notLearn in notLearns">
         <div class="card mt-4">
             <div class="card-body">
@@ -175,9 +177,13 @@ export default {
                 this.data = mutation.payload;
                 this.relearns = this.data.relearn = mutation.payload.relearn;
                 this.notLearns = this.data.notLearn = mutation.payload.notLearn;
-                console.log(this.notLearns);
-                document.getElementById("text").innerHTML = this.data.notLearn[this.currentCardIndex].definition;
+                console.log(this.relearns);
+                if (this.type === 'delete') {
+                    this.$root.showSnackbar('Delete lesson successfully', 'success');
+                    this.$router.push({ name: 'home.home' });
+                }
             } else if (mutation.type === "learn/requestFailure") {
+                this.$root.showSnackbar(mutation.payload, 'danger');
             }
         });
         this.$store.dispatch("learn/getFlashCard", this.id);
@@ -215,22 +221,11 @@ export default {
                 this.currentSide = "front";
             }
         },
-        delete() {
-            this.$swal({
-                icon: "question",
-                title: "Are you sure?",
-                text: "You won't be able to revert this!",
-                showCancelButton: true,
-                confirmButtonText: "Yes, delete it!",
-                cancelButtonText: "No, cancel!",
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    this.$store.dispatch('lesson/deleteLesson', this.id);
-                    this.$store.push({ name: 'home.home' });
-                    // close modal
-                    document.getElementById('edit-close').click();
-                }
-            });
+        deleteLesson() {
+            if (confirm('Are you sure?')) {
+                this.type = 'delete';
+                this.$store.dispatch('lesson/deleteLesson', this.id);
+            }
         },
     },
     computed: {

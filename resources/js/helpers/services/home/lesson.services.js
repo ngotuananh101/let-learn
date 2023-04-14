@@ -68,7 +68,7 @@ function getLessonById(id) {
         headers: authHeader()
     };
 
-    return fetch(`/api/admin/lesson/${id}`, requestOptions)
+    return fetch(`/api/user/lesson/${id}`, requestOptions)
         .then(handleResponse)
         .then(lesson => {
             return lesson;
@@ -82,7 +82,7 @@ function updateLesson(lesson) {
         body: JSON.stringify(lesson)
     };
 
-    return fetch(`/api/admin/lesson/${lesson.id}`, requestOptions)
+    return fetch(`/api/user/lesson/${lesson.id}`, requestOptions)
         .then(handleResponse)
         .then(lesson => {
             return lesson;
