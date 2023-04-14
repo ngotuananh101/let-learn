@@ -156,12 +156,13 @@ class LessonController extends Controller
                 ], 403);
             }
             if ($lesson->status == 'inactive') {
-                $lesson->delete();
+                //$lesson->delete();
+                //cant delete lesson if lesson is inactive
                 return response()->json([
-                    'status' => 'success',
-                    'status_code' => 200,
-                    'message' => 'Delete lesson successfully!',
-                ], 200);
+                    'status' => 'error',
+                    'status_code' => 400,
+                    'message' => 'Lesson is already deleted!'
+                ], 400);
             } else {
                 // Soft delete lesson if lesson is active
                 $lesson->update([
