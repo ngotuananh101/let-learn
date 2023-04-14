@@ -1,7 +1,7 @@
 <template>
     <div class="row mt-3">
         <div class="col-md-7 col-12">
-            <div class="container pt-5">
+            <div class="container">
                 <div class="card" id="card">
                     <div class="card-header">
                         <div class="d-flex justify-content-between align-items-center">
@@ -30,22 +30,22 @@
                 <div class="col-12 mb-3 row align-items-center justify-content-center">
                     <div class="col-2">
                         <img src="https://gcavocats.ca/wp-content/uploads/2018/09/man-avatar-icon-flat-vector-19152370-1.jpg"
-                            class="rounded-circle" alt="Avatar" style="width: 150px" size="md" circular />
+                            class="rounded-circle" alt="Avatar" style="width: 50px" />
                     </div>
-                    <div class="col-6">
+                    <div class="col-8">
                         <p class="m-0">
-                            <!--Show username-->
+                            {{ this.user.name }}
                         </p>
                     </div>
-                    <div class="col-4 p-0">
-                        <div class="dropdown float-end">
+                    <div class="col-2">
+                        <div class="dropdown show">
                             <button class="btn btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown"
                                 aria-expanded="false"></button>
                             <ul class="dropdown-menu">
                                 <router-link :to="{ name: 'lesson.edit', params: { id: id } }">
                                     <li><a class="dropdown-item" href="#">Edit</a></li>
                                 </router-link>
-                                <li><a class="dropdown-item" @click="delete">Delete</a></li>
+                                <li><a class="dropdown-item" @click="deleteLesson">Delete</a></li>
                             </ul>
                         </div>
                     </div>
@@ -152,12 +152,13 @@ export default {
     data() {
         return {
             id: this.$route.params.id,
-            user: JSON.parse(localStorage.getItem("user")),
+            user: null,
             data: null,
             currentCardIndex: 0,
             currentSide: "front",
             relearns: null,
             notLearns: null,
+            type: null,
         };
     },
     title() {
@@ -165,19 +166,23 @@ export default {
             "Home - " + document.getElementsByTagName("meta")["title"].content
         );
     },
-    mounted() {
-        console.log(this.user);
-    },
     created() {
+        this.user = this.$store.getters['user/userData'].info;
         this.unsubscribe = this.$store.subscribe((mutation) => {
             if (mutation.type === "learn/request") {
             } else if (mutation.type === "learn/requestSuccess") {
-                this.data = mutation.payload;
-                this.relearns = this.data.relearn = mutation.payload.relearn;
-                this.notLearns = this.data.notLearn = mutation.payload.notLearn;
-                console.log(this.notLearns);
-                document.getElementById("text").innerHTML = this.data.notLearn[this.currentCardIndex].definition;
+                if (!this.type) {
+                    this.data = mutation.payload;
+                    this.relearns = this.data.relearn = mutation.payload.relearn;
+                    this.notLearns = this.data.notLearn = mutation.payload.notLearn;
+                    document.getElementById("text").innerHTML = this.data.notLearn[this.currentCardIndex].definition;
+                }
+                if (this.type === 'delete') {
+                    this.$root.showSnackbar('Delete lesson successfully', 'success');
+                    this.$router.push({ name: 'home.home' });
+                }
             } else if (mutation.type === "learn/requestFailure") {
+                this.$root.showSnackbar(mutation.payload, 'danger');
             }
         });
         this.$store.dispatch("learn/getFlashCard", this.id);
@@ -215,22 +220,11 @@ export default {
                 this.currentSide = "front";
             }
         },
-        delete() {
-            this.$swal({
-                icon: "question",
-                title: "Are you sure?",
-                text: "You won't be able to revert this!",
-                showCancelButton: true,
-                confirmButtonText: "Yes, delete it!",
-                cancelButtonText: "No, cancel!",
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    this.$store.dispatch('lesson/deleteLesson', this.id);
-                    this.$store.push({ name: 'home.home' });
-                    // close modal
-                    document.getElementById('edit-close').click();
-                }
-            });
+        deleteLesson() {
+            if (confirm('Are you sure?')) {
+                this.type = 'delete';
+                this.$store.dispatch('lesson/deleteLesson', this.id);
+            }
         },
     },
     computed: {

@@ -22,31 +22,20 @@ export default {
         },
     },
     actions: {
-        getCourseInfo({ commit }, course_id) {
-            commit("request");
-            courseService.getCourseInfo(course_id).then(
-                (course) => {
-                    commit("success", course);
-                },
-                (error) => {
-                    commit("failure", error);
-                }
-            );
-        },
         getLessonByCourseId({ commit }, course_id) {
             commit("request");
             courseService.getLessonByCourseId(course_id).then(
-                (lessons) => {
-                    commit("success", lessons);
+                (response) => {
+                    commit("success", response);
                 },
                 (error) => {
                     commit("failure", error);
                 }
             );
         },
-        createCourse({ commit }, course) {
+        addCourse({ commit }, course) {
             commit("request");
-            courseService.createCourse(course).then(
+            courseService.addCourse(course).then(
                 (course) => {
                     commit("success", course);
                 },
@@ -55,62 +44,27 @@ export default {
                 }
             );
         },
-        updateCourse({commit}, course) {
-            commit('request');
+        updateCourse({ commit }, course) {
+            commit("request");
             courseService.updateCourse(course).then(
-                course => {
-                    commit('success', course);
+                (course) => {
+                    commit("success", course);
                 },
-                error => {
-                    commit('failure', error);
+                (error) => {
+                    commit("failure", error);
                 }
             );
         },
-        searchLesson({commit}, keyword) {
-            commit('request');
-            courseService.searchLesson(keyword).then(
-                lesson => {
-                    commit('success', lesson);
-                },
-                error => {
-                    commit('failure', error);
-                }
-            );
-        },
-        addLessonToCourse({commit}, data) {
-            commit('request');
-            data.type = 'add_lesson';
-            courseService.addLessonToCourse(data).then(
-                lesson => {
-                    commit('success', lesson);
-                },
-                error => {
-                    commit('failure', error);
-                }
-            );
-        },
-        deleteCourse({commit}, id) {
-            commit('request');
+        deleteCourse({ commit }, id) {
+            commit("request");
             courseService.deleteCourse(id).then(
-                course => {
-                    commit('success', course);
+                (course) => {
+                    commit("success", course);
                 },
-                error => {
-                    commit('failure', error);
+                (error) => {
+                    commit("failure", error);
                 }
             );
         },
-        removeLessonFromCourse({commit}, data) {
-            commit('request');
-            data.type = 'remove_lesson';
-            courseService.removeLessonFromCourse(data).then(
-                lesson => {
-                    commit('success', lesson);
-                },
-                error => {
-                    commit('failure', error);
-                }
-            );
-        }
     },
 };

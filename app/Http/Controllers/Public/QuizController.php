@@ -43,7 +43,7 @@ class QuizController extends Controller
             //check current time is between start time and end time. if not, return error
             $now = date('Y-m-d H:i:s');
             $quiz = Quiz::findOrFail($id);
-            if ($request->type != 'all' && ($now < $quiz->start_time || $now > $quiz->end_time)) {
+            if (auth()->user()->role->name == 'student' && ($now < $quiz->start_time || $now > $quiz->end_time) && ($request->type != 'all' ||  $request->type != 'answer')) {
                 return response()->json([
                     'status' => 'error',
                     'status_code' => 400,
@@ -187,6 +187,8 @@ class QuizController extends Controller
                         $data = [
                             'quiz_name' => $quiz->name,
                             'quiz_description' => $quiz->description,
+                            'start_time' => $quiz->start_time,
+                            'end_time' => $quiz->end_time,
                             'count_questions' => $count_questions,
                         ];
                         return response()->json(['data' => $data]);
@@ -198,6 +200,15 @@ class QuizController extends Controller
                                 'status' => 'error',
                                 'status_code' => 400,
                                 'message' => 'Quiz is not exist or quiz is not active'
+                            ], 400);
+                        }
+                        //check if student already take quiz
+                        $answer = Answer::where('quiz_id', $id)->where('user_id', auth()->user()->id)->first();
+                        if ($answer) {
+                            return response()->json([
+                                'status' => 'error',
+                                'status_code' => 400,
+                                'message' => 'You already take this quiz'
                             ], 400);
                         }
                         $questions = $quiz->questions;
@@ -433,7 +444,7 @@ class QuizController extends Controller
                         'answers.*.is_correct' => 'nullable|boolean',
                         'answers.*.points' => 'nullable|integer|',
                     ]);
-
+                    //check if 
                     //check if user has already submitted the quiz
                     $quiz = Quiz::where('id', $request->quiz_id)->first();
                     $user_id_check = auth()->user()->id;
@@ -494,63 +505,63 @@ class QuizController extends Controller
 
     public function exportToCSV($id)
     {
-        try{
-        $quiz = Quiz::findOrFail($id);
-        $answers = Answer::where('quiz_id', $quiz->id)->get();
+        try {
+            $quiz = Quiz::findOrFail($id);
+            $answers = Answer::where('quiz_id', $quiz->id)->get();
 
-        $maxPoints = Question::where('quiz_id', $quiz->id)->sum('points');
+            $maxPoints = Question::where('quiz_id', $quiz->id)->sum('points');
 
-        $header = array(
-            'Quiz ID',
-            'Quiz Name',
-            'User Name',
-            'Quiz Total Points',
-            'Quiz Max Points',
-            'Question',
-            'Answer',
-            'Is Correct'
-        );
+            $header = array(
+                'Quiz ID',
+                'Quiz Name',
+                'User Name',
+                'Quiz Total Points',
+                'Quiz Max Points',
+                'Question',
+                'Answer',
+                'Is Correct'
+            );
 
-        $data = array();
-        foreach ($answers as $answer) {
-            $user = User::findOrFail($answer->user_id);
-            $ans = json_decode($answer->answer_text, true);
+            $data = array();
+            foreach ($answers as $answer) {
+                $user = User::findOrFail($answer->user_id);
+                $ans = json_decode($answer->answer_text, true);
 
-            $sumPoints = 0;
-            $ques_ids = [];
-            foreach ($ans as $a) {
-                $sumPoints += $a['points'];
-                $ques_ids[] = $a['question_id'];
+                $sumPoints = 0;
+                $ques_ids = [];
+                foreach ($ans as $a) {
+                    $sumPoints += $a['points'];
+                    $ques_ids[] = $a['question_id'];
 
-                $data[] = [
-                    'quiz_id' => $quiz->id,
-                    'quiz_name' => $quiz->name,
-                    'user_name' => $user->name,
-                    'quiz_total_points' => $sumPoints,
-                    'quiz_max_points' => $maxPoints,
-                    'question' => Question::findOrFail($a['question_id'])->question,
-                    'answer' => $a['answer'],
-                    'is_correct' => $a['is_correct'] ? 'Yes' : 'No',
-                ];
+                    $data[] = [
+                        'quiz_id' => $quiz->id,
+                        'quiz_name' => $quiz->name,
+                        'user_name' => $user->name,
+                        'quiz_total_points' => $sumPoints,
+                        'quiz_max_points' => $maxPoints,
+                        'question' => Question::findOrFail($a['question_id'])->question,
+                        'answer' => $a['answer'],
+                        'is_correct' => $a['is_correct'] ? 'Yes' : 'No',
+                    ];
+                }
             }
-        }
 
-        $filename = 'quiz_' . $quiz->id . '_answers.csv';
-        $handle = fopen($filename, 'w');
-        fputcsv($handle, $header);
+            $filename = 'quiz_' . $quiz->id . '_answers.csv';
+            $handle = fopen($filename, 'w');
+            fputcsv($handle, $header);
 
-        foreach ($data as $row) {
-            fputcsv($handle, $row);
-        }
+            foreach ($data as $row) {
+                fputcsv($handle, $row);
+            }
 
-        fclose($handle);
+            fclose($handle);
 
-        //Download file
-        $headers = array(
-            'Content-Type' => 'text/csv',
-        );
-        return response()->download($filename, $filename, $headers)->deleteFileAfterSend(true);
-        }catch(\Throwable $th){
+            //Download file
+            $headers = array(
+                'Content-Type' => 'text/csv',
+            );
+            return response()->download($filename, $filename, $headers)->deleteFileAfterSend(true);
+        } catch (\Throwable $th) {
             return response()->json([
                 'status' => 'error',
                 'status_code' => 500,

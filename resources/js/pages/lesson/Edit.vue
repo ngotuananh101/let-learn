@@ -120,9 +120,9 @@ export default {
             id: this.$route.params.id,
             unsubscribe: null,
             lesson: {
-                name: '',
-                description: '',
-                password: '',
+                name: null,
+                description: null,
+                password: null,
             },
             import_lesson_modal: null,
             importFile: true,
