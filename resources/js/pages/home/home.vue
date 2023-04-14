@@ -212,7 +212,6 @@
 </template>
 
 <script>
-import { Modal } from "bootstrap";
 export default {
     name: "home",
     data() {
@@ -259,8 +258,8 @@ export default {
         });
         this.$store.dispatch("home/getHome");
     },
-    mounted() {
-        this.addModal = new Modal(document.getElementById("modal"));
+    beforeUnmount() {
+        this.unsubscribe();
     },
     methods: {
         createLesson() {
@@ -279,6 +278,9 @@ export default {
         },
         init() {
             const bootstrap = this.$store.state.config.bootstrap;
+            this.addModal = new bootstrap.Modal(document.getElementById('modal'), {
+                show: true,
+            });
             this.import_lesson_modal = new bootstrap.Modal(document.getElementById('importModal'), {
                 show: true,
             });

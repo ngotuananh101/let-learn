@@ -26,18 +26,18 @@
         </div>
         <div class="col-md-5 col-12">
             <div class="row">
-                <!-- <h2>{{ data.lesson.name }}</h2> -->
+                <h2>{{ data.lesson.name }}</h2>
                 <div class="col-12 mb-3 row align-items-center justify-content-center">
                     <div class="col-2">
                         <img src="https://gcavocats.ca/wp-content/uploads/2018/09/man-avatar-icon-flat-vector-19152370-1.jpg"
-                            class="rounded-circle" alt="Avatar" style="width: 150px" />
+                            class="rounded-circle" alt="Avatar" style="width: 50px" />
                     </div>
-                    <div class="col-6">
-                        <!-- <p class="m-0">
-                            Show username
-                        </p> -->
+                    <div class="col-8">
+                        <p class="m-0">
+                            {{ this.user.name }}
+                        </p>
                     </div>
-                    <div class="col-4">
+                    <div class="col-2">
                         <div class="dropdown show">
                             <button class="btn btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown"
                                 aria-expanded="false"></button>
@@ -120,10 +120,9 @@
     <div class="mt-4">
         <!--show the lesson's description by lesson id -->
         <h5 class="mt-4">Description</h5>
-        <!-- <p>{{ data.lesson.description }}</p> -->
+        <p>{{ data.lesson.description }}</p>
     </div>
-    <!-- <h6>Relearn: {{ data.relearn.length }}</h6> -->
-    <h6>Relearn: </h6>
+    <h6>Relearn: {{ data.relearn.length }}</h6>
     <div class="col-12" v-for="relearn in relearns">
         <div class="card mt-4">
             <div class="card-body">
@@ -132,8 +131,7 @@
             </div>
         </div>
     </div>
-    <!-- <h6>NotLearn: {{ data.notLearn.length }}</h6> -->
-    <h6>NotLearn: </h6>
+    <h6>NotLearn: {{ data.notLearn.length }}</h6>
     <div class="col-12" v-for="notLearn in notLearns">
         <div class="card mt-4">
             <div class="card-body">
@@ -154,12 +152,13 @@ export default {
     data() {
         return {
             id: this.$route.params.id,
-            user: JSON.parse(localStorage.getItem("user")),
+            user: null,
             data: null,
             currentCardIndex: 0,
             currentSide: "front",
             relearns: null,
             notLearns: null,
+            type: null,
         };
     },
     title() {
@@ -167,17 +166,17 @@ export default {
             "Home - " + document.getElementsByTagName("meta")["title"].content
         );
     },
-    mounted() {
-        console.log(this.user);
-    },
     created() {
+        this.user = this.$store.getters['user/userData'].info;
         this.unsubscribe = this.$store.subscribe((mutation) => {
             if (mutation.type === "learn/request") {
             } else if (mutation.type === "learn/requestSuccess") {
-                this.data = mutation.payload;
-                this.relearns = this.data.relearn = mutation.payload.relearn;
-                this.notLearns = this.data.notLearn = mutation.payload.notLearn;
-                console.log(this.relearns);
+                if (!this.type) {
+                    this.data = mutation.payload;
+                    this.relearns = this.data.relearn = mutation.payload.relearn;
+                    this.notLearns = this.data.notLearn = mutation.payload.notLearn;
+                    document.getElementById("text").innerHTML = this.data.notLearn[this.currentCardIndex].definition;
+                }
                 if (this.type === 'delete') {
                     this.$root.showSnackbar('Delete lesson successfully', 'success');
                     this.$router.push({ name: 'home.home' });
