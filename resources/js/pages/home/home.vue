@@ -139,12 +139,12 @@
                     <div>
                         <label class="form-label mt-2 fs-6">Name</label>
                         <input class="form-control" id="name" type="text" name="name"
-                            placeholder="Enter a name. Example:'MAE Chapter 1' " />
+                            placeholder="Enter a name. Example:'MAE Chapter 1' " v-model="this.course.name" />
                     </div>
                     <div>
                         <label class="form-label mt-2 fs-6">Description</label>
                         <input class="form-control" id="description" type="text" name="description"
-                            placeholder="Add a description..." />
+                            placeholder="Add a description..." v-model="this.course.description" />
                     </div>
                 </div>
                 <div class="modal-footer">
@@ -152,7 +152,7 @@
                         Cancel
                     </button>
                     <button type="button" class="btn bg-gradient-success btn-sm" data-bs-toggle="modal"
-                        @click="this.createCourse">
+                        @click="createCourse">
                         Create
                     </button>
                 </div>
@@ -226,6 +226,10 @@ export default {
             addModal: null,
             import_lesson_modal: null,
             importFile: true,
+            course: {
+                name: null,
+                description: null,
+            },
         };
     },
     created() {
@@ -238,6 +242,19 @@ export default {
                 console.log(this.other_lesson);
                 this.other_course = mutation.payload.other_course;
             } else if (mutation.type === "home/requestFailure") {
+            } else if (mutation.type === 'course/request') {
+            } else if (mutation.type === 'course/success') {
+                if (this.type === 'add') {
+                    this.$root.showSnackbar('User added successfully', 'success');
+                    this.courses.push(mutation.payload);
+                    console.log(this.courses);
+                    this.table.rows.add([
+                        mutation.payload.name,
+                        mutation.payload.description,
+                    ]);
+                }
+            } else if (mutation.type === 'course/failure') {
+                this.$root.showSnackbar(mutation.payload, 'danger');
             }
         });
         this.$store.dispatch("home/getHome");
@@ -254,16 +271,13 @@ export default {
             // redirect to add lesson page
             this.$router.push({ name: "lesson.add" });
         },
-        createCourse() {
-            let name = document.getElementById('name').value;
-            let description = document.getElementById('description').value;
-            if (name === '' || description === '') {
-                alert('Please fill all fields to create new course');
-            } else {
-                this.$store.dispatch('course/createCourse', { name: name, description: description }).then(() => {
-                    this.$router.push({ name: "home.home" });
-                });
-            }
+        add() {
+            this.type = 'add';
+            this.$store.dispatch('course/createCourse', this.course, {
+                name: this.course.name,
+                description: this.course.description,
+            });
+            this.$router.push({ name: 'home.home' });
         },
         init() {
             const bootstrap = this.$store.state.config.bootstrap;

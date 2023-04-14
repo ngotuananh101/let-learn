@@ -37,12 +37,26 @@ class QuizController extends Controller
     {
         try {
             $request->validate([
-                'type' => 'required|string|in:all,quiz,question,answer,grade',
+                'type' => 'required|string|in:all,quiz,question,answer,export',
                 //'class_id' => 'required_if:type,all|nullable|integer|exists:classes,id',
             ]);
+            //check current time is between start time and end time. if not, return error
+            $now = date('Y-m-d H:i:s');
+            $quiz = Quiz::findOrFail($id);
+            if ($request->type != 'all' && ($now < $quiz->start_time || $now > $quiz->end_time)) {
+                return response()->json([
+                    'status' => 'error',
+                    'status_code' => 400,
+                    'message' => 'Quiz is not active now'
+                ], 400);
+            }
 
             if (auth()->user()->role->name == 'teacher') {
                 switch ($request->type) {
+                    case 'export':
+                        //use exportToCSV method below to export data
+                        return $this->exportToCSV($id);
+                        break;
                     case 'all':
                         $class = Classes::with('quizzes')->findOrFail($id);
                         $quizzes = $class->quizzes;
@@ -140,7 +154,7 @@ class QuizController extends Controller
                         ], 400);
                         break;
                 }
-            } else if (auth()->user()->role->name == 'user') {
+            } else if (auth()->user()->role->name == 'student') {
                 //check if value score_report of quiz is true               
                 switch ($request->type) {
                     case 'all':
@@ -199,7 +213,7 @@ class QuizController extends Controller
                         break;
                     case 'answer':
                         $quiz = Quiz::with('questions')->findOrFail($id);
-                        if (!$quiz || $quiz->score_report == false || $quiz->status != 'active') { //
+                        if ($quiz->score_reporting == false || $quiz->status != 'active') { //
                             return response()->json([
                                 'status' => 'error',
                                 'status_code' => 400,
@@ -265,14 +279,28 @@ class QuizController extends Controller
             $request->validate([
                 'type' => 'required|string|in:quiz,answer,import',
             ]);
-
+            if (auth()->user()->role->name != 'teacher' && auth()->user()->role->name != 'student') {
+                return response()->json([
+                    'status' => 'error',
+                    'status_code' => 403,
+                    'message' => 'You are not authorized to create quizzes or import quizzes.'
+                ], 403);
+            }
             // Check user role, allow only students to submit answers
             if (auth()->user()->role->name == 'student' && $request->type != 'answer') {
                 return response()->json([
                     'status' => 'error',
                     'status_code' => 403,
-                    'message' => 'You are not authorized to create quizzes.'
+                    'message' => 'You are not authorized to create quizzes or import quizzes.'
                 ], 403);
+            }
+            //check if auth()->user()->role->name == 'teacher' return error
+            if (auth()->user()->role->name == 'teacher' && $request->type == 'answer') {
+                return response()->json([
+                    'status' => 'error',
+                    'status_code' => 400,
+                    'message' => 'You are not allowed to do this quiz'
+                ], 400);
             }
             switch ($request->type) {
                 case 'import':
@@ -283,18 +311,16 @@ class QuizController extends Controller
                         'description' => 'required|string',
                         'status' => 'nullable|in:pending,inactive',
                         'score_reporting' => 'nullable|boolean',
-                        'start_time' => 'nullable|date|after_or_equal:today',
+                        'start_time' => 'required|date|after_or_equal:today',
                         'end_time' => 'nullable|date|after:start_date',
                         'quantity' => 'nullable|integer',
-
+                        'reverse' => 'nullable|boolean',
                     ]);
                     $lesson_id = $request->lesson_id;
-
                     // Call the learn method in the LessonController and get the response
                     $lessonController = new LessonController();
                     $response = $lessonController->learnForImport($request, $lesson_id);
                     // Get the data from the response
-
                     $quantity = $request->input('quantity', 20);
                     // Check if the request was successful
                     if ($response->getStatusCode() == 200) {
@@ -397,7 +423,7 @@ class QuizController extends Controller
                         'status' => 200
                     ], 200);
                     break;
-                    
+
                 case 'answer':
                     $request->validate([
                         'quiz_id' => 'required|integer',
@@ -407,17 +433,10 @@ class QuizController extends Controller
                         'answers.*.is_correct' => 'nullable|boolean',
                         'answers.*.points' => 'nullable|integer|',
                     ]);
-                    //check if auth()->user()->role->name == 'teacher' return error
-                    if (auth()->user()->role->name != 'student') {
-                        return response()->json([
-                            'status' => 'error',
-                            'status_code' => 400,
-                            'message' => 'You are not allowed to do this quiz'
-                        ], 400);
-                    }
+
                     //check if user has already submitted the quiz
                     $quiz = Quiz::where('id', $request->quiz_id)->first();
-                    $user_id_check = auth()->user()->id;                   
+                    $user_id_check = auth()->user()->id;
                     //check if answer table has user_id and quiz_id
                     if (Answer::where('user_id', $user_id_check)->where('quiz_id', $quiz->id)->exists()) {
                         return response()->json([
@@ -473,80 +492,71 @@ class QuizController extends Controller
         }
     }
 
-    public function exportToExcel($id)
+    public function exportToCSV($id)
     {
-        $quiz = Quiz::findOrFail($id);;
+        try{
+        $quiz = Quiz::findOrFail($id);
         $answers = Answer::where('quiz_id', $quiz->id)->get();
-        $data = [];
-        $data_per_user = [];
 
         $maxPoints = Question::where('quiz_id', $quiz->id)->sum('points');
+
+        $header = array(
+            'Quiz ID',
+            'Quiz Name',
+            'User Name',
+            'Quiz Total Points',
+            'Quiz Max Points',
+            'Question',
+            'Answer',
+            'Is Correct'
+        );
+
+        $data = array();
         foreach ($answers as $answer) {
             $user = User::findOrFail($answer->user_id);
             $ans = json_decode($answer->answer_text, true);
 
             $sumPoints = 0;
             $ques_ids = [];
-            //$ans_by_user = [];
             foreach ($ans as $a) {
                 $sumPoints += $a['points'];
                 $ques_ids[] = $a['question_id'];
-                //$ans_by_user = $a['answer'];
-                $data_per_user[$a['answer']][] = [
+
+                $data[] = [
                     'quiz_id' => $quiz->id,
                     'quiz_name' => $quiz->name,
                     'user_name' => $user->name,
+                    'quiz_total_points' => $sumPoints,
+                    'quiz_max_points' => $maxPoints,
                     'question' => Question::findOrFail($a['question_id'])->question,
                     'answer' => $a['answer'],
-                    'is_correct' => $a['is_correct'],
+                    'is_correct' => $a['is_correct'] ? 'Yes' : 'No',
                 ];
             }
-            $data[] = [
-                'quiz_id' => $quiz->id,
-                'quiz_name' => $quiz->name,
-                'user_name' => $user->name,
-                'quiz_total_points' => $sumPoints,
-                'quiz_max_points' => $maxPoints,
-                'questions' => Question::whereIn('id', $ques_ids)->get(),
-                'answers' => $ans,
-            ];
         }
-        // Create a new Excel workbook
-        $filename = 'quiz_data.xlsx';
-        $filepath = storage_path('app/export' . $filename);
 
-        Excel::download(new class($data, $data_per_user) implements WithMultipleSheets
-        {
-            private $data;
-            private $dataPerUser;
+        $filename = 'quiz_' . $quiz->id . '_answers.csv';
+        $handle = fopen($filename, 'w');
+        fputcsv($handle, $header);
 
-            public function __construct($data, $dataPerUser)
-            {
-                $this->data = $data;
-                $this->dataPerUser = $dataPerUser;
-            }
+        foreach ($data as $row) {
+            fputcsv($handle, $row);
+        }
 
-            public function sheets(): array
-            {
-                $sheets = [];
+        fclose($handle);
 
-                // Add the main quiz data sheet
-                $sheets[] = new ExportQuizData(collect($this->data));
-
-                // Loop through each answer and add a sheet for the answer data
-                foreach ($this->dataPerUser as $answer => $group_data_by_user) {
-                    $sheet_name = str_replace(['\\', '/', '?', '*', '[', ']'], '', $answer); // Clean up answer string for sheet name
-                    $sheet_name = substr($sheet_name, 0, 30); // Truncate to 30 characters, maximum sheet name length
-                    $sheet_name = trim($sheet_name); // Trim any whitespace
-
-                    $sheets[] = new ExportAnswerData(collect($group_data_by_user), $sheet_name);
-                }
-
-                return $sheets;
-            }
-        }, $filename)->deleteFileAfterSend(true);
-        // Return a success message
-        return response()->json(['success' => true]);
+        //Download file
+        $headers = array(
+            'Content-Type' => 'text/csv',
+        );
+        return response()->download($filename, $filename, $headers)->deleteFileAfterSend(true);
+        }catch(\Throwable $th){
+            return response()->json([
+                'status' => 'error',
+                'status_code' => 500,
+                'message' => $th->getMessage()
+            ], 500);
+        }
     }
     //method to compare answer with correct answer
     public function compareAnswer($questionId, $correctAnswer, $answer)
@@ -589,23 +599,23 @@ class QuizController extends Controller
                     'message' => 'You are not authorized to update.'
                 ], 403);
             }
-            if (auth()->user()->role->name == 'teacher' && $request->type == 'quiz') {
-                return response()->json([
-                    'status' => 'error',
-                    'status_code' => 403,
-                    'message' => 'You are not authorized to update quiz.'
-                ], 403);
-            }
+            // if (auth()->user()->role->name == 'teacher' && $request->type == 'quiz') {
+            //     return response()->json([
+            //         'status' => 'error',
+            //         'status_code' => 403,
+            //         'message' => 'You are not authorized to update quiz.'
+            //     ], 403);
+            // }
 
             switch ($request->type) {
                 case 'quiz':
                     $request->validate([
                         'name' => 'required|string|max:255',
-                        'description' => 'required|string',
-                        'status' => 'required|in:active,pending,inactive',
+                        'description' => 'required|string|max:255',
+                        'status' => 'required|in:pending,inactive',
                         'score_reporting' => 'nullable|boolean',
-                        'start_time' => 'nullable|date',
-                        'end_time' => 'nullable|date',
+                        'start_time' => 'nullable|date|after_or_equal:today',
+                        'end_time' => 'nullable|date|after:start_time',
                     ]);
 
                     $quiz = Quiz::with('questions')->findOrFail($id);
@@ -636,6 +646,18 @@ class QuizController extends Controller
                         'questions.*.correct_answer' => 'nullable|string',
                         'questions.*.points' => 'nullable|integer|',
                     ]);
+                    //check if question_id is belong to this quiz
+                    $quiz = Quiz::with('questions')->findOrFail($id);
+                    $ques_ids = $quiz->questions->pluck('id')->toArray();
+                    foreach ($request->input('questions') as $questionData) {
+                        if (!in_array($questionData['question_id'], $ques_ids)) {
+                            return response()->json([
+                                'status' => 'error',
+                                'status_code' => 403,
+                                'message' => 'This question is not belong to this quiz.'
+                            ], 403);
+                        }
+                    }
                     $questions = Question::where('quiz_id', $id)->get();
                     //loop through questions and update the questions by data from request following the question_id
                     foreach ($questions as $question) {

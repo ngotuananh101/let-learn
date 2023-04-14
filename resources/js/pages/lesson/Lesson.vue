@@ -41,6 +41,12 @@
                         <div class="dropdown float-end">
                             <button class="btn btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown"
                                 aria-expanded="false"></button>
+                            <ul class="dropdown-menu">
+                                <router-link :to="{ name: 'lesson.edit', params: { id: id } }">
+                                    <li><a class="dropdown-item" href="#">Edit</a></li>
+                                </router-link>
+                                <li><a class="dropdown-item" @click="delete">Delete</a></li>
+                            </ul>
                         </div>
                     </div>
                     <div class="col-md-6 col-12">
@@ -116,19 +122,22 @@
         <h5 class="mt-4">Description</h5>
         <p>{{ data.lesson.description }}</p>
     </div>
-
-    <div class="card mb-3">
-        <h6>Relearn: {{ data.relearn.length}}</h6>
-        <div class="card-body" v-for="relearn in relearns">
-            <h5 class="card-title">{{ relearn.term }}</h5>
-            <p class="card-text">{{ relearn.definition }}</p>
+    <h6>Relearn: {{ data.relearn.length }}</h6>
+    <div class="col-12" v-for="relearn in relearns">
+        <div class="card mt-4">
+            <div class="card-body">
+                <p class="card-text text-success">{{ relearn.term }}</p>
+                <p class="card-text">{{ relearn.definition }}</p>
+            </div>
         </div>
     </div>
-    <div class="card mb-3">
-        <h6>NotLearn: {{ data.notLearn.length }}</h6>
-        <div class="card pt-5 " v-for="notLearn in notLearns">
-            <h5 class="card-title">{{ notLearn.term }}</h5>
-            <p class="card-text">{{ notLearn.definition }}</p>
+    <h6>NotLearn: {{ data.notLearn.length }}</h6>
+    <div class="col-12" v-for="notLearn in notLearns">
+        <div class="card mt-4">
+            <div class="card-body">
+                <p class="card-text text-success">{{ notLearn.term }}</p>
+                <p class="card-text">{{ notLearn.definition }}</p>
+            </div>
         </div>
     </div>
 </template>
@@ -172,19 +181,6 @@ export default {
             }
         });
         this.$store.dispatch("learn/getFlashCard", this.id);
-
-        // this.unsubscribe = this.$store.subscribe((mutation) => {
-        //     if (mutation.type === "lesson/request") {
-        //     } else if (mutation.type === "lesson/requestSuccess") {
-        //         this.data.relearns = mutation.payload.relearns;
-        //         this.data.notLearns = mutation.payload.notLearns;
-        //         console.log(this.data);
-        //         document.getElementById("text").innerHTML = this.data.notLearn[this.currentCardIndex].definition;
-        //     } else if (mutation.type === "lesson/requestFailure") {
-        //     }
-        // });
-        // this.$store.dispatch("lesson/showLessonDetailRelearn", this.id);
-        // this.$store.dispatch("lesson/showLessonDetailNotLearn", this.id);
     },
     methods: {
         updateTitle(title) {
@@ -218,7 +214,24 @@ export default {
                 document.getElementById("text").innerHTML = this.data.notLearn[this.currentCardIndex].definition;
                 this.currentSide = "front";
             }
-        }
+        },
+        delete() {
+            this.$swal({
+                icon: "question",
+                title: "Are you sure?",
+                text: "You won't be able to revert this!",
+                showCancelButton: true,
+                confirmButtonText: "Yes, delete it!",
+                cancelButtonText: "No, cancel!",
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    this.$store.dispatch('lesson/deleteLesson', this.id);
+                    this.$store.push({ name: 'home.home' });
+                    // close modal
+                    document.getElementById('edit-close').click();
+                }
+            });
+        },
     },
     computed: {
         cardsCount() { // add cardsCount computed property

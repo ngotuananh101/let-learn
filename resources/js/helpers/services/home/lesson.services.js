@@ -5,10 +5,9 @@ import readXlsxFile from "read-excel-file";
 export const lessonService = {
     importExcelFile,
     addLesson,
-    getLessonInfor,
-    showLessonDetailRelearn,
-    showLessonDetailNotLearn,
-    // updateLesson
+    deleteLesson,
+    getLessonById,
+    updateLesson,
 };
 
 function importExcelFile(formData) {
@@ -50,58 +49,42 @@ function addLesson(lesson) {
         });
 }
 
-function getLessonInfor(id) {
+function deleteLesson(id) {
     const requestOptions = {
-        method: "GET",
+        method: "DELETE",
         headers: authHeader(),
     };
 
     return fetch(`/api/user/lesson/${id}`, requestOptions)
         .then(handleResponse)
-        .then((data) => {
-            return data.lesson;
+        .then((lesson) => {
+            return lesson;
         });
 }
 
-//show lesson detail of relearn
-function showLessonDetailRelearn(id) {
+function getLessonById(id) {
     const requestOptions = {
-        method: 'POST',
-        headers: authHeader(),
-        body: JSON.stringify({lesson_id: id})
+        method: 'GET',
+        headers: authHeader()
     };
-    return fetch(`/api/user/main?type=detail_split`, requestOptions)
+
+    return fetch(`/api/admin/lesson/${id}`, requestOptions)
         .then(handleResponse)
-        .then(data => {
-            console.log(data.data.relearns);
-            return data.data.relearn;
+        .then(lesson => {
+            return lesson;
         });
 }
 
-//show lesson detail of not learn
-function showLessonDetailNotLearn(id) {
+function updateLesson(lesson) {
     const requestOptions = {
-        method: 'POST',
+        method: 'PUT',
         headers: authHeader(),
-        body: JSON.stringify({lesson_id: id})
+        body: JSON.stringify(lesson)
     };
-    return fetch(`/api/user/main?type=detail_split`, requestOptions)
+
+    return fetch(`/api/admin/lesson/${lesson.id}`, requestOptions)
         .then(handleResponse)
-        .then(data => {
-            return data.data.notLearn;
+        .then(lesson => {
+            return lesson;
         });
 }
-
-// function updateLesson(lesson) {
-//     const requestOptions = {
-//         method: 'PUT',
-//         headers: authHeader(),
-//         body: JSON.stringify(lesson)
-//     };
-
-//     return fetch(`/api/admin/lesson/${lesson.id}`, requestOptions)
-//         .then(handleResponse)
-//         .then(lesson => {
-//             return lesson;
-//         });
-// }

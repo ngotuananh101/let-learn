@@ -1,4 +1,4 @@
-import { lessonService } from "../../../services/home/lesson.service";
+import { lessonService } from "../../../services/home/lesson.services";
 
 const state = {
     lessonData: {},
@@ -52,9 +52,9 @@ export default {
                 }
             );
         },
-        getLessonInfor({ commit }, id) {
+        deleteLesson({ commit }, id) {
             commit("request");
-            lessonService.getLessonInfor(id).then(
+            lessonService.deleteLesson(id).then(
                 (lesson) => {
                     commit("success", lesson);
                 },
@@ -63,38 +63,27 @@ export default {
                 }
             );
         },
-        showLessonDetailRelearn({ commit }, id) {
+        getLessonById({ commit }, id) {
             commit("request");
-            lessonService.showLessonDetailRelearn(id).then(
-                (relearns) => {
-                    commit("success", relearns);
+            lessonService.getLessonById(id).then(
+                (lesson) => {
+                    commit("success", lesson);
                 },
                 (error) => {
                     commit("failure", error);
                 }
             );
         },
-        showLessonDetailNotLearn({ commit }, id) {
+        updateLesson({ commit }, lesson) {
             commit("request");
-            lessonService.showLessonDetailNotLearn(id).then(
-                (notLearns) => {
-                    commit("success", notLearns);
+            lessonService.updateLesson(lesson).then(
+                (lesson) => {
+                    commit("success", lesson);
                 },
                 (error) => {
                     commit("failure", error);
                 }
             );
         },
-        // updateLesson({commit}, lesson) {
-        //     commit("request");
-        //     lessonService.updateLesson(lesson).then(
-        //         lesson => {
-        //             commit("success", lesson);
-        //         },
-        //         error => {
-        //             commit("failure", error);
-        //         }
-        //     )
-        // }
     },
 };

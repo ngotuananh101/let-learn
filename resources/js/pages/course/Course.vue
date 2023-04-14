@@ -1,6 +1,6 @@
 <template>
     <div class="row">
-        <h2>{{ course ? course.name : 'loading' }}</h2>
+        <h2>{{ data.course.name }}</h2>
         <div class="col-12 mb-3 row align-items-center justify-content-center">
             <div class="col-2">
                 <argon-avatar
@@ -8,30 +8,28 @@
                     alt="Avatar" size="md" circular />
             </div>
             <div class="col-6">
-                <h6 class="m-0">{{ this.user.email }}</h6>
-                <p class="m-0">{{ this.user.username }} | {{ this.user.email_verified_at ? 'verified' : 'unverified'
-                }}</p>
             </div>
             <div class="col-4 p-0">
                 <div class="dropdown float-end">
                     <button class="btn btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown"
                         aria-expanded="false">
                     </button>
-                    <!-- <ul class="dropdown-menu">
-                        <router-link :to="{ name: 'home.course.edit', params: { id: course_id } }">
+                    <ul class="dropdown-menu">
+                        <router-link :to="{ name: 'course.edit', params: { id: course_id } }">
                             <li><a class="dropdown-item" href="#">Edit</a></li>
                         </router-link>
-                        <li><a class="dropdown-item" @click="this.delete">Delete</a></li>
-                    </ul> -->
+                        <li><a class="dropdown-item" @click="deleteCourse">
+                                Delete</a></li>
+                    </ul>
                 </div>
             </div>
         </div>
     </div>
     <div>
         <!-- show description -->
-        <p class="m-0">{{ course ? course.description : 'loading' }}</p>
+        <p class="m-0">{{ data.course.description }}</p>
     </div>
-    <div class="row mt-4">
+    <!-- <div class="row mt-4">
         <div class="col-lg-4 col-md-6 col-12" v-for="lesson in lessons" :key="lesson.id">
                 <router-link :to="`/lesson/${lesson.id}`">
                     <div class="card mt-4">
@@ -44,7 +42,7 @@
                     </div>
                 </router-link>
             </div>
-    </div>
+    </div> -->
 </template>
 
 <script>
@@ -57,7 +55,6 @@ export default {
     },
     data() {
         return {
-            unsubscribe: null,
             lessons: null,
             course_id: this.$route.params.id,
             course: null,
@@ -74,6 +71,9 @@ export default {
                 this.lessons = mutation.payload.lessons;
                 this.course = mutation.payload.course;
             } else if (mutation.type === "course/requestFailure") {
+            } else if (this.type === 'delete') {
+                this.$root.showSnackbar('Delete course successfully', 'success');
+                this.$router.push({ name: 'home.home' });
             }
         });
     },
@@ -95,6 +95,12 @@ export default {
         //         }
         //     });
         // }
+        deleteCourse() {
+            if (confirm('Are you sure?')) {
+                this.type = 'delete';
+                this.$store.dispatch('course/deleteCourse', this.$route.params.id);
+            }
+        },
     },
 };
 </script>

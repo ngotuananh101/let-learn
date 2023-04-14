@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Classes extends Model
 {
@@ -31,5 +32,11 @@ class Classes extends Model
     public function member(): BelongsToMany
     {
         return $this->belongsToMany(User::class, 'class_members', 'class_id', 'user_id');
+    }
+
+    //get quizzes of a class
+    public function quizzes(): HasMany
+    {
+        return $this->hasMany(Quiz::class, 'class_id', 'id');
     }
 }

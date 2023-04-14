@@ -7,6 +7,7 @@ use App\Models\Comment;
 use App\Models\CommentVote;
 use App\Models\Post;
 use App\Models\PostLike;
+use App\Models\UserLogPost;
 use Illuminate\Http\Request;
 
 
@@ -126,45 +127,62 @@ class PostController extends Controller
      */
     public function show($id)
     {
-        try{
-        //get post by id
-        $post = Post::findOrFail($id);
-        //if post not found, return 404
-        if (!$post || $post->status != 'active') {
+        try {
+            //get post by id
+            $post = Post::findOrFail($id);
+            //if post not found, return 404
+            if (!$post || $post->status != 'active') {
+                return response()->json([
+                    'status' => 'error',
+                    'status_code' => 404,
+                    'message' => 'Post not found'
+                ], 404);
+            }
+            //if post has class_id, check if user is in class, if not return 403
+            if ($post->class_id) {
+                if (!auth()->user()->classes->contains($post->class_id)) {
+                    return response()->json([
+                        'status' => 'error',
+                        'status_code' => 403,
+                        'message' => 'Forbidden access!'
+                    ], 403);
+                }
+            }
+            //get title, content, tags, views, created_at
+            $post = $post;
+            //get comments by post id
+            $comments = Comment::where('post_id', $id)->get();
+            //if post has class_id, get class by class_id
+            if ($post->class_id) {
+                $class = $post->class->only(['name']);
+            } else {
+                $class = null;
+            }
+            ////check user log is exist, if exist update accessed_at, else create new user log
+            if (UserLogPost::where('user_id', auth()->user()->id)->where('post_id', $id)->exists()) {
+                $userLogPost = UserLogPost::where('user_id', auth()->user()->id)->where('post_id', $id)->first();
+                $userLogPost->accessed_at = now();
+                $userLogPost->save();
+            } else {
+                $userLogPost = new UserLogPost();
+                $userLogPost->user_id = auth()->user()->id;
+                $userLogPost->post_id = $id;
+                $userLogPost->accessed_at = now();
+                $userLogPost->save();
+                //update post views
+                $post->views = $post->views + 1;
+            }
+            $data = [
+                'post' => $post,
+                'comments' => $comments,
+                'class' => $class ?? null,
+            ];
+
             return response()->json([
-                'status' => 'error',
-                'status_code' => 404,
-                'message' => 'Post not found'
-            ], 404);
-        }
-        
-        //get title, content, tags, views, created_at
-        $post = $post;
-        //get comments by post id
-        $comments = Comment::where('post_id', $id)->get();
-        //get user by user_id of post and comments
-        // $user = $post->user;
-        // $comments->each(function ($comment) {
-        //     $comment->user;
-        // });
-        //if post has class_id, get class by class_id
-        if ($post->class_id) {
-            $class = $post->class->only(['name']);
-        } else {
-            $class = null;
-        }
-
-        $data = [
-            'post' => $post,
-            'comments' => $comments,            
-            'class' => $class ?? null,
-        ];
-
-        return response()->json([
-            'status' => 'success',
-            'status_code' => 200,
-            'data' => $data
-        ], 200);
+                'status' => 'success',
+                'status_code' => 200,
+                'data' => $data
+            ], 200);
         } catch (\Throwable $th) {
             return response()->json([
                 'status' => 'error',
@@ -201,7 +219,7 @@ class PostController extends Controller
                         'status' => 'nullable|in:active,pending,inactive',
                         'score_reporting' => 'nullable|integer',
                         'tags' => 'nullable|string',
-                        'like' => 'nullable|in:like,unlike',                        
+                        'like' => 'nullable|in:like,unlike',
                     ]);
                     $post = Post::findOrFail($id);
                     //check if class_id of post is null or not
@@ -209,32 +227,32 @@ class PostController extends Controller
                     $postLike = PostLike::where('user_id', auth()->user()->id)->where('post_id', $post->id)->first();
                     $liked = $postLike->like_status;
                     $poststatus = $post->score_reporting;
-                    
-                    if($liked == 'like'){
-                        if($request->input('like') == 'unlike'){
+
+                    if ($liked == 'like') {
+                        if ($request->input('like') == 'unlike') {
                             $likestatus =  'unlike';
                             $poststatus = $post->score_reporting - 1;
                         }
-                        if($request->input('like') == 'like' || $request->input('like') == null){
+                        if ($request->input('like') == 'like' || $request->input('like') == null) {
                             $likestatus = 'like';
                             $poststatus = $post->score_reporting;
-                        }                        
-                    }else if($liked == 'unlike'){
-                        if($request->input('like') == 'unlike' || $request->input('like') == null){
+                        }
+                    } else if ($liked == 'unlike') {
+                        if ($request->input('like') == 'unlike' || $request->input('like') == null) {
                             $likestatus = 'unlike';
                             $poststatus = $post->score_reporting;
                         }
-                        if($request->input('like') == 'like'){
+                        if ($request->input('like') == 'like') {
                             $likestatus = 'like';
                             $poststatus = $post->score_reporting + 1;
                         }
-                    } 
-
+                    }
+                    //check if user_log
                     $userRole = auth()->user()->role->name;
                     if ($post->class_id) {
                         //if class_id is not null, check if user is teacher or student of the class
-                        if (($userRole == 'user'&& auth()->user()->id == $post->user_id) || ($userRole == 'student' && auth()->user()->id == $post->user_id)) {
-                            
+                        if (($userRole == 'teacher' && auth()->user()->id == $post->user_id) || ($userRole == 'student' && auth()->user()->id == $post->user_id)) {
+
                             $post->user_id = auth()->user()->id;
                             $post->class_id = $request->input('class_id', $post->class_id);
                             $post->title = $request->input('title', $post->title);
@@ -242,7 +260,7 @@ class PostController extends Controller
                             $post->status = $request->input('status', $post->status);
                             $post->score_reporting = $poststatus;
                             $post->tags = $request->input('tags');
-                            $post->views = $request->input('views', $post->views + 1); 
+                            $post->views = $request->input('views', $post->views);
                             $post->save();
 
                             //update post like status
@@ -258,25 +276,25 @@ class PostController extends Controller
                         }
                     } else {
                         //for case post is not in class
-                        if(auth()->user()->id == $post->user_id){
+                        if (auth()->user()->id == $post->user_id) {
                             $post->user_id = auth()->user()->id;
                             $post->title = $request->input('title', $post->title);
                             $post->content = $request->input('content', $post->content);
                             $post->status = $request->input('status', $post->status);
                             $post->score_reporting = $poststatus;
                             $post->tags = $request->input('tags');
-                            $post->views = $request->input('views', $post->views + 1);
+                            $post->views = $request->input('views', $post->views);
                             $post->save();
 
                             //update post like status
                             $postLike->like_status = $likestatus;
                             $postLike->save();
                             return response()->json([
-                                'message' => 'Post updated', 
+                                'message' => 'Post updated',
                                 'post' => $post,
                                 'postLike' => $postLike
                             ], 200);
-                        }else{
+                        } else {
                             return response()->json(['message' => 'You are not authorized to update this post'], 403);
                         }
                     }
@@ -290,65 +308,67 @@ class PostController extends Controller
                         'votetype' => 'nullable|in:upvote,downvote,nonvote',
                     ]);
                     $comment = Comment::findOrFail($request->input('comment_id'));
+                    $votetype = $request->input('votetype');
+                    //check if user update vote type
                     //check if post contains comment_id has class_id or not
                     //get current voted status of comment
                     $commentVote = CommentVote::where('user_id', auth()->user()->id)->where('comment_id', $comment->id)->first();
                     $voted = $commentVote->vote_status;
                     $votesstatus = $comment->votes;
-                   
-                    if($voted == 'upvote'){
-                        if($request->input('votetype') == 'downvote'){
-                            $votetypestatus =  'downvote';
+
+                    if ($voted == 'upvote') {
+                        if ($votetype == 'downvote') {
+                            $votetypestatus = 'downvote';
                             $votesstatus = $comment->votes - 1;
                         }
-                        if($request->input('votetype') == 'upvote' || $request->input('votetype') == null){
+                        if ($votetype == 'upvote' || $votetype == null) {
                             $votetypestatus = 'upvote';
                             $votesstatus = $comment->votes;
                         }
-                        if($request->input('votetype') == 'nonvote'){
+                        if ($votetype == 'nonvote') {
                             $votetypestatus = 'nonvote';
                             $votesstatus = $comment->votes;
                         }
-                    }else if($voted == 'downvote'){
-                        if($request->input('votetype') == 'downvote' || $request->input('votetype') == null){
-                            $votetypestatus = $comment->votetype = 'downvote';
+                    } else if ($voted == 'downvote') {
+                        if ($votetype == 'downvote' || $votetype == null) {
+                            $votetypestatus = 'downvote';
                             $votesstatus = $comment->votes;
                         }
-                        if($request->input('votetype') == 'upvote'){
-                            $votetypestatus = $comment->votetype = 'upvote';
+                        if ($votetype == 'upvote') {
+                            $votetypestatus = 'upvote';
                             $votesstatus = $comment->votes + 1;
                         }
-                        if($request->input('votetype') == 'nonvote'){
-                            $votetypestatus = $comment->votetype = 'nonvote';
+                        if ($votetype == 'nonvote') {
+                            $votetypestatus = 'nonvote';
                             $votesstatus = $comment->votes;
                         }
-                    }else if($voted == 'nonvote'){
-                        if($request->input('votetype') == 'downvote'){
-                            $votetypestatus = $comment->votetype = 'downvote';
+                    } else if ($voted == 'nonvote') {
+                        if ($votetype == 'downvote') {
+                            $votetypestatus = 'downvote';
                             $votesstatus = $comment->votes - 1;
                         }
-                        if($request->input('votetype') == 'upvote'){
-                            $votetypestatus = $comment->votetype = 'upvote';
+                        if ($votetype == 'upvote') {
+                            $votetypestatus = 'upvote';
                             $votesstatus = $comment->votes + 1;
                         }
-                        if($request->input('votetype') == 'nonvote' || $request->input('votetype') == null){
-                            $votetypestatus = $comment->votetype = 'nonvote';
+                        if ($votetype == 'nonvote' || $votetype == null) {
+                            $votetypestatus = 'nonvote';
                             $votesstatus = $comment->votes;
                         }
                     }
-                    dd($votesstatus);
+
+                    //check if user is teacher or student of the class
                     $userRole = auth()->user()->role->name;
                     if ($comment->post->class_id) {
                         if (($userRole == 'teacher' && auth()->user()->id == $comment->user_id) || ($userRole == 'student' && auth()->user()->id == $comment->user_id)) {
-                            $comment->user_id = $request->input('user_id');
+                            $comment->user_id = auth()->user()->id;
                             //post_id is $id
                             $comment->post_id = $id;
                             $comment->comment = $request->input('comment', $comment->comment);
                             $comment->status = $request->input('status', $comment->status);
                             $comment->votes = $votesstatus;
-                            $comment->votetype = $votetypestatus;
                             $comment->save();
-                            
+
                             //update comment vote status
                             $commentVote->vote_status = $votetypestatus;
                             $commentVote->save();
@@ -361,14 +381,13 @@ class PostController extends Controller
                             return response()->json(['message' => 'You are not authorized to update this comment'], 403);
                         }
                     } else {
-                        if(auth()->user()->id == $comment->user_id){
-                            $comment->user_id = $request->input('user_id');
+                        if (auth()->user()->id == $comment->user_id) {
+                            $comment->user_id = auth()->user()->id;
                             //post_id is $id
                             $comment->post_id = $id;
                             $comment->comment = $request->input('comment', $comment->comment);
                             $comment->status = $request->input('status', $comment->status);
                             $comment->votes = $votesstatus;
-                            $comment->votetype = $votetypestatus;
                             $comment->save();
 
                             //update comment vote status
@@ -379,7 +398,7 @@ class PostController extends Controller
                                 'comment' => $comment,
                                 'commentVote' => $commentVote
                             ], 200);
-                        }else{
+                        } else {
                             return response()->json(['message' => 'You are not authorized to update this comment'], 403);
                         }
                     }
@@ -485,7 +504,7 @@ class PostController extends Controller
                             ], 403);
                         }
                     } else {
-                        if(auth()->user()->id == $comment->user_id){
+                        if (auth()->user()->id == $comment->user_id) {
                             //delete comment and comment votes
                             $commentVotes = CommentVote::where('comment_id', $request->input('comment_id'))->get();
                             foreach ($commentVotes as $commentVote) {
@@ -493,7 +512,7 @@ class PostController extends Controller
                             }
                             $comment->delete();
                             return response()->json(['message' => 'Comment deleted'], 200);
-                        }else{
+                        } else {
                             return response()->json([
                                 'status' => 'error',
                                 'status_code' => 403,
