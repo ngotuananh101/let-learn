@@ -14,7 +14,7 @@
                     <div class="card mt-4">
                         <div class="card-body">
                             <p class="card-text text-primary">Title: {{ lesson.name }}</p>
-                            <p class="card-text">Author: {{ lesson.number_of_detail }}</p>
+                            <p class="card-text">Quantity: {{ lesson.number_of_detail }}</p>
                             <p class="card-text">Author: {{ lesson.author }}</p>
                         </div>
                     </div>
@@ -258,8 +258,8 @@ export default {
             }
         });
         this.$store.dispatch("home/getHome");
-        this.user = JSON.parse(localStorage.getItem("user"));
-        console.log(this.user);
+        // this.user = JSON.parse(localStorage.getItem("user"));
+        // console.log(this.user);
     },
     mounted() {
         this.addModal = new Modal(document.getElementById("modal"));

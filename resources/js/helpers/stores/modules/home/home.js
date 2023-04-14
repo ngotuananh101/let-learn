@@ -28,9 +28,10 @@ export default {
                     }
                 );
         },
-        getLessonById({commit}) {
+        getLessonByUserId({commit}, id) {
             commit('request');
-            homeService.loadLessonById()
+            console.log(id);
+            homeService.loadLessonByUserId(id)
                 .then(
                     response => {
                         commit('requestSuccess', response);
@@ -40,7 +41,32 @@ export default {
                     }
                 );
         },
-
+        getCourseByUserId({commit}, id) {
+            commit('request');
+            console.log(id);
+            homeService.loadCourseByUserId(id)
+                .then(
+                    response => {
+                        commit('requestSuccess', response);
+                    },
+                    error => {
+                        commit('requestFailure', error);
+                    }
+                );
+        },
+        getClassDetail({commit}, id) {
+            commit('request');
+            console.log(id);
+            homeService.loadClassDetail(id)
+                .then(
+                    response => {
+                        commit('requestSuccess', response);
+                    },
+                    error => {
+                        commit('requestFailure', error);
+                    }
+                );
+        },
 
     },
     getters: {

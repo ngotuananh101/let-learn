@@ -52,6 +52,18 @@ export default {
                     }
                 );
         },
+        sendTestResult({commit}, data) {
+            commit('request');
+            learnService.sendTestResult(data)
+                .then(
+                    response => {
+                        commit('requestSuccess', response);
+                    },
+                    error => {
+                        commit('requestFailure', error);
+                    }
+                );
+        },
         updateResult({commit}, data) {
             return learnService.updateResult(data)
                 .then(data => {

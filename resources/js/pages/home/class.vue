@@ -27,8 +27,8 @@
         <div class="tab-pane fade show active" id="pills-excercite" role="tabpanel" aria-labelledby="pills-home-tab">
             <div class="container pt-3">
                 <h3 class="text-center">Excercite</h3>
-                <div v-if="quizs.quizzes" class="row mt-5">
-                    <div class="col-md-6 col-6 mt-3" v-for="(quiz, index) in quizs.quizzes" :key="index">
+                <div v-if="quizzes" class="row mt-5">
+                    <div class="col-md-6 col-6 mt-3" v-for="(quiz, index) in quizzes" :key="index">
                         <div class="card">
                             <div class="card-header" style="color: black; font-weight: bold">
                                 {{ quiz.name }}
@@ -37,7 +37,7 @@
                                 <div class="row">
                                     <div class="col-6">
                                         <p>{{ quiz.description }}</p>
-                                        <p>Number of questions: {{ quiz.questions.length }}</p>
+                                        <p>Number of questions: {{ quiz.count_questions }}</p>
                                         <p>Score reporting: {{ quiz.score_reporting }}</p>
                                     </div>
                                     <div class="col-6">
@@ -150,19 +150,9 @@
                                         <button type="button"
                                                 class="btn btn-primary">
                                             <router-link
-                                                :to="'/quiz/' + quiz.id"
+                                                :to="'/lesson/test/' + quiz.id"
                                             >
                                                 Start
-                                            </router-link>
-                                        </button>
-                                    </div>
-                                    <div class="col">
-                                        <button type="button"
-                                                class="btn btn-primary">
-                                            <router-link
-                                                :to="'/essay/' + quiz.id"
-                                            >
-                                                Essay
                                             </router-link>
                                         </button>
                                     </div>
@@ -247,54 +237,30 @@
 </template>
 
 <script>
-import DataTable from 'datatables.net-vue3'
-import DataTablesLib from 'datatables.net-bs5';
-import 'datatables.net-select';
-import {mapActions} from "vuex";
-
-DataTable.use(DataTablesLib);
 export default {
-    components: {
-        DataTable,
-    },
     data() {
         return {
             id: this.$route.params.id,
-            quizs: [],
+            quizzes: null,
             showDetails: false,
-            table: null,
-            results: [
-                {id: 1, name: "Vu Hai Long", score: "80", time: "15:34", status: "submitted"},
-                {id: 2, name: "Ngo Tuan Anh", score: "89", time: "15:38", status: "unsubmitted"},
-                {id: 3, name: "Dao Xuan Dat", score: "87", time: "15:34", status: "submitted"},
-                {id: 4, name: "Nguyen Quang Tuan", score: "45", time: "35:34", status: "unsubmitted"},
-                {id: 5, name: "Tran Manh Dat", score: "25", time: "15:34", status: "submitted"},
-                {id: 6, name: "Pham Thi An", score: "95", time: "16:22", status: "unsubmitted"},
-                {id: 7, name: "Nguyen Van A", score: "70", time: "14:56", status: "submitted"},
-                {id: 8, name: "Le Thi B", score: "82", time: "16:08", status: "unsubmitted"},
-                {id: 9, name: "Truong Duc C", score: "68", time: "15:12", status: "submitted"},
-                {id: 10, name: "Doan Minh D", score: "93", time: "17:04", status: "submitted"},
-                {id: 11, name: "Le Tran Gia Huy", score: "75", time: "15:50", status: "unsubmitted"},
-                {id: 12, name: "Phan Thi Kim Ngan", score: "78", time: "16:34", status: "submitted"}
-
-            ],
         };
     },
     created() {
-        this.$store.dispatch("home/getQuiz", this.id).then(
-            quiz => {
-                this.quizs = quiz;
-                console.log(this.quizs);
-            });
+        this.unsubscribe = this.$store.subscribe((mutation) => {
+            if (mutation.type === "home/request") {
+            } else if (mutation.type === "home/requestSuccess") {
+                this.quizzes = mutation.payload.quizzes;
+                console.log(this.quizzes);
+            } else if (mutation.type === "home/requestFailure") {
+            }
+        });
+        this.$store.dispatch("home/getClassDetail", this.id);
     },
     mounted() {
 
     },
 
     methods: {
-        ...mapActions({
-            getQuiz: "home/getQuiz",
-        }),
         onSubmit() {
             // Handle form submission here
         },

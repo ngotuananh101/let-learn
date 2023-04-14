@@ -25,6 +25,11 @@ const home = [
                 component: () =>
                     import("../../../pages/home/option/setting.vue"),
             },
+            {
+                path: "class/:id",
+                name: "home.class",
+                component: () => import("../../../pages/home/class.vue"),
+            },
         ],
     },
     {

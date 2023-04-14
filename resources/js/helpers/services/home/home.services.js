@@ -4,7 +4,9 @@ import authHeader from '../../other/auth-header';
 
 export const homeService = {
     loadHome,
-    loadLessonById,
+    loadClassDetail,
+    loadLessonByUserId,
+    loadCourseByUserId
 };
 
 function loadHome() {
@@ -19,16 +21,40 @@ function loadHome() {
             return data;
         });
 };
-function loadLessonById(id) {
+function loadLessonByUserId(id) {
     const requestOptions = {
         method: 'GET',
         headers: authHeader(),
     };
-    return fetch(`/api/user/main/3?type=lesson`, requestOptions).then(handleResponse).then(
+    return fetch(`/api/student/main/${id}?type=lesson`, requestOptions).then(handleResponse).then(
         data => {
             console.log(data);
             return data.data;
         }
     )
+}
+function loadCourseByUserId(id) {
+    const requestOptions = {
+        method: 'GET',
+        headers: authHeader(),
+    };
+    return fetch(`/api/student/main/${id}?type=course`, requestOptions).then(handleResponse).then(
+        data => {
+            console.log(data);
+            return data.data;
+        }
+    )
+}
+function loadClassDetail(id) {
+    const requestOptions = {
+        method: 'GET',
+        headers: authHeader(),
+    };
+    return fetch(`/api/student/quiz/${id}?type=all`, requestOptions)
+        .then(handleResponse)
+        .then(data => {
+            console.log(data.data);
+            return data.data;
+        });
 }
 
