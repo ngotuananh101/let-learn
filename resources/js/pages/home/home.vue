@@ -62,7 +62,7 @@
     </div>
     <!-- Floating button -->
     <div class="position-fixed bottom-3 end-2" style="z-index: 11">
-        <i class="fa-sharp fa-solid fa-circle-plus" style="font-size: 4rem" @click="this.addModal.show()"></i>
+        <i class="fa-sharp fa-solid fa-circle-plus" style="font-size: 4rem" @click="addModal.show()"></i>
     </div>
     <div class="modal" id="modal" data-bs-keyboard="false" tabindex="-1">
         <div class="modal-dialog modal-dialog-centered modal-xl">
@@ -151,8 +151,7 @@
                     <button type="button" class="btn bg-gradient-secondary btn-sm" data-bs-toggle="modal" href="#modal">
                         Cancel
                     </button>
-                    <button type="button" class="btn bg-gradient-success btn-sm" data-bs-toggle="modal"
-                        @click="createCourse">
+                    <button type="button" class="btn bg-gradient-success btn-sm" data-bs-toggle="modal" @click="addCourse">
                         Create
                     </button>
                 </div>
@@ -216,6 +215,10 @@ export default {
     name: "home",
     data() {
         return {
+            course: {
+                name: '',
+                description: '',
+            },
             user: JSON.parse(localStorage.getItem("user")),
             unsubscribe: null,
             lessons: [],
@@ -225,10 +228,6 @@ export default {
             addModal: null,
             import_lesson_modal: null,
             importFile: true,
-            course: {
-                name: null,
-                description: null,
-            },
         };
     },
     created() {
@@ -238,21 +237,16 @@ export default {
                 this.lessons = mutation.payload.lessons;
                 this.courses = mutation.payload.courses;
                 this.other_lesson = mutation.payload.other_lesson;
-                console.log(this.other_lesson);
                 this.other_course = mutation.payload.other_course;
+                this.init();
             } else if (mutation.type === "home/requestFailure") {
-            } else if (mutation.type === 'course/request') {
-            } else if (mutation.type === 'course/success') {
-                if (this.type === 'add') {
-                    this.$root.showSnackbar('User added successfully', 'success');
-                    this.courses.push(mutation.payload);
-                    console.log(this.courses);
-                    this.table.rows.add([
-                        mutation.payload.name,
-                        mutation.payload.description,
-                    ]);
+                this.$root.showSnackbar(mutation.payload, 'danger');
+            } else if (mutation.type === "course/request") {
+            } else if (mutation.type === "course/success") {
+                if (this.type === "addCourse") {
+                    this.$root.showSnackbar('Add course successfully', 'success');
                 }
-            } else if (mutation.type === 'course/failure') {
+            } else if (mutation.type === "course/failure") {
                 this.$root.showSnackbar(mutation.payload, 'danger');
             }
         });
@@ -267,14 +261,6 @@ export default {
             this.addModal.hide();
             // redirect to add lesson page
             this.$router.push({ name: "lesson.add" });
-        },
-        add() {
-            this.type = 'add';
-            this.$store.dispatch('course/createCourse', this.course, {
-                name: this.course.name,
-                description: this.course.description,
-            });
-            this.$router.push({ name: 'home.home' });
         },
         init() {
             const bootstrap = this.$store.state.config.bootstrap;
@@ -292,27 +278,6 @@ export default {
                     document.getElementById('raw_data').value = '';
                 }
             });
-            // init 3 cards
-            this.details = [
-                {
-                    index: 0,
-                    term: '',
-                    definition: '',
-                },
-                {
-                    index: 1,
-                    term: '',
-                    definition: '',
-                },
-                {
-                    index: 2,
-                    term: '',
-                    definition: '',
-                },
-            ];
-            this.cards = markRaw(this.details.map((detail, index) => {
-                return LessonDetailCard;
-            }));
         },
         import() {
             this.type = 'import';
@@ -357,6 +322,14 @@ export default {
                 }
             }
         },
+        addCourse() {
+            this.type = 'add';
+            this.$store.dispatch('course/addCourse', {
+                name: this.course.name,
+                description: this.course.description,
+            });
+            this.$router.push({ name: 'home.home' });
+        }
     }
 };
 

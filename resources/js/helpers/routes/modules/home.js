@@ -85,7 +85,6 @@ const home = [
             },
             {
                 path: "/course",
-                name: "course",
                 meta: {
                     requiresAuth: true,
                 },
