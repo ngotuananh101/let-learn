@@ -4,6 +4,7 @@ import authHeader from '../../other/auth-header';
 
 export const homeService = {
     loadHome,
+    loadLessonById,
 };
 
 function loadHome() {
@@ -18,4 +19,16 @@ function loadHome() {
             return data;
         });
 };
+function loadLessonById(id) {
+    const requestOptions = {
+        method: 'GET',
+        headers: authHeader(),
+    };
+    return fetch(`/api/user/main/3?type=lesson`, requestOptions).then(handleResponse).then(
+        data => {
+            console.log(data);
+            return data.data;
+        }
+    )
+}
 

@@ -51,7 +51,18 @@ export default {
                         commit('requestFailure', error);
                     }
                 );
-        }
+        },
+        updateResult({commit}, data) {
+            return learnService.updateResult(data)
+                .then(data => {
+                    console.log("data");
+                        return data;
+                    },
+                    error => {
+                        return null;
+                    }
+                );
+        },
     },
     getters: {
         userData: state => {

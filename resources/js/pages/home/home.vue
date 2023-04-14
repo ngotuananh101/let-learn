@@ -217,7 +217,7 @@ export default {
     name: "home",
     data() {
         return {
-            user: JSON.parse(localStorage.getItem("user")),
+
             unsubscribe: null,
             lessons: [],
             courses: [],
@@ -241,6 +241,8 @@ export default {
             }
         });
         this.$store.dispatch("home/getHome");
+        this.user = JSON.parse(localStorage.getItem("user"));
+        console.log(this.user);
     },
     mounted() {
         this.addModal = new Modal(document.getElementById("modal"));

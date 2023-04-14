@@ -4,7 +4,8 @@ import authHeader from '../../other/auth-header';
 export const learnService = {
     loadFlashCard,
     loadLearn,
-    loadTest
+    loadTest,
+    updateResult
 }
 
 function loadFlashCard(id) {
@@ -16,7 +17,6 @@ function loadFlashCard(id) {
     return fetch(`/api/user/main?type=detail_split`, requestOptions)
         .then(handleResponse)
         .then(data => {
-            console.log(data.data);
             return data.data;
         });
 }
@@ -29,7 +29,6 @@ function loadLearn(id) {
     return fetch(`/api/user/main?type=learn`, requestOptions)
         .then(handleResponse)
         .then(data => {
-            console.log(data.lesson_details);
             return data.lesson_details;
         });
 }
@@ -42,7 +41,19 @@ function loadTest(id) {
     return fetch(`/api/user/main?type=test`, requestOptions)
         .then(handleResponse)
         .then(data => {
-            console.log(data.lesson_details);
             return data.lesson_details;
+        });
+}
+function updateResult(data) {
+    const requestOptions = {
+        method: 'POST',
+        headers: authHeader(),
+        body: JSON.stringify({data})
+    };
+    return fetch(`/api/user/main/2/?type=learned`, requestOptions)
+        .then(handleResponse)
+        .then(data => {
+            console.log(data);
+            return data;
         });
 }

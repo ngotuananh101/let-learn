@@ -17,13 +17,19 @@ export default {
             lessons: null,
         };
     },
-    beforeMount() {
-        this.$store.dispatch('home/getLesson').then(
-            lesson => {
-                console.log(lesson);
-                this.lessons = lesson;
+    created() {
+        this.unsubscribe = this.$store.subscribe((mutation) => {
+            if (mutation.type === "home/request") {
+            } else if (mutation.type === "home/requestSuccess") {
+                this.lessons = mutation.payload.lessons;
+                this.courses = mutation.payload.courses;
+                this.other_lesson = mutation.payload.other_lesson;
+                console.log(this.other_lesson);
+                this.other_course = mutation.payload.other_course;
+            } else if (mutation.type === "home/requestFailure") {
             }
-        );
-    }
+        });
+        this.$store.dispatch("home/getLessonById");
+    },
 };
 </script>

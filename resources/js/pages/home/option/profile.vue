@@ -15,31 +15,31 @@
                 </div>
             </div>
         </div>
-        <div class="card-body pt-1">
-            <ul class="nav nav-tabs border-0">
-                <li class="nav-item">
-                    <router-link :to="{ name: 'home.profile.lessons'}" class="nav-link"
-                                 :class="{ active: $route.name === 'home.profile.lessons' }" style="color: black"
-                                 aria-current="page">Lesson
-                    </router-link>
-                </li>
-                <li class="nav-item">
-                    <router-link :to="{ name: 'home.profile.courses'}" class="nav-link"
-                                 :class="{ active: $route.name === 'home.profile.courses' }" style="color: black"
-                                 aria-current="page">Course
-                    </router-link>
-                </li>
-                <li class="nav-item">
-                    <router-link :to="{ name: 'home.profile.class.js'}" class="nav-link"
-                                 :class="{ active: $route.name === 'home.profile.class.js' }" style="color: black"
-                                 aria-current="page">Class
-                    </router-link>
-                </li>
-            </ul>
-            <div class="row mt-4">
-                <router-view></router-view>
-            </div>
-        </div>
+<!--        <div class="card-body pt-1">-->
+<!--            <ul class="nav nav-tabs border-0">-->
+<!--                <li class="nav-item">-->
+<!--                    <router-link :to="{ name: 'home.profile.lessons'}" class="nav-link"-->
+<!--                                 :class="{ active: $route.name === 'home.profile.lessons' }" style="color: black"-->
+<!--                                 aria-current="page">Lesson-->
+<!--                    </router-link>-->
+<!--                </li>-->
+<!--                <li class="nav-item">-->
+<!--                    <router-link :to="{ name: 'home.profile.courses'}" class="nav-link"-->
+<!--                                 :class="{ active: $route.name === 'home.profile.courses' }" style="color: black"-->
+<!--                                 aria-current="page">Course-->
+<!--                    </router-link>-->
+<!--                </li>-->
+<!--                <li class="nav-item">-->
+<!--                    <router-link :to="{ name: 'home.profile.class.js'}" class="nav-link"-->
+<!--                                 :class="{ active: $route.name === 'home.profile.class.js' }" style="color: black"-->
+<!--                                 aria-current="page">Class-->
+<!--                    </router-link>-->
+<!--                </li>-->
+<!--            </ul>-->
+<!--            <div class="row mt-4">-->
+<!--                <router-view></router-view>-->
+<!--            </div>-->
+<!--        </div>-->
     </div>
 </template>
 
@@ -67,30 +67,32 @@ export default {
         };
     },
     created() {
-        this.user = {
-            avatar: "https://via.placeholder.com/150",
-            username: "JaneDoe",
-            email: "janedoe@example.com",
-            date_of_birth: "1990-01-01"
-        };
-
-        this.lessons = [
-            { id: 1, title: "Lesson 1", description: "Lorem ipsum dolor sit amet." },
-            { id: 2, title: "Lesson 2", description: "Consectetur adipiscing elit." },
-            { id: 3, title: "Lesson 3", description: "Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua." }
-        ];
-
-        this.courses = [
-            { id: 1, title: "Course 1", description: "Ut enim ad minim veniam." },
-            { id: 2, title: "Course 2", description: "Quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat." },
-            { id: 3, title: "Course 3", description: "Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur." }
-        ];
-
-        this.classes = [
-            { id: 1, title: "Class 1", description: "Excepteur sint occaecat cupidatat non proident." },
-            { id: 2, title: "Class 2", description: "Sunt in culpa qui officia deserunt mollit anim id est laborum." },
-            { id: 3, title: "Class 3", description: "Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit." }
-        ];
+        // this.user = {
+        //     avatar: "https://via.placeholder.com/150",
+        //     username: "JaneDoe",
+        //     email: "janedoe@example.com",
+        //     date_of_birth: "1990-01-01"
+        // };
+        //
+        // this.lessons = [
+        //     { id: 1, title: "Lesson 1", description: "Lorem ipsum dolor sit amet." },
+        //     { id: 2, title: "Lesson 2", description: "Consectetur adipiscing elit." },
+        //     { id: 3, title: "Lesson 3", description: "Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua." }
+        // ];
+        //
+        // this.courses = [
+        //     { id: 1, title: "Course 1", description: "Ut enim ad minim veniam." },
+        //     { id: 2, title: "Course 2", description: "Quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat." },
+        //     { id: 3, title: "Course 3", description: "Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur." }
+        // ];
+        //
+        // this.classes = [
+        //     { id: 1, title: "Class 1", description: "Excepteur sint occaecat cupidatat non proident." },
+        //     { id: 2, title: "Class 2", description: "Sunt in culpa qui officia deserunt mollit anim id est laborum." },
+        //     { id: 3, title: "Class 3", description: "Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit." }
+        // ];
+        this.user = JSON.parse(localStorage.getItem('user'));
+        console.log(this.user);
     },
 };
 </script>
