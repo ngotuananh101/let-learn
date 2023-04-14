@@ -28,7 +28,31 @@ export default {
                     }
                 );
         },
-
+        getUserInformation({commit}) {
+            commit('request');
+            homeService.loadUserInformation()
+                .then(
+                    response => {
+                        commit('requestSuccess', response);
+                    },
+                    error => {
+                        commit('requestFailure', error);
+                    }
+                );
+        },
+        getClassDetail({commit}, id) {
+            commit('request');
+            console.log(id);
+            homeService.loadClassDetail(id)
+                .then(
+                    response => {
+                        commit('requestSuccess', response);
+                    },
+                    error => {
+                        commit('requestFailure', error);
+                    }
+                );
+        },
 
     },
     getters: {

@@ -54,10 +54,10 @@
                             <img :src="this.user.gravatar" :alt="this.user.name"
                                  class="img img-fluid rounded-circle avatar-sm">
                         </a>
-                        <ul id="btnNotification" class="px-2 py-3 dropdown-menu dropdown-menu-end me-sm-n3"
-                            aria-labelledby="btnNotification">
+                        <!-- Notification dropdown -->
+                        <ul id="btnNotification" class="px-2 py-3 dropdown-menu dropdown-menu-end me-sm-n3" aria-labelledby="btnNotification">
                             <li class="mb-2">
-                                <a class="dropdown-item border-radius-md" href="javascript:;">
+                                <router-link class="dropdown-item border-radius-md" :to="{ name: 'home.setting' }">
                                     <div class="py-1 d-flex">
                                         <div class="my-auto">
                                             <p class="mb-0 text-xs text-secondary">
@@ -66,13 +66,30 @@
                                         </div>
                                         <div class="d-flex flex-column justify-content-center">
                                             <h6 class="mb-1 text-sm font-weight-normal">
-                                                <span >Setting</span>
+                                                <span>Setting</span>
                                             </h6>
                                         </div>
                                     </div>
-                                </a>
+                                </router-link>
+                            </li>
+                            <li class="mb-2">
+                                <router-link class="dropdown-item border-radius-md" :to="{ name: 'home.profile' }">
+                                    <div class="py-1 d-flex">
+                                        <div class="my-auto">
+                                            <p class="mb-0 text-xs text-secondary">
+                                                <i class="fa-solid fa-user"></i>
+                                            </p>
+                                        </div>
+                                        <div class="d-flex flex-column justify-content-center">
+                                            <h6 class="mb-1 text-sm font-weight-normal">
+                                                <span>Profile</span>
+                                            </h6>
+                                        </div>
+                                    </div>
+                                </router-link>
                             </li>
                         </ul>
+
                     </li>
                 </ul>
             </div>

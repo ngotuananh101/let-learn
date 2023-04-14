@@ -299,6 +299,7 @@ export default {
             this.type = 'add';
         },
         addUser() {
+            console.log(this.user);
             this.$store.dispatch('adminUser/addUser', this.user);
         },
         updateUser() {

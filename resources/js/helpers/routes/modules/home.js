@@ -26,6 +26,11 @@ const home = [
                     import("../../../pages/home/option/setting.vue"),
             },
             {
+                path: "class/:id",
+                name: "home.class",
+                component: () => import("../../../pages/home/class.vue"),
+            },
+            {
                 path: "/lesson",
                 meta: {
                     requiresAuth: true,
@@ -73,7 +78,7 @@ const home = [
                         component: () =>
                             import(
                                 "../../../pages/home/forum/forum_detail.vue"
-                            ),
+                                ),
                     },
                     {
                         path: "forum",
@@ -85,6 +90,7 @@ const home = [
             },
             {
                 path: "/course",
+                name: "course",
                 meta: {
                     requiresAuth: true,
                 },
@@ -106,5 +112,4 @@ const home = [
         ],
     },
 ];
-
 export default home;

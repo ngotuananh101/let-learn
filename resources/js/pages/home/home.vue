@@ -14,7 +14,7 @@
                     <div class="card mt-4">
                         <div class="card-body">
                             <p class="card-text text-primary">Title: {{ lesson.name }}</p>
-                            <p class="card-text">Author: {{ lesson.number_of_detail }}</p>
+                            <p class="card-text">Quantity: {{ lesson.number_of_detail }}</p>
                             <p class="card-text">Author: {{ lesson.author }}</p>
                         </div>
                     </div>
@@ -235,6 +235,7 @@ export default {
             if (mutation.type === "home/request") {
             } else if (mutation.type === "home/requestSuccess") {
                 this.lessons = mutation.payload.lessons;
+                console.log(this.other_course);
                 this.courses = mutation.payload.courses;
                 this.other_lesson = mutation.payload.other_lesson;
                 this.other_course = mutation.payload.other_course;
@@ -251,6 +252,8 @@ export default {
             }
         });
         this.$store.dispatch("home/getHome");
+        // this.user = JSON.parse(localStorage.getItem("user"));
+        // console.log(this.user);
     },
     beforeUnmount() {
         this.unsubscribe();

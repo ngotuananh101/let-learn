@@ -106,7 +106,6 @@ export default {
             if (mutation.type === "learn/request") {
             } else if (mutation.type === "learn/requestSuccess") {
                 this.lesson_details = mutation.payload;
-                console.log(this.lesson_details);
             } else if (mutation.type === "learn/requestFailure") {
             }
         });
@@ -147,7 +146,13 @@ export default {
                     this.$emit('change-progress', 100);
                     let incorrect_answers = this.lesson_details.filter(q => !q.isCorrect).map(q => q.id);
                     let correct_answers = this.lesson_details.filter(q => q.isCorrect).map(q => q.id);
-                    this.show_result = true;
+                    this.$store.dispatch('learn/updateResult', {
+                        lesson_id: this.id,
+                        learned: correct_answers,
+                        relearn: incorrect_answers
+                    }).then((res) => {
+                        this.show_result = true;
+                    });
                 } else {
                     document.getElementById('next').classList.remove('d-none');
                 }
