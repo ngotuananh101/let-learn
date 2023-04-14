@@ -17,8 +17,7 @@ function getLessonByCourseId(course_id) {
     return fetch(`/api/user/course/${course_id}?type=info`, requestOptions)
         .then(handleResponse)
         .then((data) => {
-            console.log(data.course);
-            return data.course;
+            return data;
         });
 }
 
@@ -62,4 +61,3 @@ function deleteCourse(id) {
             return course;
         });
 }
-
