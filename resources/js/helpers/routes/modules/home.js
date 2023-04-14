@@ -83,24 +83,26 @@ const home = [
                     },
                 ],
             },
-        ],
-    },
-    {
-        path: "/course",
-        name: "course",
-        meta: {
-            requiresAuth: true,
-        },
-        children: [
             {
-                path: ":id",
-                name: "course.index",
-                component: () => import("../../../pages/course/Course.vue"),
-            },
-            {
-                path: ":id/edit",
-                name: "course.edit",
-                component: () => import("../../../pages/course/Edit.vue"),
+                path: "/course",
+                name: "course",
+                meta: {
+                    requiresAuth: true,
+                },
+                children: [
+                    {
+                        path: ":id",
+                        name: "course.index",
+                        component: () =>
+                            import("../../../pages/course/Course.vue"),
+                    },
+                    {
+                        path: ":id/edit",
+                        name: "course.edit",
+                        component: () =>
+                            import("../../../pages/course/Edit.vue"),
+                    },
+                ],
             },
         ],
     },

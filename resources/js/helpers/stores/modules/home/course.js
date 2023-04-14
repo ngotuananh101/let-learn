@@ -22,22 +22,11 @@ export default {
         },
     },
     actions: {
-        getCourseInfo({ commit }, course_id) {
-            commit("request");
-            courseService.getCourseInfo(course_id).then(
-                (course) => {
-                    commit("success", course);
-                },
-                (error) => {
-                    commit("failure", error);
-                }
-            );
-        },
         getLessonByCourseId({ commit }, course_id) {
             commit("request");
             courseService.getLessonByCourseId(course_id).then(
-                (lessons) => {
-                    commit("success", lessons);
+                (response) => {
+                    commit("success", response);
                 },
                 (error) => {
                     commit("failure", error);

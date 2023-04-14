@@ -4,7 +4,6 @@ import authHeader from "../../other/auth-header";
 export const courseService = {
     getLessonByCourseId,
     createCourse,
-    getCourseInfo,
     updateCourse,
     deleteCourse,
     addLessonToCourse,
@@ -12,29 +11,16 @@ export const courseService = {
     searchLesson,
 };
 
-function getCourseInfo(course_id) {
-    const requestOptions = {
-        method: "GET",
-        headers: authHeader(),
-    };
-
-    return fetch(`/api/user/course/${course_id}`, requestOptions)
-        .then(handleResponse)
-        .then((course) => {
-            return course;
-        });
-}
-
 function getLessonByCourseId(course_id) {
     const requestOptions = {
         method: "GET",
         headers: authHeader(),
     };
 
-    return fetch(`/api/user/course/${course_id}`, requestOptions)
+    return fetch(`/api/user/course/${course_id}?type=info`, requestOptions)
         .then(handleResponse)
-        .then((lessons) => {
-            return lessons;
+        .then((data) => {
+            return data;
         });
 }
 
