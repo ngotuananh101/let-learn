@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Public;
 
 use App\Http\Controllers\Controller;
+use App\Models\Classes;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use App\Models\User;
@@ -13,12 +14,105 @@ use App\Models\LessonDetail;
 use App\Models\School;
 use App\Models\UserLog;
 use Illuminate\Support\Carbon;
+use PhpParser\Builder\Class_;
 
 use function PHPSTORM_META\type;
 
 class UserController extends Controller
 {
+    public function index(): JsonResponse
+    {
+        try {
+            //get info of auth user
+            $user = auth()->user();
 
+            $lessons = $user->lessons->where('status', 'active')->take(6);
+            $lessons = $lessons->map(function ($lesson) {
+                return [
+                    'id' => $lesson->id,
+                    'name' => $lesson->name,
+                    'description' => $lesson->description,
+                    'author' => $lesson->user->name,
+                    'number_of_detail' => $lesson->details->count(),
+                ];
+            });
+
+            $courses = $user->courses->where('status', 'active')->take(6);
+            $courses = $courses->map(function ($course) {
+                return [
+                    'id' => $course->id,
+                    'name' => $course->name,
+                    'description' => $course->description,
+                    'author' => $course->user->name,
+                    'number_of_lesson' => $course->lessons->count(),
+                ];
+            });
+
+            $other_lesson = Lesson::where('user_id', '!=', $user->id)
+                ->where('status', 'active')
+                ->where('password', null)
+                ->where('school_id', null)
+                ->where('class_id', null)
+                ->inRandomOrder()
+                ->take(6)
+                ->get();
+            $other_lesson = $other_lesson->map(function ($lesson) {
+                return [
+                    'id' => $lesson->id,
+                    'name' => $lesson->name,
+                    'description' => $lesson->description,
+                    'author' => $lesson->user->name,
+                    'number_of_detail' => $lesson->details->count(),
+                ];
+            });
+
+            $other_course = Course::where('user_id', '!=', $user->id)
+                ->where('status', 'active')
+                ->where('password', null)
+                ->where('school_id', null)
+                ->where('class_id', null)
+                ->inRandomOrder()
+                ->take(6)
+                ->get();
+            $other_course = $other_course->map(function ($course) {
+                return [
+                    'id' => $course->id,
+                    'name' => $course->name,
+                    'description' => $course->description,
+                    'author' => $course->user->name,
+                    'number_of_lesson' => $course->lessons->count(),
+                ];
+            });
+            //get all school of user
+            if ($user->role->name == 'student' || $user->role->name == 'teacher') {
+                //get school_id of user
+                $school_id = $user->school_id;
+                //check user belong to class by relationship member in class model
+                $schools = School::where('id', $school_id)->get();
+                $classes = Classes::select('classes.*')
+                    ->join('class_members', 'classes.id', '=', 'class_members.class_id')
+                    ->where('class_members.user_id', $user->id)
+                    ->get();
+            } else {
+                $schools = null;
+                $classes = null;
+            }
+            return response()->json([
+                // get random 6 lessons
+                'schools' => $schools,
+                'classes' => $classes,
+                'lessons' => $lessons,
+                'courses' => $courses,
+                'other_lesson' => $other_lesson,
+                'other_course' => $other_course
+            ]);
+        } catch (\Throwable $th) {
+            //throw $th;
+            return response()->json([
+                'message' => $th->getMessage(),
+            ], 400);
+        }
+    }
     /**
      * Display the specified resource.
      *
@@ -579,7 +673,7 @@ class UserController extends Controller
                     'message' => 'You do not have permission to delete this user'
                 ], 403);
             }
-            if($user->status == 'inactive'){
+            if ($user->status == 'inactive') {
                 //delete user
                 $user->delete();
                 return response()->json([
