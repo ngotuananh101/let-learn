@@ -44,9 +44,10 @@ Route::middleware('auth:sanctum')->group(function () {
     });
     Route::group(['prefix' => 'public'], function () {
         Route::get('home', 'App\Http\Controllers\Public\HomeController@index');
+        Route::get('information', 'App\Http\Controllers\Public\UserController@index');
     });
     Route::group(['middleware' => ['permission:user.default'], 'prefix' => 'user'], function () {
-        Route::resource('user', 'App\Http\Controllers\Public\UserController');
+        Route::resource('user', 'App\Http\Controllers\Public\UserController')->except(['index']);
         Route::resource('class', 'App\Http\Controllers\Public\ClassController');
         Route::resource('main', 'App\Http\Controllers\Public\UserController');        
         Route::resource('lesson', 'App\Http\Controllers\Public\LessonController');
@@ -54,14 +55,14 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::resource('post', 'App\Http\Controllers\Public\PostController');
     });
     Route::group(['middleware' => ['permission:teacher.default'], 'prefix' => 'teacher'], function () {
-        Route::resource('main', 'App\Http\Controllers\Public\UserController');        
+        Route::resource('main', 'App\Http\Controllers\Public\UserController')->except(['index']);        
         Route::resource('lesson', 'App\Http\Controllers\Public\LessonController');
         Route::resource('course', 'App\Http\Controllers\Public\CourseController');
         Route::resource('post', 'App\Http\Controllers\Public\PostController');
         Route::resource('quiz', 'App\Http\Controllers\Public\QuizController');
     });
     Route::group(['middleware' => ['permission:student.default'], 'prefix' => 'student'], function () {
-        Route::resource('main', 'App\Http\Controllers\Public\UserController');        
+        Route::resource('main', 'App\Http\Controllers\Public\UserController')->except(['index']);        
         Route::resource('lesson', 'App\Http\Controllers\Public\LessonController');
         Route::resource('course', 'App\Http\Controllers\Public\CourseController');
         Route::resource('post', 'App\Http\Controllers\Public\PostController');
