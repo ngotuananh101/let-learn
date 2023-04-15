@@ -32,12 +32,12 @@ function loadUserInformation() {
             return data;
         });
 }
-function loadClassDetail(id) {
+function loadClassDetail(id, roleName) {
     const requestOptions = {
         method: 'GET',
         headers: authHeader(),
     };
-    return fetch(`/api/student/quiz/${id}?type=all`, requestOptions)
+    return fetch(`/api/${roleName}/quiz/${id}?type=all`, requestOptions)
         .then(handleResponse)
         .then(data => {
             console.log(data.data);
