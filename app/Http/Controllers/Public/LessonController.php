@@ -156,12 +156,13 @@ class LessonController extends Controller
                 ], 403);
             }
             if ($lesson->status == 'inactive') {
-                $lesson->delete();
+                //$lesson->delete();
+                //cant delete lesson if lesson is inactive
                 return response()->json([
-                    'status' => 'success',
-                    'status_code' => 200,
-                    'message' => 'Delete lesson successfully!',
-                ], 200);
+                    'status' => 'error',
+                    'status_code' => 400,
+                    'message' => 'Lesson is already deleted!'
+                ], 400);
             } else {
                 // Soft delete lesson if lesson is active
                 $lesson->update([
@@ -273,7 +274,7 @@ class LessonController extends Controller
                     $lessonDetails = $lessonDetails->merge($notLearn);
                 }
             }
-            //$lessonDetails = $lessonDetails->where('id', 19);
+            //$lessonDetails = $lessonDetails->where('id', 51);
             $response = ['lesson_id' => $lesson_id, 'lesson_details' => []];
             foreach ($lessonDetails as $lessonDetail) {
                 try {
@@ -307,6 +308,14 @@ class LessonController extends Controller
                         //check if $options might be missing any options like A, B, C, D
 
                         $answers = array_map('trim', $options);
+                        if (count($answers) < 2) {
+                            // if the number of options is less than 4, then the options are missing
+                            return response()->json([
+                                'status' => 'error',
+                                'status_code' => 500,
+                                'message' => 'Please recheck the options for the question "' . $question . '"' . ' in the lesson "' . $lesson->name . '" ,question_id: ' . $lessonDetail->id
+                            ], 500);
+                        }
                         //count characters of definition
                         $count = strlen($definition);
                         //if count > 1, then correct answer include more than 1 option
@@ -540,6 +549,14 @@ class LessonController extends Controller
                         //check if $options might be missing any options like A, B, C, D
 
                         $answers = array_map('trim', $options);
+                        if (count($answers) < 2) {
+                            // if the number of options is less than 4, then the options are missing
+                            return response()->json([
+                                'status' => 'error',
+                                'status_code' => 500,
+                                'message' => 'Please recheck the options for the question "' . $question . '"' . ' in the lesson "' . $lesson->name . '" ,question_id: ' . $lessonDetail->id
+                            ], 500);
+                        }
                         //count characters of definition
                         $count = strlen($definition);
                         //if count > 1, then correct answer include more than 1 option

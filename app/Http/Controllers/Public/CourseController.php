@@ -57,7 +57,12 @@ class CourseController extends Controller
                             'message' => 'Course is not allowed to be viewed',
                             'status' => 'error'
                         ], 400);
-                    return response()->json($course->load(['user', 'school', 'class']), 200);
+                    return response()->json([
+                        //with each lesson loaded, add count of details in each lesson
+                        'course' => $course->load(['lessons' => function ($query) {
+                            $query->withCount('details');
+                        }]),
+                    ], 200);
                     break;
                 case 'lessons':
                     $request->validate([
@@ -175,13 +180,18 @@ class CourseController extends Controller
                 return response()->json(['message' => 'Course soft deleted successfully', 'status' => 'success'], 200);
             } else {
                 //if course has lessons, remove them from course first then delete course
-                if ($course->lessons()->count() > 0)
-                    $course->lessons()->detach();
-                $course->delete();
                 return response()->json([
-                    'message' => 'Course deleted successfully',
-                    'status' => 'success'
-                ], 200);
+                    'status' => 'error',
+                    'status_code' => 400,
+                    'message' => 'Course is already deleted!'
+                ], 400);
+                // if ($course->lessons()->count() > 0)
+                //     $course->lessons()->detach();
+                // $course->delete();
+                // return response()->json([
+                //     'message' => 'Course deleted successfully',
+                //     'status' => 'success'
+                // ], 200);
             }
         } catch (\Throwable $th) {
             return response()->json([

@@ -18,7 +18,7 @@ return new class extends Migration
             $table->foreignId('class_id')->constrained('classes')->onDelete('cascade');
             $table->string('name');
             $table->text('description');
-            $table->enum('status', ['active','pending', 'inactive'])->default('inactive'); //status: active, pending, inactive
+            $table->enum('status', ['active','pending', 'inactive'])->default('pending'); //status: active, pending, inactive
             $table->boolean('score_reporting')->default(false); // true = show score, false = hide score
             $table->timestamp('start_time');
             $table->timestamp('end_time')->default('2030-12-31 23:59:59');
