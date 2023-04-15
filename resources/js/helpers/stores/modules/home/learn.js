@@ -52,6 +52,18 @@ export default {
                     }
                 );
         },
+        getSelfTest({commit}, id) {
+            commit('request');
+            learnService.loadSelfTest(id)
+                .then(
+                    response => {
+                        commit('requestSuccess', response);
+                    },
+                    error => {
+                        commit('requestFailure', error);
+                    }
+                );
+        },
         sendTestResult({commit}, data) {
             commit('request');
             learnService.sendTestResult(data)
