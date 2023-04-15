@@ -35,6 +35,23 @@ const school = [
                         path: 'users',
                         name: 'school.users',
                         component: () => import('../../../pages/school/users.vue'),
+                    },
+                    {
+                        path: 'lesson',
+                        name: 'school.lesson',
+                        redirect: {name: 'school.lesson.index'},
+                        children: [
+                            {
+                                path: '',
+                                name: 'school.lesson.index',
+                                component: () => import('../../../pages/school/lesson/index.vue'),
+                            },
+                            {
+                                path: 'create',
+                                name: 'school.lesson.add',
+                                component: () => import('../../../pages/school/lesson/add.vue'),
+                            }
+                        ]
                     }
                 ],
             }
