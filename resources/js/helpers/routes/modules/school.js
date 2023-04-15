@@ -47,9 +47,31 @@ const school = [
                                 component: () => import('../../../pages/school/lesson/index.vue'),
                             },
                             {
+                                path: ':id/edit',
+                                name: 'school.lesson.edit',
+                                component: () => import('../../../pages/school/lesson/edit.vue'),
+                            },
+                            {
                                 path: 'create',
                                 name: 'school.lesson.add',
                                 component: () => import('../../../pages/school/lesson/add.vue'),
+                            }
+                        ]
+                    },
+                    {
+                        path: 'course',
+                        name: 'school.course',
+                        redirect: {name: 'school.course.index'},
+                        children: [
+                            {
+                                path: '',
+                                name: 'school.course.index',
+                                component: () => import('../../../pages/school/course/index.vue'),
+                            },
+                            {
+                                path: ':id/edit',
+                                name: 'school.course.edit',
+                                component: () => import('../../../pages/school/course/edit.vue'),
                             }
                         ]
                     }

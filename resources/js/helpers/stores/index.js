@@ -14,6 +14,7 @@ import schoolDashboard from "./modules/school/dashboard";
 import school from "./modules/school/school";
 import schoolUser from "./modules/school/user";
 import schoolLesson from "./modules/school/lesson";
+import schoolCourse from "./modules/school/course";
 import lesson from "./modules/home/lesson";
 import learn from "./modules/home/learn";
 import course from "./modules/home/course";
@@ -37,7 +38,8 @@ const store = createStore({
         school,
         schoolDashboard,
         schoolUser,
-        schoolLesson
+        schoolLesson,
+        schoolCourse,
     },
 });
 

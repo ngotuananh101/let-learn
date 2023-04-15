@@ -152,13 +152,7 @@ export default {
     },
     created() {
         this.unsubscribe = this.$store.subscribe((mutation) => {
-            if (mutation.type === 'adminCourse/request') {
-                if (this.type === 'update_info') {
-                    this.$root.showSnackbar('Updating course info...', 'info');
-                } else if (this.type === 'search_lesson') {
-                    this.$root.showSnackbar('Searching lesson...', 'info');
-                }
-            } else if (mutation.type === 'adminCourse/success') {
+            if (mutation.type === 'schoolCourse/success') {
                 if (this.type === 'get') {
                     this.course = mutation.payload;
                     this.init();
@@ -172,36 +166,24 @@ export default {
                     this.lesson_choice.setChoices(mutation.payload, 'id', 'name', true);
                 } else if (this.type === 'add_lesson') {
                     this.$root.showSnackbar('Add lesson successfully', 'success');
-                    this.lesson_datatable.data.data = [];
-                    let lessons = mutation.payload;
-                    lessons.forEach((lesson) => {
-                        this.lesson_datatable.rows.add([
-                            lesson.id,
-                            lesson.name,
-                            lesson.description,
-                            lesson.school ? lesson.school.name : 'N/A',
-                            lesson.class ? lesson.class.name : 'N/A',
-                            new Date(lesson.updated_at).toLocaleString(),
-                            lesson.status,
-                            `<a href="/admin/lesson/${lesson.id}/edit" class="btn btn-sm btn-outline-primary">Edit</a>`
-                        ]);
-                        this.course.lessons.push(lesson);
-                    });
-                    this.lesson_modal.hide();
+                    location.reload();
                 } else if (this.type === 'delete') {
                     this.$root.showSnackbar('Delete course successfully', 'success');
-                    this.$router.push({name: 'admin.course'});
+                    this.$router.push({name: 'school.course'});
                 } else if (this.type === 'remove_lesson') {
                     this.$root.showSnackbar('Remove lesson successfully', 'success');
                     this.lesson_datatable.rows.remove(this.selectedRows);
                     this.selectedRows = [];
                     this.lesson_datatable.update();
                 }
-            } else if (mutation.type === 'adminCourse/failure') {
+            } else if (mutation.type === 'schoolCourse/failure') {
                 this.$root.showSnackbar(mutation.payload, 'danger');
+            } else if (mutation.type === 'schoolLesson/success') {
+                let lessons = mutation.payload.lessons;
+                this.lesson_choice.setChoices(lessons, 'id', 'name', true);
             }
         });
-        this.$store.dispatch('adminCourse/getCourseById', this.$route.params.id);
+        this.$store.dispatch('schoolCourse/edit', this.$route.params.id);
     },
     beforeUnmount() {
         this.unsubscribe();
@@ -213,17 +195,16 @@ export default {
         init() {
             this.lesson_datatable = new DataTable("#lesson_datatable", {
                 data: {
-                    headings: ["ID", "Name", "Description", "School", "Class", "Update At", "Status", "Action"],
+                    headings: ["ID", "Name", "Description", "Class", "Update At", "Status", "Action"],
                     data: this.course.lessons.map((lesson) => {
                         return [
                             lesson.id,
                             lesson.name,
                             lesson.description,
-                            lesson.school ? lesson.school.name : 'N/A',
                             lesson.class ? lesson.class.name : 'N/A',
                             new Date(lesson.updated_at).toLocaleString(),
                             lesson.status,
-                            `<a href="/admin/lesson/${lesson.id}/edit" class="btn btn-sm btn-outline-primary">Edit</a>`
+                            `<a href="/school/${this.$route.params.slug}/lesson/${lesson.id}/edit" class="btn btn-sm btn-outline-primary">Edit</a>`
                         ];
                     }),
                 },
@@ -255,13 +236,6 @@ export default {
                 placeholder: true,
                 placeholderValue: 'Enter lesson name ',
             });
-            this.lesson_choice.passedElement.element.addEventListener('search', (event) => {
-                this.type = 'search_lesson';
-                clearTimeout(this.timer);
-                this.timer = setTimeout(() => {
-                    this.$store.dispatch('adminCourse/searchLesson', event.detail.value);
-                }, 500);
-            });
             this.lesson_datatable.on("datatable.selectrow", (rowIndex, event) => {
                 if (this.selectedRows.includes(rowIndex)) {
                     this.selectedRows = this.selectedRows.filter(row => row !== rowIndex)
@@ -270,11 +244,12 @@ export default {
                 }
                 this.lesson_datatable.update();
             });
+            this.$store.dispatch('schoolLesson/index', this.$route.params.slug);
         },
         updateInfo() {
             this.type = 'update_info';
-            this.$store.dispatch('adminCourse/updateCourse', {
-                type: 'info',
+            this.$store.dispatch('schoolCourse/updateCourse', {
+                type: 'update',
                 id: this.$route.params.id,
                 name: this.course.name,
                 description: this.course.description,
@@ -284,7 +259,7 @@ export default {
         },
         addLesson() {
             this.type = 'add_lesson';
-            this.$store.dispatch('adminCourse/addLessonToCourse', {
+            this.$store.dispatch('schoolCourse/addLessonToCourse', {
                 id: this.$route.params.id,
                 lesson_ids: this.lesson_choice.getValue(true),
             });
@@ -292,13 +267,13 @@ export default {
         deleteCourse() {
             if (confirm('Are you sure?')) {
                 this.type = 'delete';
-                this.$store.dispatch('adminCourse/deleteCourse', this.$route.params.id);
+                this.$store.dispatch('schoolCourse/deleteCourse', this.$route.params.id);
             }
         },
         removeLesson() {
             if (confirm('Are you sure?')) {
                 this.type = 'remove_lesson';
-                this.$store.dispatch('adminCourse/removeLessonFromCourse', {
+                this.$store.dispatch('schoolCourse/removeLessonFromCourse', {
                     id: this.$route.params.id,
                     lesson_ids: this.selectedRows.map((row) => this.course.lessons[row].id),
                 });
