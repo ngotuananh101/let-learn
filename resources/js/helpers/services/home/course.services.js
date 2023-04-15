@@ -14,7 +14,7 @@ function getLessonByCourseId(course_id) {
         headers: authHeader(),
     };
 
-    return fetch(`/api/user/course/${course_id}?type=info`, requestOptions)
+    return fetch(`/api/student/course/${course_id}?type=info`, requestOptions)
         .then(handleResponse)
         .then((data) => {
             return data;
@@ -28,7 +28,7 @@ function addCourse(course) {
         body: JSON.stringify(course),
     };
 
-    return fetch(`/api/user/course`, requestOptions)
+    return fetch(`/api/student/course`, requestOptions)
         .then(handleResponse)
         .then((course) => {
             return course;
@@ -42,7 +42,7 @@ function updateCourse(course) {
         body: JSON.stringify(course),
     };
 
-    return fetch(`/api/user/course/${course.id}`, requestOptions)
+    return fetch(`/api/student/course/${course.id}`, requestOptions)
         .then(handleResponse)
         .then((course) => {
             return course;
@@ -55,7 +55,7 @@ function deleteCourse(id) {
         headers: authHeader(),
     };
 
-    return fetch(`/api/user/course/${id}`, requestOptions)
+    return fetch(`/api/student/course/${id}`, requestOptions)
         .then(handleResponse)
         .then((course) => {
             return course;

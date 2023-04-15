@@ -36,12 +36,12 @@
                             </div>
                         </div>
                         <div class="row justify-content-end">
-                            <div class="col-md-2 col-6">
+                            <div class="col-md-4 col-6">
                                 <button class="btn btn-lg btn-primary mt-3 w-100" @click="addCard">
                                     Add Card
                                 </button>
                             </div>
-                            <div class="col-md-2 col-6">
+                            <div class="col-md-4 col-6">
                                 <button class="btn btn-lg btn-success mt-3 w-100" @click="addLesson">
                                     Create
                                 </button>
