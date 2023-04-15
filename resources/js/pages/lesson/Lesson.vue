@@ -50,52 +50,58 @@
                         </div>
                     </div>
                     <div class="col-md-6 col-12">
-                        <div class="card">
-                            <div class="card-body p-3 row">
-                                <div class="col-8">
-                                    <h5 class="card-title mb-0">Flashcard</h5>
-                                    <p class="card-text text-sm">
-                                        Review terms and definitions
-                                    </p>
-                                </div>
-                                <div class="col-4">
-                                    <img src="https://cdn-icons-png.flaticon.com/512/5484/5484383.png" class="img-fluid"
-                                        alt="" />
+                        <router-link :to="{ name: 'home.flashcard', params: { id: id } }">
+                            <div class="card">
+                                <div class="card-body p-3 row">
+                                    <div class="col-8">
+                                        <h5 class="card-title mb-0">Flashcard</h5>
+                                        <p class="card-text text-sm">
+                                            Review terms and definitions
+                                        </p>
+                                    </div>
+                                    <div class="col-4">
+                                        <img src="https://cdn-icons-png.flaticon.com/512/5484/5484383.png" class="img-fluid"
+                                            alt="" />
+                                    </div>
                                 </div>
                             </div>
-                        </div>
+                        </router-link>
                     </div>
                     <div class="col-md-6 col-12">
-                        <div class="card">
-                            <div class="card-body p-3 row">
-                                <div class="col-8">
-                                    <h5 class="card-title mb-0">Learn</h5>
-                                    <p class="card-text text-sm">
-                                        Study with MC, T/F, and other questions
-                                    </p>
-                                </div>
-                                <div class="col-4">
-                                    <img src="https://cdn-icons-png.flaticon.com/512/4207/4207247.png" class="img-fluid"
-                                        alt="" />
+                        <router-link :to="{ name: 'home.learn', params: { id: id } }">
+                            <div class="card">
+                                <div class="card-body p-3 row">
+                                    <div class="col-8">
+                                        <h5 class="card-title mb-0">Learn</h5>
+                                        <p class="card-text text-sm">
+                                            Study with MC, T/F, and other questions
+                                        </p>
+                                    </div>
+                                    <div class="col-4">
+                                        <img src="https://cdn-icons-png.flaticon.com/512/4207/4207247.png" class="img-fluid"
+                                            alt="" />
+                                    </div>
                                 </div>
                             </div>
-                        </div>
+                        </router-link>
                     </div>
                     <div class="col-md-6 col-12 pt-3">
-                        <div class="card">
-                            <div class="card-body p-3 row">
-                                <div class="col-8">
-                                    <h5 class="card-title mb-0">Test</h5>
-                                    <p class="card-text text-sm">
-                                        Create a test for this lesson
-                                    </p>
-                                </div>
-                                <div class="col-4">
-                                    <img src="https://cdn-icons-png.flaticon.com/512/3068/3068553.png" class="img-fluid"
-                                        alt="" />
+                        <router-link :to="{ name: 'home.selftest', params: { id: id } }">
+                            <div class="card">
+                                <div class="card-body p-3 row">
+                                    <div class="col-8">
+                                        <h5 class="card-title mb-0">Test</h5>
+                                        <p class="card-text text-sm">
+                                            Create a test for this lesson
+                                        </p>
+                                    </div>
+                                    <div class="col-4">
+                                        <img src="https://cdn-icons-png.flaticon.com/512/3068/3068553.png" class="img-fluid"
+                                            alt="" />
+                                    </div>
                                 </div>
                             </div>
-                        </div>
+                        </router-link>
                     </div>
                     <div class="col-md-6 col-12 pt-3">
                         <div class="card">
@@ -225,6 +231,7 @@ export default {
                 this.type = 'delete';
                 this.$store.dispatch('lesson/deleteLesson', this.id);
             }
+            this.$router.push({ name: 'home.home' });
         },
     },
     computed: {

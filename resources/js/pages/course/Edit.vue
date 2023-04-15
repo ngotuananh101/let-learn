@@ -45,10 +45,6 @@
                                         @click="updateInfo">
                                         Update
                                     </button>
-                                    <button type="button" class="mx-1 mb-0 btn btn-outline-danger btn-sm"
-                                        @click="deleteCourse">
-                                        Delete
-                                    </button>
                                 </div>
                             </div>
                         </div>
@@ -87,7 +83,9 @@ export default {
                 }
             } else if (mutation.type === 'course/success') {
                 if (this.type === 'get') {
-                    this.course = mutation.payload;
+                    this.data = mutation.payload;
+                    this.course = this.data.course;
+                    this.lessons = this.data.course.lessons;
                 } else if (this.type === 'update_info') {
                     this.$root.showSnackbar('Update course info successfully', 'success');
                 } else if (this.type === 'delete') {
@@ -98,7 +96,7 @@ export default {
                 this.$root.showSnackbar(mutation.payload, 'danger');
             }
         });
-        this.$store.dispatch('course/getCourseById', this.$route.params.id);
+        this.$store.dispatch('course/getLessonByCourseId', this.$route.params.id);
     },
     methods: {
         updateInfo() {
@@ -111,12 +109,6 @@ export default {
                 password: this.course.password,
                 status: this.course.status,
             });
-        },
-        deleteCourse() {
-            if (confirm('Are you sure?')) {
-                this.type = 'delete';
-                this.$store.dispatch('course/deleteCourse', this.$route.params.id);
-            }
         },
     },
 }

@@ -42,7 +42,7 @@ function addLesson(lesson) {
         body: JSON.stringify(lesson),
     };
 
-    return fetch(`/api/user/lesson`, requestOptions)
+    return fetch(`/api/student/lesson`, requestOptions)
         .then(handleResponse)
         .then((lesson) => {
             return lesson;
@@ -55,7 +55,7 @@ function deleteLesson(id) {
         headers: authHeader(),
     };
 
-    return fetch(`/api/user/lesson/${id}`, requestOptions)
+    return fetch(`/api/student/lesson/${id}`, requestOptions)
         .then(handleResponse)
         .then((lesson) => {
             return lesson;
@@ -68,7 +68,7 @@ function getLessonById(id) {
         headers: authHeader()
     };
 
-    return fetch(`/api/user/lesson/${id}`, requestOptions)
+    return fetch(`/api/student/lesson/${id}`, requestOptions)
         .then(handleResponse)
         .then(lesson => {
             return lesson;
@@ -82,7 +82,7 @@ function updateLesson(lesson) {
         body: JSON.stringify(lesson)
     };
 
-    return fetch(`/api/user/lesson/${lesson.id}`, requestOptions)
+    return fetch(`/api/student/lesson/${lesson.id}`, requestOptions)
         .then(handleResponse)
         .then(lesson => {
             return lesson;

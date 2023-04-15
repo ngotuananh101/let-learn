@@ -11,39 +11,60 @@
                         <div class="row">
                             <div class="col-md-3 col-12">
                                 <label class="form-label mt-3">Name</label>
-                                <input id="name" name="name" class="form-control" type="text"
-                                    placeholder="Enter a name. Example:'MAE Chapter 1'" v-model="this.lesson.name" />
+                                <input
+                                    id="name"
+                                    name="name"
+                                    class="form-control"
+                                    type="text"
+                                    placeholder="Enter a name. Example:'MAE Chapter 1'"
+                                    v-model="this.lesson.name"
+                                />
                             </div>
                             <div class="col-md-6 col-12">
                                 <label class="form-label mt-3">Description</label>
-                                <input id="description" name="description" class="form-control" type="text"
-                                    placeholder="Add a description..." v-model="this.lesson.description" />
+                                <input
+                                    id="description"
+                                    name="description"
+                                    class="form-control"
+                                    type="text"
+                                    placeholder="Add a description..."
+                                    v-model="this.lesson.description"
+                                />
                             </div>
                             <div class="col-md-3 col-12">
                                 <label class="form-label mt-3">Password</label>
-                                <input id="password" name="password" class="form-control" type="text" placeholder="Password"
-                                    v-model="this.lesson.password" />
+                                <input
+                                    id="password"
+                                    name="password"
+                                    class="form-control"
+                                    type="text"
+                                    placeholder="Password"
+                                    v-model="this.lesson.password"
+                                />
                             </div>
-                        </div>
-                        <div class="col-md-2 col-6">
-                            <button class="btn btn-primary w-100 mt-4" @click="import_lesson_modal.show">
-                                Import Lesson
-                            </button>
-                        </div>
-                        <div class="col-12">
-                            <div v-for="(child, index) in cards">
-                                <component :is="child" :data="details[index]" @remove="removeCard"></component>
+                            <div class="col-md-2 col-6">
+                                <button class="btn btn-primary w-100 mt-3" @click="import_lesson_modal.show">
+                                    Import Lesson
+                                </button>
                             </div>
-                        </div>
-                        <div class="row justify-content-end">
-                            <div class="col-md-4 col-6">
+                            <div class="col-md-2 col-6">
+                                <button class="btn btn-success w-100 mt-3" @click="add">
+                                    Save
+                                </button>
+                            </div>
+                            <div class="col-12">
+                                <div v-for="(child, index) in cards">
+                                    <component :is="child" :data="details[index]" @remove="removeCard"></component>
+                                </div>
+                            </div>
+                            <div class="col-6">
                                 <button class="btn btn-lg btn-primary mt-3 w-100" @click="addCard">
                                     Add Card
                                 </button>
                             </div>
-                            <div class="col-md-4 col-6">
-                                <button class="btn btn-lg btn-success mt-3 w-100" @click="addLesson">
-                                    Create
+                            <div class="col-6">
+                                <button class="btn btn-lg btn-success mt-3 w-100" @click="add">
+                                    Save
                                 </button>
                             </div>
                         </div>
@@ -52,9 +73,8 @@
             </div>
         </div>
     </div>
-
     <div class="modal fade" id="importModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
-        aria-labelledby="staticBackdropLabel" aria-hidden="true">
+         aria-labelledby="staticBackdropLabel" aria-hidden="true">
         <div class="modal-dialog modal-lg mt-lg-10">
             <div class="modal-content">
                 <div class="modal-header">
@@ -65,37 +85,39 @@
                 <div class="modal-body">
                     <div class="form-check form-switch ps-0 mb-3">
                         <input id="importFile" class="form-check-input ms-0" type="checkbox" name="importFile"
-                            v-model="importFile" />
+                               v-model="importFile"/>
                         <label class="form-check-label" for="rememberMe">
                             Import from file
                         </label>
                     </div>
                     <div v-if="this.importFile">
                         <p>Import lesson from Excel (.xlsx) file ( <a
-                                href="https://s3-hcm-r1.longvan.net/19403879-letlearn/template/lesson_template.xlsx"
-                                target="_blank">Template</a> )</p>
-                        <input type="file" placeholder="Browse file..." class="mb-3 form-control" accept=".csv, .xlsx"
-                            name="file" @change="changeFile" />
+                            href="https://s3-hcm-r1.longvan.net/19403879-letlearn/template/lesson_template.xlsx"
+                            target="_blank">Template</a> )</p>
+                        <input type="file" placeholder="Browse file..." class="mb-3 form-control"
+                               accept=".csv, .xlsx" name="file" @change="changeFile"/>
                     </div>
                     <div v-else>
                         <p>Import lesson from plant text</p>
-                        <textarea class="form-control" rows="10" id="raw_data" placeholder="Enter text here..."></textarea>
+                        <textarea class="form-control" rows="10" id="raw_data"
+                                  placeholder="Enter text here..."></textarea>
                         <div class="row">
                             <div class="col-6">
                                 <label class="form-label mt-2">Between term and definition</label>
                                 <input type="text" class="mb-3 form-control" id="betweenTermDefinition"
-                                    placeholder="Between term and definition" value="---">
+                                       placeholder="Between term and definition" value="---">
                             </div>
                             <div class="col-6">
                                 <label class="form-label mt-2">Between row</label>
                                 <input type="text" class="mb-3 form-control" id="betweenCard" placeholder="Between row"
-                                    value="\n\n\n">
+                                       value="\n\n\n">
                             </div>
                         </div>
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn bg-gradient-secondary btn-sm" data-bs-dismiss="modal" id="closeImport">
+                    <button type="button" class="btn bg-gradient-secondary btn-sm"
+                            data-bs-dismiss="modal" id="closeImport">
                         Close
                     </button>
                     <button type="button" class="btn bg-gradient-success btn-sm" @click="this.import">
@@ -107,8 +129,8 @@
     </div>
 </template>
 <script>
-import LessonDetailCard from "../../components/cards/lesson-detail-card.vue";
-import { markRaw } from "vue";
+import LessonDetailCard from "../../../components/cards/lesson-detail-card.vue";
+import {markRaw} from "vue";
 
 export default {
     name: "Add",
@@ -120,6 +142,7 @@ export default {
     },
     data() {
         return {
+            unsubscribe: null,
             lesson: {
                 name: '',
                 description: '',
@@ -135,13 +158,7 @@ export default {
     },
     created() {
         this.unsubscribe = this.$store.subscribe((mutation) => {
-            if (mutation.type === 'lesson/request') {
-                if (this.type === 'import') {
-                    this.$root.showSnackbar('Importing lesson...', 'info');
-                } else if (this.type === 'addLesson') {
-                    this.$root.showSnackbar('Adding lesson...', 'info');
-                }
-            } else if (mutation.type === 'lesson/success') {
+            if (mutation.type === 'schoolLesson/success') {
                 if (this.type === 'import') {
                     this.$root.showSnackbar('Import lesson successfully', 'success');
                     this.details = mutation.payload;
@@ -149,10 +166,10 @@ export default {
                         return LessonDetailCard;
                     }));
                     this.import_lesson_modal.hide();
-                } else if (this.type === 'addLesson') {
+                } else if (this.type === 'add') {
                     this.$root.showSnackbar('Add lesson successfully', 'success');
                 }
-            } else if (mutation.type === 'lesson/failure') {
+            } else if (mutation.type === 'schoolLesson/failure') {
                 this.$root.showSnackbar(mutation.payload, 'danger');
             }
         });
@@ -233,7 +250,7 @@ export default {
                 }
                 const formData = new FormData();
                 formData.append('file', this.file);
-                this.$store.dispatch('lesson/importFile', formData);
+                this.$store.dispatch('adminLesson/importFile', formData);
             } else {
                 this.$root.showSnackbar('Importing lesson...', 'info');
                 try {
@@ -267,15 +284,14 @@ export default {
                 }
             }
         },
-        addLesson() {
+        add() {
             this.type = 'add';
-            this.$store.dispatch('lesson/addLesson', {
+            this.$store.dispatch('adminLesson/add', {
                 name: this.lesson.name,
                 description: this.lesson.description,
                 password: this.lesson.password,
                 details: this.details,
             });
-            this.$router.push({ name: 'home.home' });
         }
     }
 };

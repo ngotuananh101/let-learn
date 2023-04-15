@@ -138,8 +138,7 @@ export default {
             if (mutation.type === 'lesson/request') {
                 if (this.type === 'get') {
                     this.$root.showSnackbar('Loading lesson info...', 'info');
-                }
-                else if (this.type === 'import') {
+                } else if (this.type === 'import') {
                     this.$root.showSnackbar('Importing lesson...', 'info');
                 } else if (this.type === 'update') {
                     this.$root.showSnackbar('Updating lesson...', 'info');

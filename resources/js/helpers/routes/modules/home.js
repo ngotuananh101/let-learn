@@ -67,6 +67,12 @@ const home = [
                             import("../../../pages/home/learn/flash_card.vue"),
                     },
                     {
+                        path: "selftest/:id",
+                        name: "home.selftest",
+                        component: () =>
+                            import("../../../pages/home/learn/self_test.vue"),
+                    },
+                    {
                         path: "test/:id",
                         name: "home.test",
                         component: () =>
