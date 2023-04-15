@@ -52,7 +52,14 @@ class PostController extends Controller
                         'views' => 'nullable|integer',
                         'like_status' => 'nullable|in:like,unlike',
                     ]);
-
+                    //check if user role is user and request has class_id
+                    if (auth()->user()->role == 'user' && $request->input('class_id')) {
+                        return response()->json([
+                            'status' => 'error',
+                            'status_code' => 403,
+                            'message' => 'Forbidden access!'
+                        ], 403);
+                    }
                     $post = new Post();
                     $post->user_id = auth()->user()->id;
                     $post->class_id = $request->input('class_id', null);
@@ -152,6 +159,19 @@ class PostController extends Controller
             $post = $post;
             //get comments by post id
             $comments = Comment::where('post_id', $id)->get();
+            $comments = $comments->map(function ($comment) {
+                return [
+                    'id' => $comment->id,
+                    'user_id' => $comment->user_id,
+                    'user_name' => $comment->user->name,
+                    'post_id' => $comment->post_id,
+                    'comment' => $comment->comment,
+                    'status' => $comment->status,
+                    'votes' => $comment->votes,
+                    'created_at' => $comment->created_at,
+                    'updated_at' => $comment->updated_at,
+                ];
+            });
             //if post has class_id, get class by class_id
             if ($post->class_id) {
                 $class = $post->class->only(['name']);

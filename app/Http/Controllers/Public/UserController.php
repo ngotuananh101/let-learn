@@ -93,6 +93,26 @@ class UserController extends Controller
                     ->join('class_members', 'classes.id', '=', 'class_members.class_id')
                     ->where('class_members.user_id', $user->id)
                     ->get();
+                //join table class_members and classes to get all member of class by class_id
+                $class_id = $classes->pluck('id');
+                $member = Classes::select('classes.*', 'class_members.user_id')
+                    ->join('class_members', 'classes.id', '=', 'class_members.class_id')
+                    ->whereIn('class_members.class_id', $class_id)
+                    ->get();
+
+                $count = 0;
+                //for each member of class count +1
+                foreach ($member as $key => $value) {
+                    $count++;
+                }
+                //get all member of class
+                $member = $member->map(function ($user_mem) {
+                    return [
+                        'id' => $user_mem->user_id,
+                        'name' => User::find($user_mem->user_id)->name,
+                        'role' => User::find($user_mem->user_id)->role->name,
+                    ];
+                });
             } else {
                 $schools = null;
                 $classes = null;
@@ -101,6 +121,8 @@ class UserController extends Controller
                 // get random 6 lessons
                 'schools' => $schools,
                 'classes' => $classes,
+                'member' => $member,
+                'number_of_member' => $count,
                 'lessons' => $lessons,
                 'courses' => $courses,
                 'other_lesson' => $other_lesson,
@@ -556,7 +578,7 @@ class UserController extends Controller
                     ]);
                     //update learned and relearn of user
                     $user = $request->user();
-                    $learn = Learn::where('user_id', $user->id)->where('lesson_id', $request->lesson_id)->first();
+                    $learn = Learn::where('user_id', auth()->user()->id)->where('lesson_id', $request->lesson_id)->first();
                     if ($learn) {
                         //update learned and relearn of user
                         //get id of learned lesson details
@@ -580,11 +602,18 @@ class UserController extends Controller
                         $learn->relearn = $relearn;
                         $learn->save();
                     } else {
+                        //remove duplicate learned and relearn
+                        $learned_arr = array_unique($request->learned);
+                        $relearn_arr = array_unique($request->relearn);
+                        //convert array to string
+                        $learned_str = implode(',', $learned_arr);
+                        $relearn_str = implode(',', $relearn_arr);
                         $learn = new Learn();
-                        $learn->user_id = $user->id;
+                        $learn->user_id = auth()->user()->id;
                         $learn->lesson_id = $request->lesson_id;
-                        $learn->learned = $request->learned;
-                        $learn->relearn = $request->relearn;
+                        $learn->learned = $learned_str;
+                        $learn->relearn = $relearn_str;
+                        
                         $learn->save();
                     }
                     //count learned from learn

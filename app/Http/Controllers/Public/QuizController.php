@@ -60,15 +60,34 @@ class QuizController extends Controller
                     case 'all':
                         $class = Classes::with('quizzes')->findOrFail($id);
                         $quizzes = $class->quizzes;
-                        $members = $class->members;
+                        $member = Classes::select('classes.*', 'class_members.user_id')
+                            ->join('class_members', 'class_members.class_id', '=', 'classes.id')
+                            ->where('classes.id', $id)
+                            ->get();
+                        $count_mem = 0;
+                        //for each member of class count +1
+                        foreach ($member as $mem) {
+                            $count_mem++;
+                        }
+                        //get all member of class
+                        $member = $member->map(function ($user) {
+                            return [
+                                'id' => $user->user_id,
+                                'name' => User::find($user->user_id)->name,
+                                'role' => User::find($user->user_id)->role->name,
+                            ];
+                        });
                         //count number of questions in each quiz
                         foreach ($quizzes as $quiz) {
                             $quiz->count_questions = $quiz->questions->count();
+                            //set submit status for teacher is true
+                            $quiz->submit_status = true;
                         }
                         $data = [
                             'class_name' => $class->name,
                             //if don't have member, count_members = 0
-                            'members' => $members ? $members->count() : 0,
+                            'members' => $member,
+                            'count_members' => $count_mem,
                             'count_quizzes' => $quizzes->count(),
                             'quizzes' => $quizzes,
                         ];
@@ -160,17 +179,37 @@ class QuizController extends Controller
                     case 'all':
                         $class = Classes::with('quizzes')->findOrFail($id);
                         $quizzes = $class->quizzes->where('status', 'active');
-                        $members = $class->members;
+                        //get and count all member of class
+                        $member = Classes::select('classes.*', 'class_members.user_id')
+                            ->join('class_members', 'class_members.class_id', '=', 'classes.id')
+                            ->where('classes.id', $id)
+                            ->get();
+                        $count_mem = 0;
+                        //for each member of class count +1
+                        foreach ($member as $mem) {
+                            $count_mem++;
+                        }
+                        //get all member of class
+                        $member = $member->map(function ($user) {
+                            return [
+                                'id' => $user->user_id,
+                                'name' => User::find($user->user_id)->name,
+                                'role' => User::find($user->user_id)->role->name,
+                            ];
+                        });
+
                         //count number of questions in each quiz
                         foreach ($quizzes as $quiz) {
                             $quiz->count_questions = $quiz->questions->count();
+                            //check if user already take quiz
+                            $quiz->submited = Answer::where('quiz_id', $quiz->id)->where('user_id', auth()->user()->id)->exists();
                         }
                         //
                         $data = [
                             'class_name' => $class->name,
                             'count_quizzes' => $quizzes->count(),
-                            'members' => $members ? $members->count() : 0,
-                            'quizzes' => $quizzes->makeHidden('questions'),
+                            'members' => $member,
+                            'quizzes' => $quizzes->makeHidden('questions')
                         ];
                         return response()->json(['data' => $data]);
                         break;
