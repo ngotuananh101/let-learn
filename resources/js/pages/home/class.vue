@@ -241,11 +241,14 @@ export default {
     data() {
         return {
             id: this.$route.params.id,
+            user: null,
             quizzes: null,
             showDetails: false,
         };
     },
     created() {
+        this.user = this.$store.getters['user/userData'].info;
+        console.log(this.user);
         this.unsubscribe = this.$store.subscribe((mutation) => {
             if (mutation.type === "home/request") {
             } else if (mutation.type === "home/requestSuccess") {
@@ -254,7 +257,7 @@ export default {
             } else if (mutation.type === "home/requestFailure") {
             }
         });
-        this.$store.dispatch("home/getClassDetail", this.id);
+        this.$store.dispatch("home/getClassDetail", { id: this.id, roleName: this.user.role.name });
     },
     mounted() {
 

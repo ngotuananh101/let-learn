@@ -40,10 +40,10 @@ export default {
                     }
                 );
         },
-        getClassDetail({commit}, id) {
+        getClassDetail({ commit }, payload) {
             commit('request');
-            console.log(id);
-            homeService.loadClassDetail(id)
+            console.log(payload.id, payload.roleName);
+            homeService.loadClassDetail(payload.id, payload.roleName)
                 .then(
                     response => {
                         commit('requestSuccess', response);
