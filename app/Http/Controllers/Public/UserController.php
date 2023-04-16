@@ -522,7 +522,7 @@ class UserController extends Controller
     {
         try {
             $request->validate([
-                'type' => 'string|in:username,password,learned,info',
+                'type' => 'string|in:username,password,learned,info,done',
             ]);
             switch ($request->type) {
                 case 'username':
@@ -573,34 +573,67 @@ class UserController extends Controller
                 case 'learned':
                     $request->validate([
                         'lesson_id' => 'required|integer',
-                        'learned' => 'required|array',
-                        'relearn' => 'required|array',
+                        'learned' => 'nullable|array',
+                        'relearn' => 'nullable|array',
                     ]);
                     //update learned and relearn of user
                     $user = $request->user();
                     $learn = Learn::where('user_id', auth()->user()->id)->where('lesson_id', $request->lesson_id)->first();
                     if ($learn) {
-                        //update learned and relearn of user
-                        //get id of learned lesson details
-                        $learned = $learn ? explode(',', $learn->learned) : [];
-                        //get id of relearn lesson details
-                        $relearn = $learn ? explode(',', $learn->relearn) : [];
-                        //add new learned lesson detail to learned
-                        $learned = array_merge($learned, $request->learned);
-                        //remove learned lesson detail from relearn
-                        $relearn = array_diff($relearn, $request->learned);
-                        //add new relearn lesson detail to relearn
-                        $relearn = array_merge($relearn, $request->relearn);
-                        //remove duplicate learned and relearn
-                        $learned = array_unique($learned);
-                        $relearn = array_unique($relearn);
-                        //convert array to string
-                        $learned = implode(',', $learned);
-                        $relearn = implode(',', $relearn);
-                        //update learned and relearn of user
-                        $learn->learned = $learned;
-                        $learn->relearn = $relearn;
-                        $learn->save();
+                        if ($request->learned == null && $request->relearn == null) {   //done learn lesson
+                            //return congratulation message
+                            return response()->json([
+                                'status' => 'success',
+                                'status_code' => 200,
+                                'message' => 'Congratulation! You have done this lesson!',
+                            ], 200);
+                        } else if ($request->learned == null && $request->relearn != null) { //update only relearn of user
+                            //get id of relearn lesson details
+                            $relearn = $learn ? explode(',', $learn->relearn) : [];
+                            //add new relearn lesson detail to relearn
+                            $relearn = array_merge($relearn, $request->relearn);
+                            //remove duplicate relearn
+                            $relearn = array_unique($relearn);
+                            //convert array to string
+                            $relearn = implode(',', $relearn);
+                            //update relearn of user
+                            $learn->relearn = $relearn;
+                            $learn->save();
+                        } else if ($request->learned != null && $request->relearn == null) { //update only learned of user
+                            //get id of learned lesson details
+                            $learned = $learn ? explode(',', $learn->learned) : [];
+                            //add new learned lesson detail to learned
+                            $learned = array_merge($learned, $request->learned);
+                            //remove duplicate learned
+                            $learned = array_unique($learned);
+                            //convert array to string
+                            $learned = implode(',', $learned);
+                            //update learned of user
+                            $learn->learned = $learned;
+                            $learn->save();
+                        } else {
+                            //update learned and relearn of user
+                            //get id of learned lesson details
+                            $learned = $learn ? explode(',', $learn->learned) : [];
+                            //get id of relearn lesson details
+                            $relearn = $learn ? explode(',', $learn->relearn) : [];
+                            //add new learned lesson detail to learned
+                            $learned = array_merge($learned, $request->learned);
+                            //remove learned lesson detail from relearn
+                            $relearn = array_diff($relearn, $request->learned);
+                            //add new relearn lesson detail to relearn
+                            $relearn = array_merge($relearn, $request->relearn);
+                            //remove duplicate learned and relearn
+                            $learned = array_unique($learned);
+                            $relearn = array_unique($relearn);
+                            //convert array to string
+                            $learned = implode(',', $learned);
+                            $relearn = implode(',', $relearn);
+                            //update learned and relearn of user
+                            $learn->learned = $learned;
+                            $learn->relearn = $relearn;
+                            $learn->save();
+                        }
                     } else {
                         //remove duplicate learned and relearn
                         $learned_arr = array_unique($request->learned);
@@ -613,7 +646,7 @@ class UserController extends Controller
                         $learn->lesson_id = $request->lesson_id;
                         $learn->learned = $learned_str;
                         $learn->relearn = $relearn_str;
-                        
+
                         $learn->save();
                     }
                     //count learned from learn
@@ -666,6 +699,40 @@ class UserController extends Controller
                         'message' => 'Update info of user successfully',
                         'status' => 200
                     ], 200);
+                    break;
+                case 'done':
+                    //request validate choice 
+                    $request->validate([
+                        'choice' => 'nullable|in:relearnall',
+                        'lesson_id' => 'required|integer',
+                    ]);
+                    //check auth user is owner user id
+                    if ($request->user()->id != $id) {
+                        return response()->json([
+                            'status' => 'error',
+                            'status_code' => 403,
+                            'message' => 'You do not have permission to update this user'
+                        ], 403);
+                    }
+                    switch ($request->choice) {
+                        case 'relearnall':
+                            //delete learn of user
+                            $learn = Learn::where('user_id', auth()->user()->id)->where('lesson_id', $request->lesson_id)->first();
+                            if ($learn) {
+                                $learn->delete();
+                            }
+                            return response()->json([
+                                'message' => 'Relearn all lesson detail successfully',
+                                'status' => 200
+                            ], 200);
+                            break;
+                        default:
+                            return response()->json([
+                                'status' => 'error',
+                                'message' => 'Nothing to do',
+                            ], 400);
+                            break;
+                    }
                     break;
                 default:
                     return response()->json([
