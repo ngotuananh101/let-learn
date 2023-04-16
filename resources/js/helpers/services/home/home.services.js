@@ -71,15 +71,16 @@ function commentForum(data) {
 }
 
 function updatePassword(password) {
+    console.log(password);
     const requestOptions = {
         method: 'PUT',
         headers: authHeader(),
         body: JSON.stringify(password)
     };
 
-    return fetch(`/api/user/main/${this.authHeader.id}?type=password`, requestOptions)
+    return fetch(`/api/user/main/${password.id}?type=password`, requestOptions)
         .then(handleResponse)
-        .then(lesson => {
-            return lesson;
+        .then(password => {
+            return password;
         });
 }
