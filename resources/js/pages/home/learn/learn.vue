@@ -102,6 +102,8 @@ export default {
     },
 
     created() {
+        this.user = this.$store.getters['user/userData'].info;
+        console.log(this.user.id);
         this.unsubscribe = this.$store.subscribe((mutation) => {
             if (mutation.type === "learn/request") {
             } else if (mutation.type === "learn/requestSuccess") {
@@ -147,9 +149,10 @@ export default {
                     let incorrect_answers = this.lesson_details.filter(q => !q.isCorrect).map(q => q.id);
                     let correct_answers = this.lesson_details.filter(q => q.isCorrect).map(q => q.id);
                     this.$store.dispatch('learn/updateResult', {
-                        lesson_id: this.id,
+                        lesson_id: this.$route.params.id,
                         learned: correct_answers,
-                        relearn: incorrect_answers
+                        relearn: incorrect_answers,
+                        user_id: this.user.id
                     }).then((res) => {
                         this.show_result = true;
                     });

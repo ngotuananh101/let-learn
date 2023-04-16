@@ -78,21 +78,30 @@ const home = [
                         component: () =>
                             import("../../../pages/home/learn/test.vue"),
                     },
+                ],
+            },
+            {
+                path: "/forum",
+                name: "forum",
+                meta: {
+                    requiresAuth: true,
+                },
+                children: [
+                    {
+                        path: "",
+                        name: "forum",
+                        component: () =>
+                            import("../../../pages/home/forum/forum.vue"),
+                    },
                     {
                         path: "forum_detail/:id",
-                        name: "home.forum_detail",
+                        name: "forum.forum_detail",
                         component: () =>
                             import(
                                 "../../../pages/home/forum/forum_detail.vue"
                                 ),
                     },
-                    {
-                        path: "forum",
-                        name: "home.forum",
-                        component: () =>
-                            import("../../../pages/home/forum/forum.vue"),
-                    },
-                ],
+                ]
             },
             {
                 path: "/course",

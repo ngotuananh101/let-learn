@@ -77,9 +77,22 @@ export default {
                 );
         },
         updateResult({commit}, data) {
+            console.log(data);
             return learnService.updateResult(data)
                 .then(data => {
-                    console.log("data");
+                    // console.log("data");
+                        return data;
+                    },
+                    error => {
+                        return null;
+                    }
+                );
+        },
+        updateComment({commit}, data) {
+            console.log(data);
+            return learnService.updateComment(data)
+                .then(data => {
+                        // console.log("data");
                         return data;
                     },
                     error => {
