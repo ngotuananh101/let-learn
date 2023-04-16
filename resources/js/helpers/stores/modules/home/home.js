@@ -126,7 +126,8 @@ export default {
                         commit('requestFailure', error);
                     }
                 );
-        updatePassword({ commit }, password) {
+        },
+        updatePassword({ commit }, password){
             commit("request");
             homeService.updatePassword(password).then(
                 (password) => {
