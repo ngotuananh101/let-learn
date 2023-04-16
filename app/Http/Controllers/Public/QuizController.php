@@ -463,7 +463,7 @@ class QuizController extends Controller
                         'class_id' => 'required|integer',
                         'name' => 'required|string|max:255',
                         'description' => 'required|string',
-                        'status' => 'required|in:pending,inactive',
+                        'status' => 'nullable|in:pending,inactive',
                         'score_reporting' => 'nullable|boolean',
                         'start_time' => 'required|date|after_or_equal:today',
                         'end_time' => 'nullable|date|after:start_time',
