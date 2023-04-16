@@ -14,6 +14,7 @@ use App\Models\LessonDetail;
 use App\Models\School;
 use App\Models\UserLog;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Hash;
 use PhpParser\Builder\Class_;
 
 use function PHPSTORM_META\type;
@@ -550,6 +551,7 @@ class UserController extends Controller
 
                 case 'password':
                     $request->validate([
+                        'old_password' => 'required|string|min:6',
                         'password' => 'required|string|min:6|confirmed',
                     ]);
                     //check auth user is owner user id
@@ -560,9 +562,17 @@ class UserController extends Controller
                             'message' => 'You do not have permission to update this user'
                         ], 403);
                     }
+                    //check old password is correct
+                    if (!Hash::check($request->old_password, $request->user()->password)) {
+                        return response()->json([
+                            'status' => 'error',
+                            'status_code' => 403,
+                            'message' => 'Old password is incorrect'
+                        ], 403);
+                    }
                     //update password of user
                     $user = $request->user();
-                    $user->password = $request->password;
+                    $user->password = bcrypt($request->password);
                     $user->save();
                     return response()->json([
                         'user' => $user,
@@ -674,7 +684,7 @@ class UserController extends Controller
                         ], 403);
                     }
                     //update info of user
-                    $user = $request->user();
+                    $user = auth()->user();
                     $user->name = $request->name ? $request->name : $user->name;
                     //$user->email = $request->email ? $request->email : $user->email;
                     //date of birth have to more than 6 years old
@@ -690,9 +700,7 @@ class UserController extends Controller
                             ], 400);
                         }
                     }
-
-                    $user = $request->date_of_birth ? $request->date_of_birth : $user->date_of_birth;
-
+                    $user->date_of_birth = $request->date_of_birth ? $request->date_of_birth : $user->date_of_birth;
                     $user->save();
                     return response()->json([
                         'user' => $user,
