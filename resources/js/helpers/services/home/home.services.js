@@ -7,7 +7,8 @@ export const homeService = {
     loadClassDetail,
     loadUserInformation,
     loadForumDetail,
-    commentForum
+    commentForum,
+    updatePassword
 };
 
 function loadHome() {
@@ -69,3 +70,16 @@ function commentForum(data) {
         .then(handleResponse)
 }
 
+function updatePassword(password) {
+    const requestOptions = {
+        method: 'PUT',
+        headers: authHeader(),
+        body: JSON.stringify(password)
+    };
+
+    return fetch(`/api/user/main/${this.authHeader.id}?type=password`, requestOptions)
+        .then(handleResponse)
+        .then(lesson => {
+            return lesson;
+        });
+}
