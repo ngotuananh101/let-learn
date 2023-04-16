@@ -7,6 +7,7 @@ use App\Models\Comment;
 use App\Models\CommentVote;
 use App\Models\Post;
 use App\Models\PostLike;
+use App\Models\User;
 use App\Models\UserLogPost;
 use Illuminate\Http\Request;
 
@@ -23,10 +24,39 @@ class PostController extends Controller
         try {
             //show all posts dont have class_id
             $posts = Post::where('class_id', null)->get();
-            //with each post, get comments
-            foreach ($posts as $post) {
-                $post->comments = Comment::where('post_id', $post->id)->get();
-            }
+            $posts = $posts->map(function ($post) {
+                return [
+                    'id' => $post->id,
+                    'user_id' => $post->user_id,
+                    'name' => $post->user->name,
+                    'username' => $post->user->username,
+                    'email' => $post->user->email,
+                    'class_id' => $post->class_id,
+                    'title' => $post->title,
+                    'content' => $post->content,
+                    'status' => $post->status,
+                    'score_reporting' => $post->score_reporting,
+                    'tags' => $post->tags,
+                    'views' => $post->views,
+                    'created_at' => $post->created_at,
+                    'updated_at' => $post->updated_at,
+                    //with each post, get each comment of this post including username
+                    'comments' => $post->comments->map(function ($comment) {
+                        return [
+                            'id' => $comment->id,
+                            'user_id' => $comment->user_id,
+                            'user_name' => $comment->user->name,
+                            'email' => $comment->user->email,
+                            'post_id' => $comment->post_id,
+                            'comment' => $comment->comment,
+                            'status' => $comment->status,
+                            'votes' => $comment->votes,
+                            'created_at' => $comment->created_at,
+                            'updated_at' => $comment->updated_at,
+                        ];
+                    }),
+                ];
+            });
             return response()->json([
                 'message' => 'Posts retrieved',
                 'posts' => $posts
@@ -174,6 +204,28 @@ class PostController extends Controller
             }
             //get title, content, tags, views, created_at
             $post = $post;
+            //add user_name, email, name to string post
+            // $post = [
+            //     'id' => $post->id,
+            //     'user_id' => $post->user_id,
+            //     'name' => $post->user->name,
+            //     'user_name' => $post->user->username,
+            //     'email' => $post->user->email,
+            //     'class_id' => $post->class_id,
+            //     'title' => $post->title,
+            //     'content' => $post->content,
+            //     'status' => $post->status,
+            //     'score_reporting' => $post->score_reporting,
+            //     'tags' => $post->tags,
+            //     'views' => $post->views,
+            //     'created_at' => $post->created_at,
+            //     'updated_at' => $post->updated_at,
+            //     'class' => $post->class,
+            // ];
+            //add user_name, email, name to post
+            $post['name'] = $post->user->name;
+            $post['user_name'] = $post->user->name;
+            $post['email'] = $post->user->email;
             //get comments by post id
             $comments = Comment::where('post_id', $id)->get();
             $comments = $comments->map(function ($comment) {
@@ -181,6 +233,7 @@ class PostController extends Controller
                     'id' => $comment->id,
                     'user_id' => $comment->user_id,
                     'user_name' => $comment->user->name,
+                    'email' => $comment->user->email,
                     'post_id' => $comment->post_id,
                     'comment' => $comment->comment,
                     'status' => $comment->status,
@@ -210,7 +263,7 @@ class PostController extends Controller
                 $post->views = $post->views + 1;
             }
             $data = [
-                'post' => $post,
+                'post' => $post->makeHidden(['user']),
                 'comments' => $comments,
                 'class' => $class ?? null,
             ];
