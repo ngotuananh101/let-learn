@@ -88,6 +88,7 @@
                     <div class="col-md-6 col-12 pt-3">
                         <router-link :to="{ name: 'home.selftest', params: { id: id } }">
                             <div class="card">
+                                <!-- :href="{/lesson/selftest/${id}}" -->
                                 <div class="card-body p-3 row">
                                     <div class="col-8">
                                         <h5 class="card-title mb-0">Test</h5>

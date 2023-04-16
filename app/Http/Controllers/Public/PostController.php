@@ -19,7 +19,7 @@ class PostController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index(Request $request)
+    public function index()
     {
         try {
             if ($request->class_id) {
@@ -31,7 +31,7 @@ class PostController extends Controller
                     ], 403);
                 }
                 //show all posts have class_id
-                $posts = Post::where('class_id', $request->class_id)->get();
+                $posts = Post::where('class_id', $request->class_id)->where('status', 'active')->orderBy('created_at', 'desc')->get();
                 $posts = $posts->map(function ($post) {
                     return [
                         'id' => $post->id,
@@ -71,7 +71,7 @@ class PostController extends Controller
                 ], 200);
             } else {
                 //show all posts dont have class_id
-                $posts = Post::where('class_id', null)->get();
+                $posts = Post::where('class_id', null)->where('status', 'active')->orderBy('created_at', 'desc')->get();
                 $posts = $posts->map(function ($post) {
                     return [
                         'id' => $post->id,
