@@ -20,7 +20,24 @@ class PostController extends Controller
      */
     public function index()
     {
-        //
+        try {
+            //show all posts dont have class_id
+            $posts = Post::where('class_id', null)->get();
+            //with each post, get comments
+            foreach ($posts as $post) {
+                $post->comments = Comment::where('post_id', $post->id)->get();
+            }
+            return response()->json([
+                'message' => 'Posts retrieved',
+                'posts' => $posts
+            ], 200);
+        } catch (\Throwable $th) {
+            return response()->json([
+                'status' => 'error',
+                'status_code' => 500,
+                'message' => $th->getMessage()
+            ], 500);
+        }
     }
 
     /**
@@ -233,197 +250,265 @@ class PostController extends Controller
             switch ($request->type) {
                 case 'post':
                     $request->validate([
-                        'class_id' => 'nullable|integer',
-                        'title' => 'nullable|string|max:255',
-                        'content' => 'nullable|string|max:1000',
-                        'status' => 'nullable|in:active,pending,inactive',
-                        'score_reporting' => 'nullable|integer',
-                        'tags' => 'nullable|string',
-                        'like' => 'nullable|in:like,unlike',
+                        'choice' => 'nullable|in:like',
                     ]);
-                    $post = Post::findOrFail($id);
-                    //check if class_id of post is null or not
-                    //get current liked status of post
-                    $postLike = PostLike::where('user_id', auth()->user()->id)->where('post_id', $post->id)->first();
-                    $liked = $postLike->like_status;
-                    $poststatus = $post->score_reporting;
+                    switch ($request->choice) {
+                        case 'like':
+                            $request->validate([
+                                'class_id' => 'nullable|integer',
+                                'like' => 'required|in:like,unlike',
+                            ]);
+                            $post = Post::findOrFail($id);
+                            //check if class_id of post is null or not
+                            //get current liked status of post
+                            if (PostLike::where('user_id', auth()->user()->id)->where('post_id', $post->id)->doesntExist() == true) {
+                                $postLike = new PostLike();
+                                $postLike->user_id = auth()->user()->id;
+                                $postLike->post_id = $post->id;
+                                $postLike->like_status = 'unlike';
+                                $postLike->save();
+                                $postLike = PostLike::where('user_id', auth()->user()->id)->where('post_id', $post->id)->first();
+                                $liked = 'unlike';
+                                $poststatus = $post->score_reporting;
+                            } else {
+                                $postLike = PostLike::where('user_id', auth()->user()->id)->where('post_id', $post->id)->first();
+                                $liked = $postLike->like_status;
+                                $poststatus = $post->score_reporting;
+                            }
+                            if ($liked == 'like') {
+                                if ($request->input('like') == 'unlike') {
+                                    $likestatus =  'unlike';
+                                    $poststatus = $post->score_reporting - 1;
+                                }
+                                if ($request->input('like') == 'like' || $request->input('like') == null) {
+                                    $likestatus = 'like';
+                                    $poststatus = $post->score_reporting;
+                                }
+                            } else if ($liked == 'unlike') {
+                                if ($request->input('like') == 'unlike' || $request->input('like') == null) {
+                                    $likestatus = 'unlike';
+                                    $poststatus = $post->score_reporting;
+                                }
+                                if ($request->input('like') == 'like') {
+                                    $likestatus = 'like';
+                                    $poststatus = $post->score_reporting + 1;
+                                }
+                            }
+                            $userRole = auth()->user()->role->name;
+                            if ($post->class_id) {
+                                //if class_id is not null, check if user is teacher or student of the class
+                                if ($userRole == 'teacher' || $userRole == 'student') {
+                                    $post->user_id = auth()->user()->id;
+                                    $post->score_reporting = $poststatus;
+                                    $post->save();
 
-                    if ($liked == 'like') {
-                        if ($request->input('like') == 'unlike') {
-                            $likestatus =  'unlike';
-                            $poststatus = $post->score_reporting - 1;
-                        }
-                        if ($request->input('like') == 'like' || $request->input('like') == null) {
-                            $likestatus = 'like';
-                            $poststatus = $post->score_reporting;
-                        }
-                    } else if ($liked == 'unlike') {
-                        if ($request->input('like') == 'unlike' || $request->input('like') == null) {
-                            $likestatus = 'unlike';
-                            $poststatus = $post->score_reporting;
-                        }
-                        if ($request->input('like') == 'like') {
-                            $likestatus = 'like';
-                            $poststatus = $post->score_reporting + 1;
-                        }
-                    }
-                    //check if user_log
-                    $userRole = auth()->user()->role->name;
-                    if ($post->class_id) {
-                        //if class_id is not null, check if user is teacher or student of the class
-                        if (($userRole == 'teacher' && auth()->user()->id == $post->user_id) || ($userRole == 'student' && auth()->user()->id == $post->user_id)) {
+                                    //update post like status
+                                    $postLike->like_status = $likestatus;
+                                    $postLike->save();
+                                    return response()->json([
+                                        'message' => 'Post updated successfully',
+                                        'post' => $post,
+                                        'postLike' => $postLike
+                                    ], 200);
+                                } else {
+                                    return response()->json(['message' => 'You are not authorized to update this post'], 403);
+                                }
+                            } else {
+                                $post->user_id = auth()->user()->id;
+                                $post->score_reporting = $poststatus;
+                                $post->save();
 
-                            $post->user_id = auth()->user()->id;
-                            $post->class_id = $request->input('class_id', $post->class_id);
-                            $post->title = $request->input('title', $post->title);
-                            $post->content = $request->input('content', $post->content);
-                            $post->status = $request->input('status', $post->status);
-                            $post->score_reporting = $poststatus;
-                            $post->tags = $request->input('tags');
-                            $post->views = $request->input('views', $post->views);
-                            $post->save();
+                                //update post like status
+                                $postLike->like_status = $likestatus;
+                                $postLike->save();
+                                return response()->json([
+                                    'message' => 'Liked successfully',
+                                    'post' => $post,
+                                    'postLike' => $postLike
+                                ], 200);
+                            }
+                            break;
+                        default:
+                            $request->validate([
+                                'class_id' => 'nullable|integer',
+                                'title' => 'nullable|string|max:255',
+                                'content' => 'nullable|string|max:1000',
+                                'status' => 'nullable|in:active,pending,inactive',
+                                'score_reporting' => 'nullable|integer',
+                                'tags' => 'nullable|string',
+                            ]);
+                            $post = Post::findOrFail($id);
+                            //check if user_log
+                            $userRole = auth()->user()->role->name;
+                            if ($post->class_id) {
+                                //if class_id is not null, check if user is teacher or student of the class
+                                if (($userRole == 'teacher' && auth()->user()->id == $post->user_id) || ($userRole == 'student' && auth()->user()->id == $post->user_id)) {
 
-                            //update post like status
-                            $postLike->like_status = $likestatus;
-                            $postLike->save();
-                            return response()->json([
-                                'message' => 'Post updated successfully',
-                                'post' => $post,
-                                'postLike' => $postLike
-                            ], 200);
-                        } else {
-                            return response()->json(['message' => 'You are not authorized to update this post'], 403);
-                        }
-                    } else {
-                        //for case post is not in class
-                        if (auth()->user()->id == $post->user_id) {
-                            $post->user_id = auth()->user()->id;
-                            $post->title = $request->input('title', $post->title);
-                            $post->content = $request->input('content', $post->content);
-                            $post->status = $request->input('status', $post->status);
-                            $post->score_reporting = $poststatus;
-                            $post->tags = $request->input('tags');
-                            $post->views = $request->input('views', $post->views);
-                            $post->save();
+                                    $post->user_id = auth()->user()->id;
+                                    $post->class_id = $request->input('class_id', $post->class_id);
+                                    $post->title = $request->input('title', $post->title);
+                                    $post->content = $request->input('content', $post->content);
+                                    $post->status = $request->input('status', $post->status);
+                                    $post->tags = $request->input('tags');
+                                    $post->views = $request->input('views', $post->views);
+                                    $post->save();
 
-                            //update post like status
-                            $postLike->like_status = $likestatus;
-                            $postLike->save();
-                            return response()->json([
-                                'message' => 'Post updated',
-                                'post' => $post,
-                                'postLike' => $postLike
-                            ], 200);
-                        } else {
-                            return response()->json(['message' => 'You are not authorized to update this post'], 403);
-                        }
+                                    //update post like status
+                                    return response()->json([
+                                        'message' => 'Post updated successfully',
+                                        'post' => $post,
+                                    ], 200);
+                                } else {
+                                    return response()->json(['message' => 'You are not authorized to update this post'], 403);
+                                }
+                            } else {
+                                //for case post is not in class
+                                if (auth()->user()->id == $post->user_id) {
+                                    $post->user_id = auth()->user()->id;
+                                    $post->title = $request->input('title', $post->title);
+                                    $post->content = $request->input('content', $post->content);
+                                    $post->status = $request->input('status', $post->status);
+                                    $post->tags = $request->input('tags');
+                                    $post->views = $request->input('views', $post->views);
+                                    $post->save();
+                                    return response()->json([
+                                        'message' => 'Post updated',
+                                        'post' => $post,
+                                    ], 200);
+                                } else {
+                                    return response()->json(['message' => 'You are not authorized to update this post'], 403);
+                                }
+                            }
+                            break;
                     }
                     break;
                 case 'comment':
                     $request->validate([
-                        'comment_id' => 'required|integer',
-                        'comment' => 'nullable|string',
-                        'status' => 'nullable|in:active,pending,inactive',
-                        'votes' => 'nullable|integer',
-                        'votetype' => 'nullable|in:upvote,downvote,nonvote',
+                        'choice' => 'nullable|in:vote',
                     ]);
-                    $comment = Comment::findOrFail($request->input('comment_id'));
-                    $votetype = $request->input('votetype');
-                    //check if user update vote type
-                    //check if post contains comment_id has class_id or not
-                    //get current voted status of comment
-                    $commentVote = CommentVote::where('user_id', auth()->user()->id)->where('comment_id', $comment->id)->first();
-                    $voted = $commentVote->vote_status;
-                    $votesstatus = $comment->votes;
+                    switch ($request->choice) {
+                        case 'vote':
+                            $request->validate([
+                                'comment_id' => 'required|integer',
+                                'votetype' => 'nullable|in:upvote,downvote,nonvote',
+                            ]);
+                            $comment = Comment::findOrFail($request->input('comment_id'));
+                            $votetype = $request->input('votetype');
+                            //find comment vote by user_id and comment_id
+                            if (CommentVote::where('user_id', auth()->user()->id)->where('comment_id', $comment->id)->first() == null) {
+                                $commentVote = new CommentVote();
+                                $commentVote->user_id = auth()->user()->id;
+                                $commentVote->post_id = $comment->post_id;
+                                $commentVote->comment_id = $request->input('comment_id');
+                                $commentVote->vote_status = 'nonvote';
+                                $commentVote->save();
+                                //get current voted status of comment
+                                $commentVote = CommentVote::where('user_id', auth()->user()->id)->where('comment_id', $comment->id)->first();
+                                $voted = 'nonvote';
+                                $votesstatus = $comment->votes;
+                            } else {
+                                //get current voted status of comment
+                                $commentVote = CommentVote::where('user_id', auth()->user()->id)->where('comment_id', $comment->id)->first();
+                                $voted = $commentVote->vote_status;
+                                $votesstatus = $comment->votes;
+                            }
 
-                    if ($voted == 'upvote') {
-                        if ($votetype == 'downvote') {
-                            $votetypestatus = 'downvote';
-                            $votesstatus = $comment->votes - 1;
-                        }
-                        if ($votetype == 'upvote' || $votetype == null) {
-                            $votetypestatus = 'upvote';
-                            $votesstatus = $comment->votes;
-                        }
-                        if ($votetype == 'nonvote') {
-                            $votetypestatus = 'nonvote';
-                            $votesstatus = $comment->votes;
-                        }
-                    } else if ($voted == 'downvote') {
-                        if ($votetype == 'downvote' || $votetype == null) {
-                            $votetypestatus = 'downvote';
-                            $votesstatus = $comment->votes;
-                        }
-                        if ($votetype == 'upvote') {
-                            $votetypestatus = 'upvote';
-                            $votesstatus = $comment->votes + 1;
-                        }
-                        if ($votetype == 'nonvote') {
-                            $votetypestatus = 'nonvote';
-                            $votesstatus = $comment->votes;
-                        }
-                    } else if ($voted == 'nonvote') {
-                        if ($votetype == 'downvote') {
-                            $votetypestatus = 'downvote';
-                            $votesstatus = $comment->votes - 1;
-                        }
-                        if ($votetype == 'upvote') {
-                            $votetypestatus = 'upvote';
-                            $votesstatus = $comment->votes + 1;
-                        }
-                        if ($votetype == 'nonvote' || $votetype == null) {
-                            $votetypestatus = 'nonvote';
-                            $votesstatus = $comment->votes;
-                        }
-                    }
+                            if ($voted == 'upvote') {
+                                if ($votetype == 'downvote') {
+                                    $votetypestatus = 'downvote';
+                                    $votesstatus = $comment->votes - 1;
+                                }
+                                if ($votetype == 'upvote' || $votetype == null) {
+                                    $votetypestatus = 'upvote';
+                                    $votesstatus = $comment->votes;
+                                }
+                                if ($votetype == 'nonvote') {
+                                    $votetypestatus = 'nonvote';
+                                    $votesstatus = $comment->votes;
+                                }
+                            } else if ($voted == 'downvote') {
+                                if ($votetype == 'downvote' || $votetype == null) {
+                                    $votetypestatus = 'downvote';
+                                    $votesstatus = $comment->votes;
+                                }
+                                if ($votetype == 'upvote') {
+                                    $votetypestatus = 'upvote';
+                                    $votesstatus = $comment->votes + 1;
+                                }
+                                if ($votetype == 'nonvote') {
+                                    $votetypestatus = 'nonvote';
+                                    $votesstatus = $comment->votes;
+                                }
+                            } else if ($voted == 'nonvote') {
+                                if ($votetype == 'downvote') {
+                                    $votetypestatus = 'downvote';
+                                    $votesstatus = $comment->votes - 1;
+                                }
+                                if ($votetype == 'upvote') {
+                                    $votetypestatus = 'upvote';
+                                    $votesstatus = $comment->votes + 1;
+                                }
+                                if ($votetype == 'nonvote' || $votetype == null) {
+                                    $votetypestatus = 'nonvote';
+                                    $votesstatus = $comment->votes;
+                                }
+                            }
 
-                    //check if user is teacher or student of the class
-                    $userRole = auth()->user()->role->name;
-                    if ($comment->post->class_id) {
-                        if (($userRole == 'teacher' && auth()->user()->id == $comment->user_id) || ($userRole == 'student' && auth()->user()->id == $comment->user_id)) {
-                            $comment->user_id = auth()->user()->id;
-                            //post_id is $id
-                            $comment->post_id = $id;
-                            $comment->comment = $request->input('comment', $comment->comment);
-                            $comment->status = $request->input('status', $comment->status);
-                            $comment->votes = $votesstatus;
-                            $comment->save();
-
-                            //update comment vote status
                             $commentVote->vote_status = $votetypestatus;
                             $commentVote->save();
+                            $comment->votes = $votesstatus;
+                            $comment->save();
                             return response()->json([
-                                'message' => 'Comment updated',
+                                'message' => 'Voted successfully',
                                 'comment' => $comment,
                                 'commentVote' => $commentVote
                             ], 200);
-                        } else {
-                            return response()->json(['message' => 'You are not authorized to update this comment'], 403);
-                        }
-                    } else {
-                        if (auth()->user()->id == $comment->user_id) {
-                            $comment->user_id = auth()->user()->id;
-                            //post_id is $id
-                            $comment->post_id = $id;
-                            $comment->comment = $request->input('comment', $comment->comment);
-                            $comment->status = $request->input('status', $comment->status);
-                            $comment->votes = $votesstatus;
-                            $comment->save();
+                            break;
+                        default: //update comment
+                            $request->validate([
+                                'comment_id' => 'required|integer',
+                                'comment' => 'nullable|string',
+                                'status' => 'nullable|in:active,pending,inactive',
+                            ]);
+                            $comment = Comment::findOrFail($request->input('comment_id'));
 
-                            //update comment vote status
-                            $commentVote->vote_status = $votetypestatus;
-                            $commentVote->save();
-                            return response()->json([
-                                'message' => 'Comment updated',
-                                'comment' => $comment,
-                                'commentVote' => $commentVote
-                            ], 200);
-                        } else {
-                            return response()->json(['message' => 'You are not authorized to update this comment'], 403);
-                        }
+                            //check if user is teacher or student of the class
+                            $userRole = auth()->user()->role->name;
+                            if ($comment->post->class_id) {
+                                if (($userRole == 'teacher' && auth()->user()->id == $comment->user_id) || ($userRole == 'student' && auth()->user()->id == $comment->user_id)) {
+                                    $comment->user_id = auth()->user()->id;
+                                    //post_id is $id
+                                    $comment->post_id = $id;
+                                    $comment->comment = $request->input('comment', $comment->comment);
+                                    $comment->status = $request->input('status', $comment->status);
+                                    $comment->save();
+
+                                    return response()->json([
+                                        'message' => 'Comment updated',
+                                        'comment' => $comment,
+                                    ], 200);
+                                } else {
+                                    return response()->json(['message' => 'You are not authorized to update this comment'], 403);
+                                }
+                            } else {
+                                if (auth()->user()->id == $comment->user_id) {
+                                    $comment->user_id = auth()->user()->id;
+                                    //post_id is $id
+                                    $comment->post_id = $id;
+                                    $comment->comment = $request->input('comment', $comment->comment);
+                                    $comment->status = $request->input('status', $comment->status);
+                                    $comment->save();
+
+                                    return response()->json([
+                                        'message' => 'Comment updated',
+                                        'comment' => $comment,
+                                    ], 200);
+                                } else {
+                                    return response()->json(['message' => 'You are not authorized to update this comment'], 403);
+                                }
+                            }
+                            break;
                     }
-                    break;
-
                 default:
                     return response()->json(['message' => 'Invalid type'], 400);
                     break;
