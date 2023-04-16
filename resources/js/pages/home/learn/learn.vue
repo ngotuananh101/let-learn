@@ -137,13 +137,6 @@ export default {
         ...mapActions({
             getLearn: 'learn/getLearn'
         }),
-        goBack() {
-            this.$router.go(-1); // Go back to previous page
-        },
-
-        relearn() {
-            this.$router.push(`/lessons/${this.id}`); // Navigate to the same lesson page to relearn it
-        },
         checkAnswer(index) {
             if (this.answered) {
                 return;
@@ -153,7 +146,6 @@ export default {
                 const selectedAnswer = this.lesson_details[this.currentQuestion].answers[selectedAnswerIndex];
                 let element = document.getElementById('answer-' + index);
                 if (selectedAnswer === this.lesson_details[this.currentQuestion].correct_answer) {
-                    // if (1===1) {
                     element.classList.add('bg-success');
                     this.isCorrectAnswer = true;
                 } else {
@@ -166,13 +158,15 @@ export default {
                     isCorrect: this.isCorrectAnswer
                 });
                 if (this.currentQuestion === this.lesson_details.length - 1) {
-                    this.$emit('change-progress', 100);
-                    let incorrect_answers = this.lesson_details.filter(q => !q.isCorrect).map(q => q.id);
-                    let correct_answers = this.lesson_details.filter(q => q.isCorrect).map(q => q.id);
+                    const userAnswers = this.userAnswers;
+                    const correctAnswers = userAnswers.filter(answer => answer.isCorrect);
+                    const learned = correctAnswers.map(answer => answer.question);
+                    const incorrectAnswers = userAnswers.filter(answer => !answer.isCorrect).map(answer => answer.question);
+
                     this.$store.dispatch('learn/updateResult', {
                         lesson_id: this.$route.params.id,
-                        learned: correct_answers,
-                        relearn: incorrect_answers,
+                        learned: learned,
+                        relearn: incorrectAnswers,
                         user_id: this.user.id
                     }).then((res) => {
                         this.show_result = true;
@@ -182,6 +176,7 @@ export default {
                 }
             }
         },
+
 
         nextQuestion() {
             this.answered = false;
