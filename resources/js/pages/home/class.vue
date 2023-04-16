@@ -10,7 +10,7 @@
             <li class="nav-item" role="presentation">
                 <button class="nav-link active" id="pills-excercite-tab" data-bs-toggle="pill"
                         data-bs-target="#pills-excercite" type="button" role="tab" aria-controls="pills-excercite"
-                        aria-selected="false" style="color: black; font-weight: bold">Excercite
+                        aria-selected="false" style="color: black; font-weight: bold">Exercises
                 </button>
             </li>
             <li class="nav-item" role="presentation">
@@ -26,7 +26,7 @@
     <div class="tab-content" id="pills-tabContent">
         <div class="tab-pane fade show active" id="pills-excercite" role="tabpanel" aria-labelledby="pills-home-tab">
             <div class="container pt-3">
-                <h3 class="text-center">Excercite</h3>
+                <h3 class="text-center">Exercises</h3>
                 <div v-if="quizzes" class="row mt-5">
                     <div class="col-md-6 col-6 mt-3" v-for="(quiz, index) in quizzes" :key="index">
                         <div class="card">

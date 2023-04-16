@@ -76,6 +76,16 @@
             </div>
         </div>
     </div>
+    <template>
+        <div v-if="completed">
+            <h1>Congratulations, you have completed the lesson!</h1>
+            <button @click="goBack">Go Back</button>
+            <button @click="relearn">Relearn</button>
+        </div>
+        <div v-else>
+            <!-- Existing code for displaying the quiz questions -->
+        </div>
+    </template>
 
 
 
@@ -94,6 +104,7 @@ export default {
             isCorrectAnswer: false,
             answered: false,
             show_result: false,
+            completed: false,
             bg: ['rgb(219, 238, 255)', 'rgb(253, 240, 227)', 'rgb(230, 223, 242)', 'rgb(235, 242, 223)'],
             ans_icon: ['A', 'B', 'C', 'D'],
             progress: 0,
@@ -102,13 +113,17 @@ export default {
     },
 
     created() {
-        this.user = this.$store.getters['user/userData'].info;
-        console.log(this.user.id);
+        this.user = this.$store.getters["user/userData"].info;
         this.unsubscribe = this.$store.subscribe((mutation) => {
             if (mutation.type === "learn/request") {
             } else if (mutation.type === "learn/requestSuccess") {
-                this.lesson_details = mutation.payload;
+                if (mutation.payload.length > 0) {
+                    this.lesson_details = mutation.payload;
+                } else {
+                    this.completed = true; // Set completed flag to true if lesson details are empty
+                }
             } else if (mutation.type === "learn/requestFailure") {
+                this.completed = true; // Set completed flag to true if there was an error fetching lesson details
             }
         });
         this.$store.dispatch("learn/getLearn", this.id);
@@ -121,8 +136,14 @@ export default {
     methods: {
         ...mapActions({
             getLearn: 'learn/getLearn'
-
         }),
+        goBack() {
+            this.$router.go(-1); // Go back to previous page
+        },
+
+        relearn() {
+            this.$router.push(`/lessons/${this.id}`); // Navigate to the same lesson page to relearn it
+        },
         checkAnswer(index) {
             if (this.answered) {
                 return;
