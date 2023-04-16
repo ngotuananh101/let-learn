@@ -22,41 +22,90 @@ class PostController extends Controller
     public function index()
     {
         try {
-            //show all posts dont have class_id
-            $posts = Post::where('class_id', null)->where('status', 'active')->orderBy('created_at', 'desc')->get();
-            $posts = $posts->map(function ($post) {
-                return [
-                    'id' => $post->id,
-                    'user_id' => $post->user_id,
-                    'name' => $post->user->name,
-                    'username' => $post->user->username,
-                    'email' => $post->user->email,
-                    'class_id' => $post->class_id,
-                    'title' => $post->title,
-                    'content' => $post->content,
-                    'status' => $post->status,
-                    'score_reporting' => $post->score_reporting,
-                    'tags' => $post->tags,
-                    'views' => $post->views,
-                    'created_at' => $post->created_at,
-                    'updated_at' => $post->updated_at,
-                    //with each post, get each comment of this post including username
-                    'comments' => $post->comments->map(function ($comment) {
-                        return [
-                            'id' => $comment->id,
-                            'user_id' => $comment->user_id,
-                            'user_name' => $comment->user->name,
-                            'email' => $comment->user->email,
-                            'post_id' => $comment->post_id,
-                            'comment' => $comment->comment,
-                            'status' => $comment->status,
-                            'votes' => $comment->votes,
-                            'created_at' => $comment->created_at,
-                            'updated_at' => $comment->updated_at,
-                        ];
-                    }),
-                ];
-            });
+            if ($request->class_id) {
+                if (!auth()->user()->classes->contains($request->class_id)) {
+                    return response()->json([
+                        'status' => 'error',
+                        'status_code' => 403,
+                        'message' => 'Forbidden access!'
+                    ], 403);
+                }
+                //show all posts have class_id
+                $posts = Post::where('class_id', $request->class_id)->where('status', 'active')->orderBy('created_at', 'desc')->get();
+                $posts = $posts->map(function ($post) {
+                    return [
+                        'id' => $post->id,
+                        'user_id' => $post->user_id,
+                        'name' => $post->user->name,
+                        'username' => $post->user->username,
+                        'email' => $post->user->email,
+                        'class_id' => $post->class_id,
+                        'title' => $post->title,
+                        'content' => $post->content,
+                        'status' => $post->status,
+                        'score_reporting' => $post->score_reporting,
+                        'tags' => $post->tags,
+                        'views' => $post->views,
+                        'created_at' => $post->created_at,
+                        'updated_at' => $post->updated_at,
+                        //with each post, get each comment of this post including username
+                        'comments' => $post->comments->map(function ($comment) {
+                            return [
+                                'id' => $comment->id,
+                                'user_id' => $comment->user_id,
+                                'user_name' => $comment->user->name,
+                                'email' => $comment->user->email,
+                                'post_id' => $comment->post_id,
+                                'comment' => $comment->comment,
+                                'status' => $comment->status,
+                                'votes' => $comment->votes,
+                                'created_at' => $comment->created_at,
+                                'updated_at' => $comment->updated_at,
+                            ];
+                        }),
+                    ];
+                });
+                return response()->json([
+                    'message' => 'Posts retrieved',
+                    'posts' => $posts
+                ], 200);
+            } else {
+                //show all posts dont have class_id
+                $posts = Post::where('class_id', null)->where('status', 'active')->orderBy('created_at', 'desc')->get();
+                $posts = $posts->map(function ($post) {
+                    return [
+                        'id' => $post->id,
+                        'user_id' => $post->user_id,
+                        'name' => $post->user->name,
+                        'username' => $post->user->username,
+                        'email' => $post->user->email,
+                        'class_id' => $post->class_id,
+                        'title' => $post->title,
+                        'content' => $post->content,
+                        'status' => $post->status,
+                        'score_reporting' => $post->score_reporting,
+                        'tags' => $post->tags,
+                        'views' => $post->views,
+                        'created_at' => $post->created_at,
+                        'updated_at' => $post->updated_at,
+                        //with each post, get each comment of this post including username
+                        'comments' => $post->comments->map(function ($comment) {
+                            return [
+                                'id' => $comment->id,
+                                'user_id' => $comment->user_id,
+                                'user_name' => $comment->user->name,
+                                'email' => $comment->user->email,
+                                'post_id' => $comment->post_id,
+                                'comment' => $comment->comment,
+                                'status' => $comment->status,
+                                'votes' => $comment->votes,
+                                'created_at' => $comment->created_at,
+                                'updated_at' => $comment->updated_at,
+                            ];
+                        }),
+                    ];
+                });
+            }
             return response()->json([
                 'message' => 'Posts retrieved',
                 'posts' => $posts
@@ -100,7 +149,7 @@ class PostController extends Controller
                         'like_status' => 'nullable|in:like,unlike',
                     ]);
                     //check if user role is user and request has class_id
-                    if (auth()->user()->role == 'user' && $request->input('class_id')) {
+                    if (auth()->user()->role->name == 'user' && $request->input('class_id')) {
                         return response()->json([
                             'status' => 'error',
                             'status_code' => 403,
@@ -204,24 +253,6 @@ class PostController extends Controller
             }
             //get title, content, tags, views, created_at
             $post = $post;
-            //add user_name, email, name to string post
-            // $post = [
-            //     'id' => $post->id,
-            //     'user_id' => $post->user_id,
-            //     'name' => $post->user->name,
-            //     'user_name' => $post->user->username,
-            //     'email' => $post->user->email,
-            //     'class_id' => $post->class_id,
-            //     'title' => $post->title,
-            //     'content' => $post->content,
-            //     'status' => $post->status,
-            //     'score_reporting' => $post->score_reporting,
-            //     'tags' => $post->tags,
-            //     'views' => $post->views,
-            //     'created_at' => $post->created_at,
-            //     'updated_at' => $post->updated_at,
-            //     'class' => $post->class,
-            // ];
             //add user_name, email, name to post
             $post['name'] = $post->user->name;
             $post['user_name'] = $post->user->name;
