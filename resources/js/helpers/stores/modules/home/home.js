@@ -78,6 +78,17 @@ export default {
                     }
                 );
         },
+        updatePassword({ commit }, password) {
+            commit("request");
+            homeService.updatePassword(password).then(
+                (password) => {
+                    commit("requestSuccess", password);
+                },
+                (error) => {
+                    commit("requestFailure", error);
+                }
+            );
+        },
 
     },
     getters: {

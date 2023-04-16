@@ -74,6 +74,7 @@ export default {
     data() {
         return {
             multipleChoice: true,
+            answer_option: [this.answer_1, this.answer_2, this.answer_3, this.answer_4],
         };
     },
     methods: {
@@ -89,7 +90,6 @@ export default {
             this.data.question = this.data.correct_answer;
             this.data.correct_answer = question;
         },
-
     },
 };
 </script>

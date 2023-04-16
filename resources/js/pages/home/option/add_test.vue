@@ -19,6 +19,34 @@
                                 <input id="description" name="description" class="form-control" type="text"
                                     placeholder="Add a description..." v-model="this.test.description" />
                             </div>
+                            <div class="row mt-2 col-">
+                                <label class="form-label mt-3">Status</label>
+                                <div class="form-check mx-3">
+                                    <input class="form-check-input" type="radio" id="pending" value="pending"
+                                        v-model="test.status">
+                                    <label for="pending">Pending</label>
+                                </div>
+                                <div class="form-check mx-3">
+                                    <input class="form-check-input" type="radio" id="inactice" value="inactice"
+                                        v-model="test.status">
+                                    <label for="inactice">Inactice</label>
+                                </div>
+                            </div>
+                            <div class="form-check col-12 mx-3 mt-2">
+                                <label class="form-check-label">Scoce reporting</label>
+                                <input class="form-check-input" type="checkbox" value="" id="score_reporting"
+                                    v-model="test.score_reporting">
+                            </div>
+                            <div class="col-md-3 col-12">
+                                <label class="form-label mt-3">Start time</label>
+                                <input id="start_time" name="start_time" class="form-control" type="text"
+                                    placeholder="yyyy-mm-dd 00:00:00" v-model="this.test.start_time" />
+                            </div>
+                            <div class="col-md-3 col-12">
+                                <label class="form-label mt-3">End time</label>
+                                <input id="end_time" name="end_time" class="form-control" type="text"
+                                    placeholder="yyyy-mm-dd 00:00:00" v-model="this.test.end_time" />
+                            </div>
                         </div>
                         <div class="col-md-2 col-6">
                             <button class="btn btn-primary w-100 mt-4" @click="import_test_modal.show">
@@ -97,6 +125,7 @@
                         Import
                     </button>
                 </div>
+                <h1>{{ answer_option }}</h1>
             </div>
         </div>
     </div>
@@ -104,6 +133,7 @@
 <script>
 import TestDetailCard from "../../../components/cards/test-detail-card.vue";
 import { markRaw } from "vue";
+import answer_option from "../../../components/cards/test-detail-card.vue";
 
 export default {
     name: "Add",
@@ -118,20 +148,18 @@ export default {
             test: {
                 name: '',
                 description: '',
-                password: '',
+                status: '',
+                score_reporting: false,
+                start_time: '',
+                end_time: '',
             },
             import_test_modal: null,
             importFile: true,
             file: null,
             type: 'get',
-            questions: [],
+            questions: { answer_option: '' },
             cards: null,
             id: this.$route.params.id,
-            status: null,
-            score_reporting: false,
-            start_time: "2023-04-16 23:59:59",
-            end_time: "2023-04-30 23:59:59",
-            answer_option: [],
             is_multiple_choice: '1',
         };
     },
@@ -255,22 +283,11 @@ export default {
                         if (question_correct_answer.length !== 2) {
                             throw new Error('Invalid format');
                         }
-                        if (this.is_multiple_choice === '1') {
-                            this.questions.push({
-                                index: index,
-                                question: question_correct_answer[0],
-                                correct_answer: question_correct_answer[1],
-
-                            });
-                        } else {
-                            this.questions.push({
-                                index: index,
-                                question: question_correct_answer[0],
-                                correct_answer: '',
-                            });
-                        }
-
-
+                        this.questions.push({
+                            index: index,
+                            question: question_correct_answer[0],
+                            correct_answer: '',
+                        });
                     });
                     this.cards = markRaw(this.questions.map((detail, index) => {
                         return TestDetailCard;
@@ -289,7 +306,7 @@ export default {
                 name: this.test.name,
                 description: this.test.description,
                 questions: this.questions,
-                status: this.status,
+                status: this.test.status,
                 score_reporting: this.score_reporting,
                 start_time: this.start_time,
                 end_time: this.end_time,
