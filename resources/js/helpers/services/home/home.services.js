@@ -11,7 +11,7 @@ export const homeService = {
     loadForum,
     AddQuestionForum,
     voteComment,
-    voteQuestion
+    voteQuestion,
     updatePassword
 };
 
