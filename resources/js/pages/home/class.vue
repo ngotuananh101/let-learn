@@ -120,11 +120,15 @@
                                         </div>
                                     </div>
                                     <div class="col">
-                                        <button type="button" class="btn btn-primary">
+                                        <button v-if="!quiz.submited"
+                                                type="button"
+                                                class="btn btn-primary">
+
                                             <router-link :to="'/lesson/test/' + quiz.id">
                                                 Start
                                             </router-link>
                                         </button>
+                                        <span v-else>Quiz already submitted</span>
                                     </div>
                                 </div>
                             </div>
@@ -136,72 +140,37 @@
     </div>
     <div class="tab-pane fade" id="pills-member">
         <div class="container">
-            <h3 class="text-center">Member</h3>
-            <div class="fixed-plugin">
-                <a class="fixed-plugin-button  position-fixed p-3">Add</a>
-            </div>
+            <h3 class="text-center">Members</h3>
+<!--            <div class="fixed-plugin">-->
+<!--                <a class="fixed-plugin-button position-fixed p-3">Add</a>-->
+<!--            </div>-->
             <div class="row">
                 <div class="col-12">
-                    <h4 class="pt-3">Teacher</h4>
-                    <div class="card my-4">
-                        <div class="card-body">
+                    <h4 class="pt-3">Teachers</h4>
+                    <div class="card my-4" v-for="(teacher, index) in teacherArray" :key="'teacher-' + teacher.id">
+                        <div class="card-body d-flex align-items-center">
                             <div class="d-flex align-items-center">
-                                <img src="https://cdn.discordapp.com/attachments/702150671943860266/1088118611794726922/ArsBlink.JPG"
-                                    style="height: 30px" class="rounded-circle">
-                                <span class="ms-2 me-auto">Long Cute pho mai que</span>
+                                <img src="https://cdn.discordapp.com/attachments/702150671943860266/1088118611794726922/ArsBlink.JPG" style="height: 30px" class="rounded-circle" alt="">
+                                <span class="ms-2 me-auto">{{ teacher.name }}</span>
                             </div>
                         </div>
                     </div>
                     <hr />
                     <h4 class="pt-3">Students</h4>
-                    <div class="card my-4">
-                        <div class="card-body d-flex align-items-center justify-content-between">
-                            <div class="d-flex align-items-center">
-                                <img src="https://cdn.discordapp.com/attachments/702150671943860266/1088118611794726922/ArsBlink.JPG"
-                                    style="height: 30px" class="rounded-circle">
-                                <span class="ms-2 me-auto">Long Cute</span>
-                            </div>
-                            <div class="dropdown">
-                                <button class="btn btn-secondary dropdown-toggle" type="button" id="student-options-1"
-                                    data-bs-toggle="dropdown" aria-expanded="false">...</button>
-                                <ul class="dropdown-menu" aria-labelledby="student-options-1">
-                                    <li><a class="dropdown-item" href="#">Delete</a></li>
-                                    <li><a class="dropdown-item" href="#">Hide</a></li>
-                                </ul>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="card my-4">
-                        <div class="card-body d-flex align-items-center justify-content-between">
-                            <div class="d-flex align-items-center">
-                                <img src="https://cdn.discordapp.com/attachments/702150671943860266/1088118611794726922/ArsBlink.JPG"
-                                    style="height: 30px" class="rounded-circle">
-                                <span class="ms-2 me-auto">Long Cute</span>
-                            </div>
-                            <div class="dropdown">
-                                <button class="btn btn-secondary dropdown-toggle" type="button" id="student-options-2"
-                                    data-bs-toggle="dropdown" aria-expanded="false">...</button>
-                                <ul class="dropdown-menu" aria-labelledby="student-options-2">
-                                    <li><a class="dropdown-item" href="#">Delete</a></li>
-                                    <li><a class="dropdown-item" href="#">Hide</a></li>
-                                </ul>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="card my-4">
-                        <div class="card-body d-flex align-items-center justify-content-between">
-                            <div class="d-flex align-items-center">
-                                <img src="https://cdn.discordapp.com/attachments/702150671943860266/1088118611794726922/ArsBlink.JPG"
-                                    style="height: 30px" class="rounded-circle">
-                                <span class="ms-2 me-auto">Long Cute</span>
-                            </div>
-                            <div class="dropdown">
-                                <button class="btn btn-secondary dropdown-toggle" type="button" id="student-options-3"
-                                    data-bs-toggle="dropdown" aria-expanded="false">...</button>
-                                <ul class="dropdown-menu" aria-labelledby="student-options-3">
-                                    <li><a class="dropdown-item" href="#">Delete</a></li>
-                                    <li><a class="dropdown-item" href="#">Hide</a></li>
-                                </ul>
+                    <div class="my-4 pb-5">
+                        <div class="card mt-3" v-for="(student, index) in studentArray" :key="'student-' + student.id">
+                            <div class="card-body d-flex align-items-center justify-content-between">
+                                <div class="d-flex align-items-center">
+                                    <img src="https://cdn.discordapp.com/attachments/702150671943860266/1088118611794726922/ArsBlink.JPG" style="height: 30px" class="rounded-circle" alt="">
+                                    <span class="ms-2 me-auto">{{ student.name }}</span>
+                                </div>
+<!--                                <div v-if="student.role === 'student'" class="dropdown">-->
+<!--                                    <button class="btn btn-secondary dropdown-toggle" type="button" :id="'student-options-' + student.id" data-bs-toggle="dropdown" aria-expanded="false">...</button>-->
+<!--                                    <ul class="dropdown-menu" :aria-labelledby="'student-options-' + student.id">-->
+<!--                                        <li><a class="dropdown-item" href="#">Delete</a></li>-->
+<!--                                        <li><a class="dropdown-item" href="#">Hide</a></li>-->
+<!--                                    </ul>-->
+<!--                                </div>-->
                             </div>
                         </div>
                     </div>
@@ -216,6 +185,7 @@
             </div>
         </router-link>
     </div>
+
 </template>
 
 <script>
@@ -223,23 +193,33 @@ export default {
     data() {
         return {
             id: this.$route.params.id,
+            user: null,
             quizzes: null,
+            members: null,
             showDetails: false,
         };
     },
     created() {
+        this.user = this.$store.getters['user/userData'].info;
+        console.log(this.user);
         this.unsubscribe = this.$store.subscribe((mutation) => {
             if (mutation.type === "home/request") {
             } else if (mutation.type === "home/requestSuccess") {
                 this.quizzes = mutation.payload.quizzes;
+                this.members = mutation.payload.members;
                 console.log(this.quizzes);
             } else if (mutation.type === "home/requestFailure") {
             }
         });
-        this.$store.dispatch("home/getClassDetail", this.id);
+        this.$store.dispatch("home/getClassDetail", { id: this.id, roleName: this.user.role.name });
     },
-    mounted() {
-
+    computed: {
+        teacherArray() {
+            return this.members ? this.members.filter(member => member.role === "teacher") : [];
+        },
+        studentArray() {
+            return this.members ? this.members.filter(member => member.role === "student") : [];
+        }
     },
 
     methods: {

@@ -1,4 +1,5 @@
 import {homeService} from '../../../services/home/home.services';
+import {learnService} from "@/helpers/services/home/learn.services";
 export default {
     namespaced: true,
     state: {
@@ -40,10 +41,34 @@ export default {
                     }
                 );
         },
-        getClassDetail({commit}, id) {
+        getClassDetail({ commit }, payload) {
             commit('request');
-            console.log(id);
-            homeService.loadClassDetail(id)
+            console.log(payload.id, payload.roleName);
+            homeService.loadClassDetail(payload.id, payload.roleName)
+                .then(
+                    response => {
+                        commit('requestSuccess', response);
+                    },
+                    error => {
+                        commit('requestFailure', error);
+                    }
+                );
+        },
+        getForumDetail({commit}, id) {
+            commit('request');
+            homeService.loadForumDetail(id)
+                .then(
+                    response => {
+                        commit('requestSuccess', response);
+                    },
+                    error => {
+                        commit('requestFailure', error);
+                    }
+                );
+        },
+        commentForum({commit}, data) {
+            commit('request');
+            homeService.commentForum(data)
                 .then(
                     response => {
                         commit('requestSuccess', response);

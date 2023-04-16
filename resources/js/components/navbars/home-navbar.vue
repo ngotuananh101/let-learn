@@ -88,6 +88,34 @@
                                     </div>
                                 </router-link>
                             </li>
+                            <li class="mb-2">
+                                    <div class="py-1 d-flex">
+                                        <div class="my-auto">
+                                            <p class="mb-0 text-xs text-secondary">
+                                                <i class="fa-solid fa-right-from-bracket"></i>
+                                            </p>
+                                        </div>
+                                        <div class="d-flex flex-column justify-content-center">
+                                            <h6 class="mb-1 text-sm font-weight-normal" @click="this.logout">
+                                                <span>Logout</span>
+                                            </h6>
+                                        </div>
+                                    </div>
+                            </li>
+                            <li class="mb-2">
+                                <div class="py-1 d-flex">
+                                    <div class="my-auto">
+                                        <p class="mb-0 text-xs text-secondary">
+                                            <i class="fa-solid fa-right-from-bracket"></i>
+                                        </p>
+                                    </div>
+                                    <div class="d-flex flex-column justify-content-center">
+                                        <h6 class="mb-1 text-sm font-weight-normal" @click="this.logoutAll">
+                                            <span>Logout all device</span>
+                                        </h6>
+                                    </div>
+                                </div>
+                            </li>
                         </ul>
 
                     </li>
@@ -133,7 +161,24 @@ export default {
             let hash = MD5.generate(email);
             user.gravatar = `https://www.gravatar.com/avatar/${hash}?d=identicon`;
             return user;
-        }
+        },
+        logout() {
+            this.$store.dispatch('user/logout');
+        },
+        logoutAll() {
+            this.$store.dispatch('user/logoutAll');
+        },
+        darkMode() {
+            if (this.$store.state.darkMode) {
+                this.$store.state.darkMode = false;
+                this.sidebar("bg-white");
+                deactivateDarkMode();
+            } else {
+                this.$store.state.darkMode = true;
+                this.sidebar("bg-default");
+                activateDarkMode();
+            }
+        },
     },
 };
 </script>

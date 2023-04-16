@@ -2,56 +2,44 @@
     <div class="container mt-3">
         <div class="row">
             <div class="col-md-12">
-                <div class="card mb-2">
-                    <div class="card-header">
-                        <h2>{{ question }}</h2>
-
+                <div v-if="post" class="col-md-12">
+                    <div class="card mb-2">
+                        <div class="card-header">
+                            <h2>{{ post.title }}</h2>
+                        </div>
+                        <div class="card-body">
+                            <p>{{ post.content }}</p>
+                        </div>
+                        <p class="text-xl-end p-lg-2">
+                            <span class="bold">
+                                Created on: {{ post.created_at }} | Tags:
+                                <span v-for="(tag, index) in post.tags.split(',')" :key="index">{{ tag }}</span>
+                            </span>
+                        </p>
                     </div>
-                    <div class="card-body">
-                        <p>{{ description }}</p>
-                    </div>
-                    <p class="text-xl-end p-lg-2">
-              <span class="bold">
-                Created on: {{ questionDate }} | Tags:
-                <span v-for="(tag, index) in tags" :key="index">{{ tag }}</span>
-              </span>
-                    </p>
                 </div>
 
-                <div class="card mb-3" v-for="(answer, index) in answers" :key="index">
+                <div class="card mb-3" v-for="(comment, index) in comments" :key="index">
                     <div class="card-body">
                         <div class="row">
                             <div class="col-md-1">
                                 <div class="text-center">
                                     <div class="row">
                                         <div class="col-md-12">
-                                            <i
-                                                class="fa-solid fa-caret-up text-success"
-                                                @click="upvoteAnswer(index)"
-                                            ></i>
-                                            <div class="col-md- justify-content-end align-items-center">
-                                                {{ answer.count }}
-                                            </div>
-                                            <i
-                                                class="fa-solid fa-caret-down text-danger mt-2"
-                                                @click="downvoteAnswer(index)"
-                                            ></i>
+                                            <i class="fa-solid fa-caret-up text-success" @click="upvoteComment(index)"></i>
+                                            <div class="col-md- justify-content-end align-items-center">{{ comment.votes }}</div>
+                                            <i class="fa-solid fa-caret-down text-danger mt-2" @click="downvoteComment(index)"></i>
                                         </div>
                                     </div>
                                 </div>
                             </div>
                             <div class="col-md-9 m-lg-2 d-flex align-items-center">
-                                <div v-html="answer.text"></div>
+                                <div>{{ comment.comment }}</div>
                             </div>
                             <div class="col-md-1">
                                 <div class="text-center">
-                                    <img
-                                        :src="answer.avatar"
-                                        class="rounded-circle d-flex align-items-center"
-                                        alt="avatar"
-                                        style="width: 50px;"
-                                    />
-                                    <div>{{ answer.username }}</div>
+                                    <img src="https://i.pravatar.cc/150?img=7" class="rounded-circle d-flex align-items-center" alt="avatar" style="width: 50px;" />
+                                    <div>{{ comment.user_name }}</div>
                                 </div>
                             </div>
                         </div>
@@ -60,18 +48,23 @@
 
                 <div class="card mb-3">
                     <div class="card-body">
-                        <form @submit.prevent="submitAnswer">
+                        <form @submit.prevent="submitComment">
                             <div class="form-group">
-                                <label for="answerInput">Your Answer</label>
-                                <textarea
-                                    class="form-control"
-                                    id="answerInput"
-                                    v-model="newAnswer"
-                                ></textarea>
+                                <label for="commentInput">Your Comment</label>
+                                <textarea class="form-control" id="commentInput" v-model="newComment"></textarea>
                             </div>
                             <button type="submit" class="btn btn-primary">Submit</button>
+                            <!-- Show a loading animation while the comment is being submitted -->
+                            <div v-if="loading" class="text-center mt-2">
+                                <i class="fa-solid fa-spinner animate-spin"></i> Loading...
+                            </div>
                         </form>
                     </div>
+                </div>
+
+                <!-- Show a reloading animation after the comment is submitted and the page is being reloaded -->
+                <div v-if="reloading" class="text-center mt-2">
+                    <i class="fa-solid fa-spinner animate-spin"></i> Reloading...
                 </div>
             </div>
         </div>
@@ -82,65 +75,73 @@
 export default {
     data() {
         return {
-            question: "What is your favorite programming language?",
-            questionDate: "April 4, 2023",
-            tags: ["programming"],
-            description:
-                "Please share your thoughts on your preferred programming language.",
-            answers: [
-                {
-                    count: 10,
-                    text: "<p>My favorite programming language is JavaScript.</p>",
-                    avatar: "https://i.pravatar.cc/150?img=3",
-                    username: "John Doe",
-                },
-                {
-                    count: 5,
-                    text: "<p>I prefer Python over JavaScript.</p>",
-                    avatar: "https://i.pravatar.cc/150?img=2",
-                    username: "Jane Doe",
-                },
-            ],
-            newAnswer: "",
-            newAnswerUsername: "Hai Long",
+            post: {
+                title: "",
+                content: "",
+                created_at: "",
+                tags: ""
+            },
+            comments: null,
+            data: null,
+            newComment: "",
+            loading: false,
+            reloading: false
         };
     },
-    // mounted() {
-    //     ClassicEditor
-    //         .create(document.querySelector('#answerInput'))
-    //         .then(editor => {
-    //             this.editor = editor
-    //         })
-    //         .catch(error => {
-    //             console.error(error)
-    //         })
-    // },
+
+    created() {
+        this.user = this.$store.getters['user/userData'].info;
+        this.unsubscribe = this.$store.subscribe((mutation) => {
+            if (mutation.type === "home/request") {
+            } else if (mutation.type === "home/requestSuccess") {
+                this.data = mutation.payload;
+                this.post = this.data.post;
+                this.comments = this.data.comments;
+                console.log(this.post);
+                console.log(this.comments);
+            } else if (mutation.type === "home/requestFailure") {
+            }
+        });
+        this.$store.dispatch("home/getForumDetail", this.$route.params.id);
+    },
 
     methods: {
-        upvoteAnswer(index) {
-            this.answers[index].count++;
-        },
-        downvoteAnswer(index) {
-            this.answers[index].count--;
-        },
-        submitAnswer() {
-            try {
-                if (this.newAnswer === "") {
-                    throw new Error("Answer cannot be empty.");
-                }
+        submitComment() {
+            if (!this.newComment) return;
 
-                this.answers.push({
-                    count: 0,
-                    text: this.newAnswer,
-                    avatar: "https://i.pravatar.cc/150?img=7",
-                    username: this.newAnswerUsername,
+            const data = {
+                post_id: this.$route.params.id,
+                comment: this.newComment,
+                status: "active"
+            };
+
+            // Show the loading animation
+            this.loading = true;
+
+            this.$store.dispatch("home/commentForum", data)
+                .then(response => {
+                    console.log('Comment added successfully:', response);
+                    // reset newComment
+                    this.newComment = "";
+// Hide the loading animationand show the reloading animation
+                    this.reloading = true;
+// Hide the loading animation after a short delay
+                    setTimeout(() => {
+                        this.loading = false;
+                    }, 500);
+// Reload the page after a delay, with a reloading animation
+                    setTimeout(() => {
+                        location.reload();
+                    }, 1000);
+                })
+                .catch(error => {
+                    console.error('Error adding comment:', error);
+// handle error
+                    this.loading = false;
                 });
-
-                this.newAnswer = "";
-            } catch (e) {
-                alert(e.message);
-            }
         },
-    },
+
+        // ...
+    }
 };
 </script>

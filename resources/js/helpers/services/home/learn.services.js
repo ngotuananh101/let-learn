@@ -10,7 +10,9 @@ export const learnService = {
     loadSelfTest,
     addTest,
     importExcelFile,
+    updateComment
 };
+
 
 function loadFlashCard(id) {
     const requestOptions = {
@@ -85,11 +87,16 @@ function sendTestResult(data) {
 }
 function updateResult(data) {
     const requestOptions = {
-        method: "POST",
+        method: 'PUT',
         headers: authHeader(),
-        body: JSON.stringify({ data }),
+        body: JSON.stringify({
+            lesson_id: data.lesson_id,
+            learned: data.learned,
+            relearn: data.relearn,
+        }),
+
     };
-    return fetch(`/api/user/main/1/?type=learned`, requestOptions)
+    return fetch(`/api/student/main/${data.user_id}/?type=learned`, requestOptions)
         .then(handleResponse)
         .then((data) => {
             console.log(data);
@@ -135,4 +142,18 @@ function importExcelFile(formData) {
                 reject(error);
             });
     });
+}
+function updateComment(data) {
+    const requestOptions = {
+        method: 'PUT',
+        headers: authHeader(),
+        body: JSON.stringify({
+            comment_id: data.comment_id,
+            comment: data.comment,
+            status: data.status,
+            votetype: data.votetype,
+        }),
+    };
+    return fetch(`/api/forum/post/1?type=comment`, requestOptions)
+        .then(handleResponse)
 }
