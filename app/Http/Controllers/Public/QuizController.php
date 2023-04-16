@@ -7,11 +7,13 @@ use App\Exports\ExportQuizData;
 use App\Http\Controllers\Controller;
 use App\Models\Answer;
 use App\Models\Classes;
+use App\Models\Lesson;
 use App\Models\Quiz;
 use App\Models\Question;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use Illuminate\Support\Carbon;
 use Maatwebsite\Excel\Facades\Excel;
 use Illuminate\Support\Collection;
 use Maatwebsite\Excel\Concerns\WithMultipleSheets;
@@ -362,11 +364,41 @@ class QuizController extends Controller
                         'status' => 'nullable|in:pending,inactive',
                         'score_reporting' => 'nullable|boolean',
                         'start_time' => 'required|date|after_or_equal:today',
-                        'end_time' => 'nullable|date|after:start_date',
+                        'end_time' => 'nullable|date|after:start_time',
                         'quantity' => 'nullable|integer',
                         'reverse' => 'nullable|boolean',
                     ]);
+                    //get class by class_id and check if class_id is not exist
+                    $class = Classes::find($request->input('class_id'));
+                    if (!$class) {
+                        return response()->json([
+                            'status' => 'error',
+                            'status_code' => 404,
+                            'message' => 'Class not found'
+                        ], 404);
+                    }
+
+                    $member = Classes::select('classes.*', 'class_members.user_id')
+                    ->join('class_members', 'class_members.class_id', '=', 'classes.id')
+                    ->where('classes.id', $request->input('class_id'))
+                    ->get();
+                    //check if auth()->user()->id is not in class_members
+                    if (!$member->contains('user_id', auth()->user()->id)) {
+                        return response()->json([
+                            'status' => 'error',
+                            'status_code' => 403,
+                            'message' => 'You are not in this class so you cannot create a quiz'
+                        ], 403);
+                    }
                     $lesson_id = $request->lesson_id;
+                    // Check if the lesson exists by lesson_id
+                    if (!Lesson::find($lesson_id)) {
+                        return response()->json([
+                            'status' => 'error',
+                            'status_code' => 404,
+                            'message' => 'Lesson not found'
+                        ], 404);
+                    }
                     // Call the learn method in the LessonController and get the response
                     $lessonController = new LessonController();
                     $response = $lessonController->learnForImport($request, $lesson_id);
@@ -377,6 +409,7 @@ class QuizController extends Controller
                         $data = $response->getData();
                         //check input quantity 
                         // store data to new quiz
+                        dd($data);
                         $quiz = Quiz::create([
                             'class_id' => $request->input('class_id'),
                             'name' => $request->input('name'),
@@ -384,7 +417,7 @@ class QuizController extends Controller
                             'status' => $request->input('status', 'pending'),
                             'score_reporting' => $request->input('score_reporting', true),
                             'start_time' => $request->input('start_time'),
-                            'end_time' => $request->input('end_time')
+                            'end_time' => $request->input('end_time', Carbon::parse($request->input('start_time'))->addMinutes(30)),
                         ]);
                         //set data to question
                         // Add questions to the quiz from the $data, split part "lesson_details" from the $data
@@ -433,7 +466,7 @@ class QuizController extends Controller
                         'status' => 'required|in:pending,inactive',
                         'score_reporting' => 'nullable|boolean',
                         'start_time' => 'required|date|after_or_equal:today',
-                        'end_time' => 'nullable|date|after:start_date',
+                        'end_time' => 'nullable|date|after:start_time',
                         'questions' => 'required|array',
                         'questions.*.question' => 'required|string',
                         'questions.*.is_multiple_choice' => 'nullable|boolean',
@@ -441,7 +474,28 @@ class QuizController extends Controller
                         'questions.*.correct_answer' => 'nullable|string',
                         'questions.*.points' => 'nullable|integer|',
                     ]);
+                    //get class by class_id and check if class_id is not exist
+                    $class = Classes::find($request->input('class_id'));
+                    if (!$class) {
+                        return response()->json([
+                            'status' => 'error',
+                            'status_code' => 404,
+                            'message' => 'Class not found'
+                        ], 404);
+                    }
 
+                    $member = Classes::select('classes.*', 'class_members.user_id')
+                    ->join('class_members', 'class_members.class_id', '=', 'classes.id')
+                    ->where('classes.id', $request->input('class_id'))
+                    ->get();
+                    //check if auth()->user()->id is not in class_members
+                    if (!$member->contains('user_id', auth()->user()->id)) {
+                        return response()->json([
+                            'status' => 'error',
+                            'status_code' => 403,
+                            'message' => 'You are not in this class so you cannot create a quiz'
+                        ], 403);
+                    }
                     $quiz = Quiz::create([
                         'class_id' => $request->input('class_id'),
                         'name' => $request->input('name'),
@@ -449,7 +503,7 @@ class QuizController extends Controller
                         'status' => $request->input('status', 'pending'),
                         'score_reporting' => $request->input('score_reporting', true),
                         'start_time' => $request->input('start_time'),
-                        'end_time' => $request->input('end_time')
+                        'end_time' => $request->input('end_time', Carbon::parse($request->input('start_time'))->addMinutes(30)),
                     ]);
 
                     //create questions collection and map the questions to the newly created quiz id
