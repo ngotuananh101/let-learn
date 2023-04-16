@@ -135,6 +135,7 @@ export default {
                 password: null,
                 password_confirmation: null,
             },
+            id: this.$route.params.id,
         };
     },
     computed: {
@@ -162,11 +163,11 @@ export default {
                 old_password: this.password.old_password,
                 password: this.password.password,
                 password_confirmation: this.password.password_confirmation,
+                id: this.user.id,
             };
-            if (data.password == data.password_confirmation) {
+            if (data.password == data.password_confirmation && data.old_password != data.password && data.old_password != data.password_confirmation) {
                 this.$store.dispatch('home/updatePassword', data);
-            }
-            else {
+            } else {
                 alert('The new password does not match the re-new password');
             }
         }
