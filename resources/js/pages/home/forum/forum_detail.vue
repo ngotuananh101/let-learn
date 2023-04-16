@@ -38,7 +38,7 @@
                             </div>
                             <div class="col-md-1">
                                 <div class="text-center">
-                                    <img src="https://i.pravatar.cc/150?img=7" class="rounded-circle d-flex align-items-center" alt="avatar" style="width: 50px;" />
+                                    <img :src="getUserInfo().gravatar" class="me-2 rounded-circle" width="30" height="30" alt="">
                                     <div>{{ comment.user_name }}</div>
                                 </div>
                             </div>
@@ -72,6 +72,8 @@
 </template>
 
 <script>
+import {MD5} from "md5-js-tools";
+
 export default {
     data() {
         return {
@@ -108,7 +110,6 @@ export default {
     methods: {
         submitComment() {
             if (!this.newComment) return;
-
             const data = {
                 post_id: this.$route.params.id,
                 comment: this.newComment,
@@ -121,27 +122,44 @@ export default {
             this.$store.dispatch("home/commentForum", data)
                 .then(response => {
                     console.log('Comment added successfully:', response);
-                    // reset newComment
                     this.newComment = "";
-// Hide the loading animationand show the reloading animation
                     this.reloading = true;
-// Hide the loading animation after a short delay
                     setTimeout(() => {
                         this.loading = false;
                     }, 500);
-// Reload the page after a delay, with a reloading animation
                     setTimeout(() => {
                         location.reload();
-                    }, 1000);
+                    }, 500);
                 })
                 .catch(error => {
                     console.error('Error adding comment:', error);
-// handle error
                     this.loading = false;
                 });
         },
-
-        // ...
+        upvoteComment(index) {
+            const comment_id = this.comments[index].id;
+            this.$store.dispatch("home/voteComment", { id: this.$route.params.id, comment_id, votetype: "upvote" });
+            setTimeout(() => {
+                location.reload();
+            }, 500);
+        },
+        downvoteComment(index) {
+            const comment_id = this.comments[index].id;
+            this.$store.dispatch("home/voteComment", { id: this.$route.params.id, comment_id, votetype: "downvote" });
+            setTimeout(() => {
+                location.reload();
+            }, 500);
+        },
+        getUserInfo() {
+            let user = this.$store.getters['user/userData'].info;
+            // get gravatar
+            let email = user.email;
+            let hash = MD5.generate(email);
+            user.gravatar = `https://www.gravatar.com/avatar/${hash}?d=identicon`;
+            return user;
+        },
+    },
+    mounted() {
     }
 };
 </script>

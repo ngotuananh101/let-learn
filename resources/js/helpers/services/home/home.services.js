@@ -8,7 +8,10 @@ export const homeService = {
     loadUserInformation,
     loadForumDetail,
     commentForum,
-    loadForum
+    loadForum,
+    AddQuestionForum,
+    voteComment,
+    voteQuestion
 };
 
 function loadHome() {
@@ -71,6 +74,16 @@ function loadForum() {
             return data.posts;
         });
 }
+function AddQuestionForum(data) {
+    const requestOptions = {
+        method: 'POST',
+        headers: authHeader(),
+        body: JSON.stringify(data),
+    };
+    console.log(data);
+    return fetch(`/api/forum/post/?type=post`, requestOptions)
+        .then(handleResponse)
+}
 function commentForum(data) {
     const requestOptions = {
         method: 'POST',
@@ -79,6 +92,26 @@ function commentForum(data) {
     };
     console.log(data);
     return fetch(`/api/forum/post/?type=comment`, requestOptions)
+        .then(handleResponse)
+}
+function voteComment(data) {
+    const requestOptions = {
+        method: 'PUT',
+        headers: authHeader(),
+        body: JSON.stringify(data),
+    };
+    console.log(data);
+    return fetch(`/api/forum/post/${data.id}?type=comment&choice=vote`, requestOptions)
+        .then(handleResponse)
+}
+function voteQuestion(data) {
+    const requestOptions = {
+        method: 'PUT',
+        headers: authHeader(),
+        body: JSON.stringify(data),
+    };
+    console.log(data);
+    return fetch(`/api/forum/post/${data.id}?type=post&choice=like`, requestOptions)
         .then(handleResponse)
 }
 

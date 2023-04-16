@@ -78,9 +78,45 @@ export default {
                     }
                 );
         },
+        addQuestionForum({commit}, data) {
+            commit('request');
+            homeService.AddQuestionForum(data)
+                .then(
+                    response => {
+                        commit('requestSuccess', response);
+                    },
+                    error => {
+                        commit('requestFailure', error);
+                    }
+                );
+        },
         commentForum({commit}, data) {
             commit('request');
             homeService.commentForum(data)
+                .then(
+                    response => {
+                        commit('requestSuccess', response);
+                    },
+                    error => {
+                        commit('requestFailure', error);
+                    }
+                );
+        },
+        voteComment({commit}, data) {
+            commit('request');
+            homeService.voteComment(data)
+                .then(
+                    response => {
+                        commit('requestSuccess', response);
+                    },
+                    error => {
+                        commit('requestFailure', error);
+                    }
+                );
+        },
+        voteQuestion({commit}, data) {
+            commit('request');
+            homeService.voteQuestion(data)
                 .then(
                     response => {
                         commit('requestSuccess', response);

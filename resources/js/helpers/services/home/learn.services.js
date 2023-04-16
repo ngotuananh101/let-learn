@@ -8,7 +8,6 @@ export const learnService = {
     updateResult,
     sendTestResult,
     loadSelfTest,
-    updateComment
 }
 
 function loadFlashCard(id) {
@@ -79,20 +78,6 @@ function updateResult(data) {
         }),
     };
     return fetch(`/api/student/main/${data.user_id}/?type=learned`, requestOptions)
-        .then(handleResponse)
-}
-function updateComment(data) {
-    const requestOptions = {
-        method: 'PUT',
-        headers: authHeader(),
-        body: JSON.stringify({
-            comment_id: data.comment_id,
-            comment: data.comment,
-            status: data.status,
-            votetype: data.votetype,
-        }),
-    };
-    return fetch(`/api/forum/post/1?type=comment`, requestOptions)
         .then(handleResponse)
 }
 
