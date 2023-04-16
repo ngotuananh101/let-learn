@@ -66,6 +66,30 @@ export default {
                     }
                 );
         },
+        getForum({commit}) {
+            commit('request');
+            homeService.loadForum()
+                .then(
+                    response => {
+                        commit('requestSuccess', response);
+                    },
+                    error => {
+                        commit('requestFailure', error);
+                    }
+                );
+        },
+        addQuestionForum({commit}, data) {
+            commit('request');
+            homeService.AddQuestionForum(data)
+                .then(
+                    response => {
+                        commit('requestSuccess', response);
+                    },
+                    error => {
+                        commit('requestFailure', error);
+                    }
+                );
+        },
         commentForum({commit}, data) {
             commit('request');
             homeService.commentForum(data)
@@ -78,6 +102,30 @@ export default {
                     }
                 );
         },
+
+        voteComment({commit}, data) {
+            commit('request');
+            homeService.voteComment(data)
+                .then(
+                    response => {
+                        commit('requestSuccess', response);
+                    },
+                    error => {
+                        commit('requestFailure', error);
+                    }
+                );
+        },
+        voteQuestion({commit}, data) {
+            commit('request');
+            homeService.voteQuestion(data)
+                .then(
+                    response => {
+                        commit('requestSuccess', response);
+                    },
+                    error => {
+                        commit('requestFailure', error);
+                    }
+                );
         updatePassword({ commit }, password) {
             commit("request");
             homeService.updatePassword(password).then(

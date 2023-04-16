@@ -58,68 +58,45 @@
                         <ul id="btnNotification" class="px-2 py-3 dropdown-menu dropdown-menu-end me-sm-n3" aria-labelledby="btnNotification">
                             <li class="mb-2">
                                 <router-link class="dropdown-item border-radius-md" :to="{ name: 'home.setting' }">
-                                    <div class="py-1 d-flex">
-                                        <div class="my-auto">
-                                            <p class="mb-0 text-xs text-secondary">
-                                                <i class="fa-solid fa-gear"></i>
-                                            </p>
-                                        </div>
-                                        <div class="d-flex flex-column justify-content-center">
-                                            <h6 class="mb-1 text-sm font-weight-normal">
-                                                <span>Setting</span>
-                                            </h6>
-                                        </div>
+                                    <div class="py-1 d-flex align-items-center">
+                                        <i class="fa-solid fa-gear me-3"></i>
+                                        <span>Setting</span>
                                     </div>
                                 </router-link>
                             </li>
                             <li class="mb-2">
                                 <router-link class="dropdown-item border-radius-md" :to="{ name: 'home.profile' }">
-                                    <div class="py-1 d-flex">
-                                        <div class="my-auto">
-                                            <p class="mb-0 text-xs text-secondary">
-                                                <i class="fa-solid fa-user"></i>
-                                            </p>
-                                        </div>
-                                        <div class="d-flex flex-column justify-content-center">
-                                            <h6 class="mb-1 text-sm font-weight-normal">
-                                                <span>Profile</span>
-                                            </h6>
-                                        </div>
+                                    <div class="py-1 d-flex align-items-center">
+                                        <i class="fa-solid fa-user me-3"></i>
+                                        <span>Profile</span>
                                     </div>
                                 </router-link>
                             </li>
                             <li class="mb-2">
-                                    <div class="py-1 d-flex">
-                                        <div class="my-auto">
-                                            <p class="mb-0 text-xs text-secondary">
-                                                <i class="fa-solid fa-right-from-bracket"></i>
-                                            </p>
-                                        </div>
-                                        <div class="d-flex flex-column justify-content-center">
-                                            <h6 class="mb-1 text-sm font-weight-normal" @click="this.logout">
-                                                <span>Logout</span>
-                                            </h6>
-                                        </div>
+                                <a class="dropdown-item border-radius-md" :href="'/forum'">
+                                    <div class="py-1 d-flex align-items-center">
+                                        <i class="fa-solid fa-user me-3"></i>
+<!--                                        <i class="fa-light fa-fire"></i>-->
+                                        <span>Forum</span>
                                     </div>
+                                </a>
                             </li>
-                            <li class="mb-2">
-                                <div class="py-1 d-flex">
-                                    <div class="my-auto">
-                                        <p class="mb-0 text-xs text-secondary">
-                                            <i class="fa-solid fa-right-from-bracket"></i>
-                                        </p>
-                                    </div>
-                                    <div class="d-flex flex-column justify-content-center">
-                                        <h6 class="mb-1 text-sm font-weight-normal" @click="this.logoutAll">
-                                            <span>Logout all device</span>
-                                        </h6>
-                                    </div>
+                            <li class="mb-2 dropdown-item border-radius-md" @click="logout">
+                                <div class="py-1 d-flex align-items-center">
+                                    <i class="fa-solid fa-right-from-bracket me-3"></i>
+                                    <span>Logout</span>
+                                </div>
+                            </li>
+                            <li class="mb-2 dropdown-item border-radius-md" @click="logoutAll">
+                                <div class="py-1 d-flex align-items-center">
+                                    <i class="fa-solid fa-right-from-bracket me-3"></i>
+                                    <span>Logout all device</span>
                                 </div>
                             </li>
                         </ul>
-
                     </li>
                 </ul>
+
             </div>
         </div>
     </nav>
@@ -162,11 +139,11 @@ export default {
             user.gravatar = `https://www.gravatar.com/avatar/${hash}?d=identicon`;
             return user;
         },
-        logout() {
-            this.$store.dispatch('user/logout');
+        async logout() {
+            await this.$store.dispatch('user/logout');
         },
-        logoutAll() {
-            this.$store.dispatch('user/logoutAll');
+        async logoutAll() {
+            await this.$store.dispatch('user/logoutAll');
         },
         darkMode() {
             if (this.$store.state.darkMode) {

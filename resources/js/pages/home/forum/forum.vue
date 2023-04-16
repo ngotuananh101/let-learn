@@ -5,135 +5,113 @@
             <form @submit.prevent="onSubmit">
                 <div class="input-group mb-3">
                     <span class="input-group-text" id="inputGroup-sizing-default">Title of question: </span>
-                    <input type="text" class="form-control" id="questionTitle" v-model="newQuestion.title">
+                    <input type="text" class="form-control" id="questionTitle">
                 </div>
                 <div class="input-group mb-3">
                     <span class="input-group-text" id="inputGroup-sizing-default">Tag: </span>
-                    <input type="text" class="form-control" id="questionTopic" v-model="newQuestion.topic">
+                    <input type="text" class="form-control" id="questionTopic">
                 </div>
                 <div class="form-floating">
-                    <textarea class="form-control" id="questionContent" rows="5"
-                              v-model="newQuestion.content"></textarea>
+                    <textarea class="form-control" id="questionContent" rows="5"></textarea>
                     <label for="floatingTextarea2">Question</label>
                 </div>
                 <button type="submit" class="btn btn-primary mt-2">Submit</button>
             </form>
         </div>
+    </div>
+    <div class="container mt-4 pb-5">
         <div class="card mt-3">
             <div class="card-header d-flex justify-content-between align-items-center">
                 <h1>Questions</h1>
             </div>
             <div class="card-body">
-                <div v-for="question in questions" :key="question.id" class="mb-3">
+                <div v-for="(post, index) in posts" :key="post.id" class="mb-3">
                     <div class="row">
-                        <div class="col-1">
-                            <div class="vote-count text-2xl">{{ question.votes }} <i class="fa-regular fa-thumbs-up"></i></div>
-                            <div class="answer-count">{{ question.answers }} answers</div>
-                            <div class="view-count">{{ question.views }} views</div>
+                        <div class="col-2">
+                            <div class="vote-count text-2xl">{{ post.score_reporting }}
+                                <i id="like-icon" class="fa-regular fa-thumbs-up" @click="upvoteQuestion(index)"></i></div>
+                            <div class="answer-count">{{ post.comments.length }} answers</div>
+                            <div class="view-count">{{ post.views }} views</div>
                         </div>
-                        <div class="col-9">
+                        <div class="col-8">
                             <div>
-<!--                                <router-link :to="{ name: 'home.forum_detail' }">-->
-                                    <div class="question-title font-weight-bold text-2xl">{{ question.title }}</div>
-<!--                                </router-link>-->
+                                <router-link :to="{ name: 'forum.forum_detail', params: { id: post.id } }">
+                                    <div class="question-title font-weight-bold text-2xl">{{ post.title }}</div>
+                                </router-link>
                             </div>
-                            <div class="topic text-info">{{ question.topic }}</div>
-                            <div class="question-content">{{ question.content }}</div>
+                            <div class="topic text-info">{{ post.tags }}</div>
+                            <div class="question-content">{{ post.content }}</div>
                         </div>
                         <div class="col-2">
                             <div class="user-info">
-                                <img :src="question.avatar" class="me-2 rounded-circle" width="30" height="30" alt="">
-                                <span class="user-name">{{ question.user }}</span>
+                                <img :src="getUserInfo().gravatar" class="me-2 rounded-circle" width="30" height="30" alt="">
+                                <span class="user-name">{{ post.name }}</span>
                             </div>
                         </div>
-                        <hr class="mt-2">
                     </div>
+                    <hr class="mt-2">
                 </div>
             </div>
         </div>
-
     </div>
 </template>
 
 <script>
+import {MD5} from "md5-js-tools";
+
 export default {
     data() {
         return {
-            questions: [
-                {
-                    id: 1,
-                    title: "How do I install Vue.js?",
-                    topic: "Vue.js",
-                    content: "I'm new to Vue.js and I'm not sure how to install it on my computer. Can someone please provide me with instructions?",
-                    user: "John Doe",
-                    avatar: "https://randomuser.me/api/portraits/men/1.jpg",
-                    votes: 4,
-                    answers: 2,
-                    views: 10
-                },
-                {
-                    id: 2,
-                    title: "What is the best way to learn JavaScript?",
-                    topic: "JavaScript",
-                    content: "I've been trying to learn JavaScript but I'm finding it really difficult. What is the best way to learn JavaScript for a beginner?",
-                    user: "Jane Smith",
-                    avatar: "https://randomuser.me/api/portraits/women/2.jpg",
-                    votes: 2,
-                    answers: 1,
-                    views: 5
-                },
-                {
-                    id: 3,
-                    title: "What is the best way to learn PHP?",
-                    topic: "PHP",
-                    content: "I've been trying to learn JavaScript but I'm finding it really difficult. What is the best way to learn JavaScript for a beginner?",
-                    user: "Jane Madison",
-                    avatar: "https://randomuser.me/api/portraits/women/3.jpg",
-                    votes: 6,
-                    answers: 1,
-                    views: 5
-                },
-                {
-                    id: 5,
-                    title: "What is the best way to learn C#?",
-                    topic: "C#",
-                    content: "I've been trying to learn JavaScript but I'm finding it really difficult. What is the best way to learn JavaScript for a beginner? I i die you still love me",
-                    user: "Andrew Taste",
-                    avatar: "https://randomuser.me/api/portraits/men/3.jpg",
-                    votes: 1,
-                    answers: 1,
-                    views: 5
-                },
-
-            ],
-            newQuestion: {
-                title: "",
-                topic: "",
-                content: "",
-                user: "Anonymous",
-                avatar: "https://randomuser.me/api/portraits/men/5.jpg",
-                votes: 0,
-                answers: 0,
-                views: 0
-            }
+            posts: [],
         };
     },
+    created() {
+        this.user = this.$store.getters['user/userData'].info;
+        this.unsubscribe = this.$store.subscribe((mutation) => {
+            if (mutation.type === "home/request") {
+            } else if (mutation.type === "home/requestSuccess") {
+                this.posts = mutation.payload;
+                console.log(this.posts);
+            } else if (mutation.type === "home/requestFailure") {
+            }
+        });
+        this.$store.dispatch("home/getForum");
+    },
+
     methods: {
         onSubmit() {
-            //validate the form
-            if (!this.newQuestion.title || !this.newQuestion.topic || !this.newQuestion.content) {
-                alert("Please fill in all fields.");
+            const title = document.getElementById("questionTitle").value;
+            const content = document.getElementById("questionContent").value;
+            const tags = document.getElementById("questionTopic").value;
+            const status = "active";
+
+            // Check if required fields are filled in
+            if (!title || !content || !tags) {
+                alert("Please fill in all required fields.");
                 return;
             }
-            // handle form submission
-            // add the new question to the questions array
-            this.questions.push(Object.assign({}, this.newQuestion, {id: this.questions.length + 1}));
-            // reset the form
-            this.newQuestion.title = "";
-            this.newQuestion.topic = "";
-            this.newQuestion.content = "";
-            // close the modal
-            $("#askQuestionModal").modal("hide");
+
+            // Dispatch action to add new question
+            this.$store.dispatch("home/addQuestionForum", { title, content, tags, status });
+
+            // Reload page with animation after submitting form
+            location.reload(true);
+        },
+        upvoteQuestion(index){
+            const id = this.posts[index].id;
+            console.log(id);
+            this.$store.dispatch("home/voteQuestion", { id: id, like: "like" });
+            setTimeout(() => {
+                location.reload();
+            }, 1000);
+        },
+        getUserInfo() {
+            let user = this.$store.getters['user/userData'].info;
+            // get gravatar
+            let email = user.email;
+            let hash = MD5.generate(email);
+            user.gravatar = `https://www.gravatar.com/avatar/${hash}?d=identicon`;
+            return user;
         },
     }
 }

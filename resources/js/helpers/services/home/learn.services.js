@@ -143,6 +143,7 @@ function importExcelFile(formData) {
             });
     });
 }
+
 function updateComment(data) {
     const requestOptions = {
         method: 'PUT',
@@ -157,3 +158,4 @@ function updateComment(data) {
     return fetch(`/api/forum/post/1?type=comment`, requestOptions)
         .then(handleResponse)
 }
+

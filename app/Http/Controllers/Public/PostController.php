@@ -23,7 +23,7 @@ class PostController extends Controller
     {
         try {
             //show all posts dont have class_id
-            $posts = Post::where('class_id', null)->get();
+            $posts = Post::where('class_id', null)->where('status', 'active')->orderBy('created_at', 'desc')->get();
             $posts = $posts->map(function ($post) {
                 return [
                     'id' => $post->id,

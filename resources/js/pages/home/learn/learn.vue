@@ -76,6 +76,16 @@
             </div>
         </div>
     </div>
+    <template>
+        <div v-if="completed">
+            <h1>Congratulations, you have completed the lesson!</h1>
+            <button @click="goBack">Go Back</button>
+            <button @click="relearn">Relearn</button>
+        </div>
+        <div v-else>
+            <!-- Existing code for displaying the quiz questions -->
+        </div>
+    </template>
 
 
 
@@ -94,6 +104,7 @@ export default {
             isCorrectAnswer: false,
             answered: false,
             show_result: false,
+            completed: false,
             bg: ['rgb(219, 238, 255)', 'rgb(253, 240, 227)', 'rgb(230, 223, 242)', 'rgb(235, 242, 223)'],
             ans_icon: ['A', 'B', 'C', 'D'],
             progress: 0,
@@ -102,13 +113,17 @@ export default {
     },
 
     created() {
-        this.user = this.$store.getters['user/userData'].info;
-        console.log(this.user.id);
+        this.user = this.$store.getters["user/userData"].info;
         this.unsubscribe = this.$store.subscribe((mutation) => {
             if (mutation.type === "learn/request") {
             } else if (mutation.type === "learn/requestSuccess") {
-                this.lesson_details = mutation.payload;
+                if (mutation.payload.length > 0) {
+                    this.lesson_details = mutation.payload;
+                } else {
+                    this.completed = true; // Set completed flag to true if lesson details are empty
+                }
             } else if (mutation.type === "learn/requestFailure") {
+                this.completed = true; // Set completed flag to true if there was an error fetching lesson details
             }
         });
         this.$store.dispatch("learn/getLearn", this.id);
@@ -121,7 +136,6 @@ export default {
     methods: {
         ...mapActions({
             getLearn: 'learn/getLearn'
-
         }),
         checkAnswer(index) {
             if (this.answered) {
@@ -132,7 +146,6 @@ export default {
                 const selectedAnswer = this.lesson_details[this.currentQuestion].answers[selectedAnswerIndex];
                 let element = document.getElementById('answer-' + index);
                 if (selectedAnswer === this.lesson_details[this.currentQuestion].correct_answer) {
-                    // if (1===1) {
                     element.classList.add('bg-success');
                     this.isCorrectAnswer = true;
                 } else {
@@ -145,13 +158,15 @@ export default {
                     isCorrect: this.isCorrectAnswer
                 });
                 if (this.currentQuestion === this.lesson_details.length - 1) {
-                    this.$emit('change-progress', 100);
-                    let incorrect_answers = this.lesson_details.filter(q => !q.isCorrect).map(q => q.id);
-                    let correct_answers = this.lesson_details.filter(q => q.isCorrect).map(q => q.id);
+                    const userAnswers = this.userAnswers;
+                    const correctAnswers = userAnswers.filter(answer => answer.isCorrect);
+                    const learned = correctAnswers.map(answer => answer.question);
+                    const incorrectAnswers = userAnswers.filter(answer => !answer.isCorrect).map(answer => answer.question);
+
                     this.$store.dispatch('learn/updateResult', {
                         lesson_id: this.$route.params.id,
-                        learned: correct_answers,
-                        relearn: incorrect_answers,
+                        learned: learned,
+                        relearn: incorrectAnswers,
                         user_id: this.user.id
                     }).then((res) => {
                         this.show_result = true;
@@ -161,6 +176,7 @@ export default {
                 }
             }
         },
+
 
         nextQuestion() {
             this.answered = false;
