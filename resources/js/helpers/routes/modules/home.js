@@ -31,6 +31,12 @@ const home = [
                 component: () => import("../../../pages/home/class.vue"),
             },
             {
+                path: "class/:id/test/add",
+                name: "home.test.add",
+                component: () =>
+                    import("../../../pages/home/option/add_test.vue"),
+            },
+            {
                 path: "/lesson",
                 meta: {
                     requiresAuth: true,

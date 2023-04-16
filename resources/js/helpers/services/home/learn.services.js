@@ -1,5 +1,5 @@
-import handleResponse from '../../other/handle-response';
-import authHeader from '../../other/auth-header';
+import handleResponse from "../../other/handle-response";
+import authHeader from "../../other/auth-header";
 
 export const learnService = {
     loadFlashCard,
@@ -7,76 +7,132 @@ export const learnService = {
     loadTest,
     updateResult,
     sendTestResult,
-    loadSelfTest
-}
+    loadSelfTest,
+    addTest,
+    importExcelFile,
+};
 
 function loadFlashCard(id) {
     const requestOptions = {
-        method: 'POST',
+        method: "POST",
         headers: authHeader(),
-        body: JSON.stringify({lesson_id: id})
+        body: JSON.stringify({ lesson_id: id }),
     };
     return fetch(`/api/student/main?type=detail_split`, requestOptions)
         .then(handleResponse)
-        .then(data => {
+        .then((data) => {
             console.log(data);
             return data.data;
         });
 }
 function loadLearn(id) {
     const requestOptions = {
-        method: 'POST',
+        method: "POST",
         headers: authHeader(),
-        body: JSON.stringify({lesson_id: id,quantity: 8 ,reverse: 1, mix_details: 0, mix_answers: 0})
+        body: JSON.stringify({
+            lesson_id: id,
+            quantity: 8,
+            reverse: 1,
+            mix_details: 0,
+            mix_answers: 0,
+        }),
     };
     return fetch(`/api/student/main?type=test`, requestOptions)
         .then(handleResponse)
-        .then(data => {
+        .then((data) => {
             return data.lesson_details;
         });
 }
 function loadTest(id) {
     const requestOptions = {
-        method: 'GET',
+        method: "GET",
         headers: authHeader(),
     };
     return fetch(`/api/student/quiz/${id}?type=question`, requestOptions)
         .then(handleResponse)
-        .then(data => {
+        .then((data) => {
             return data.data;
         });
 }
 function loadSelfTest(id) {
     const requestOptions = {
-        method: 'POST',
+        method: "POST",
         headers: authHeader(),
-        body: JSON.stringify({lesson_id: id,quantity: 20 ,reverse: 1, mix_details: 0, mix_answers: 0}),
+        body: JSON.stringify({
+            lesson_id: id,
+            quantity: 20,
+            reverse: 1,
+            mix_details: 0,
+            mix_answers: 0,
+        }),
     };
     return fetch(`/api/student/main?type=test`, requestOptions)
         .then(handleResponse)
-        .then(data => {
+        .then((data) => {
             return data.lesson_details;
         });
 }
 function sendTestResult(data) {
     const requestOptions = {
-        method: 'POST',
+        method: "POST",
         headers: authHeader(),
         body: JSON.stringify(data),
     };
-    return fetch(`/api/student/quiz?type=answer&quiz_id=${data.id}`, requestOptions)
-        .then(handleResponse)
+    return fetch(
+        `/api/student/quiz?type=answer&quiz_id=${data.id}`,
+        requestOptions
+    ).then(handleResponse);
 }
 function updateResult(data) {
     const requestOptions = {
-        method: 'POST',
+        method: "POST",
         headers: authHeader(),
-        body: JSON.stringify({data})
+        body: JSON.stringify({ data }),
     };
     return fetch(`/api/user/main/1/?type=learned`, requestOptions)
         .then(handleResponse)
-        .then(data => {
+        .then((data) => {
             console.log(data);
             return data;
         });
+}
+
+function addTest(test) {
+    console.log(test);
+    const requestOptions = {
+        method: "POST",
+        headers: authHeader(),
+        body: JSON.stringify(test),
+    };
+
+    return fetch(`/api/teacher/quiz?type=quiz`, requestOptions)
+        .then(handleResponse)
+        .then((test) => {
+            return test;
+        });
+}
+
+function importExcelFile(formData) {
+    return new Promise((resolve, reject) => {
+        let file = formData.get("file");
+        let details = [];
+        readXlsxFile(file)
+            .then((rows) => {
+                rows.forEach((row, index) => {
+                    if (index > 1) {
+                        details.push({
+                            id: 0,
+                            term: row[1],
+                            definition: row[2],
+                        });
+                    }
+                });
+            })
+            .then(() => {
+                resolve(details);
+            })
+            .catch((error) => {
+                reject(error);
+            });
+    });
 }

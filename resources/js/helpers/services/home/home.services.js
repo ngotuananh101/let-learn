@@ -37,7 +37,7 @@ function loadClassDetail(id) {
         method: 'GET',
         headers: authHeader(),
     };
-    return fetch(`/api/student/quiz/${id}?type=all`, requestOptions)
+    return fetch(`/api/teacher/quiz/${id}?type=all`, requestOptions)
         .then(handleResponse)
         .then(data => {
             console.log(data.data);
