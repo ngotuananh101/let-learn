@@ -66,6 +66,18 @@ export default {
                     }
                 );
         },
+        getForum({commit}) {
+            commit('request');
+            homeService.loadForum()
+                .then(
+                    response => {
+                        commit('requestSuccess', response);
+                    },
+                    error => {
+                        commit('requestFailure', error);
+                    }
+                );
+        },
         commentForum({commit}, data) {
             commit('request');
             homeService.commentForum(data)

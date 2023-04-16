@@ -7,7 +7,8 @@ export const homeService = {
     loadClassDetail,
     loadUserInformation,
     loadForumDetail,
-    commentForum
+    commentForum,
+    loadForum
 };
 
 function loadHome() {
@@ -56,6 +57,18 @@ function loadForumDetail(id) {
         .then(data => {
             console.log(data.data);
             return data.data;
+        });
+}
+function loadForum() {
+    const requestOptions = {
+        method: 'GET',
+        headers: authHeader()
+    };
+    return fetch(`/api/forum/post/`, requestOptions)
+        .then(handleResponse)
+        .then(data => {
+            console.log(data.posts);
+            return data.posts;
         });
 }
 function commentForum(data) {
