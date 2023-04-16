@@ -47,14 +47,15 @@
         <h2>Learn Results</h2>
         <p>You answered {{ numCorrectAnswers }} out of {{ lesson_details.length }} questions correctly.</p>
         <h3>Your score: {{ numCorrectAnswers / lesson_details.length * 10 }}</h3>
-        <h3>Correct Answers:</h3>
+        <!-- <h3>Correct Answers:</h3>
         <div class="row row-cols-1 g-4 p-3">
             <template v-for="(question, index) in lesson_details">
-                <div :key="'correct_' + index" v-if="question.isCorrect && question.count_answered <= 1" class="col">
+                <div :key="'correct_' + index"
+                    v-if="question.isSelected === index && question.isCorrect && question.count_answered <= 1" class="col">
                     <div class="card text-dark bg-light">
                         <div class="card-body">
                             <h5 class="card-title">{{ question.question }}</h5>
-                            <p class="card-text text-success">Your answer: {{ question.correct_answer }}</p>
+                            <p class="card-text text-success">Your answer: {{ question.selectedAnswer }}</p>
                         </div>
                     </div>
                 </div>
@@ -74,10 +75,43 @@
                     </div>
                 </div>
             </template>
+        </div> -->
+        <!-- Correct Answers -->
+        <h3>Correct Answers:</h3>
+        <div class="row row-cols-1 g-4 p-3">
+            <template v-for="(question, index) in lesson_details">
+                <div :key="'correct_' + index" v-if="question.isSelected === index && question.isCorrect" class="col">
+                    <div class="card text-dark bg-light correct-answer">
+                        <div class="card-body">
+                            <h5 class="card-title">{{ question.question }}</h5>
+                            <p class="card-text text-success">Your answer: {{ question.answers[question.isSelected] }}</p>
+                        </div>
+                    </div>
+                </div>
+            </template>
         </div>
+
+        <!-- Incorrect Answers -->
+        <h3 class="p-3">Incorrect Answers:</h3>
+        <div class="row row-cols-1 g-4 p-3">
+            <template v-for="(answer, index) in userAnswers">
+                <div :key="'incorrect_' + index" v-if="!answer.isCorrect" class="col">
+                    <div class="card text-dark bg-light incorrect-answer">
+                        <div class="card-body">
+                            <h5 class="card-title">{{ answer.question }}</h5>
+                            <p class="card-text text-danger">Your answer: {{ answer.selectedAnswer }}</p>
+                            <p class="card-text text-success">Correct answer: {{ lesson_details.find(q => q.question ===
+                                answer.question).correct_answer }}</p>
+                        </div>
+                    </div>
+                </div>
+            </template>
+        </div>
+
         <div class="row">
             <div class="col-12">
-                <button class="btn btn-primary position-fixed bottom-0 end-0 mt-3 ms-3" @click="comebackHome" type="button"><i class="fa-solid fa-arrow-right"></i></button>
+                <button class="btn btn-primary position-fixed bottom-0 end-0 mt-3 ms-3" @click="comebackHome"
+                    type="button"><i class="fa-solid fa-arrow-right"></i></button>
             </div>
         </div>
     </div>
@@ -106,12 +140,12 @@ export default {
             } else if (mutation.type === "learn/requestSuccess") {
                 if (this.type === 'getSelfTest') {
                     this.lesson_details = mutation.payload;
+                    console.log(this.lesson_details);
                     const arr = Array.from(this.lesson_details);
                     arr.forEach((question) => {
                         question.isSelected = null;
                         question.isCorrect = null;
                     });
-                    console.log(this.question);
                 }
             } else if (mutation.type === "learn/requestFailure") {
             }

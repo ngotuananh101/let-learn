@@ -2,21 +2,23 @@
     <div class="justify-content-center" id="navbarNav">
         <ul class="nav nav-pills bg-transparent border-0" id="pills-tab" role="tablist">
             <li class="nav-item" role="presentation">
-                <button class="nav-link" id="pills-home-tab" data-bs-toggle="pill"
-                        data-bs-target="#pills-news" type="button" role="tab" aria-controls="pills-news"
-                        aria-selected="true" style="color: black; font-weight: bold">News
+                <button class="nav-link" id="pills-home-tab" data-bs-toggle="pill" data-bs-target="#pills-news"
+                    type="button" role="tab" aria-controls="pills-news" aria-selected="true"
+                    style="color: black; font-weight: bold">News
                 </button>
             </li>
             <li class="nav-item" role="presentation">
                 <button class="nav-link active" id="pills-excercite-tab" data-bs-toggle="pill"
                         data-bs-target="#pills-excercite" type="button" role="tab" aria-controls="pills-excercite"
                         aria-selected="false" style="color: black; font-weight: bold">Exercises
+                    data-bs-target="#pills-excercite" type="button" role="tab" aria-controls="pills-excercite"
+                    aria-selected="false" style="color: black; font-weight: bold">Excercite
                 </button>
             </li>
             <li class="nav-item" role="presentation">
-                <button class="nav-link" id="pills-member-tab" data-bs-toggle="pill"
-                        data-bs-target="#pills-member" type="button" role="tab" aria-controls="pills-member"
-                        aria-selected="false" style="color: black; font-weight: bold">Members
+                <button class="nav-link" id="pills-member-tab" data-bs-toggle="pill" data-bs-target="#pills-member"
+                    type="button" role="tab" aria-controls="pills-member" aria-selected="false"
+                    style="color: black; font-weight: bold">Members
                 </button>
             </li>
 
@@ -49,33 +51,20 @@
                             <div class="card-footer">
                                 <div class="row">
                                     <div class="col">
-                                        <button
-                                            type="button"
-                                            class="btn btn-primary"
-                                            data-bs-toggle="modal"
-                                            :data-bs-target="'#exampleModal-' + index"
-                                        >
+                                        <button type="button" class="btn btn-primary" data-bs-toggle="modal"
+                                            :data-bs-target="'#exampleModal-' + index">
                                             Result
                                         </button>
-                                        <div
-                                            :id="'exampleModal-' + index"
-                                            class="modal fade"
-                                            tabindex="-1"
-                                            aria-labelledby="exampleModalLabel"
-                                            aria-hidden="true"
-                                        >
+                                        <div :id="'exampleModal-' + index" class="modal fade" tabindex="-1"
+                                            aria-labelledby="exampleModalLabel" aria-hidden="true">
                                             <div class="modal-dialog modal-fullscreen">
                                                 <div class="modal-content">
                                                     <div class="modal-header">
                                                         <h5 class="modal-title" id="exampleModalLabel">
                                                             Detailed test results of students
                                                         </h5>
-                                                        <button
-                                                            type="button"
-                                                            class="btn-close"
-                                                            data-bs-dismiss="modal"
-                                                            aria-label="Close"
-                                                        ></button>
+                                                        <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                                            aria-label="Close"></button>
                                                     </div>
                                                     <div class="modal-body">
                                                         <div class="pb-0 card-header">
@@ -86,14 +75,10 @@
                                                                         List all result of test
                                                                     </p>
                                                                 </div>
-                                                                <div
-                                                                    class="my-auto mt-4 ms-auto mt-lg-0"
-                                                                >
+                                                                <div class="my-auto mt-4 ms-auto mt-lg-0">
                                                                     <div class="my-auto ms-auto">
-                                                                        <button
-                                                                            type="button"
-                                                                            class="mx-1 mb-0 btn btn-outline-success btn-sm"
-                                                                        >
+                                                                        <button type="button"
+                                                                            class="mx-1 mb-0 btn btn-outline-success btn-sm">
                                                                             Export to exel
                                                                         </button>
                                                                     </div>
@@ -102,43 +87,33 @@
                                                         </div>
                                                         <div class="px-0 pb-0 pt-0 card-body">
                                                             <div class="table-responsive">
-                                                                <DataTable
-                                                                    id="setdata"
-                                                                    :options="{ select: 'single' }"
-                                                                    ref="table"
-                                                                    class="table table-flush mx-3"
-                                                                >
+                                                                <DataTable id="setdata" :options="{ select: 'single' }"
+                                                                    ref="table" class="table table-flush mx-3">
                                                                     <thead class="thead-light">
-                                                                    <tr>
-                                                                        <th>ID</th>
-                                                                        <th>Name</th>
-                                                                        <th>Score</th>
-                                                                        <th>Time to finish</th>
-                                                                        <th>Status</th>
-                                                                    </tr>
+                                                                        <tr>
+                                                                            <th>ID</th>
+                                                                            <th>Name</th>
+                                                                            <th>Score</th>
+                                                                            <th>Time to finish</th>
+                                                                            <th>Status</th>
+                                                                        </tr>
                                                                     </thead>
                                                                     <tbody>
-                                                                    <tr
-                                                                        v-for="(result, index) in results"
-                                                                        :key="index"
-                                                                    >
-                                                                        <td>{{ result.id }}</td>
-                                                                        <td>{{ result.name }}</td>
-                                                                        <td>{{ result.score }}</td>
-                                                                        <td>{{ result.time }}</td>
-                                                                        <td>{{ result.status }}</td>
-                                                                    </tr>
+                                                                        <tr v-for="(result, index) in results" :key="index">
+                                                                            <td>{{ result.id }}</td>
+                                                                            <td>{{ result.name }}</td>
+                                                                            <td>{{ result.score }}</td>
+                                                                            <td>{{ result.time }}</td>
+                                                                            <td>{{ result.status }}</td>
+                                                                        </tr>
                                                                     </tbody>
                                                                 </DataTable>
                                                             </div>
                                                         </div>
                                                     </div>
                                                     <div class="modal-footer">
-                                                        <button
-                                                            type="button"
-                                                            class="btn btn-secondary"
-                                                            data-bs-dismiss="modal"
-                                                        >
+                                                        <button type="button" class="btn btn-secondary"
+                                                            data-bs-dismiss="modal">
                                                             Close
                                                         </button>
                                                     </div>
@@ -150,6 +125,7 @@
                                         <button v-if="!quiz.submited"
                                                 type="button"
                                                 class="btn btn-primary">
+
                                             <router-link :to="'/lesson/test/' + quiz.id">
                                                 Start
                                             </router-link>
@@ -204,7 +180,13 @@
             </div>
         </div>
     </div>
-
+    <div class="row">
+        <router-link :to="{ name: 'home.test.add', params: {id: this.id} }">
+            <div class="col-12">
+                <button class="btn btn-primary position-fixed bottom-0 end-0 mt-3 ms-3" type="button">Add new test</button>
+            </div>
+        </router-link>
+    </div>
 
 </template>
 

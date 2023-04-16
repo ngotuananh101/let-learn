@@ -12,6 +12,7 @@ export const homeService = {
     AddQuestionForum,
     voteComment,
     voteQuestion
+    updatePassword
 };
 
 function loadHome() {
@@ -115,3 +116,17 @@ function voteQuestion(data) {
         .then(handleResponse)
 }
 
+function updatePassword(password) {
+    console.log(password);
+    const requestOptions = {
+        method: 'PUT',
+        headers: authHeader(),
+        body: JSON.stringify(password)
+    };
+
+    return fetch(`/api/user/main/${password.id}?type=password`, requestOptions)
+        .then(handleResponse)
+        .then(password => {
+            return password;
+        });
+}

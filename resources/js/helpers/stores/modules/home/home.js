@@ -102,6 +102,7 @@ export default {
                     }
                 );
         },
+
         voteComment({commit}, data) {
             commit('request');
             homeService.voteComment(data)
@@ -125,6 +126,16 @@ export default {
                         commit('requestFailure', error);
                     }
                 );
+        updatePassword({ commit }, password) {
+            commit("request");
+            homeService.updatePassword(password).then(
+                (password) => {
+                    commit("requestSuccess", password);
+                },
+                (error) => {
+                    commit("requestFailure", error);
+                }
+            );
         },
 
     },
