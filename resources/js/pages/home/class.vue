@@ -3,28 +3,33 @@
         <ul class="nav nav-pills bg-transparent border-0" id="pills-tab" role="tablist">
             <li class="nav-item" role="presentation">
                 <button class="nav-link" id="pills-home-tab" data-bs-toggle="pill" data-bs-target="#pills-news"
-                    type="button" role="tab" aria-controls="pills-news" aria-selected="true"
-                    style="color: black; font-weight: bold">News
+                        type="button" role="tab" aria-controls="pills-news" aria-selected="true"
+                        style="color: black; font-weight: bold">News
                 </button>
             </li>
             <li class="nav-item" role="presentation">
                 <button class="nav-link active" id="pills-excercite-tab" data-bs-toggle="pill"
                         data-bs-target="#pills-excercite" type="button" role="tab" aria-controls="pills-excercite"
                         aria-selected="false" style="color: black; font-weight: bold">Exercises
-                    data-bs-target="#pills-excercite" type="button" role="tab" aria-controls="pills-excercite"
-                    aria-selected="false" style="color: black; font-weight: bold">Excercite
                 </button>
             </li>
             <li class="nav-item" role="presentation">
                 <button class="nav-link" id="pills-member-tab" data-bs-toggle="pill" data-bs-target="#pills-member"
-                    type="button" role="tab" aria-controls="pills-member" aria-selected="false"
-                    style="color: black; font-weight: bold">Members
+                        type="button" role="tab" aria-controls="pills-member" aria-selected="false"
+                        style="color: black; font-weight: bold">Members
                 </button>
             </li>
 
         </ul>
     </div>
-    <div class="tab-pane fade" id="pills-news">nothing</div>
+    <div class="tab-pane fade" id="pills-news">
+        <div class="container pt-3">
+            <h3 class="text-center">News</h3>
+            <div class="row justify-content-center mt-4">
+
+            </div>
+        </div>
+    </div>
     <div class="tab-content" id="pills-tabContent">
         <div class="tab-pane fade show active" id="pills-excercite" role="tabpanel" aria-labelledby="pills-home-tab">
             <div class="container pt-3">
@@ -52,11 +57,11 @@
                                 <div class="row">
                                     <div class="col">
                                         <button type="button" class="btn btn-primary" data-bs-toggle="modal"
-                                            :data-bs-target="'#exampleModal-' + index">
+                                                :data-bs-target="'#exampleModal-' + index">
                                             Result
                                         </button>
                                         <div :id="'exampleModal-' + index" class="modal fade" tabindex="-1"
-                                            aria-labelledby="exampleModalLabel" aria-hidden="true">
+                                             aria-labelledby="exampleModalLabel" aria-hidden="true">
                                             <div class="modal-dialog modal-fullscreen">
                                                 <div class="modal-content">
                                                     <div class="modal-header">
@@ -64,7 +69,7 @@
                                                             Detailed test results of students
                                                         </h5>
                                                         <button type="button" class="btn-close" data-bs-dismiss="modal"
-                                                            aria-label="Close"></button>
+                                                                aria-label="Close"></button>
                                                     </div>
                                                     <div class="modal-body">
                                                         <div class="pb-0 card-header">
@@ -78,7 +83,7 @@
                                                                 <div class="my-auto mt-4 ms-auto mt-lg-0">
                                                                     <div class="my-auto ms-auto">
                                                                         <button type="button"
-                                                                            class="mx-1 mb-0 btn btn-outline-success btn-sm">
+                                                                                class="mx-1 mb-0 btn btn-outline-success btn-sm">
                                                                             Export to exel
                                                                         </button>
                                                                     </div>
@@ -88,24 +93,24 @@
                                                         <div class="px-0 pb-0 pt-0 card-body">
                                                             <div class="table-responsive">
                                                                 <DataTable id="setdata" :options="{ select: 'single' }"
-                                                                    ref="table" class="table table-flush mx-3">
+                                                                           ref="table" class="table table-flush mx-3">
                                                                     <thead class="thead-light">
-                                                                        <tr>
-                                                                            <th>ID</th>
-                                                                            <th>Name</th>
-                                                                            <th>Score</th>
-                                                                            <th>Time to finish</th>
-                                                                            <th>Status</th>
-                                                                        </tr>
+                                                                    <tr>
+                                                                        <th>ID</th>
+                                                                        <th>Name</th>
+                                                                        <th>Score</th>
+                                                                        <th>Time to finish</th>
+                                                                        <th>Status</th>
+                                                                    </tr>
                                                                     </thead>
                                                                     <tbody>
-                                                                        <tr v-for="(result, index) in results" :key="index">
-                                                                            <td>{{ result.id }}</td>
-                                                                            <td>{{ result.name }}</td>
-                                                                            <td>{{ result.score }}</td>
-                                                                            <td>{{ result.time }}</td>
-                                                                            <td>{{ result.status }}</td>
-                                                                        </tr>
+                                                                    <tr v-for="(result, index) in results" :key="index">
+                                                                        <td>{{ result.id }}</td>
+                                                                        <td>{{ result.name }}</td>
+                                                                        <td>{{ result.score }}</td>
+                                                                        <td>{{ result.time }}</td>
+                                                                        <td>{{ result.status }}</td>
+                                                                    </tr>
                                                                     </tbody>
                                                                 </DataTable>
                                                             </div>
@@ -113,7 +118,7 @@
                                                     </div>
                                                     <div class="modal-footer">
                                                         <button type="button" class="btn btn-secondary"
-                                                            data-bs-dismiss="modal">
+                                                                data-bs-dismiss="modal">
                                                             Close
                                                         </button>
                                                     </div>
@@ -143,36 +148,40 @@
     <div class="tab-pane fade" id="pills-member">
         <div class="container">
             <h3 class="text-center">Members</h3>
-<!--            <div class="fixed-plugin">-->
-<!--                <a class="fixed-plugin-button position-fixed p-3">Add</a>-->
-<!--            </div>-->
+            <!--            <div class="fixed-plugin">-->
+            <!--                <a class="fixed-plugin-button position-fixed p-3">Add</a>-->
+            <!--            </div>-->
             <div class="row">
                 <div class="col-12">
                     <h4 class="pt-3">Teachers</h4>
                     <div class="card my-4" v-for="(teacher, index) in teacherArray" :key="'teacher-' + teacher.id">
                         <div class="card-body d-flex align-items-center">
                             <div class="d-flex align-items-center">
-                                <img src="https://cdn.discordapp.com/attachments/702150671943860266/1088118611794726922/ArsBlink.JPG" style="height: 30px" class="rounded-circle" alt="">
+                                <img
+                                    src="https://cdn.discordapp.com/attachments/702150671943860266/1088118611794726922/ArsBlink.JPG"
+                                    style="height: 30px" class="rounded-circle" alt="">
                                 <span class="ms-2 me-auto">{{ teacher.name }}</span>
                             </div>
                         </div>
                     </div>
-                    <hr />
+                    <hr/>
                     <h4 class="pt-3">Students</h4>
                     <div class="my-4 pb-5">
                         <div class="card mt-3" v-for="(student, index) in studentArray" :key="'student-' + student.id">
                             <div class="card-body d-flex align-items-center justify-content-between">
                                 <div class="d-flex align-items-center">
-                                    <img src="https://cdn.discordapp.com/attachments/702150671943860266/1088118611794726922/ArsBlink.JPG" style="height: 30px" class="rounded-circle" alt="">
+                                    <img
+                                        src="https://cdn.discordapp.com/attachments/702150671943860266/1088118611794726922/ArsBlink.JPG"
+                                        style="height: 30px" class="rounded-circle" alt="">
                                     <span class="ms-2 me-auto">{{ student.name }}</span>
                                 </div>
-<!--                                <div v-if="student.role === 'student'" class="dropdown">-->
-<!--                                    <button class="btn btn-secondary dropdown-toggle" type="button" :id="'student-options-' + student.id" data-bs-toggle="dropdown" aria-expanded="false">...</button>-->
-<!--                                    <ul class="dropdown-menu" :aria-labelledby="'student-options-' + student.id">-->
-<!--                                        <li><a class="dropdown-item" href="#">Delete</a></li>-->
-<!--                                        <li><a class="dropdown-item" href="#">Hide</a></li>-->
-<!--                                    </ul>-->
-<!--                                </div>-->
+                                <!--                                <div v-if="student.role === 'student'" class="dropdown">-->
+                                <!--                                    <button class="btn btn-secondary dropdown-toggle" type="button" :id="'student-options-' + student.id" data-bs-toggle="dropdown" aria-expanded="false">...</button>-->
+                                <!--                                    <ul class="dropdown-menu" :aria-labelledby="'student-options-' + student.id">-->
+                                <!--                                        <li><a class="dropdown-item" href="#">Delete</a></li>-->
+                                <!--                                        <li><a class="dropdown-item" href="#">Hide</a></li>-->
+                                <!--                                    </ul>-->
+                                <!--                                </div>-->
                             </div>
                         </div>
                     </div>
@@ -183,7 +192,8 @@
     <div class="row">
         <router-link :to="{ name: 'home.test.add', params: {id: this.id} }">
             <div class="col-12">
-                <button class="btn btn-primary position-fixed bottom-0 end-0 mt-3 ms-3" type="button">Add new test</button>
+                <button class="btn btn-primary position-fixed bottom-0 end-0 mt-3 ms-3" type="button">Add new test
+                </button>
             </div>
         </router-link>
     </div>
@@ -199,6 +209,24 @@ export default {
             quizzes: null,
             members: null,
             showDetails: false,
+            newPostText: '',
+            posts: [
+                {
+                    id: 1,
+                    user: {
+                        name: 'John Doe',
+                        photo: 'https://via.placeholder.com/150'
+                    },
+                    text: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.'
+                }
+            ],
+            comment: {
+                user: {
+                    name: 'Jane Smith',
+                    photo: 'https://via.placeholder.com/150'
+                },
+                text: 'Nice post!'
+            }
         };
     },
     created() {
@@ -213,7 +241,7 @@ export default {
             } else if (mutation.type === "home/requestFailure") {
             }
         });
-        this.$store.dispatch("home/getClassDetail", { id: this.id, roleName: this.user.role.name });
+        this.$store.dispatch("home/getClassDetail", {id: this.id, roleName: this.user.role.name});
     },
     computed: {
         teacherArray() {
