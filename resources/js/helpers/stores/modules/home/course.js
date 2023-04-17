@@ -22,9 +22,9 @@ export default {
         },
     },
     actions: {
-        getLessonByCourseId({ commit }, course_id) {
+        getLessonByCourseId({ commit }, course_id, roleName) {
             commit("request");
-            courseService.getLessonByCourseId(course_id).then(
+            courseService.getLessonByCourseId(course_id, roleName).then(
                 (response) => {
                     commit("success", response);
                 },
@@ -55,9 +55,9 @@ export default {
                 }
             );
         },
-        deleteCourse({ commit }, id) {
+        deleteCourse({ commit }, id, roleName) {
             commit("request");
-            courseService.deleteCourse(id).then(
+            courseService.deleteCourse(id, roleName).then(
                 (course) => {
                     commit("success", course);
                 },

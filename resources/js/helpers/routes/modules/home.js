@@ -120,13 +120,13 @@ const home = [
                         path: ":id",
                         name: "course.index",
                         component: () =>
-                            import("../../../pages/course/Course.vue"),
+                            import("../../../pages/home/course/Course.vue"),
                     },
                     {
                         path: ":id/edit",
                         name: "course.edit",
                         component: () =>
-                            import("../../../pages/course/Edit.vue"),
+                            import("../../../pages/home/course/Edit.vue"),
                     },
                 ],
             },

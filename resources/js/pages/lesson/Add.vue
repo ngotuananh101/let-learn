@@ -131,9 +131,11 @@ export default {
             type: 'get',
             details: [],
             cards: null,
+            user: null,
         };
     },
     created() {
+        this.user = this.$store.getters['user/userData'].info;
         this.unsubscribe = this.$store.subscribe((mutation) => {
             if (mutation.type === 'lesson/request') {
                 if (this.type === 'import') {
@@ -274,6 +276,7 @@ export default {
                 description: this.lesson.description,
                 password: this.lesson.password,
                 details: this.details,
+                roleName: this.user.roleName,
             });
             this.$router.push({ name: 'home.home' });
         }

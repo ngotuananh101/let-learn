@@ -161,9 +161,11 @@ export default {
             cards: null,
             id: this.$route.params.id,
             is_multiple_choice: '1',
+            user: null,
         };
     },
     created() {
+        this.user = this.$store.getters['user/userData'].info;
         this.unsubscribe = this.$store.subscribe((mutation) => {
             if (mutation.type === 'learn/request') {
                 if (this.type === 'import') {
@@ -310,6 +312,7 @@ export default {
                 score_reporting: this.score_reporting,
                 start_time: this.start_time,
                 end_time: this.end_time,
+                roleName: this.user.roleName,
             });
             // this.$router.push({ name: 'home.class', params: { id: this.id } });
         }

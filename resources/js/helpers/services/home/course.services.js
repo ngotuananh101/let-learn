@@ -8,13 +8,13 @@ export const courseService = {
     deleteCourse,
 };
 
-function getLessonByCourseId(course_id) {
+function getLessonByCourseId(course_id, roleName) {
     const requestOptions = {
         method: "GET",
         headers: authHeader(),
     };
 
-    return fetch(`/api/student/course/${course_id}?type=info`, requestOptions)
+    return fetch(`/api/${roleName}/course/${course_id}?type=info`, requestOptions)
         .then(handleResponse)
         .then((data) => {
             return data;
@@ -28,7 +28,7 @@ function addCourse(course) {
         body: JSON.stringify(course),
     };
 
-    return fetch(`/api/student/course`, requestOptions)
+    return fetch(`/api/${course.roleName}/course`, requestOptions)
         .then(handleResponse)
         .then((course) => {
             return course;
@@ -42,20 +42,20 @@ function updateCourse(course) {
         body: JSON.stringify(course),
     };
 
-    return fetch(`/api/student/course/${course.id}`, requestOptions)
+    return fetch(`/api/${course.roleName}/course/${course.id}`, requestOptions)
         .then(handleResponse)
         .then((course) => {
             return course;
         });
 }
 
-function deleteCourse(id) {
+function deleteCourse(id, roleName) {
     const requestOptions = {
         method: "DELETE",
         headers: authHeader(),
     };
 
-    return fetch(`/api/student/course/${id}`, requestOptions)
+    return fetch(`/api/${roleName}/course/${id}`, requestOptions)
         .then(handleResponse)
         .then((course) => {
             return course;
