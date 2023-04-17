@@ -127,6 +127,19 @@ export default {
                     }
                 );
         },
+        updatePost({commit}, data) {
+            commit('request');
+            homeService.postUpdate(data)
+                .then(
+                    response => {
+                        commit('requestSuccess', response);
+                    },
+                    error => {
+                        commit('requestFailure', error);
+                    }
+                );
+        },
+
         updatePassword({ commit }, password){
             commit("request");
             homeService.updatePassword(password).then(
