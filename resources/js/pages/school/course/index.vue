@@ -94,12 +94,11 @@ export default {
     },
     created() {
         this.unsubscribe = this.$store.subscribe((mutation) => {
-            if (mutation.type === 'adminCourse/request') {
-            } else if (mutation.type === 'adminCourse/success') {
-                if(this.type === 'get') {
-                    this.courses = mutation.payload.courses;
+            if (mutation.type === 'schoolCourse/success') {
+                if (this.type === 'get') {
+                    this.courses = mutation.payload;
                     this.init();
-                } else if(this.type === 'add') {
+                } else if (this.type === 'add') {
                     this.$root.showSnackbar('User added successfully', 'success');
                     this.courseModal.hide();
                     this.courses.push(mutation.payload);
@@ -108,20 +107,19 @@ export default {
                         mutation.payload.name,
                         mutation.payload.description,
                         mutation.payload.user.name,
-                        mutation.payload.school ? mutation.payload.school.name : 'N/A',
                         mutation.payload.class ? mutation.payload.class.name : 'N/A',
                         'active',
                     ]);
                 }
-            } else if (mutation.type === 'adminCourse/failure') {
+            } else if (mutation.type === 'schoolCourse/failure') {
                 this.$root.showSnackbar(mutation.payload, 'danger');
             }
         });
-        this.$store.dispatch('adminCourse/getAll');
+        this.$store.dispatch('schoolCourse/index', this.$route.params.slug);
     },
     beforeUnmount() {
         this.unsubscribe();
-        this.table.destroy();
+        this.table ? this.table.destroy() : null;
     },
     methods: {
         exportCSV,
@@ -133,34 +131,33 @@ export default {
                         "Name",
                         "Description",
                         "Creator",
-                        "School",
                         "Class",
                         "Status",
                     ],
-                    data: this.courses.map((course) => {
-                        return [
-                            course.id,
-                            course.name,
-                            course.description,
-                            course.user.name,
-                            course.school ? course.school.name : 'N/A',
-                            course.class ? course.class.name : 'N/A',
-                            course.status,
-                        ];
-                    }),
+                    data: this.courses.length > 0 ? this.courses.map((course) => [
+                        course.id,
+                        course.name,
+                        course.description,
+                        course.user.name,
+                        course.class ? course.class.name : 'N/A',
+                        'active',
+                    ]) : [],
                 },
             });
             this.table.on('datatable.selectrow', (row_index) => {
-                this.$router.push({name: 'admin.course.edit', params: {id: this.courses[row_index].id}});
+                if(!isNaN(row_index)) {
+                    this.$router.push({name: 'school.course.edit', params: {id: this.courses[row_index].id}});
+                }
             });
             const bootstrap = this.$store.state.config.bootstrap;
             this.courseModal = new bootstrap.Modal(document.getElementById('courseModal'), {
                 keyboard: false,
             });
         },
-        add(){
+        add() {
             this.type = 'add';
-            this.$store.dispatch('adminCourse/add', this.course);
+            this.course.slug = this.$route.params.slug;
+            this.$store.dispatch('schoolCourse/store', this.course);
         }
     }
 };

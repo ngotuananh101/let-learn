@@ -49,7 +49,7 @@
                     <template #list>
                         <ul class="nav ms-4">
                             <!-- nav links -->
-                            <sidenav-item :to="{ name: 'admin.lesson.index' }" mini-icon="M" text="Manage"/>
+                            <sidenav-item :to="{ name: 'school.lesson.index' }" mini-icon="M" text="Manage"/>
                             <sidenav-item :to="{ name: 'school.lesson.add' }" mini-icon="A" text="Add"/>
                         </ul>
                     </template>
@@ -60,10 +60,25 @@
                     collapse-ref="course"
                     nav-text="Course"
                     :class="getRoute() === 'course' ? 'active' : ''"
-                    @click="go('admin.course')"
+                    @click="go('school.course')"
                 >
                     <template #icon>
                         <i class="fa-regular fa-folder text-danger text-sm opacity-10"></i>
+                    </template>
+                </sidenav-collapse>
+            </li>
+            <li class="nav-item">
+                <sidenav-collapse collapse-ref="classManager" nav-text="Class"
+                                  :class="getRoute() === 'class' ? 'active' : ''">
+                    <template #icon>
+                        <i class="fa-regular fa-screen-users text-info text-sm opacity-10"></i>
+                    </template>
+                    <template #list>
+                        <ul class="nav ms-4">
+                            <!-- nav links -->
+                            <sidenav-item :to="{ name: 'school.class.index' }" mini-icon="I" text="Index"/>
+<!--                            <sidenav-item :to="{ name: 'school.class.add' }" mini-icon="A" text="Add"/>-->
+                        </ul>
                     </template>
                 </sidenav-collapse>
             </li>

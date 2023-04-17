@@ -168,6 +168,7 @@ export default {
                     this.import_lesson_modal.hide();
                 } else if (this.type === 'add') {
                     this.$root.showSnackbar('Add lesson successfully', 'success');
+                    this.$router.push({name: 'school.lesson.index'});
                 }
             } else if (mutation.type === 'schoolLesson/failure') {
                 this.$root.showSnackbar(mutation.payload, 'danger');
@@ -250,7 +251,7 @@ export default {
                 }
                 const formData = new FormData();
                 formData.append('file', this.file);
-                this.$store.dispatch('adminLesson/importFile', formData);
+                this.$store.dispatch('schoolLesson/importFile', formData);
             } else {
                 this.$root.showSnackbar('Importing lesson...', 'info');
                 try {
@@ -286,12 +287,19 @@ export default {
         },
         add() {
             this.type = 'add';
-            this.$store.dispatch('adminLesson/add', {
-                name: this.lesson.name,
-                description: this.lesson.description,
-                password: this.lesson.password,
-                details: this.details,
+            this.details = this.details.filter((detail) => {
+                return detail.term !== '' && detail.definition !== '';
             });
+            if(this.details.length === 0) {
+                this.$root.showSnackbar('Please add at least 1 card', 'danger');
+            } else{
+                this.$store.dispatch('schoolLesson/add', {
+                    name: this.lesson.name,
+                    description: this.lesson.description,
+                    password: this.lesson.password,
+                    details: this.details,
+                });
+            }
         }
     }
 };

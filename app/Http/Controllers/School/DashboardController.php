@@ -9,11 +9,11 @@ use Illuminate\Http\Request;
 
 class DashboardController extends Controller
 {
-    public function show($slug): JsonResponse
+    public function show(Request $request): JsonResponse
     {
         try {
             // Get school by slug
-            $school = School::where('slug', $slug)->firstOrFail();
+            $school = School::where('slug', $request->input('slug'))->firstOrFail();
             // Load relationships
             $school->load('users', 'classes', 'courses', 'lessons');
             return response()->json($school, 200);
