@@ -105,6 +105,7 @@
 
 <script>
 import {MD5} from "md5-js-tools";
+import {activateDarkMode, deactivateDarkMode} from "@/helpers/other/dark-mode";
 
 export default {
     name: "Navbar",
@@ -140,10 +141,14 @@ export default {
             return user;
         },
         async logout() {
-            await this.$store.dispatch('user/logout');
+            await this.$store.dispatch('user/logout').then(() => {
+                location.reload();
+            });
         },
         async logoutAll() {
-            await this.$store.dispatch('user/logoutAll');
+            await this.$store.dispatch('user/logoutAll').then(() => {
+                location.reload();
+            });
         },
         darkMode() {
             if (this.$store.state.darkMode) {
