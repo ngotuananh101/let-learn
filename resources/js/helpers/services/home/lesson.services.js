@@ -1,6 +1,7 @@
 import handleResponse from "../../other/handle-response";
 import authHeader from "../../other/auth-header";
 import readXlsxFile from "read-excel-file";
+import role from "../../stores/modules/admin/role";
 
 export const lessonService = {
     importExcelFile,
@@ -42,7 +43,7 @@ function addLesson(lesson) {
         body: JSON.stringify(lesson),
     };
 
-    return fetch(`/api/student/lesson`, requestOptions)
+    return fetch(`/api/${lesson.roleName}/lesson`, requestOptions)
         .then(handleResponse)
         .then((lesson) => {
             return lesson;
@@ -55,20 +56,20 @@ function deleteLesson(id) {
         headers: authHeader(),
     };
 
-    return fetch(`/api/student/lesson/${id}`, requestOptions)
+    return fetch(`/api/${roleName}/lesson/${id}`, requestOptions)
         .then(handleResponse)
         .then((lesson) => {
             return lesson;
         });
 }
 
-function getLessonById(id) {
+function getLessonById(id, roleName) {
     const requestOptions = {
         method: 'GET',
         headers: authHeader()
     };
 
-    return fetch(`/api/student/lesson/${id}`, requestOptions)
+    return fetch(`/api/${roleName}/lesson/${id}`, requestOptions)
         .then(handleResponse)
         .then(lesson => {
             return lesson;
@@ -82,7 +83,7 @@ function updateLesson(lesson) {
         body: JSON.stringify(lesson)
     };
 
-    return fetch(`/api/student/lesson/${lesson.id}`, requestOptions)
+    return fetch(`/api/${lesson.roleName}/lesson/${lesson.id}`, requestOptions)
         .then(handleResponse)
         .then(lesson => {
             return lesson;

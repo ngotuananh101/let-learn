@@ -9,18 +9,17 @@ export const learnService = {
     sendTestResult,
     loadSelfTest,
     addTest,
-    importExcelFile,
-    updateComment
+    // importExcelFile,
+    updateComment,
 };
 
-
-function loadFlashCard(id) {
+function loadFlashCard(id, roleName) {
     const requestOptions = {
         method: "POST",
         headers: authHeader(),
         body: JSON.stringify({ lesson_id: id }),
     };
-    return fetch(`/api/student/main?type=detail_split`, requestOptions)
+    return fetch(`/api/${roleName}/main?type=detail_split`, requestOptions)
         .then(handleResponse)
         .then((data) => {
             console.log(data);
@@ -56,7 +55,7 @@ function loadTest(id) {
             return data.data;
         });
 }
-function loadSelfTest(id) {
+function loadSelfTest(id, roleName) {
     const requestOptions = {
         method: "POST",
         headers: authHeader(),
@@ -68,7 +67,7 @@ function loadSelfTest(id) {
             mix_answers: 0,
         }),
     };
-    return fetch(`/api/student/main?type=test`, requestOptions)
+    return fetch(`/api/${roleName}/main?type=test`, requestOptions)
         .then(handleResponse)
         .then((data) => {
             return data.lesson_details;
@@ -87,16 +86,18 @@ function sendTestResult(data) {
 }
 function updateResult(data) {
     const requestOptions = {
-        method: 'PUT',
+        method: "PUT",
         headers: authHeader(),
         body: JSON.stringify({
             lesson_id: data.lesson_id,
             learned: data.learned,
             relearn: data.relearn,
         }),
-
     };
-    return fetch(`/api/student/main/${data.user_id}/?type=learned`, requestOptions)
+    return fetch(
+        `/api/student/main/${data.user_id}/?type=learned`,
+        requestOptions
+    )
         .then(handleResponse)
         .then((data) => {
             console.log(data);
@@ -112,41 +113,41 @@ function addTest(test) {
         body: JSON.stringify(test),
     };
 
-    return fetch(`/api/teacher/quiz?type=quiz`, requestOptions)
+    return fetch(`/api/${test.roleName}/quiz?type=quiz`, requestOptions)
         .then(handleResponse)
         .then((test) => {
             return test;
         });
 }
 
-function importExcelFile(formData) {
-    return new Promise((resolve, reject) => {
-        let file = formData.get("file");
-        let details = [];
-        readXlsxFile(file)
-            .then((rows) => {
-                rows.forEach((row, index) => {
-                    if (index > 1) {
-                        details.push({
-                            id: 0,
-                            term: row[1],
-                            definition: row[2],
-                        });
-                    }
-                });
-            })
-            .then(() => {
-                resolve(details);
-            })
-            .catch((error) => {
-                reject(error);
-            });
-    });
-}
+// function importExcelFile(formData) {
+//     return new Promise((resolve, reject) => {
+//         let file = formData.get("file");
+//         let details = [];
+//         readXlsxFile(file)
+//             .then((rows) => {
+//                 rows.forEach((row, index) => {
+//                     if (index > 1) {
+//                         details.push({
+//                             id: 0,
+//                             term: row[1],
+//                             definition: row[2],
+//                         });
+//                     }
+//                 });
+//             })
+//             .then(() => {
+//                 resolve(details);
+//             })
+//             .catch((error) => {
+//                 reject(error);
+//             });
+//     });
+// }
 
 function updateComment(data) {
     const requestOptions = {
-        method: 'PUT',
+        method: "PUT",
         headers: authHeader(),
         body: JSON.stringify({
             comment_id: data.comment_id,
@@ -155,7 +156,7 @@ function updateComment(data) {
             votetype: data.votetype,
         }),
     };
-    return fetch(`/api/forum/post/1?type=comment`, requestOptions)
-        .then(handleResponse)
+    return fetch(`/api/forum/post/1?type=comment`, requestOptions).then(
+        handleResponse
+    );
 }
-

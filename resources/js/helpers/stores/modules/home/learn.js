@@ -16,9 +16,9 @@ export default {
         },
     },
     actions: {
-        getFlashCard({ commit }, id) {
+        getFlashCard({ commit }, id, roleName) {
             commit("request");
-            learnService.loadFlashCard(id).then(
+            learnService.loadFlashCard(id, roleName).then(
                 (response) => {
                     commit("requestSuccess", response);
                 },
@@ -49,9 +49,9 @@ export default {
                 }
             );
         },
-        getSelfTest({ commit }, id) {
+        getSelfTest({ commit }, payload) {
             commit("request");
-            learnService.loadSelfTest(id).then(
+            learnService.loadSelfTest(payload.id, payload.roleName).then(
                 (response) => {
                     commit("requestSuccess", response);
                 },
@@ -90,9 +90,7 @@ export default {
                 "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
             ) {
                 try {
-                    let response = await learnService.importExcelFile(
-                        formData
-                    );
+                    let response = await learnService.importExcelFile(formData);
                     commit("requestSuccess", response);
                 } catch (error) {
                     commit("requestFailure", error);
@@ -101,29 +99,29 @@ export default {
                 commit("requestFailure", "File type not supported");
             }
         },
-        updateResult({commit}, data) {
+        updateResult({ commit }, data) {
             console.log(data);
-            return learnService.updateResult(data)
-                .then(data => {
+            return learnService.updateResult(data).then(
+                (data) => {
                     // console.log("data");
-                        return data;
-                    },
-                    error => {
-                        return null;
-                    }
-                );
+                    return data;
+                },
+                (error) => {
+                    return null;
+                }
+            );
         },
-        updateComment({commit}, data) {
+        updateComment({ commit }, data) {
             console.log(data);
-            return learnService.updateComment(data)
-                .then(data => {
-                        // console.log("data");
-                        return data;
-                    },
-                    error => {
-                        return null;
-                    }
-                );
+            return learnService.updateComment(data).then(
+                (data) => {
+                    // console.log("data");
+                    return data;
+                },
+                (error) => {
+                    return null;
+                }
+            );
         },
     },
     getters: {

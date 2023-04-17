@@ -131,9 +131,11 @@ export default {
             details: [],
             cards: null,
             removed_ids: [],
+            user: null,
         };
     },
     created() {
+        this.user = this.$store.getters['user/userData'].info;
         this.unsubscribe = this.$store.subscribe((mutation) => {
             if (mutation.type === 'lesson/request') {
                 if (this.type === 'get') {
@@ -163,7 +165,7 @@ export default {
                 this.$root.showSnackbar(mutation.payload, 'danger');
             }
         });
-        this.$store.dispatch('lesson/getLessonById', this.id);
+        this.$store.dispatch('lesson/getLessonById', { id: this.id, roleName: this.user.role.name });
     },
     beforeUnmount() {
         this.unsubscribe();
@@ -286,6 +288,7 @@ export default {
                 password: this.lesson.password,
                 details: this.details,
                 removed_ids: this.removed_ids,
+                roleName: this.user.roleName,
             };
             this.$store.dispatch('lesson/updateLesson', data);
         }

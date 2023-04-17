@@ -166,6 +166,7 @@ export default {
             relearns: null,
             notLearns: null,
             type: null,
+            user: null,
         };
     },
     title() {
@@ -192,7 +193,7 @@ export default {
                 this.$root.showSnackbar(mutation.payload, 'danger');
             }
         });
-        this.$store.dispatch("learn/getFlashCard", this.id);
+        this.$store.dispatch("learn/getFlashCard", { id: this.id, roleName: this.user.roleName });
     },
     methods: {
         updateTitle(title) {
@@ -230,7 +231,7 @@ export default {
         deleteLesson() {
             if (confirm('Are you sure?')) {
                 this.type = 'delete';
-                this.$store.dispatch('lesson/deleteLesson', this.id);
+                this.$store.dispatch('lesson/deleteLesson', { id: this.id, roleName: this.user.roleName });
             }
             this.$router.push({ name: 'home.home' });
         },

@@ -73,9 +73,11 @@ export default {
                 status: "",
             },
             type: 'get',
+            user: null,
         };
     },
     created() {
+        this.user = this.$store.getters['user/userData'].info;
         this.unsubscribe = this.$store.subscribe((mutation) => {
             if (mutation.type === 'course/request') {
                 if (this.type === 'update_info') {
@@ -96,7 +98,7 @@ export default {
                 this.$root.showSnackbar(mutation.payload, 'danger');
             }
         });
-        this.$store.dispatch('course/getLessonByCourseId', this.$route.params.id);
+        this.$store.dispatch('course/getLessonByCourseId', { id: this.$route.params.id, roleName: this.user.role.name });
     },
     methods: {
         updateInfo() {
@@ -108,6 +110,7 @@ export default {
                 description: this.course.description,
                 password: this.course.password,
                 status: this.course.status,
+                roleName: this.user.role.name,
             });
         },
     },

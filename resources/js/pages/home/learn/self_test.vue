@@ -96,9 +96,11 @@ export default {
             show_result: false,
             type: "getSelfTest",
             question: null,
+            user: null,
         };
     },
     created() {
+        this.user = this.$store.getters['user/userData'].info;
         this.unsubscribe = this.$store.subscribe((mutation) => {
             if (mutation.type === "learn/request") {
             } else if (mutation.type === "learn/requestSuccess") {
@@ -113,7 +115,7 @@ export default {
             } else if (mutation.type === "learn/requestFailure") {
             }
         });
-        this.$store.dispatch("learn/getSelfTest", this.id);
+        this.$store.dispatch("learn/getSelfTest", { id: this.id, roleName: this.user.role.name});
     },
     computed: {
         numCorrectAnswers() {
