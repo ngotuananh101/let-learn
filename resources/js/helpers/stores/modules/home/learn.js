@@ -27,6 +27,18 @@ export default {
                 }
             );
         },
+        getNews({ commit }) {
+            commit("request");
+            learnService.loadNew().then(
+                (response) => {
+                    commit("requestSuccess", response);
+                },
+                (error) => {
+                    commit("requestFailure", error);
+                }
+            );
+        },
+
         getLearn({ commit }, id) {
             commit("request");
             learnService.loadLearn(id).then(

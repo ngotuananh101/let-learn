@@ -153,19 +153,18 @@ export default {
                     this.isCorrectAnswer = false;
                 }
                 this.userAnswers.push({
+                    id: this.lesson_details[this.currentQuestion].id,
                     question: this.lesson_details[this.currentQuestion].question,
                     selectedAnswer: selectedAnswer,
                     isCorrect: this.isCorrectAnswer
                 });
                 if (this.currentQuestion === this.lesson_details.length - 1) {
                     const userAnswers = this.userAnswers;
-                    const correctAnswers = userAnswers.filter(answer => answer.isCorrect);
-                    const learned = correctAnswers.map(answer => answer.question);
-                    const incorrectAnswers = userAnswers.filter(answer => !answer.isCorrect).map(answer => answer.question);
-
+                    const correctAnswers = userAnswers.filter(answer => answer.isCorrect).map(answer => answer.id);
+                    const incorrectAnswers = userAnswers.filter(answer => !answer.isCorrect).map(answer => answer.id);
                     this.$store.dispatch('learn/updateResult', {
                         lesson_id: this.$route.params.id,
-                        learned: learned,
+                        learned: correctAnswers,
                         relearn: incorrectAnswers,
                         user_id: this.user.id
                     }).then((res) => {

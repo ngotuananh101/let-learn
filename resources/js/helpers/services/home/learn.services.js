@@ -10,7 +10,8 @@ export const learnService = {
     loadSelfTest,
     addTest,
     importExcelFile,
-    updateComment
+    updateComment,
+    loadNew
 };
 
 
@@ -116,6 +117,18 @@ function addTest(test) {
         .then(handleResponse)
         .then((test) => {
             return test;
+        });
+}
+function loadNew() {
+    const requestOptions = {
+        method: 'GET',
+        headers: authHeader()
+    };
+    return fetch(`/api/forum/post/`, requestOptions)
+        .then(handleResponse)
+        .then(data => {
+            console.log(data.posts);
+            return data.posts;
         });
 }
 
