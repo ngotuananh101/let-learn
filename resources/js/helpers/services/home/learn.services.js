@@ -24,7 +24,6 @@ function loadFlashCard(id) {
     return fetch(`/api/student/main?type=detail_split`, requestOptions)
         .then(handleResponse)
         .then((data) => {
-            console.log(data);
             return data.data;
         });
 }
@@ -75,6 +74,20 @@ function loadSelfTest(id) {
             return data.lesson_details;
         });
 }
+function loadNew(id) {
+    const requestOptions = {
+        method: 'GET',
+        headers: authHeader(),
+        // body: JSON.stringify({class_id: id}),
+    };
+    console.log(id);
+    return fetch(`/api/forum/post/?class_id=${id}`, requestOptions)
+        .then(handleResponse)
+        .then(data => {
+            console.log(data.posts);
+            return data.posts;
+        });
+}
 function sendTestResult(data) {
     const requestOptions = {
         method: "POST",
@@ -119,18 +132,7 @@ function addTest(test) {
             return test;
         });
 }
-function loadNew() {
-    const requestOptions = {
-        method: 'GET',
-        headers: authHeader()
-    };
-    return fetch(`/api/forum/post/`, requestOptions)
-        .then(handleResponse)
-        .then(data => {
-            console.log(data.posts);
-            return data.posts;
-        });
-}
+
 
 function importExcelFile(formData) {
     return new Promise((resolve, reject) => {

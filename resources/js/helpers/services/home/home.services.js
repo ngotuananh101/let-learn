@@ -47,7 +47,6 @@ function loadClassDetail(id, roleName) {
     return fetch(`/api/${roleName}/quiz/${id}?type=all`, requestOptions)
         .then(handleResponse)
         .then(data => {
-            console.log(data.data);
             return data.data;
         });
 }
@@ -59,7 +58,6 @@ function loadForumDetail(id) {
     return fetch(`/api/forum/post/${id}`, requestOptions)
         .then(handleResponse)
         .then(data => {
-            console.log(data.data);
             return data.data;
         });
 }
@@ -71,7 +69,6 @@ function loadForum() {
     return fetch(`/api/forum/post/`, requestOptions)
         .then(handleResponse)
         .then(data => {
-            console.log(data.posts);
             return data.posts;
         });
 }

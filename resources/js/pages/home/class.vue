@@ -23,12 +23,20 @@
                     <div class="col-md-8">
                         <div class="card">
                             <div class="card-body">
-                                <form @submit.prevent="submitPost">
-                                    <div class="form-group">
-                            <textarea v-model.trim="newPostText" class="form-control"
-                                      placeholder="Write a new post"></textarea>
+                                <form @submit.prevent="onSubmit">
+<!--                                    <div class="input-group mb-3">-->
+<!--                                        <span class="input-group-text" id="inputGroup-sizing-default">Title of question: </span>-->
+<!--                                        <input type="text" class="form-control" id="questionTitle">-->
+<!--                                    </div>-->
+<!--                                    <div class="input-group mb-3">-->
+<!--                                        <span class="input-group-text" id="inputGroup-sizing-default">Tag: </span>-->
+<!--                                        <input type="text" class="form-control" id="questionTopic">-->
+<!--                                    </div>-->
+                                    <div class="form-floating">
+                                        <textarea class="form-control" id="questionContent" rows="5"></textarea>
+                                        <label for="floatingTextarea2">Question</label>
                                     </div>
-                                    <button type="submit" class="btn btn-primary">Submit</button>
+                                    <button type="submit" class="btn btn-primary mt-2">Submit</button>
                                 </form>
                             </div>
                         </div>
@@ -73,8 +81,6 @@
                     </div>
                 </div>
             </div>
-
-
         </div>
         <div class="tab-pane fade" id="profile" role="tabpanel" aria-labelledby="profile-tab">
             <div class="container pt-3">
@@ -272,7 +278,8 @@ export default {
             } else if (mutation.type === "learn/requestFailure") {
             }
         });
-        this.$store.dispatch("learn/getNews");
+        this.$store.dispatch("learn/getNews", this.id);
+        console.log(this.id);
     },
     created() {
         this.user = this.$store.getters['user/userData'].info;
@@ -282,7 +289,6 @@ export default {
             } else if (mutation.type === "home/requestSuccess") {
                 this.quizzes = mutation.payload.quizzes;
                 this.members = mutation.payload.members;
-                console.log(this.quizzes);
             } else if (mutation.type === "home/requestFailure") {
             }
         });
@@ -327,6 +333,25 @@ export default {
                     console.error('Error adding comment:', error);
                     this.loading = false;
                 });
+        },
+        onSubmit() {
+            const class_id = this.id;
+            const title = "Class";
+            const content = document.getElementById("questionContent").value;
+            const tags = "Class";
+            const status = "active";
+
+            // Check if required fields are filled in
+            if (!content) {
+                alert("Please fill in all required fields.");
+                return;
+            }
+
+            // Dispatch action to add new question
+            this.$store.dispatch("home/addQuestionForum", {class_id, title, content, tags, status });
+
+            // Reload page with animation after submitting form
+            location.reload(true);
         },
 
         viewExerciseResult(exerciseId) {

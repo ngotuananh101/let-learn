@@ -27,9 +27,9 @@ export default {
                 }
             );
         },
-        getNews({ commit }) {
+        getNews({ commit }, id) {
             commit("request");
-            learnService.loadNew().then(
+            learnService.loadNew(id).then(
                 (response) => {
                     commit("requestSuccess", response);
                 },
