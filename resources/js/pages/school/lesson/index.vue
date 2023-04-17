@@ -12,10 +12,10 @@
                             <div class="my-auto mt-4 ms-auto mt-lg-0">
                                 <div class="my-auto ms-auto">
                                     <button type="button" class="mx-1 mb-0 btn btn-outline-success btn-sm"
-                                        @click="()=>{
-                                            this.$router.push({name: 'admin.lesson.add'})
+                                            @click="()=>{
+                                            this.$router.push({name: 'school.lesson.add'})
                                         }"
-                                        >
+                                    >
                                         Add Lesson
                                         <i class="fa-regular fa-user-plus ms-2"></i>
                                     </button>
@@ -44,6 +44,7 @@
 </template>
 <script>
 import {DataTable, exportCSV} from "simple-datatables";
+
 export default {
     name: "User",
     title() {
@@ -59,17 +60,18 @@ export default {
     },
     created() {
         this.unsubscribe = this.$store.subscribe((mutation) => {
-            if (mutation.type === 'adminLesson/request') {
-            } else if (mutation.type === 'adminLesson/success') {
+            if (mutation.type === 'schoolLesson/request') {
+            } else if (mutation.type === 'schoolLesson/success') {
                 if (this.type === 'get') {
                     this.lessons = mutation.payload.lessons;
+                    console.log(this.lessons);
                     this.init();
                 }
-            } else if (mutation.type === 'adminLesson/failure') {
+            } else if (mutation.type === 'schoolLesson/failure') {
                 this.$root.showSnackbar(mutation.payload, 'danger');
             }
         });
-        this.$store.dispatch('adminLesson/getLessons');
+        this.$store.dispatch('schoolLesson/index', this.$route.params.slug);
     },
     beforeUnmount() {
         this.unsubscribe();
@@ -80,13 +82,12 @@ export default {
         init() {
             this.table = new DataTable("#lesson_datatable", {
                 data: {
-                    headings: ['ID', 'Name', 'Description', 'School', 'Class', 'Updated At', 'Status'],
+                    headings: ['ID', 'Name', 'Description', 'Class', 'Updated At', 'Status'],
                     data: this.lessons.map((lesson) => {
                         return [
                             lesson.id,
                             lesson.name,
                             lesson.description,
-                            lesson.school_id ? lesson.school.name : 'N/A',
                             lesson.class_id ? lesson.class.name : 'N/A',
                             new Date(lesson.updated_at).toLocaleString(),
                             lesson.status,
@@ -95,7 +96,7 @@ export default {
                 },
             });
             this.table.on('datatable.selectrow', (row_index) => {
-                this.$router.push({name: 'admin.lesson.edit', params: {id: this.lessons[row_index].id}});
+                this.$router.push({name: 'school.lesson.edit', params: {id: this.lessons[row_index].id}});
             });
         }
     }

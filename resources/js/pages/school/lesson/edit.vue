@@ -4,8 +4,9 @@
             <div class="col-12">
                 <div id="basic-info" class="card mt-4">
                     <div class="card-header pb-0">
-                        <h5 class="mb-0">Add Lesson</h5>
-                        <p class="mb-0 text-sm">Add a new lesson</p>
+                        <h5 class="mb-0">Edit Lesson</h5>
+                        <p class="mb-0 text-sm">
+                            You can edit lesson here</p>
                     </div>
                     <div class="card-body pt-0">
                         <div class="row">
@@ -42,14 +43,19 @@
                                     v-model="this.lesson.password"
                                 />
                             </div>
-                            <div class="col-md-2 col-6">
+                            <div class="col-md-2 col-4">
                                 <button class="btn btn-primary w-100 mt-3" @click="import_lesson_modal.show">
                                     Import Lesson
                                 </button>
                             </div>
-                            <div class="col-md-2 col-6">
+                            <div class="col-md-2 col-4">
                                 <button class="btn btn-success w-100 mt-3" @click="update">
                                     Save
+                                </button>
+                            </div>
+                            <div class="col-md-2 col-4">
+                                <button class="btn btn-danger w-100 mt-3" @click="deleteLesson">
+                                    Delete
                                 </button>
                             </div>
                             <div class="col-12">
@@ -138,7 +144,7 @@ export default {
         LessonDetailCard
     },
     title() {
-        return "Add Lesson";
+        return this.lesson.name + " | Edit Lesson";
     },
     data() {
         return {
@@ -160,7 +166,7 @@ export default {
     },
     created() {
         this.unsubscribe = this.$store.subscribe((mutation) => {
-            if (mutation.type === 'adminLesson/request') {
+            if (mutation.type === 'schoolLesson/request') {
                 if (this.type === 'get') {
                     this.$root.showSnackbar('Loading lesson info...', 'info');
                 }
@@ -169,7 +175,7 @@ export default {
                 } else if (this.type === 'update') {
                     this.$root.showSnackbar('Updating lesson...', 'info');
                 }
-            } else if (mutation.type === 'adminLesson/success') {
+            } else if (mutation.type === 'schoolLesson/success') {
                 if (this.type === 'get' && this.id) {
                     this.$root.showSnackbar('Load lesson info successfully', 'success');
                     let data = mutation.payload.lesson;
@@ -183,13 +189,16 @@ export default {
                     this.import_lesson_modal.hide();
                 } else if (this.type === 'update') {
                     this.$root.showSnackbar('Update lesson successfully', 'success');
-                    this.$router.push({name: 'admin.lesson.index'});
+                    this.$router.push({name: 'school.lesson.index'});
+                } else if(this.type === 'delete') {
+                    this.$root.showSnackbar('Delete lesson successfully', 'success');
+                    this.$router.push({name: 'school.lesson.index'});
                 }
-            } else if (mutation.type === 'adminLesson/failure') {
+            } else if (mutation.type === 'schoolLesson/failure') {
                 this.$root.showSnackbar(mutation.payload, 'danger');
             }
         });
-        this.$store.dispatch('adminLesson/getLessonById', this.id);
+        this.$store.dispatch('schoolLesson/getLessonById', this.id);
     },
     beforeUnmount() {
         this.unsubscribe();
@@ -268,7 +277,7 @@ export default {
                 }
                 const formData = new FormData();
                 formData.append('file', this.file);
-                this.$store.dispatch('adminLesson/importFile', formData);
+                this.$store.dispatch('schoolLesson/importFile', formData);
             } else {
                 this.$root.showSnackbar('Importing lesson...', 'info');
                 try {
@@ -305,6 +314,9 @@ export default {
         },
         update() {
             this.type = 'update';
+            this.details = this.details.filter((detail) => {
+                return detail.term !== '' && detail.definition !== '';
+            });
             let data = {
                 id: this.id,
                 name: this.lesson.name,
@@ -313,8 +325,14 @@ export default {
                 details: this.details,
                 removed_ids: this.removed_ids,
             };
-            this.$store.dispatch('adminLesson/updateLesson', data);
-        }
+            this.$store.dispatch('schoolLesson/updateLesson', data);
+        },
+        deleteLesson() {
+            if(confirm('Are you sure you want to delete this lesson?')) {
+                this.type = 'delete';
+                this.$store.dispatch('schoolLesson/deleteLesson', this.id);
+            }
+        },
     }
 };
 </script>

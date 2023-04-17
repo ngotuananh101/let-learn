@@ -9,8 +9,9 @@ export const learnService = {
     sendTestResult,
     loadSelfTest,
     addTest,
-    // importExcelFile,
+    importExcelFile,
     updateComment,
+    loadNew
 };
 
 function loadFlashCard(id, roleName) {
@@ -22,7 +23,6 @@ function loadFlashCard(id, roleName) {
     return fetch(`/api/${roleName}/main?type=detail_split`, requestOptions)
         .then(handleResponse)
         .then((data) => {
-            console.log(data);
             return data.data;
         });
 }
@@ -73,6 +73,20 @@ function loadSelfTest(id, roleName) {
             return data.lesson_details;
         });
 }
+function loadNew(id) {
+    const requestOptions = {
+        method: 'GET',
+        headers: authHeader(),
+        // body: JSON.stringify({class_id: id}),
+    };
+    console.log(id);
+    return fetch(`/api/forum/post/?class_id=${id}`, requestOptions)
+        .then(handleResponse)
+        .then(data => {
+            console.log(data.posts);
+            return data.posts;
+        });
+}
 function sendTestResult(data) {
     const requestOptions = {
         method: "POST",
@@ -120,30 +134,30 @@ function addTest(test) {
         });
 }
 
-// function importExcelFile(formData) {
-//     return new Promise((resolve, reject) => {
-//         let file = formData.get("file");
-//         let details = [];
-//         readXlsxFile(file)
-//             .then((rows) => {
-//                 rows.forEach((row, index) => {
-//                     if (index > 1) {
-//                         details.push({
-//                             id: 0,
-//                             term: row[1],
-//                             definition: row[2],
-//                         });
-//                     }
-//                 });
-//             })
-//             .then(() => {
-//                 resolve(details);
-//             })
-//             .catch((error) => {
-//                 reject(error);
-//             });
-//     });
-// }
+function importExcelFile(formData) {
+    return new Promise((resolve, reject) => {
+        let file = formData.get("file");
+        let details = [];
+        readXlsxFile(file)
+            .then((rows) => {
+                rows.forEach((row, index) => {
+                    if (index > 1) {
+                        details.push({
+                            id: 0,
+                            term: row[1],
+                            definition: row[2],
+                        });
+                    }
+                });
+            })
+            .then(() => {
+                resolve(details);
+            })
+            .catch((error) => {
+                reject(error);
+            });
+    });
+}
 
 function updateComment(data) {
     const requestOptions = {

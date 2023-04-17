@@ -4,8 +4,9 @@
             <div class="col-12">
                 <div id="basic-info" class="card mt-4">
                     <div class="card-header pb-0">
-                        <h5 class="mb-0">Add Lesson</h5>
-                        <p class="mb-0 text-sm">Add a new lesson</p>
+                        <h5 class="mb-0">Edit Lesson</h5>
+                        <p class="mb-0 text-sm">
+                            You can edit lesson here</p>
                     </div>
                     <div class="card-body pt-0">
                         <div class="row">
@@ -138,7 +139,7 @@ export default {
         LessonDetailCard
     },
     title() {
-        return "Add Lesson";
+        return this.lesson.name + " | Edit Lesson";
     },
     data() {
         return {

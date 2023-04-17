@@ -10,7 +10,7 @@ function baseInfo(slug) {
         method: 'GET',
         headers: authHeader()
     };
-    return fetch(`/api/school/${slug}`, requestOptions)
+    return fetch(`/api/school/dashboard?slug=${slug}`, requestOptions)
         .then(handleResponse)
         .then(response => {
             return response;
