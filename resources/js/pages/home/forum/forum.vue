@@ -86,16 +86,16 @@ export default {
             const status = "active";
 
             // Check if required fields are filled in
-            // if (!title || !content || !tags) {
-            //     alert("Please fill in all required fields.");
-            //     return;
-            // }
+            if (!title || !content || !tags) {
+                alert("Please fill in all required fields.");
+                return;
+            }
 
             // Dispatch action to add new question
             this.$store.dispatch("home/addQuestionForum", { title, content, tags, status });
 
             // Reload page with animation after submitting form
-            // location.reload(true);
+            location.reload(true);
         },
         upvoteQuestion(index){
             const id = this.posts[index].id;
