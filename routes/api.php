@@ -38,11 +38,12 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::resource('course', 'App\Http\Controllers\Admin\CourseController');
     });
     Route::group(['middleware' => ['permission:manager.dashboard,admin.super'], 'prefix' => 'school'], function () {
-        Route::get('{slug}', 'App\Http\Controllers\School\DashboardController@show');
+        Route::get('dashboard', 'App\Http\Controllers\School\DashboardController@show');
         Route::resource('info', 'App\Http\Controllers\School\SchoolController')->only(['show', 'update']);
         Route::resource('users', 'App\Http\Controllers\School\UserController');
         Route::resource('lessons', 'App\Http\Controllers\School\LessonController');
         Route::resource('courses', 'App\Http\Controllers\School\CourseController');
+        Route::resource('classes', 'App\Http\Controllers\School\ClassController');
     });
     Route::group(['prefix' => 'public'], function () {
         Route::get('home', 'App\Http\Controllers\Public\HomeController@index');

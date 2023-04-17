@@ -74,6 +74,18 @@ const school = [
                                 component: () => import('../../../pages/school/course/edit.vue'),
                             }
                         ]
+                    },
+                    {
+                        path: 'class',
+                        name: 'school.class',
+                        redirect: {name: 'school.class.index'},
+                        children: [
+                            {
+                                path: '',
+                                name: 'school.class.index',
+                                component: () => import('../../../pages/school/class/index.vue'),
+                            }
+                        ]
                     }
                 ],
             }
