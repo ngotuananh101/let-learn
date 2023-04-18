@@ -62,7 +62,22 @@ class ClassController extends Controller
      */
     public function show(string $id)
     {
-        //
+        try {
+            if ($this->checkPermission($id)) {
+                $class = Classes::findOrFail($id);
+                return response()->json([
+                    'class' => $class->load(['member','quizzes']),
+                ], 200);
+            } else {
+                return response()->json([
+                    'message' => 'You are not authorized to view this resource',
+                ], 403);
+            }
+        } catch (\Exception $e) {
+            return response()->json([
+                'message' => $e->getMessage(),
+            ], 500);
+        }
     }
 
     /**
