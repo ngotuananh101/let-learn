@@ -224,7 +224,7 @@ export default {
             });
         },
         back() {
-            this.$router.push({name: 'home.learn', params: {id: this.id}});
+            this.$router.push({name: 'lesson.index'});
         }
     },
 };

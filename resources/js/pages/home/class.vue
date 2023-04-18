@@ -18,7 +18,8 @@
     </ul>
     <div class="tab-content" id="myTabContent">
     <div class="tab-pane fade show active" id="home" role="tabpanel" aria-labelledby="home-tab">
-            <div class="container">
+            <div class="container pt-3">
+                <h3 class="text-center">News</h3>
                 <div class="row justify-content-center mt-4 pb-5">
                     <div class="col-md-8">
                         <div class="card">
@@ -72,23 +73,26 @@
                                         </div>
                                     </form>
                                 </div>
-                            </div>
-                            <hr>
-                            <div class="card-footer" v-for="comment in post.comments" :key="comment.id">
-                                <div class="row">
-                                    <div class="col-md-1">
-                                        <img :src="getUserInfo().gravatar" class="me-2 rounded-circle" width="30"
-                                             height="30" alt="">
-                                    </div>
-                                    <div class="col-md-10">
-                                        <div class="card-header">
-                                            <p>{{ comment.user_name }}</p>
-                                            <p>{{ comment.comment }}</p>
+                                <hr>
+                                <div class="card-footer" v-for="comment in post.comments" :key="comment.id">
+                                    <div class="row">
+                                        <div class="col-1">
+                                            <img :src="getUserInfo().gravatar" class="me-2 rounded-circle" width="30"
+                                                 height="30" alt="">
                                         </div>
+                                        <div class="col-10">
+                                            <div class="card-header">
+                                                <p>{{ comment.user_name }}</p>
+                                                <p>{{ comment.comment }}</p>
+                                            </div>
+                                        </div>
+                                        <hr>
                                     </div>
-                                    <hr>
+
                                 </div>
                             </div>
+
+
                         </div>
                     </div>
 
@@ -218,7 +222,7 @@
         </div>
     </div>
     <div class="tab-pane fade" id="contact" role="tabpanel" >
-        <div class="container">
+        <div class="container pt-3">
             <h3 class="text-center">Members</h3>
             <div class="row">
                 <div class="col-12">
