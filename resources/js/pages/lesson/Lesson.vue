@@ -88,7 +88,6 @@
                     <div class="col-md-6 col-12 pt-3">
                         <router-link :to="{ name: 'home.selftest', params: { id: id } }">
                             <div class="card">
-                                <!-- :href="{/lesson/selftest/${id}}" -->
                                 <div class="card-body p-3 row">
                                     <div class="col-8">
                                         <h5 class="card-title mb-0">Test</h5>
@@ -130,7 +129,7 @@
         <!-- <p>{{ data.lesson.description }}</p> -->
     </div>
     <h6>Relearn:</h6>
-<!--     <h6>Relearn: {{ data.relearn.length }}</h6>-->
+     <!-- <h6>Relearn: {{ data.relearns.length }}</h6> -->
     <div class="col-12" v-for="relearn in relearns">
         <div class="card mt-4">
             <div class="card-body">
@@ -140,12 +139,22 @@
         </div>
     </div>
     <h6>NotLearn:</h6>
-<!--     <h6>NotLearn: {{ data.notLearn.length }}</h6>-->
+     <!-- <h6>NotLearn: {{ data.notLearns.length }}</h6> -->
     <div class="col-12" v-for="notLearn in notLearns">
         <div class="card mt-4">
             <div class="card-body">
                 <p class="card-text text-success">{{ notLearn.term }}</p>
                 <p class="card-text">{{ notLearn.definition }}</p>
+            </div>
+        </div>
+    </div>
+    <h6>Learned:</h6>
+     <!-- <h6>NotLearn: {{ data.learneds.length }}</h6> -->
+    <div class="col-12" v-for="learned in learneds">
+        <div class="card mt-4">
+            <div class="card-body">
+                <p class="card-text text-success">{{ learned.term }}</p>
+                <p class="card-text">{{ learned.definition }}</p>
             </div>
         </div>
     </div>
@@ -168,6 +177,7 @@ export default {
             relearns: null,
             notLearns: null,
             type: null,
+            learneds: null,
         };
     },
     title() {
@@ -182,9 +192,10 @@ export default {
             } else if (mutation.type === "lesson/success") {
                 if (!this.type) {
                     this.data = mutation.payload;
-                    console.log(this.data);
+                    console.log(this.learneds);
                     this.relearns = this.data.relearn = mutation.payload.relearn;
                     this.notLearns = this.data.notLearn = mutation.payload.notLearn;
+                    this.learneds = this.data.learned = mutation.payload.learned;
                     document.getElementById("text").innerHTML = this.data.notLearn[this.currentCardIndex].definition;
                 }
                 if (this.type === 'delete') {
