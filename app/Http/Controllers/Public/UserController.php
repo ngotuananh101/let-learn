@@ -161,7 +161,7 @@ class UserController extends Controller
                 case 'info':
                     //show all information of user
                     $user = $request->user();
-                    //check user is active 
+                    //check user is active
                     if ($user->status != 'active') {
                         return response()->json([
                             'status' => 'error',
@@ -209,7 +209,7 @@ class UserController extends Controller
                     ]);
                     //show course by user id
                     if ($request->limit) {
-                        //where 
+                        //where
                         $courses = Course::where('user_id', $id)->where('status', 'active')->where('password', null)->limit($request->limit)->get();
                     } else {
                         $courses = Course::where('user_id', $id)->where('status', 'active')->where('password', null)->get();
@@ -612,14 +612,17 @@ class UserController extends Controller
                         } else if ($request->learned != null && $request->relearn == null) { //update only learned of user
                             //get id of learned lesson details
                             $learned = $learn ? explode(',', $learn->learned) : [];
+                            $relearn = $learn ? explode(',', $learn->relearn) : [];
                             //add new learned lesson detail to learned
                             $learned = array_merge($learned, $request->learned);
+                            $relearn = array_diff($relearn, $request->learned);
                             //remove duplicate learned
                             $learned = array_unique($learned);
                             //convert array to string
                             $learned = implode(',', $learned);
                             //update learned of user
                             $learn->learned = $learned;
+                            $learn->relearn = $relearn;
                             $learn->save();
                         } else {
                             //update learned and relearn of user
@@ -709,7 +712,7 @@ class UserController extends Controller
                     ], 200);
                     break;
                 case 'done':
-                    //request validate choice 
+                    //request validate choice
                     $request->validate([
                         'choice' => 'nullable|in:relearnall',
                         'lesson_id' => 'required|integer',

@@ -17,7 +17,7 @@
         </li>
     </ul>
     <div class="tab-content" id="myTabContent">
-        <div class="tab-pane fade show active" id="home" role="tabpanel" aria-labelledby="home-tab">
+    <div class="tab-pane fade show active" id="home" role="tabpanel" aria-labelledby="home-tab">
             <div class="container">
                 <div class="row justify-content-center mt-4 pb-5">
                     <div class="col-md-8">
@@ -95,7 +95,6 @@
                 </div>
             </div>
         </div>
-    </div>
     <div class="tab-pane fade" id="profile" role="tabpanel" >
         <div class="container pt-3">
             <h3 class="text-center">Exercises</h3>
@@ -251,7 +250,7 @@
             </div>
         </div>
     </div>
-
+    </div>
 </template>
 
 <script>
