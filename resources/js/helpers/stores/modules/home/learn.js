@@ -16,9 +16,9 @@ export default {
         },
     },
     actions: {
-        getFlashCard({ commit }, id, roleName) {
+        getFlashCard({ commit }, payload) {
             commit("request");
-            learnService.loadFlashCard(id, roleName).then(
+            learnService.loadFlashCard(payload.id, payload.roleName).then(
                 (response) => {
                     commit("requestSuccess", response);
                 },
@@ -85,6 +85,7 @@ export default {
         },
         addTest({ commit }, test) {
             commit("request");
+            console.log(test);
             learnService.addTest(test).then(
                 (test) => {
                     commit("requestSuccess", test);

@@ -9,7 +9,21 @@ export const lessonService = {
     deleteLesson,
     getLessonById,
     updateLesson,
+    loadFlashCard
 };
+
+function loadFlashCard(id, roleName) {
+    const requestOptions = {
+        method: "POST",
+        headers: authHeader(),
+        body: JSON.stringify({ lesson_id: id }),
+    };
+    return fetch(`/api/${roleName}/main?type=detail_split`, requestOptions)
+        .then(handleResponse)
+        .then((data) => {
+            return data.data;
+        });
+}
 
 function importExcelFile(formData) {
     return new Promise((resolve, reject) => {
@@ -64,6 +78,7 @@ function deleteLesson(id) {
 }
 
 function getLessonById(id, roleName) {
+    console.log(id, roleNames);
     const requestOptions = {
         method: 'GET',
         headers: authHeader()
