@@ -26,7 +26,7 @@
         </div>
         <div class="col-md-5 col-12">
             <div class="row">
-                <h2>{{ data.lesson.name }}</h2>
+                <!-- <h2>{{ data.lesson.name }}</h2> -->
                 <div class="col-12 mb-3 row align-items-center justify-content-center">
                     <div class="col-2">
                         <img src="https://gcavocats.ca/wp-content/uploads/2018/09/man-avatar-icon-flat-vector-19152370-1.jpg"
@@ -127,9 +127,10 @@
     <div class="mt-4">
         <!--show the lesson's description by lesson id -->
         <h5 class="mt-4">Description</h5>
-        <p>{{ data.lesson.description }}</p>
+        <!-- <p>{{ data.lesson.description }}</p> -->
     </div>
-    <h6>Relearn: {{ data.relearn.length }}</h6>
+    <h6>Relearn:</h6>
+     <h6>Relearn: {{ data.relearn.length }}</h6>
     <div class="col-12" v-for="relearn in relearns">
         <div class="card mt-4">
             <div class="card-body">
@@ -138,7 +139,8 @@
             </div>
         </div>
     </div>
-    <h6>NotLearn: {{ data.notLearn.length }}</h6>
+    <h6>NotLearn:</h6>
+     <h6>NotLearn: {{ data.notLearn.length }}</h6>
     <div class="col-12" v-for="notLearn in notLearns">
         <div class="card mt-4">
             <div class="card-body">
@@ -166,7 +168,6 @@ export default {
             relearns: null,
             notLearns: null,
             type: null,
-            user: null,
         };
     },
     title() {
@@ -177,10 +178,11 @@ export default {
     created() {
         this.user = this.$store.getters['user/userData'].info;
         this.unsubscribe = this.$store.subscribe((mutation) => {
-            if (mutation.type === "learn/request") {
-            } else if (mutation.type === "learn/requestSuccess") {
+            if (mutation.type === "lesson/request") {
+            } else if (mutation.type === "lesson/success") {
                 if (!this.type) {
                     this.data = mutation.payload;
+                    console.log(this.data);
                     this.relearns = this.data.relearn = mutation.payload.relearn;
                     this.notLearns = this.data.notLearn = mutation.payload.notLearn;
                     document.getElementById("text").innerHTML = this.data.notLearn[this.currentCardIndex].definition;
@@ -189,18 +191,17 @@ export default {
                     this.$root.showSnackbar('Delete lesson successfully', 'success');
                     this.$router.push({ name: 'home.home' });
                 }
-            } else if (mutation.type === "learn/requestFailure") {
+            } else if (mutation.type === "lesson/failure") {
                 this.$root.showSnackbar(mutation.payload, 'danger');
             }
         });
-        this.$store.dispatch("learn/getFlashCard", { id: this.id, roleName: this.user.roleName });
+        this.$store.dispatch("lesson/getFlashCard", { id: this.id, roleName: this.user.role.name });
     },
     methods: {
         updateTitle(title) {
             this.$emit("change-title", title);
         },
         nextCard() {
-            console.log(this.currentCardIndex);
             if (this.currentCardIndex < this.data.notLearn.length - 1) {
                 this.currentCardIndex++;
             } else {
@@ -231,7 +232,7 @@ export default {
         deleteLesson() {
             if (confirm('Are you sure?')) {
                 this.type = 'delete';
-                this.$store.dispatch('lesson/deleteLesson', { id: this.id, roleName: this.user.roleName });
+                this.$store.dispatch('lesson/deleteLesson', { id: this.id, roleName: this.user.role.name });
             }
             this.$router.push({ name: 'home.home' });
         },

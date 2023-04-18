@@ -222,7 +222,6 @@ export default {
             course: {
                 name: '',
                 description: '',
-                roleName: '',
             },
             user: JSON.parse(localStorage.getItem("user")),
             unsubscribe: null,

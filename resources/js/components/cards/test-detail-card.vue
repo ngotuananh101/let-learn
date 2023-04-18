@@ -3,9 +3,13 @@
         <div class="card-header bg-secondary">
             <div class="row">
                 <div class="col-6">
-                    <h5 class="mb-0 col-4">{{ data.index + 1 }}</h5>
+                    <h5 class="mb-0 col-6">{{ data.index + 1 }}</h5>
                 </div>
-                <div class="form-check form-switch ps-0 mb-3 col-6 justify-content-end">
+                <div class="col-6 ms-auto text-end">
+                    <span class="text-danger fs-5" @click="this.remove()" title="Delete this detail"><i
+                            class="far fa-trash-alt me-2" aria-hidden="true"></i></span>
+                </div>
+                <div class="form-check form-switch ps-0 mb-3 col-12 justify-content-end">
                     <input id="multipleChoice" class="form-check-input ms-0" type="checkbox" name="multipleChoice"
                         v-model="multipleChoice" />
                     <label class="form-check-label" for="rememberMe">
@@ -15,49 +19,44 @@
             </div>
         </div>
         <div class="card-body bg-secondary">
-            <div v-if="this.multipleChoice">
+            <div v-if="multipleChoice">
                 <div class="row">
                     <input type="hidden" class="id" v-model="data.id">
-                    <div class="col-md-7 col-12">
+                    <div class="col-md- col-12">
                         <label>Question</label>
                         <textarea class="form-control form-control-lg" rows="8" v-model="data.question"></textarea>
                     </div>
-                    <div class="col-md-5 col-12">
-                        <label>Correct answer</label>
-                        <textarea class="form-control form-control-lg" rows="8" v-model="data.correct_answer"></textarea>
+                    <div class="col-md-4 col-3">
+                        <button class="btn btn-lg btn-primary mt-3 w-100" @click="addAnswer">
+                            Add Answer
+                        </button>
                     </div>
-                    <div class="col-md-6 col-12">
-                        <label>Answer 1</label>
-                        <textarea class="form-control" rows="8" v-model="data.answer_1"></textarea>
-                    </div>
-                    <div class="col-md-6 col-12">
-                        <label>Answer 2</label>
-                        <textarea class="form-control" rows="8" v-model="data.answer_2"></textarea>
-                    </div>
-                    <div class="col-md-6 col-12">
-                        <label>Answer 3</label>
-                        <textarea class="form-control" rows="8" v-model="data.answer_3"></textarea>
-                    </div>
-                    <div class="col-md-6 col-12">
-                        <label>Answer 4</label>
-                        <textarea class="form-control" rows="8" v-model="data.answer_4"></textarea>
+                </div>
+                <div class="row">
+                    <div class="col-md-3 col-12 mt-2" v-for="(answer, index) in answerOptions">
+                        <!-- <div class="form-check col-1">
+                            <input class="form-check-input" type="radio" id="correcr_answer" value="correcr_answer" v-model="correcr_answer">
+                        </div> -->
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" :id="'answer' + index" :name="'answer' + data.id"
+                                :value="answer.answer" v-model="data.correct_answer">
+                        </div>
+                        <div class="justify-content-end">
+                            <button type="button" class="btn-close" @click="this.removeAnswer()"> </button>
+                        </div>
+                        <input class="form-control" type="text" for="rememberMe" v-model="answer.answer" />
                     </div>
                 </div>
             </div>
             <div v-else>
                 <div class="row">
                     <input type="hidden" class="id" v-model="data.id">
-                    <div class="col-md-7 col-12">
+                    <div class="col-12">
                         <label>Question</label>
-                        <textarea class="form-control form-control-lg" rows="8" v-model="data.question"></textarea>
-                    </div>
-                    <div class="col-md-5 col-12">
-                        <label>Correct answer</label>
-                        <textarea class="form-control form-control-lg" rows="8" v-model="data.correct_answer"></textarea>
+                        <textarea class="form-control" rows="8" v-model="data.question"></textarea>
                     </div>
                 </div>
             </div>
-
         </div>
     </div>
 </template>
@@ -69,13 +68,17 @@ export default {
         data: {
             type: Object,
             default: null,
+            answers: null,
         },
     },
     data() {
         return {
             multipleChoice: true,
-            answer_option: [this.answer_1, this.answer_2, this.answer_3, this.answer_4],
+            answer_option: [],
         };
+    },
+    mounted() {
+        this.init();
     },
     methods: {
         // remove this card
@@ -84,13 +87,60 @@ export default {
                 data: this.data,
             });
         },
-        switch() {
-            // switch question and correct answer
-            let question = this.data.question;
-            this.data.question = this.data.correct_answer;
-            this.data.correct_answer = question;
+        init() {
+            this.answer_option = [];
+            if (this.data.answers && this.data.answers.length) {
+                this.data.answers.forEach(answer => {
+                    this.answer_option.push({
+                        answer: answer.answer || '',
+                        answer_option: this.answer_option = {
+                            answer(index) {
+                                return this.answer_option[index].answer;
+                            }
+                        }
+                    });
+                });
+            } else {
+                // init 1 answer when start
+                this.answer_option.push({
+                    index: 0,
+                    answer: '',
+                    is_correct: false,
+                });
+            }
+            this.data.correct_answer = '';
+            console.log(this.answer_option);
+        },
+        addAnswer() {
+            // add new answer
+            this.answer_option.push({
+                index: this.answer_option.length,
+                answer: '',
+                is_correct: false,
+            });
+        },
+        removeAnswer(index) {
+            // remove selected answer
+            this.answer_option.splice(index, 1);
+
         },
     },
+    computed: {
+        answerOptions() {
+            return this.answer_option.map((option, index) => ({
+                index,
+                answer: option.answer
+            }));
+        },
+        answerOptionsWithIndex() {
+            return this.answer_option.map((option, index) => ({
+                index,
+                answer: option.answer,
+                is_correct: this.data.correct_answer === index
+            }));
+        }
+    },
+
 };
 </script>
 
@@ -109,7 +159,8 @@ export default {
     height: 100px;
 }
 
-.lesson-detail .card-body .form-control-lg {
-    height: 200px;
+.lesson-detail .card-body .form-control-sm {
+    height: 100px;
+    width: 200px;
 }
 </style>

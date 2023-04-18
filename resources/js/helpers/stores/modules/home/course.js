@@ -22,9 +22,10 @@ export default {
         },
     },
     actions: {
-        getLessonByCourseId({ commit }, course_id, roleName) {
+        getLessonByCourseId({ commit }, payload) {
             commit("request");
-            courseService.getLessonByCourseId(course_id, roleName).then(
+            console.log(id, roleName);
+            courseService.getLessonByCourseId(payload.id, payload.roleName).then(
                 (response) => {
                     commit("success", response);
                 },
