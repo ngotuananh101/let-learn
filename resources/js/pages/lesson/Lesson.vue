@@ -130,7 +130,7 @@
         <!-- <p>{{ data.lesson.description }}</p> -->
     </div>
     <h6>Relearn:</h6>
-     <h6>Relearn: {{ data.relearn.length }}</h6>
+<!--     <h6>Relearn: {{ data.relearn.length }}</h6>-->
     <div class="col-12" v-for="relearn in relearns">
         <div class="card mt-4">
             <div class="card-body">
@@ -140,7 +140,7 @@
         </div>
     </div>
     <h6>NotLearn:</h6>
-     <h6>NotLearn: {{ data.notLearn.length }}</h6>
+<!--     <h6>NotLearn: {{ data.notLearn.length }}</h6>-->
     <div class="col-12" v-for="notLearn in notLearns">
         <div class="card mt-4">
             <div class="card-body">

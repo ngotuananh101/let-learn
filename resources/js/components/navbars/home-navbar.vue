@@ -75,8 +75,7 @@
                             <li class="mb-2">
                                 <a class="dropdown-item border-radius-md" :href="'/forum'">
                                     <div class="py-1 d-flex align-items-center">
-                                        <i class="fa-solid fa-user me-3"></i>
-<!--                                        <i class="fa-light fa-fire"></i>-->
+                                        <i class="fa-solid fa-comments me-3"></i>
                                         <span>Forum</span>
                                     </div>
                                 </a>

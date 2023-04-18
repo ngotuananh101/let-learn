@@ -50,6 +50,19 @@ export default {
                 }
             );
         },
+        relearn({ commit }, data) {
+            commit("request");
+            console.log(data.lesson_id);
+            console.log(data.user_id);
+            learnService.relearn(data).then(
+                (response) => {
+                    commit("requestSuccess", response);
+                },
+                (error) => {
+                    commit("requestFailure", error);
+                }
+            );
+        },
         getTest({ commit }, id) {
             commit("request");
             learnService.loadTest(id).then(
