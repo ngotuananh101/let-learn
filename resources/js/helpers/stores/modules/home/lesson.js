@@ -52,9 +52,9 @@ export default {
                 }
             );
         },
-        deleteLesson({ commit }, id) {
+        deleteLesson({ commit }, id, roleName) {
             commit("request");
-            lessonService.deleteLesson(id).then(
+            lessonService.deleteLesson(id, roleName).then(
                 (lesson) => {
                     commit("success", lesson);
                 },
@@ -63,9 +63,9 @@ export default {
                 }
             );
         },
-        getLessonById({ commit }, id) {
+        getLessonById({ commit }, id, roleName) {
             commit("request");
-            lessonService.getLessonById(id).then(
+            lessonService.getLessonById(id,roleName).then(
                 (lesson) => {
                     commit("success", lesson);
                 },

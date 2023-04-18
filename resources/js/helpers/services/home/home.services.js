@@ -132,7 +132,7 @@ function updatePassword(password) {
         body: JSON.stringify(password)
     };
 
-    return fetch(`/api/user/main/${password.id}?type=password`, requestOptions)
+    return fetch(`/api/${password.roleName}/main/${password.id}?type=password`, requestOptions)
         .then(handleResponse)
         .then(password => {
             return password;

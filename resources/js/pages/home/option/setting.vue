@@ -136,6 +136,7 @@ export default {
                 password_confirmation: null,
             },
             id: this.$route.params.id,
+            user: null,
         };
     },
     computed: {
@@ -164,6 +165,7 @@ export default {
                 password: this.password.password,
                 password_confirmation: this.password.password_confirmation,
                 id: this.user.id,
+                role: this.user.role,
             };
             if (data.password == data.password_confirmation && data.old_password != data.password && data.old_password != data.password_confirmation) {
                 this.$store.dispatch('home/updatePassword', data);

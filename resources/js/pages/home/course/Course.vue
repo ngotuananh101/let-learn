@@ -1,7 +1,7 @@
 <template>
     <div class="row">
         <div class="mt-5">
-            <h2>{{ data.course.name }}</h2>
+            <!-- <h2>{{ data.course.name }}</h2> -->
         </div>
         <div class="row">
             <div class="col-12 mb-3 row align-items-center justify-content-center mt-3">
@@ -32,7 +32,7 @@
         </div>
         <div>
             <!-- show description -->
-            <p class="m-0">{{ data.course.description }}</p>
+            <!-- <p class="m-0">{{ data.course.description }}</p> -->
         </div>
     </div>
     <div class="row">
@@ -86,7 +86,7 @@ export default {
                 this.$root.showSnackbar(mutation.payload, 'danger');
             }
         });
-        this.$store.dispatch("course/getLessonByCourseId", this.id);
+        this.$store.dispatch("course/getLessonByCourseId", { id: this.id, roleName: this.user.roleName });
     },
 
     // this.unsubscribe = this.$store.subscribe((mutation) => {
@@ -110,7 +110,7 @@ export default {
         deleteCourse() {
             if (confirm('Are you sure?')) {
                 this.type = 'delete';
-                this.$store.dispatch('course/deleteCourse', this.id);
+                this.$store.dispatch('course/deleteCourse', { id: this.id, roleName: this.user.roleName  });
             }
         },
     },

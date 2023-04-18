@@ -37,11 +37,13 @@ export default {
             data: null,
             currentCardIndex: 0,
             currentSide: "front",
-            showSettings: false // add showSettings data property
+            showSettings: false, // add showSettings data property
+            user: null,
         };
     },
 
     created() {
+        this.user = this.$store.getters['user/userData'].info;
         this.unsubscribe = this.$store.subscribe((mutation) => {
             if (mutation.type === "learn/request") {
             } else if (mutation.type === "learn/requestSuccess") {
@@ -51,7 +53,7 @@ export default {
             } else if (mutation.type === "learn/requestFailure") {
             }
         });
-        this.$store.dispatch("learn/getFlashCard", this.id);
+        this.$store.dispatch("learn/getFlashCard", { id: this.id, roleName: this.user.roleName });
     },
     methods: {
         updateTitle(title) {
