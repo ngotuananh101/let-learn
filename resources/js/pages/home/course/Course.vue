@@ -86,7 +86,7 @@ export default {
                 this.$root.showSnackbar(mutation.payload, 'danger');
             }
         });
-        this.$store.dispatch("course/getLessonByCourseId", { id: this.id, roleName: this.user.roleName });
+        this.$store.dispatch("course/getLessonByCourseId", {id: this.id, roleName: this.user.role.name});
     },
 
     // this.unsubscribe = this.$store.subscribe((mutation) => {
@@ -110,7 +110,7 @@ export default {
         deleteCourse() {
             if (confirm('Are you sure?')) {
                 this.type = 'delete';
-                this.$store.dispatch('course/deleteCourse', { id: this.id, roleName: this.user.roleName  });
+                this.$store.dispatch('course/deleteCourse', { id: this.user.id, roleName: this.user.role.name  });
             }
         },
     },

@@ -8,13 +8,14 @@ export const courseService = {
     deleteCourse,
 };
 
-function getLessonByCourseId(course_id, roleName) {
+function getLessonByCourseId(id, roleName) {
+    console.log(id, roleName);
     const requestOptions = {
         method: "GET",
         headers: authHeader(),
     };
 
-    return fetch(`/api/${roleName}/course/${course_id}?type=info`, requestOptions)
+    return fetch(`/api/${roleName}/course/${id}?type=info`, requestOptions)
         .then(handleResponse)
         .then((data) => {
             return data;
