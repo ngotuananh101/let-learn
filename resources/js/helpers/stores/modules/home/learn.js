@@ -16,10 +16,9 @@ export default {
         },
     },
     actions: {
-        getFlashCard({ commit }, data) {
+        getFlashCard({ commit }, id, roleName) {
             commit("request");
-            console.log(data);
-            learnService.loadFlashCard(data).then(
+            learnService.loadFlashCard(id, roleName).then(
                 (response) => {
                     commit("requestSuccess", response);
                 },

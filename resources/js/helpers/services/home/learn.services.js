@@ -15,14 +15,13 @@ export const learnService = {
     relearn,
 };
 
-function loadFlashCard(data) {
+function loadFlashCard(id, roleName) {
     const requestOptions = {
         method: "POST",
         headers: authHeader(),
-        body: JSON.stringify({ lesson_id: data.id }),
+        body: JSON.stringify({ lesson_id: id }),
     };
-    console.log(data);
-    return fetch(`/api/${data.roleName}/main?type=detail_split`, requestOptions)
+    return fetch(`/api/${roleName}/main?type=detail_split`, requestOptions)
         .then(handleResponse)
         .then((data) => {
             return data.data;
