@@ -16,9 +16,10 @@ export default {
         },
     },
     actions: {
-        getFlashCard({ commit }, id, roleName) {
+        getFlashCard({ commit }, data) {
             commit("request");
-            learnService.loadFlashCard(id, roleName).then(
+            console.log(data);
+            learnService.loadFlashCard(data).then(
                 (response) => {
                     commit("requestSuccess", response);
                 },
@@ -42,6 +43,19 @@ export default {
         getLearn({ commit }, id) {
             commit("request");
             learnService.loadLearn(id).then(
+                (response) => {
+                    commit("requestSuccess", response);
+                },
+                (error) => {
+                    commit("requestFailure", error);
+                }
+            );
+        },
+        relearn({ commit }, data) {
+            commit("request");
+            console.log(data.lesson_id);
+            console.log(data.user_id);
+            learnService.relearn(data).then(
                 (response) => {
                     commit("requestSuccess", response);
                 },

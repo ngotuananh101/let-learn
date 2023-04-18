@@ -159,7 +159,6 @@ export default {
     data() {
         return {
             id: this.$route.params.id,
-            user: null,
             data: null,
             currentCardIndex: 0,
             currentSide: "front",
@@ -193,7 +192,7 @@ export default {
                 this.$root.showSnackbar(mutation.payload, 'danger');
             }
         });
-        this.$store.dispatch("learn/getFlashCard", { id: this.id, roleName: this.user.roleName });
+        this.$store.dispatch("learn/getFlashCard", { id: this.id, roleName: this.user.role.name });
     },
     methods: {
         updateTitle(title) {
