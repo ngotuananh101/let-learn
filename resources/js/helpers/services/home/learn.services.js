@@ -11,7 +11,8 @@ export const learnService = {
     addTest,
     importExcelFile,
     updateComment,
-    loadNew
+    loadNew,
+    relearn,
 };
 
 function loadFlashCard(id, roleName) {
@@ -131,6 +132,20 @@ function addTest(test) {
         .then(handleResponse)
         .then((test) => {
             return test;
+        });
+}
+function relearn(data) {
+    console.log(data);
+    const requestOptions = {
+        method: "PUT",
+        headers: authHeader(),
+        body: JSON.stringify(data),
+    };
+console.log(data.user_id);
+    return fetch(`/api/student/main/${data.user_id}/?type=done&choice=relearnall`, requestOptions)
+        .then(handleResponse)
+        .then((data) => {
+            return data;
         });
 }
 

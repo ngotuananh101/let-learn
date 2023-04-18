@@ -2,12 +2,12 @@
     <div class="container-fluid">
         <div class="row mb-5">
             <div class="col-12">
-                <div id="basic-info" class="card mt-4">
+                <div class="card mt-4">
                     <div class="card-header">
                         <div class="d-lg-flex">
                             <div>
                                 <h5 class="mb-0">Class</h5>
-                                <p class="mb-0 text-sm">List of all classes</p>
+                                <p class="mb-0 text-sm">Edit class information</p>
                             </div>
                             <div class="my-auto mt-4 ms-auto mt-lg-0">
                                 <div class="my-auto ms-auto">
@@ -19,23 +19,7 @@
                             </div>
                         </div>
                     </div>
-                    <div class="table-responsive">
-                        <table id="classes_datatable" class="table table-flush"></table>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-    <!-- Modal -->
-    <div class="modal fade" id="classModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
-         aria-labelledby="staticBackdropLabel" aria-hidden="true">
-        <div class="modal-dialog modal-fullscreen">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h1 class="modal-title fs-5" id="staticBackdropLabel">Class management</h1>
-                </div>
-                <div class="modal-body">
-                    <div class="row">
+                    <div class="card-body row">
                         <div class="col-md-6 col-12">
                             <label class="form-label mt-3">Name</label>
                             <input
@@ -69,23 +53,49 @@
                                 v-model="class_info.end_date"
                             />
                         </div>
-                        <div class="col-md-6 col-12">
-                            <label class="form-label mt-3">Member</label>
-                            <div class="table-responsive">
-                                <table id="class_member_datatable" class="table table-flush"></table>
+                    </div>
+                </div>
+                <div class="card mt-4">
+                    <div class="card-header">
+                        <div class="d-lg-flex">
+                            <div>
+                                <h5 class="mb-0">Member</h5>
+                                <p class="mb-0 text-sm">Member in this class</p>
+                            </div>
+                            <div class="my-auto mt-4 ms-auto mt-lg-0">
+                                <div class="my-auto ms-auto">
+                                    <button type="button" class="mx-1 mb-0 btn btn-outline-success btn-sm">
+                                        Add Class
+                                        <i class="fa-regular fa-user-plus ms-2"></i>
+                                    </button>
+                                </div>
                             </div>
                         </div>
                     </div>
+                    <div class="table-responsive">
+                        <table id="class_member_datatable" class="table table-flush"></table>
+                    </div>
                 </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                    <button type="button" class="btn btn-warning"
-                            @click="this.updateUser">
-                        Update
-                    </button>
-                    <button type="button" class="btn btn-danger" @click="this.deleteUser">
-                        Delete
-                    </button>
+                <div class="card mt-4">
+                    <div class="card-header">
+                        <div class="d-lg-flex">
+                            <div>
+                                <h5 class="mb-0">Quiz</h5>
+                                <p class="mb-0 text-sm">Quiz in this class</p>
+                            </div>
+                            <div class="my-auto mt-4 ms-auto mt-lg-0">
+                                <div class="my-auto ms-auto">
+                                    <button type="button" class="mx-1 mb-0 btn btn-outline-success btn-sm">
+                                        Add Class
+                                        <i class="fa-regular fa-user-plus ms-2"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="table-responsive">
+                        <table id="class_quiz_datatable" class="table table-flush"></table>
+                    </div>
                 </div>
             </div>
         </div>
@@ -104,11 +114,8 @@ export default {
         return {
             unsubscribe: null,
             type: 'get',
-            classes_datatable: null,
             class_member_datatable: null,
-            classes: null,
-            class_modal: null,
-            selected_class_id: null,
+            class_quiz_datatable: null,
             class_info: {}
         }
     },
@@ -118,16 +125,10 @@ export default {
                 case 'schoolClass/request':
                     break;
                 case 'schoolClass/success':
-                    if (this.type === 'get'){
-                        this.classes = mutation.payload.classes;
-                        this.init();
-                    }
-                    if (this.type === 'show'){
-                        this.class_member_datatable.data.data = [];
+                    if (this.type === 'get') {
+                        console.log(mutation.payload);
                         this.class_info = mutation.payload.class;
-                        this.class_info.member ? this.class_info.member.map((member) => {
-                            this.class_member_datatable.rows.add([member.id, member.name, member.email, member.role_id === 5 ? 'Teacher' : 'Student']);
-                        }) : null;
+                        this.init();
                     }
                     break;
                 case 'schoolClass/failure':
@@ -135,7 +136,7 @@ export default {
                     break;
             }
         });
-        this.$store.dispatch('schoolClass/index', this.$route.params.slug);
+        this.$store.dispatch('schoolClass/show', this.$route.params.id);
     },
     beforeUnmount() {
         this.unsubscribe();
@@ -143,32 +144,21 @@ export default {
     },
     methods: {
         init() {
-            this.classes_datatable = new DataTable('#classes_datatable', {
+            this.class_member_datatable = new DataTable('#class_member_datatable', {
                 data: {
-                    headings: ['ID', 'Name', 'Status', 'Start Date', 'End Date'],
-                    data: this.classes.map((cl) => {
-                        return [
-                            cl.id,
-                            cl.name,
-                            cl.status,
-                            cl.start_date,
-                            cl.end_date,
-                        ]
-                    }),
+                    headings: ['ID', 'Name', 'Email', 'Role'],
+                    data: this.class_info.member ? this.class_info.member.map((member) => {
+                        return [member.id, member.name, member.email, member.role_id === 5 ? 'Teacher' : 'Student'];
+                    }) : [],
                 },
             });
-            this.classes_datatable.on("datatable.selectrow", (rowIndex, event) => {
-                event.preventDefault();
-                if (isNaN(rowIndex)) return;
-                this.selected_class_id = this.classes[rowIndex].id;
-                this.$router.push({name: 'school.class.edit', params: {id: this.selected_class_id}});
-            });
-            const bootstrap = this.$store.state.config.bootstrap;
-            this.class_modal = new bootstrap.Modal(document.getElementById('classModal'), {
-                keyboard: false
-            });
-            this.class_modal._element.addEventListener('hidden.bs.modal', () => {
-
+            this.class_quiz_datatable = new DataTable('#class_quiz_datatable', {
+                data: {
+                    headings: ['ID', 'Name', 'Start time', 'End time', 'Status'],
+                    data: this.class_info.quizzes ? this.class_info.quizzes.map((quiz) => {
+                        return [quiz.id, quiz.name, quiz.start_time, quiz.end_time, quiz.status];
+                    }) : [],
+                },
             });
         }
     }
@@ -176,7 +166,7 @@ export default {
 </script>
 
 <style scoped>
-.modal{
+.modal {
     z-index: 9999 !important;
 }
 </style>
