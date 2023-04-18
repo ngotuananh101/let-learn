@@ -29,6 +29,17 @@ export default {
                     commit('failure', error);
                 }
             );
+        },
+        show({commit}, id) {
+            commit('request');
+            classService.show(id).then(
+                classes => {
+                    commit('success', classes);
+                },
+                error => {
+                    commit('failure', error);
+                }
+            );
         }
     }
 }
