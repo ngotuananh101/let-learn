@@ -280,6 +280,8 @@ export default {
             }
         },
         updateLesson() {
+            this.user = this.$store.getters['user/userData'].info;
+            console.log(this.user);
             this.type = 'update';
             let data = {
                 id: this.id,
@@ -288,7 +290,7 @@ export default {
                 password: this.lesson.password,
                 details: this.details,
                 removed_ids: this.removed_ids,
-                roleName: this.user.roleName,
+                roleName: this.user.role.name,
             };
             this.$store.dispatch('lesson/updateLesson', data);
         }

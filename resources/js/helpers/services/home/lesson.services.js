@@ -78,7 +78,6 @@ function deleteLesson(id) {
 }
 
 function getLessonById(id, roleName) {
-    console.log(id, roleNames);
     const requestOptions = {
         method: 'GET',
         headers: authHeader()
@@ -97,7 +96,7 @@ function updateLesson(lesson) {
         headers: authHeader(),
         body: JSON.stringify(lesson)
     };
-
+console.log(lesson);
     return fetch(`/api/${lesson.roleName}/lesson/${lesson.id}`, requestOptions)
         .then(handleResponse)
         .then(lesson => {

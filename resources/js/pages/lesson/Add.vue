@@ -136,6 +136,7 @@ export default {
     },
     created() {
         this.user = this.$store.getters['user/userData'].info;
+        console.log(this.user);
         this.unsubscribe = this.$store.subscribe((mutation) => {
             if (mutation.type === 'lesson/request') {
                 if (this.type === 'import') {
@@ -270,13 +271,16 @@ export default {
             }
         },
         addLesson() {
+            this.user = this.$store.getters['user/userData'].info;
+            console.log(this.user);
+            console.log("this.user");
             this.type = 'add';
             this.$store.dispatch('lesson/addLesson', {
                 name: this.lesson.name,
                 description: this.lesson.description,
                 password: this.lesson.password,
                 details: this.details,
-                roleName: this.user.roleName,
+                roleName: this.user.role.name,
             });
             this.$router.push({ name: 'home.home' });
         }

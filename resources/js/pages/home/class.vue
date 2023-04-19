@@ -286,7 +286,7 @@ export default {
     },
     created() {
         this.user = this.$store.getters['user/userData'].info;
-        console.log(this.user.email);
+        console.log(this.user);
         this.unsubscribe = this.$store.subscribe((mutation) => {
             if (mutation.type === "home/request") {
             } else if (mutation.type === "home/requestSuccess") {
