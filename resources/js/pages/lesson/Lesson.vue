@@ -169,13 +169,13 @@ export default {
         return {
             id: this.$route.params.id,
             user: null,
-            data: null,
             currentCardIndex: 0,
             currentSide: "front",
             relearns: null,
             notLearns: null,
             type: null,
             learneds: null,
+            lesson: null,
         };
     },
     title() {
@@ -191,10 +191,11 @@ export default {
                 if (!this.type) {
                     this.data = mutation.payload;
                     console.log(this.data);
-                    this.relearns = this.data.relearn = mutation.payload.relearn;
-                    this.notLearns = this.data.notLearn = mutation.payload.notLearn;
-                    this.learneds = this.data.learned = mutation.payload.learned;
-                    document.getElementById("text").innerHTML = this.data.notLearn[this.currentCardIndex].definition;
+                    // this.lesson = this.data.lesson = mutation.payload.lesson;
+                    // this.relearns = this.data.relearn = mutation.payload.relearn;
+                    // this.notLearns = this.data.notLearn = mutation.payload.notLearn;
+                    // this.learneds = this.data.learned = mutation.payload.learned;
+                    // document.getElementById("text").innerHTML = this.data.notLearn[this.currentCardIndex].definition;
                 }
                 if (this.type === 'delete') {
                     this.$root.showSnackbar('Delete lesson successfully', 'success');
@@ -250,7 +251,7 @@ export default {
         cardsCount() { // add cardsCount computed property
             return {
                 currentCardIndex: this.currentCardIndex,
-                totalCards: this.data ? this.data.notLearn.length : 0
+                totalCards: this.data ? this.data.notLearn.length: 0
             };
         }
     }
