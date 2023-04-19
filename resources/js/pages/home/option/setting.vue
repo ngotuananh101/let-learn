@@ -77,50 +77,6 @@
             </div>
         </div>
     </div>
-
-    <div class="row mt-5">
-        <div class="col-2 d-flex justify-content-end align-items-center">
-            <i class="fa-solid fa-eye fs-1"></i>
-        </div>
-        <div class="col-10">
-            <div class="card">
-                <h5 style="padding-left: 10px; padding-top: 10px;">How you appear on Quizlet</h5>
-                <div class="form-check" style="margin-left: 10px">
-                    <input class="form-check-input" type="checkbox" value="" id="defaultCheck1">
-                    <label class="form-check-label" for="defaultCheck1">
-                        Show your real name on Let Learn
-                    </label>
-                </div>
-                <div class="form-check" style="margin-left: 10px">
-                    <input class="form-check-input" type="checkbox" value="" id="defaultCheck2">
-                    <label class="form-check-label" for="defaultCheck2">
-                        Show your profile on Let Learn
-                    </label>
-                    <p>Removing a page from Google takes a variable amount of time depending on how recently Google
-                        indexed the page. If you have an urgent need to remove your profile from Google search, please
-                        contact us and we can do it for you manually</p>
-
-                </div>
-                <div class="form-check">
-                    <button type="submit" class="btn btn-behance">Save</button>
-                </div>
-            </div>
-        </div>
-    </div>
-    <div class="row mt-5">
-        <div class="col-2 d-flex justify-content-end align-items-center">
-            <i class="fa-solid fa-x fs-1"></i>
-        </div>
-        <div class="col-10">
-            <div class="card">
-                <h5 style="padding-left: 10px; padding-top: 10px;">Permanently delete Account</h5>
-                <div class="card-body">
-                    <p>Be careful - this will delete all your data and cannot be undone.</p>
-                    <button type="submit" class="btn btn-warning">Delete Account</button>
-                </div>
-            </div>
-        </div>
-    </div>
 </template>
 
 <script>
@@ -148,11 +104,11 @@ export default {
     },
     created() {
         this.user = this.$store.getters['user/userData'].info;
-        console.log(this.user.id);
+        console.log(this.user);
     },
     methods: {
         darkMode() {
-            if (this.$store.state.darkMode) {
+            if (this.$store.state.darưkMode) {
                 activateDarkMode(); // disable dark mode using the helper function
             } else {
                 deactivateDarkMode(); // enable dark mode using the helper function
@@ -165,12 +121,19 @@ export default {
                 password: this.password.password,
                 password_confirmation: this.password.password_confirmation,
                 id: this.user.id,
-                role: this.user.role,
+                roleName: this.user.role.name,
             };
-            if (data.password == data.password_confirmation && data.old_password != data.password && data.old_password != data.password_confirmation) {
-                this.$store.dispatch('home/updatePassword', data);
-            } else {
+            if (data.password == "" || data.password_confirmation == "" || data.old_password == "") {
+                alert('Please fill in all the fields');
+            } else if (data.old_password == data.password || data.old_password == data.password_confirmation) {
+                alert('The new password cannot be the same as the old password');
+            } else if (data.password != data.password_confirmation) {
                 alert('The new password does not match the re-new password');
+            } else if (data.password == data.password_confirmation && data.old_password != data.password && data.old_password != data.password_confirmation) {
+                this.$store.dispatch('home/updatePassword', data);
+                console.log(data);
+                //push to login page
+                this.$router.push('/auth/login');
             }
         }
     },

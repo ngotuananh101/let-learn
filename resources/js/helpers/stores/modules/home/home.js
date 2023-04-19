@@ -142,6 +142,7 @@ export default {
         },
 
         updatePassword({ commit }, password){
+            console.log(password);
             commit("request");
             homeService.updatePassword(password).then(
                 (password) => {
