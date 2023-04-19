@@ -42,15 +42,13 @@
                             <button class="btn btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown"
                                 aria-expanded="false"></button>
                             <ul class="dropdown-menu">
-                                <router-link :to="{ name: 'lesson.edit', params: { id: id } }">
-                                    <li><a class="dropdown-item" href="#">Edit</a></li>
-                                </router-link>
+                                <li><a class="dropdown-item" :href="'/lesson/' + this.id + '/edit'">Edit</a></li>
                                 <li><a class="dropdown-item" @click="deleteLesson">Delete</a></li>
                             </ul>
                         </div>
                     </div>
                     <div class="col-md-6 col-12">
-                        <router-link :to="{ name: 'home.flashcard', params: { id: id } }">
+                        <a :href="'/lesson/flashcard/' + this.id">
                             <div class="card">
                                 <div class="card-body p-3 row">
                                     <div class="col-8">
@@ -65,10 +63,10 @@
                                     </div>
                                 </div>
                             </div>
-                        </router-link>
+                        </a>
                     </div>
                     <div class="col-md-6 col-12">
-                        <router-link :to="{ name: 'home.learn', params: { id: id } }">
+                        <a :href="'/lesson/learn/' + this.id">
                             <div class="card">
                                 <div class="card-body p-3 row">
                                     <div class="col-8">
@@ -83,10 +81,10 @@
                                     </div>
                                 </div>
                             </div>
-                        </router-link>
+                        </a>
                     </div>
                     <div class="col-md-6 col-12 pt-3">
-                        <router-link :to="{ name: 'home.selftest', params: { id: id } }">
+                        <a :href="'/lesson/selftest/' + this.id">
                             <div class="card">
                                 <div class="card-body p-3 row">
                                     <div class="col-8">
@@ -101,7 +99,7 @@
                                     </div>
                                 </div>
                             </div>
-                        </router-link>
+                        </a>
                     </div>
                     <div class="col-md-6 col-12 pt-3">
                         <div class="card">
@@ -128,8 +126,8 @@
         <h5 class="mt-4">Description</h5>
         <!-- <p>{{ data.lesson.description }}</p> -->
     </div>
-    <h6>Relearn:</h6>
-     <!-- <h6>Relearn: {{ data.relearns.length }}</h6> -->
+    <h6 class="mt-3">Relearn:</h6>
+    <!-- <h6>Relearn: {{ data.relearns.length }}</h6> -->
     <div class="col-12" v-for="relearn in relearns">
         <div class="card mt-4">
             <div class="card-body">
@@ -138,8 +136,8 @@
             </div>
         </div>
     </div>
-    <h6>NotLearn:</h6>
-     <!-- <h6>NotLearn: {{ data.notLearns.length }}</h6> -->
+    <h6 class="mt-3">NotLearn:</h6>
+    <!-- <h6>NotLearn: {{ data.notLearns.length }}</h6> -->
     <div class="col-12" v-for="notLearn in notLearns">
         <div class="card mt-4">
             <div class="card-body">
@@ -148,8 +146,8 @@
             </div>
         </div>
     </div>
-    <h6>Learned:</h6>
-     <!-- <h6>NotLearn: {{ data.learneds.length }}</h6> -->
+    <h6 class="mt-3">Learned:</h6>
+    <!-- <h6>NotLearn: {{ data.learneds.length }}</h6> -->
     <div class="col-12" v-for="learned in learneds">
         <div class="card mt-4">
             <div class="card-body">
@@ -192,7 +190,7 @@ export default {
             } else if (mutation.type === "lesson/success") {
                 if (!this.type) {
                     this.data = mutation.payload;
-                    console.log(this.learneds);
+                    console.log(this.data);
                     this.relearns = this.data.relearn = mutation.payload.relearn;
                     this.notLearns = this.data.notLearn = mutation.payload.notLearn;
                     this.learneds = this.data.learned = mutation.payload.learned;
