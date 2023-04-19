@@ -177,14 +177,11 @@ class UserController extends Controller
                     break;
 
                 case 'lesson':
-                    $request->validate([
-                        'limit' => 'nullable|integer|between:1,100',
-                    ]);
-                    //show lesson by user id
-                    if ($request->limit) {
-                        $lessons = Lesson::where('user_id', $id)->where('status', 'active')->where('password', null)->limit($request->limit)->get();
-                    } else {
-                        $lessons = Lesson::where('user_id', $id)->where('status', 'active')->where('password', null)->get();
+                    //get pagination for lesson
+                    $lessons = Lesson::where('user_id', $id)->where('status', 'active')->where('password', null)->paginate(6);
+                    //check page is exist
+                    if ($request->page) {
+                        $page = $request->page;
                     }
 
                     $lessons = $lessons->map(function ($lessons) {
@@ -204,16 +201,9 @@ class UserController extends Controller
                     break;
 
                 case 'course':
-                    $request->validate([
-                        'limit' => 'nullable|integer|between:1,100',
-                    ]);
-                    //show course by user id
-                    if ($request->limit) {
-                        //where
-                        $courses = Course::where('user_id', $id)->where('status', 'active')->where('password', null)->limit($request->limit)->get();
-                    } else {
-                        $courses = Course::where('user_id', $id)->where('status', 'active')->where('password', null)->get();
-                    }
+                    //get pagination for course
+                    $courses = Course::where('user_id', $id)->where('status', 'active')->where('password', null)->paginate(6);
+
                     $courses = $courses->map(function ($courses) {
                         return [
                             'id' => $courses->id,
@@ -472,6 +462,7 @@ class UserController extends Controller
                             'definition' => $notLearn->definition,
                         ];
                     });
+                    $learned = LessonDetail::where('lesson_id', $lesson_id)->whereIn('id', $learned)->get();
                     $lessonDetail = $lesson->details()->get();
                     //check user log is exist, if exist update accessed_at, else create new user log
                     if (UserLog::where('user_id', $request->user()->id)->where('lesson_id', $request->lesson_id)->exists()) {
@@ -491,6 +482,7 @@ class UserController extends Controller
                         'message' => 'Get lesson successfully!',
                         'data' => [
                             'lesson' => $lesson,
+                            'learned' => $learned,
                             'relearn' => $lessonDetails,
                             'notLearn' => $notLearn,
                         ]
