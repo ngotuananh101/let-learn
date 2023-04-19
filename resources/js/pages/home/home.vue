@@ -223,7 +223,6 @@ export default {
                 name: '',
                 description: '',
             },
-            user: JSON.parse(localStorage.getItem("user")),
             unsubscribe: null,
             lessons: [],
             courses: [],
@@ -336,9 +335,9 @@ export default {
             this.$store.dispatch('course/addCourse', {
                 name: this.course.name,
                 description: this.course.description,
-                roleName: this.user.roleName,
+                roleName: this.user.role.name,
             });
-            this.$router.push({ name: 'home.home' });
+            location.reload();
         }
     }
 };

@@ -24,7 +24,6 @@ export default {
     actions: {
         getLessonByCourseId({ commit }, payload) {
             commit("request");
-            console.log(id, roleName);
             courseService.getLessonByCourseId(payload.id, payload.roleName).then(
                 (response) => {
                     commit("success", response);
@@ -56,9 +55,9 @@ export default {
                 }
             );
         },
-        deleteCourse({ commit }, id, roleName) {
+        deleteCourse({ commit }, data) {
             commit("request");
-            courseService.deleteCourse(id, roleName).then(
+            courseService.deleteCourse(data).then(
                 (course) => {
                     commit("success", course);
                 },
