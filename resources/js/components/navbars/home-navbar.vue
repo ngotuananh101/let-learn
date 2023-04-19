@@ -6,14 +6,14 @@
     >
         <div class="container-fluid p-0">
             <div style="height: 3rem">
-                <router-link class="m-0 navbar-brand" to="/">
+                <a class="m-0 navbar-brand" href="/">
                     <img
                         src="/logo.png"
                         class="navbar-brand-img h-100"
                         alt="main_logo"
                     />
                     <span class="ms-2 font-weight-bold">Let Learn</span>
-                </router-link>
+                </a>
             </div>
             <div>
                 <button
