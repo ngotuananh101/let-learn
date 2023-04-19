@@ -19,7 +19,7 @@ export default {
         getFlashCard({ commit }, payload) {
             commit("request");
             console.log(payload);
-            learnService.loadFlashCard(payload.id, payload.roleName).then(
+            learnService.loadFlashCard(payload.lesson_id, payload.roleName, payload.userId).then(
                 (response) => {
                     commit("requestSuccess", response);
                 },
