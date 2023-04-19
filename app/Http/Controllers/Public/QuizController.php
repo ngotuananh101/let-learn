@@ -620,6 +620,7 @@ class QuizController extends Controller
                 'Quiz Max Points',
                 'Question',
                 'Answer',
+                'Points',
                 'Is Correct'
             );
 
@@ -642,6 +643,7 @@ class QuizController extends Controller
                         'quiz_max_points' => $maxPoints,
                         'question' => Question::findOrFail($a['question_id'])->question,
                         'answer' => $a['answer'],
+                        'points' => $a['points'],
                         'is_correct' => $a['is_correct'] ? 'Yes' : 'No',
                     ];
                 }
