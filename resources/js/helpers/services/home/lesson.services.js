@@ -51,6 +51,7 @@ function importExcelFile(formData) {
 }
 
 function addLesson(lesson) {
+    console.log(lesson);
     const requestOptions = {
         method: "POST",
         headers: authHeader(),
@@ -64,7 +65,7 @@ function addLesson(lesson) {
         });
 }
 
-function deleteLesson(id) {
+function deleteLesson(id, roleName) {
     const requestOptions = {
         method: "DELETE",
         headers: authHeader(),
