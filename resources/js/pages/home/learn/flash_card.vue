@@ -53,7 +53,7 @@ export default {
             } else if (mutation.type === "learn/requestFailure") {
             }
         });
-        this.$store.dispatch("learn/getFlashCard", { id: this.id, roleName: this.user.role.name });
+        this.$store.dispatch("learn/getFlashCard", { lesson_id: this.id, roleName: this.user.role.name, userId: this.user.id });
     },
     methods: {
         updateTitle(title) {
