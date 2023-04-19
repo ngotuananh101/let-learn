@@ -27,7 +27,7 @@ class UserController extends Controller
             //get info of auth user
             $user = auth()->user();
 
-            $lessons = $user->lessons->where('status', 'active')->take(6);
+            $lessons = Lesson::where('user_id', auth()->user()->id)->where('status', 'active')->paginate(6);
             $lessons = $lessons->map(function ($lesson) {
                 return [
                     'id' => $lesson->id,

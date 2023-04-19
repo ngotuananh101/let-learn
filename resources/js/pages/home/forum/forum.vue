@@ -51,6 +51,13 @@
                     </div>
                     <hr class="mt-2">
                 </div>
+                <div class="row">
+                    <button type="button" class="btn btn-primary mt-3 col-1" @click="previous()"><i
+                        class="fa-sharp fa-solid fa-arrow-left"></i></button>
+                    <div class="col-10"></div>
+                    <button type="button" class="btn btn-primary mt-3 col-1" @click="next()"><i
+                        class="fa-sharp fa-solid fa-arrow-right"></i></button>
+                </div>
             </div>
         </div>
     </div>
@@ -63,6 +70,7 @@ export default {
     data() {
         return {
             posts: [],
+            page: 1,
         };
     },
     created() {
@@ -113,6 +121,22 @@ export default {
             user.gravatar = `https://www.gravatar.com/avatar/${hash}?d=identicon`;
             return user;
         },
+        next() {
+            if (this.posts.length > 0) {
+                this.page++;
+                this.$store.dispatch("home/getForum", this.page);
+            } else {
+                this.page = 1;
+                console.log(this.page);
+                this.$store.dispatch("home/getForum", this.page);
+            }
+        },
+        previous() {
+            if (this.page > 1) {
+                this.page--;
+                this.$store.dispatch("home/getForum", this.page);
+            }
+        }
     }
 }
 </script>
