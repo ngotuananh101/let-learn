@@ -55,7 +55,7 @@
             </div>
         </div>
     </div>
-    <div class="row mt-5">
+    <div class="row mt-5 pb-5">
         <div class="col-2 d-flex justify-content-end align-items-center">
             <i class="fa-solid fa-moon-cloud fs-1"></i>
         </div>
