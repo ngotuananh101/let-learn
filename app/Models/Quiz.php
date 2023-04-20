@@ -22,4 +22,16 @@ class Quiz extends Model
     {
         return $this->hasMany(Question::class);
     }
+
+    public function class()
+    {
+        return $this->belongsTo(Classes::class);
+    }
+
+    // get answer of user
+    public function answers()
+    {
+        return $this->hasMany(Answer::class);
+    }
+
 }
