@@ -9,12 +9,12 @@
                     <img src="https://gcavocats.ca/wp-content/uploads/2018/09/man-avatar-icon-flat-vector-19152370-1.jpg"
                         class="rounded-circle" alt="Avatar" style="width: 100px" />
                 </div>
-                <div class="col-2">
-                    <p class="pt-2">
+                <div class="col-3">
+                    <p class="pt-2 mx-5">
                         {{ this.user.name }}
                     </p>
                 </div>
-                <div class="col-9 justify-content-end">
+                <div class="col-8 justify-content-end" v-if="this.user.role.name">
                     <div class="dropdown show">
                         <button class="btn btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown"
                             aria-expanded="false">
@@ -86,33 +86,15 @@ export default {
                 this.$root.showSnackbar(mutation.payload, 'danger');
             }
         });
-        this.$store.dispatch("course/getLessonByCourseId", {id: this.id, roleName: this.user.role.name});
+        this.$store.dispatch("course/getLessonByCourseId", { id: this.id, roleName: this.user.role.name });
     },
-
-    // this.unsubscribe = this.$store.subscribe((mutation) => {
-    //     if (mutation.type === "course/request") {
-    //     } else if (mutation.type === "course/success") {
-    //         if (!this.type) {
-    //             this.data = mutation.payload;
-    //             this.lessons = this.data.lessons = mutation.payload.lessons;
-    //             console.log(this.lessons);
-    //         }
-    //         if (this.type === 'delete') {
-    //             this.$root.showSnackbar('Delete course successfully', 'success');
-    //             this.$router.push({ name: 'home.home' });
-    //         }
-    //     } else if (mutation.type === "course/failure") {
-    //         this.$root.showSnackbar(mutation.payload, 'danger');
-    //     }
-    // });
-    // this.$store.dispatch("course/getLessonByCourseId", this.id);
     methods: {
         deleteCourse() {
             this.user = this.$store.getters['user/userData'].info;
             console.log(this.user.role.name);
             if (confirm('Are you sure?')) {
                 this.type = 'delete';
-                this.$store.dispatch('course/deleteCourse', { id: this.$route.params.id, roleName: this.user.role.name});
+                this.$store.dispatch('course/deleteCourse', { id: this.$route.params.id, roleName: this.user.role.name });
             }
             this.$router.push({ name: 'home.home' });
         },

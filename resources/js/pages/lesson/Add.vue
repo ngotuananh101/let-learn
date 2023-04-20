@@ -236,7 +236,7 @@ export default {
                 }
                 const formData = new FormData();
                 formData.append('file', this.file);
-                this.$store.dispatch('lesson/importFile', formData);
+                this.$store.dispatch('adminLesson/importFile', formData);
             } else {
                 this.$root.showSnackbar('Importing lesson...', 'info');
                 try {

@@ -1,27 +1,30 @@
 <template>
     <div class="row mt-3">
-        <div class="col-md-7 col-12">
-            <div class="container">
-                <div class="card" id="card">
-                    <div class="card-header">
-                        <div class="d-flex justify-content-between align-items-center">
-                            <div>
-                                <h6 class="card-subtitle text-muted">{{ cardsCount.currentCardIndex + 1 }} /
-                                    {{ cardsCount.totalCards }}</h6>
-                            </div>
+        <div class="container pt-5" v-if="data">
+            <div class="card" id="card">
+                <div class="card-header">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="card-subtitle text-muted">{{ cardsCount.currentCardIndex + 1 }} /
+                                {{ cardsCount.totalCards }}</h6>
+                        </div>
+                        <div @click="speak">
+                            <i class="fa-solid fa-volume fs-4"></i>
                         </div>
                     </div>
-                    <div class="card-body" style="height: 50vh; max-height: 70vh;" @click="rotateCard">
-                        <div class="h-100 d-flex justify-content-center align-items-center">
-                            <p class="card-text fs-4" id="text"></p>
-                        </div>
+                </div>
+                <div class="card-body" style="height: 50vh; max-height: 70vh;" @click="rotateCard">
+                    <div class="h-100 d-flex justify-content-center align-items-center">
+                        <p class="card-text fs-4" id="text"
+                            v-text="currentSide === 'front' ? data[currentCardIndex].definition : data[currentCardIndex].term">
+                        </p>
                     </div>
-                    <h5 class="card-footer"></h5>
                 </div>
-                <div class="mt-3 mx-1 row justify-content-between">
-                    <button class="btn btn-outline-warning col-sm-3 col-5" @click="previousCard">Previous</button>
-                    <button class="btn btn-outline-success col-sm-3 col-5" @click="nextCard">Next</button>
-                </div>
+                <h5 class="card-footer"></h5>
+            </div>
+            <div class="mt-3 mx-1 row justify-content-between">
+                <button class="btn btn-outline-warning col-sm-3 col-5" @click="previousCard">Previous</button>
+                <button class="btn btn-outline-success col-sm-3 col-5" @click="nextCard">Next</button>
             </div>
         </div>
         <div class="col-md-5 col-12">
@@ -176,6 +179,7 @@ export default {
             type: null,
             learneds: null,
             lesson: null,
+            showSettings: false,
         };
     },
     title() {
@@ -191,11 +195,11 @@ export default {
                 if (!this.type) {
                     this.data = mutation.payload;
                     console.log(this.data);
-                    // this.lesson = this.data.lesson = mutation.payload.lesson;
-                    // this.relearns = this.data.relearn = mutation.payload.relearn;
-                    // this.notLearns = this.data.notLearn = mutation.payload.notLearn;
-                    // this.learneds = this.data.learned = mutation.payload.learned;
-                    // document.getElementById("text").innerHTML = this.data.notLearn[this.currentCardIndex].definition;
+                    this.lesson = this.data.lesson = mutation.payload.lesson;
+                    this.relearns = this.data.relearn = mutation.payload.relearn;
+                    this.notLearns = this.data.notLearn = mutation.payload.notLearn;
+                    this.learneds = this.data.learned = mutation.payload.learned;
+                    document.getElementById("text").innerHTML = this.data.notLearn[this.currentCardIndex].definition;
                 }
                 if (this.type === 'delete') {
                     this.$root.showSnackbar('Delete lesson successfully', 'success');
@@ -212,30 +216,41 @@ export default {
             this.$emit("change-title", title);
         },
         nextCard() {
-            if (this.currentCardIndex < this.data.notLearn.length - 1) {
+            console.log(this.currentCardIndex);
+            if (this.data && this.currentCardIndex < this.data.length - 1) {
                 this.currentCardIndex++;
+                this.$emit("change-progress", Math.round((this.currentCardIndex / this.data.length) * 100));
             } else {
                 this.currentCardIndex = 0;
+                this.$emit("change-progress", 0);
             }
-            document.getElementById("text").innerHTML = this.data.notLearn[this.currentCardIndex].definition;
+            this.currentCard = this.currentSide === 'front' ? this.data[this.currentCardIndex].definition : this.data[this.currentCardIndex].term;
         },
         previousCard() {
-            if (this.currentCardIndex > 0) {
+            if (this.data && this.currentCardIndex > 0) {
                 this.currentCardIndex--;
+                this.$emit("change-progress", Math.round((this.currentCardIndex / this.data.length) * 100));
             } else {
-                this.currentCardIndex = this.data.notLearn.length - 1;
+                this.currentCardIndex = this.data.length - 1;
             }
-            document.getElementById("text").innerHTML = this.data.notLearn[this.currentCardIndex].definition;
+            this.currentCard = this.currentSide === 'front' ? this.data[this.currentCardIndex].definition : this.data[this.currentCardIndex].term;
         },
-        rotateCard(e) {
-            let card = document.getElementById("card");
+        toggleSettings() { // add toggleSettings method
+            this.showSettings = !this.showSettings;
+        },
+        // text to speech
+        speak() {
+            const msg = new SpeechSynthesisUtterance();
+            msg.text = document.getElementById("text").innerHTML;
+            window.speechSynthesis.speak(msg);
+        },
+        rotateCard() {
+            const card = document.getElementById("card");
             if (this.currentSide === "front") {
-                card.classList.add("rotate");
-                document.getElementById("text").innerHTML = this.data.notLearn[this.currentCardIndex].term;
                 this.currentSide = "back";
+                card.classList.add("rotate");
             } else {
                 card.classList.remove("rotate");
-                document.getElementById("text").innerHTML = this.data.notLearn[this.currentCardIndex].definition;
                 this.currentSide = "front";
             }
         },
@@ -251,7 +266,7 @@ export default {
         cardsCount() { // add cardsCount computed property
             return {
                 currentCardIndex: this.currentCardIndex,
-                totalCards: this.data ? this.data.notLearn.length: 0
+                totalCards: this.data ? this.data.notLearn.length : 0
             };
         }
     }
