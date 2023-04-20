@@ -6,14 +6,14 @@
     >
         <div class="container-fluid p-0">
             <div style="height: 3rem">
-                <router-link class="m-0 navbar-brand" to="/">
+                <a class="m-0 navbar-brand" href="/">
                     <img
                         src="/logo.png"
                         class="navbar-brand-img h-100"
                         alt="main_logo"
                     />
                     <span class="ms-2 font-weight-bold">Let Learn</span>
-                </router-link>
+                </a>
             </div>
             <div>
                 <button
@@ -75,8 +75,7 @@
                             <li class="mb-2">
                                 <a class="dropdown-item border-radius-md" :href="'/forum'">
                                     <div class="py-1 d-flex align-items-center">
-                                        <i class="fa-solid fa-user me-3"></i>
-<!--                                        <i class="fa-light fa-fire"></i>-->
+                                        <i class="fa-solid fa-comments me-3"></i>
                                         <span>Forum</span>
                                     </div>
                                 </a>

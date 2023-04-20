@@ -10,7 +10,7 @@
         <div class="row">
             <h3>Lesson</h3>
             <div class="col-lg-4 col-md-6 col-12" v-for="lesson in lessons" :key="lesson.id">
-                <router-link :to="`/lesson/${lesson.id}`">
+                    <a :href="'/lesson/'+ lesson.id">
                     <div class="card mt-4">
                         <div class="card-body">
                             <p class="card-text text-primary">Title: {{ lesson.name }}</p>
@@ -18,13 +18,13 @@
                             <p class="card-text">Author: {{ lesson.author }}</p>
                         </div>
                     </div>
-                </router-link>
+                </a>
             </div>
         </div>
         <div class="row mt-5">
             <h3>Course</h3>
             <div class="col-lg-4 col-md-6 col-12" v-for="course in courses" :key="course.id">
-                <router-link :to="`/course/${course.id}`">
+                <a :href="'/course/'+ course.id">
                     <div class="card mt-4">
                         <div class="card-body">
                             <p class="card-text text-primary">Title: {{ course.name }}</p>
@@ -32,27 +32,27 @@
                             <p class="card-text">Author: {{ course.description }}</p>
                         </div>
                     </div>
-                </router-link>
+                </a>
             </div>
         </div>
         <div class="row mt-5">
             <h3>Other Lessons</h3>
-            <div class="col-lg-4 col-md-6 col-12" v-for="ol in other_lesson" :key="ol.id">
-                <router-link :to="`/lesson/${ol.id}`">
+            <div class="col-lg-4 col-md-6 col-12" v-for="other_lessons in other_lesson" :key="other_lessons.id">
+                <a :href="'/lesson/'+ other_lessons.id">
                     <div class="card mt-4">
                         <div class="card-body">
-                            <p class="card-text text-primary">Title: {{ ol.name }}</p>
-                            <p class="card-text">Quantity: {{ ol.number_of_detail }}</p>
-                            <p class="card-text">Author: {{ ol.description }}</p>
+                            <p class="card-text text-primary">Title: {{ other_lessons.name }}</p>
+                            <p class="card-text">Quantity: {{ other_lessons.number_of_detail }}</p>
+                            <p class="card-text">Author: {{ other_lessons.description }}</p>
                         </div>
                     </div>
-                </router-link>
+                </a>
             </div>
         </div>
         <div class="row mb-5 mt-5">
             <h3>Other Courses</h3>
             <div class="col-lg-4 col-md-6 col-12" v-for="other_courses in other_course" :key="other_courses.id">
-                <router-link :to="`/course/${other_courses.id}`">
+                <a :href="'/course/'+ other_courses.id">
                     <div class="card mt-4">
                         <div class="card-body">
                             <p class="card-text text-primary">Title: {{ other_courses.name }}</p>
@@ -60,7 +60,7 @@
                             <p class="card-text">Author: {{ other_courses.description }}</p>
                         </div>
                     </div>
-                </router-link>
+                </a>
             </div>
         </div>
     </div>
@@ -222,9 +222,7 @@ export default {
             course: {
                 name: '',
                 description: '',
-                roleName: '',
             },
-            user: JSON.parse(localStorage.getItem("user")),
             unsubscribe: null,
             lessons: [],
             courses: [],
@@ -337,9 +335,9 @@ export default {
             this.$store.dispatch('course/addCourse', {
                 name: this.course.name,
                 description: this.course.description,
-                roleName: this.user.roleName,
+                roleName: this.user.role.name,
             });
-            this.$router.push({ name: 'home.home' });
+            location.reload();
         }
     }
 };

@@ -17,8 +17,9 @@
         </li>
     </ul>
     <div class="tab-content" id="myTabContent">
-        <div class="tab-pane fade show active" id="home" role="tabpanel" aria-labelledby="home-tab">
-            <div class="container">
+    <div class="tab-pane fade show active" id="home" role="tabpanel" aria-labelledby="home-tab">
+            <div class="container pt-3">
+                <h3 class="text-center">News</h3>
                 <div class="row justify-content-center mt-4 pb-5">
                     <div class="col-md-8">
                         <div class="card">
@@ -72,32 +73,34 @@
                                         </div>
                                     </form>
                                 </div>
-                            </div>
-                            <hr>
-                            <div class="card-footer" v-for="comment in post.comments" :key="comment.id">
-                                <div class="row">
-                                    <div class="col-md-1">
-                                        <img :src="getUserInfo().gravatar" class="me-2 rounded-circle" width="30"
-                                             height="30" alt="">
-                                    </div>
-                                    <div class="col-md-10">
-                                        <div class="card-header">
-                                            <p>{{ comment.user_name }}</p>
-                                            <p>{{ comment.comment }}</p>
+                                <hr>
+                                <div class="card-footer" v-for="comment in post.comments" :key="comment.id">
+                                    <div class="row">
+                                        <div class="col-1">
+                                            <img :src="getUserInfo().gravatar" class="me-2 rounded-circle" width="30"
+                                                 height="30" alt="">
                                         </div>
+                                        <div class="col-10">
+                                            <div class="card-header">
+                                                <p>{{ comment.user_name }}</p>
+                                                <p>{{ comment.comment }}</p>
+                                            </div>
+                                        </div>
+                                        <hr>
                                     </div>
-                                    <hr>
+
                                 </div>
                             </div>
+
+
                         </div>
                     </div>
 
                 </div>
             </div>
         </div>
-    </div>
     <div class="tab-pane fade" id="profile" role="tabpanel" >
-        <div class="container pt-3">
+        <div class="container pt-3 pb-5">
             <h3 class="text-center">Exercises</h3>
             <div v-if="quizzes" class="row mt-5">
                 <div class="col-md-6 col-6 mt-3" v-for="(quiz, index) in quizzes" :key="index">
@@ -121,8 +124,8 @@
                         <div class="card-footer">
                             <div class="row">
                                 <div class="col">
-                                    <button type="button" class="btn btn-primary" data-bs-toggle="modal"
-                                            :data-bs-target="'#exampleModal-' + index">
+                                    <button  type="button" class="btn btn-primary" data-bs-toggle="modal" v-if="this.user.role.name === 'teacher'"
+                                             :data-bs-target="'#exampleModal-' + index">
                                         Result
                                     </button>
                                     <div :id="'exampleModal-' + index" class="modal fade" tabindex="-1"
@@ -192,7 +195,7 @@
                                     </div>
                                 </div>
                                 <div class="col">
-                                    <button v-if="!quiz.submited"
+                                    <button v-if="!quiz.submited && this.user.role.name === 'student'"
                                             type="button"
                                             class="btn btn-primary">
 
@@ -200,7 +203,7 @@
                                             Start
                                         </router-link>
                                     </button>
-                                    <span v-else>Quiz already submitted</span>
+                                    <span v-if="quiz.submited && this.user.role.name === 'student'">Quiz already submitted</span>
                                 </div>
                             </div>
                         </div>
@@ -210,7 +213,7 @@
         </div>
         <div class="row">
             <router-link :to="{ name: 'home.test.add', params: {id: this.id} }">
-                <div class="col-12">
+                <div v-if="this.user.role.name === 'teacher'" class="col-12">
                     <button class="btn btn-primary position-fixed bottom-0 end-0 mt-3 ms-3" type="button">Add new
                         test
                     </button>
@@ -219,7 +222,7 @@
         </div>
     </div>
     <div class="tab-pane fade" id="contact" role="tabpanel" >
-        <div class="container">
+        <div class="container pt-3">
             <h3 class="text-center">Members</h3>
             <div class="row">
                 <div class="col-12">
@@ -251,7 +254,7 @@
             </div>
         </div>
     </div>
-
+    </div>
 </template>
 
 <script>
@@ -283,7 +286,7 @@ export default {
     },
     created() {
         this.user = this.$store.getters['user/userData'].info;
-        console.log(this.user.email);
+        console.log(this.user);
         this.unsubscribe = this.$store.subscribe((mutation) => {
             if (mutation.type === "home/request") {
             } else if (mutation.type === "home/requestSuccess") {

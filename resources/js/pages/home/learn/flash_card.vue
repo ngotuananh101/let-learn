@@ -1,5 +1,5 @@
 <template>
-    <div class="container pt-5">
+    <div class="container pt-5" v-if="data">
     <div class="card" id="card">
         <div class="card-header">
             <div class="d-flex justify-content-between align-items-center">
@@ -14,7 +14,7 @@
         </div>
         <div class="card-body" style="height: 50vh; max-height: 70vh;" @click="rotateCard">
             <div class="h-100 d-flex justify-content-center align-items-center">
-                <p class="card-text fs-4" id="text"></p>
+                <p class="card-text fs-4" id="text" v-text="currentSide === 'front' ? data[currentCardIndex].definition : data[currentCardIndex].term"></p>
             </div>
         </div>
         <h5 class="card-footer"></h5>
@@ -49,11 +49,13 @@ export default {
             } else if (mutation.type === "learn/requestSuccess") {
                 this.data = mutation.payload;
                 console.log(this.data);
-                document.getElementById("text").innerHTML = this.data.notLearn[this.currentCardIndex].definition;
+                if(this.data.length > 0){
+                    this.currentCard = this.data[0].definition;
+                }
             } else if (mutation.type === "learn/requestFailure") {
             }
         });
-        this.$store.dispatch("learn/getFlashCard", { id: this.id, roleName: this.user.roleName });
+        this.$store.dispatch("learn/getFlashCard", { lesson_id: this.id, roleName: this.user.role.name, userId: this.user.id });
     },
     methods: {
         updateTitle(title) {
@@ -61,23 +63,23 @@ export default {
         },
         nextCard() {
             console.log(this.currentCardIndex);
-            if (this.currentCardIndex < this.data.notLearn.length-1) {
+            if (this.data && this.currentCardIndex < this.data.length - 1) {
                 this.currentCardIndex++;
-                this.$emit("change-progress", Math.round((this.currentCardIndex / this.data.notLearn.length) * 100));
+                this.$emit("change-progress", Math.round((this.currentCardIndex / this.data.length) * 100));
             } else {
                 this.currentCardIndex = 0;
                 this.$emit("change-progress", 0);
             }
-            document.getElementById("text").innerHTML = this.data.notLearn[this.currentCardIndex].definition;
+            this.currentCard = this.currentSide === 'front' ? this.data[this.currentCardIndex].definition : this.data[this.currentCardIndex].term;
         },
         previousCard() {
-            if (this.currentCardIndex > 0) {
+            if (this.data && this.currentCardIndex > 0) {
                 this.currentCardIndex--;
-                this.$emit("change-progress", Math.round((this.currentCardIndex / this.data.notLearn.length) * 100));
+                this.$emit("change-progress", Math.round((this.currentCardIndex / this.data.length) * 100));
             } else {
-                this.currentCardIndex = this.data.notLearn.length - 1;
+                this.currentCardIndex = this.data.length - 1;
             }
-            document.getElementById("text").innerHTML = this.data.notLearn[this.currentCardIndex].definition;
+            this.currentCard = this.currentSide === 'front' ? this.data[this.currentCardIndex].definition : this.data[this.currentCardIndex].term;
         },
         toggleSettings() { // add toggleSettings method
             this.showSettings = !this.showSettings;
@@ -88,27 +90,26 @@ export default {
             msg.text = document.getElementById("text").innerHTML;
             window.speechSynthesis.speak(msg);
         },
-        rotateCard(e) {
-            let card = document.getElementById("card");
+        rotateCard() {
+            const card = document.getElementById("card");
             if (this.currentSide === "front") {
-                card.classList.add("rotate");
-                document.getElementById("text").innerHTML = this.data.notLearn[this.currentCardIndex].term;
                 this.currentSide = "back";
+                card.classList.add("rotate");
             } else {
                 card.classList.remove("rotate");
-                document.getElementById("text").innerHTML = this.data.notLearn[this.currentCardIndex].definition;
                 this.currentSide = "front";
             }
-        }
+        },
     },
     computed: {
-        cardsCount() { // add cardsCount computed property
+        cardsCount() {
             return {
                 currentCardIndex: this.currentCardIndex,
-                totalCards: this.data ? this.data.notLearn.length : 0
+                totalCards: this.data.length,
             };
-        }
-    }
+        },
+    },
+
 };
 </script>
 

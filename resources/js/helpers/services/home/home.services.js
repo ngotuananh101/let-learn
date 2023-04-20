@@ -13,7 +13,8 @@ export const homeService = {
     voteComment,
     voteQuestion,
     updatePassword,
-    postUpdate
+    postUpdate,
+
 };
 
 function loadHome() {
@@ -28,12 +29,12 @@ function loadHome() {
             return data;
         });
 };
-function loadUserInformation() {
+function loadUserInformation(page) {
     const requestOptions = {
         method: 'GET',
         headers: authHeader()
     };
-    return fetch(`/api/public/information`, requestOptions)
+    return fetch(`/api/public/information?page=${page}`, requestOptions)
         .then(handleResponse)
         .then(data => {
             console.log(data);
@@ -62,15 +63,26 @@ function loadForumDetail(id) {
             return data.data;
         });
 }
-function loadForum() {
+function loadForum(page) {
     const requestOptions = {
         method: 'GET',
         headers: authHeader()
     };
-    return fetch(`/api/forum/post/`, requestOptions)
+    return fetch(`/api/forum/post/?page=${page}`, requestOptions)
         .then(handleResponse)
         .then(data => {
             return data.posts;
+        });
+}
+function loadLessonByUser() {
+    const requestOptions = {
+        method: 'GET',
+        headers: authHeader()
+    };
+    return fetch(`/api/student/main/17?type=lesson&page=1`, requestOptions)
+        .then(handleResponse)
+        .then(data => {
+            return data.data;
         });
 }
 function AddQuestionForum(data) {

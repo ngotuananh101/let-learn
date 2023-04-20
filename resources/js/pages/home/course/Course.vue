@@ -86,7 +86,7 @@ export default {
                 this.$root.showSnackbar(mutation.payload, 'danger');
             }
         });
-        this.$store.dispatch("course/getLessonByCourseId", { id: this.id, roleName: this.user.roleName });
+        this.$store.dispatch("course/getLessonByCourseId", {id: this.id, roleName: this.user.role.name});
     },
 
     // this.unsubscribe = this.$store.subscribe((mutation) => {
@@ -108,10 +108,13 @@ export default {
     // this.$store.dispatch("course/getLessonByCourseId", this.id);
     methods: {
         deleteCourse() {
+            this.user = this.$store.getters['user/userData'].info;
+            console.log(this.user.role.name);
             if (confirm('Are you sure?')) {
                 this.type = 'delete';
-                this.$store.dispatch('course/deleteCourse', { id: this.id, roleName: this.user.roleName  });
+                this.$store.dispatch('course/deleteCourse', { id: this.$route.params.id, roleName: this.user.role.name});
             }
+            this.$router.push({ name: 'home.home' });
         },
     },
 };

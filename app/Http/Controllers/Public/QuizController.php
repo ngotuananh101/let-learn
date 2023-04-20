@@ -45,7 +45,7 @@ class QuizController extends Controller
             //check current time is between start time and end time. if not, return error
             $now = date('Y-m-d H:i:s');
             $quiz = Quiz::findOrFail($id);
-            if (auth()->user()->role->name == 'student' && ($now < $quiz->start_time || $now > $quiz->end_time) && ($request->type != 'all' ||  $request->type != 'answer')) {
+            if (auth()->user()->role->name == 'student' && ($now < $quiz->start_time || $now > $quiz->end_time) && ($request->type == 'export')) {
                 return response()->json([
                     'status' => 'error',
                     'status_code' => 400,
@@ -273,6 +273,14 @@ class QuizController extends Controller
                             ], 400);
                         }
                         $answers = Answer::where('quiz_id', $id)->get();
+                        //check if student not take quiz
+                        if (Answer::where('quiz_id', $id)->where('user_id', auth()->user()->id)->doesntExist()) {
+                            return response()->json([
+                                'status' => 'error',
+                                'status_code' => 400,
+                                'message' => 'You not take this quiz yet!'
+                            ], 400);
+                        }
                         $sumPoints = 0;
                         $answerData = [];
                         $userId = auth()->id();
@@ -612,6 +620,7 @@ class QuizController extends Controller
                 'Quiz Max Points',
                 'Question',
                 'Answer',
+                'Points',
                 'Is Correct'
             );
 
@@ -634,6 +643,7 @@ class QuizController extends Controller
                         'quiz_max_points' => $maxPoints,
                         'question' => Question::findOrFail($a['question_id'])->question,
                         'answer' => $a['answer'],
+                        'points' => $a['points'],
                         'is_correct' => $a['is_correct'] ? 'Yes' : 'No',
                     ];
                 }

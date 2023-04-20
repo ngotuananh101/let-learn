@@ -11,19 +11,21 @@ export const learnService = {
     addTest,
     importExcelFile,
     updateComment,
-    loadNew
+    loadNew,
+    relearn,
 };
 
-function loadFlashCard(id, roleName) {
+function loadFlashCard(lesson_id, roleName, userId) {
     const requestOptions = {
-        method: "POST",
+        method: "GET",
         headers: authHeader(),
-        body: JSON.stringify({ lesson_id: id }),
     };
-    return fetch(`/api/${roleName}/main?type=detail_split`, requestOptions)
+    console.log(lesson_id);
+    return fetch(`/api/${roleName}/main/${userId}?type=detail&lesson_id=${lesson_id}`, requestOptions)
         .then(handleResponse)
         .then((data) => {
-            return data.data;
+            console.log(data.data.lessonDetail);
+            return data.data.lessonDetail;
         });
 }
 function loadLearn(id) {
@@ -131,6 +133,20 @@ function addTest(test) {
         .then(handleResponse)
         .then((test) => {
             return test;
+        });
+}
+function relearn(data) {
+    console.log(data);
+    const requestOptions = {
+        method: "PUT",
+        headers: authHeader(),
+        body: JSON.stringify(data),
+    };
+console.log(data.user_id);
+    return fetch(`/api/student/main/${data.user_id}/?type=done&choice=relearnall`, requestOptions)
+        .then(handleResponse)
+        .then((data) => {
+            return data;
         });
 }
 

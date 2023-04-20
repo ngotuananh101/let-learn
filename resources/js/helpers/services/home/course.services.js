@@ -8,13 +8,13 @@ export const courseService = {
     deleteCourse,
 };
 
-function getLessonByCourseId(course_id, roleName) {
+function getLessonByCourseId(id, roleName) {
     const requestOptions = {
         method: "GET",
         headers: authHeader(),
     };
 
-    return fetch(`/api/${roleName}/course/${course_id}?type=info`, requestOptions)
+    return fetch(`/api/${roleName}/course/${id}?type=info`, requestOptions)
         .then(handleResponse)
         .then((data) => {
             return data;
@@ -49,13 +49,13 @@ function updateCourse(course) {
         });
 }
 
-function deleteCourse(id, roleName) {
+function deleteCourse(data) {
     const requestOptions = {
         method: "DELETE",
         headers: authHeader(),
     };
-
-    return fetch(`/api/${roleName}/course/${id}`, requestOptions)
+console.log(data);
+    return fetch(`/api/${data.roleName}/course/${data.id}`, requestOptions)
         .then(handleResponse)
         .then((course) => {
             return course;

@@ -29,9 +29,9 @@ export default {
                     }
                 );
         },
-        getUserInformation({commit}) {
+        getUserInformation({commit}, page) {
             commit('request');
-            homeService.loadUserInformation()
+            homeService.loadUserInformation(page)
                 .then(
                     response => {
                         commit('requestSuccess', response);
@@ -66,9 +66,10 @@ export default {
                     }
                 );
         },
-        getForum({commit}) {
+        getForum({commit}, page) {
             commit('request');
-            homeService.loadForum()
+            console.log(page);
+            homeService.loadForum(page)
                 .then(
                     response => {
                         commit('requestSuccess', response);
@@ -141,6 +142,7 @@ export default {
         },
 
         updatePassword({ commit }, password){
+            console.log(password);
             commit("request");
             homeService.updatePassword(password).then(
                 (password) => {

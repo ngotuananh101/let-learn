@@ -9,7 +9,21 @@ export const lessonService = {
     deleteLesson,
     getLessonById,
     updateLesson,
+    loadFlashCard
 };
+
+function loadFlashCard(id, roleName) {
+    const requestOptions = {
+        method: "POST",
+        headers: authHeader(),
+        body: JSON.stringify({ lesson_id: id }),
+    };
+    return fetch(`/api/${roleName}/main?type=detail_split`, requestOptions)
+        .then(handleResponse)
+        .then((data) => {
+            return data.data;
+        });
+}
 
 function importExcelFile(formData) {
     return new Promise((resolve, reject) => {
@@ -37,6 +51,7 @@ function importExcelFile(formData) {
 }
 
 function addLesson(lesson) {
+    console.log(lesson);
     const requestOptions = {
         method: "POST",
         headers: authHeader(),
@@ -50,7 +65,7 @@ function addLesson(lesson) {
         });
 }
 
-function deleteLesson(id) {
+function deleteLesson(id, roleName) {
     const requestOptions = {
         method: "DELETE",
         headers: authHeader(),
@@ -82,7 +97,7 @@ function updateLesson(lesson) {
         headers: authHeader(),
         body: JSON.stringify(lesson)
     };
-
+console.log(lesson);
     return fetch(`/api/${lesson.roleName}/lesson/${lesson.id}`, requestOptions)
         .then(handleResponse)
         .then(lesson => {

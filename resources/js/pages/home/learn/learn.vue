@@ -64,7 +64,8 @@
                         <div class="card-body">
                             <h5 class="card-title">{{ answer.question }}</h5>
                             <p class="card-text text-danger">Your answer: {{ answer.selectedAnswer }}</p>
-                            <p class="card-text text-success">Correct answer: {{ lesson_details.find(q => q.question === answer.question).correct_answer }}</p>
+                            <p class="card-text text-success">Correct answer:
+                                {{ lesson_details.find(q => q.question === answer.question).correct_answer }}</p>
                         </div>
                     </div>
                 </div>
@@ -72,23 +73,22 @@
         </div>
         <div class="row">
             <div class="col-12">
-                <button class="btn btn-primary position-fixed bottom-0 end-0 mt-3 ms-3" @click="reloadPage" type="button"><i class="fa-solid fa-arrow-right"></i></button>
+                <button class="btn btn-primary position-fixed bottom-0 end-0 mt-3 ms-3" @click="reloadPage"
+                        type="button"><i class="fa-solid fa-arrow-right"></i></button>
             </div>
         </div>
     </div>
-    <template>
-        <div v-if="completed">
-            <h1>Congratulations, you have completed the lesson!</h1>
-            <button @click="goBack">Go Back</button>
-            <button @click="relearn">Relearn</button>
+    <div class="container h-100 d-flex flex-column justify-content-center align-items-center" v-if="completed">
+        <h1 class="text-success text-center pt-8">Congratulations on completing the lesson</h1>
+        <div class="row pt-3 justify-content-center">
+            <div class="col-md-auto col-sm-12">
+                <button class="btn btn-primary d-flex align-items-center" @click="back" type="button">Back</button>
+            </div>
+            <div class="col-md-auto col-sm-12 mt-2 mt-md-0">
+                <button class="btn btn-primary d-flex align-items-center" @click="relearn" type="button">Learn Again</button>
+            </div>
         </div>
-        <div v-else>
-            <!-- Existing code for displaying the quiz questions -->
-        </div>
-    </template>
-
-
-
+    </div>
 </template>
 
 <script>
@@ -119,7 +119,9 @@ export default {
             } else if (mutation.type === "learn/requestSuccess") {
                 if (mutation.payload.length > 0) {
                     this.lesson_details = mutation.payload;
+                    console.log(this.lesson_details);
                 } else {
+                    console.log("No lesson details");
                     this.completed = true; // Set completed flag to true if lesson details are empty
                 }
             } else if (mutation.type === "learn/requestFailure") {
@@ -130,7 +132,7 @@ export default {
     },
     computed: {
         numCorrectAnswers() {
-            return this.lesson_details.filter(q => q.isCorrect).length;
+            return this.userAnswers.filter(answer => answer.isCorrect).length;
         }
     },
     methods: {
@@ -193,7 +195,7 @@ export default {
                     this.currentQuestion++;
                     this.progress = Math.round((this.currentQuestion / this.lesson_details.length) * 100);
                     this.$emit('change-progress', this.progress);
-                }else{
+                } else {
                     this.lesson_details[this.currentQuestion].count_answered ? this.lesson_details[this.currentQuestion].count_answered++ : this.lesson_details[this.currentQuestion].count_answered = 1;
                     this.lesson_details[this.currentQuestion].isCorrect = this.isCorrectAnswer;
                     if (this.isCorrectAnswer) {
@@ -210,6 +212,19 @@ export default {
         },
         reloadPage() {
             location.reload();
+        },
+        relearn() {
+            console.log('relearn');
+            console.log(this.user.id);
+            this.$store.dispatch('learn/relearn', {
+                lesson_id: this.$route.params.id,
+                user_id: this.user.id
+            }).then((res) => {
+                this.reloadPage();
+            });
+        },
+        back() {
+            this.$router.push({name: 'lesson.index'});
         }
     },
 };
