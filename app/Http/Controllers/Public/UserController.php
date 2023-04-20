@@ -117,6 +117,8 @@ class UserController extends Controller
             } else {
                 $schools = null;
                 $classes = null;
+                $member = null;
+                $count = null;
             }
             return response()->json([
                 // get random 6 lessons
@@ -523,7 +525,7 @@ class UserController extends Controller
                         'username' => 'required|string|unique:users',
                     ]);
                     //check auth user is owner user id
-                    if ($request->user()->id != $id) {
+                    if (auth()->user()->id != $id) {
                         return response()->json([
                             'status' => 'error',
                             'status_code' => 403,
@@ -531,7 +533,7 @@ class UserController extends Controller
                         ], 403);
                     }
                     //update username of user
-                    $user = $request->user();
+                    $user = auth()->user();
                     $user->username = $request->username;
                     $user->save();
                     return response()->json([
@@ -547,7 +549,7 @@ class UserController extends Controller
                         'password' => 'required|string|min:6|confirmed',
                     ]);
                     //check auth user is owner user id
-                    if ($request->user()->id != $id) {
+                    if (auth()->user()->id != $id) {
                         return response()->json([
                             'status' => 'error',
                             'status_code' => 403,
@@ -555,15 +557,23 @@ class UserController extends Controller
                         ], 403);
                     }
                     //check old password is correct
-                    if (!Hash::check($request->old_password, $request->user()->password)) {
+                    if (!Hash::check($request->old_password, auth()->user()->password)) {
                         return response()->json([
                             'status' => 'error',
                             'status_code' => 403,
                             'message' => 'Old password is incorrect'
                         ], 403);
                     }
+                    //check if old password is same new password
+                    if (Hash::check($request->password, auth()->user()->password)) {
+                        return response()->json([
+                            'status' => 'error',
+                            'status_code' => 403,
+                            'message' => 'New password is same old password'
+                        ], 403);
+                    }
                     //update password of user
-                    $user = $request->user();
+                    $user = auth()->user();
                     $user->password = bcrypt($request->password);
                     $user->save();
                     return response()->json([

@@ -163,17 +163,6 @@ export default {
         sidebar(type) {
             this.setSidebarType(type);
         },
-        darkMode() {
-            if (this.$store.state.darkMode) {
-                this.$store.state.darkMode = false;
-                this.sidebar("bg-white");
-                deactivateDarkMode();
-            } else {
-                this.$store.state.darkMode = true;
-                this.sidebar("bg-default");
-                activateDarkMode();
-            }
-        },
         getUserInfo() {
             let user = this.$store.getters['user/userData'].info;
             // get gravatar
