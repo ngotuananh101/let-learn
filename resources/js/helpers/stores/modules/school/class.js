@@ -84,6 +84,17 @@ export default {
                     commit('failure', error);
                 }
             );
+        },
+        deletePost({commit}, data) {
+            commit('request');
+            classService.deletePost(data.post_id, data.class_id).then(
+                classes => {
+                    commit('success', classes);
+                },
+                error => {
+                    commit('failure', error);
+                }
+            );
         }
     }
 }

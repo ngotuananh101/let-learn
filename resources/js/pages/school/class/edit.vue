@@ -252,11 +252,31 @@
                     <i class="fa-duotone fa-circle-xmark fs-2" data-bs-dismiss="modal"></i>
                 </div>
                 <div class="modal-body overflow-auto" style="max-height: 75vh;">
-                    <div class="d-flex">
-                        <img :src="post.post.avatar" alt="user avatar" class="img img-fluid rounded-circle avatar me-3">
-                        <div>
-                            <h6 class="mb-0">{{ post.post.author }}</h6>
-                            <p class="mb-0">{{ post.post.created_at }}</p>
+                    <div class="d-flex justify-content-between">
+                        <div class="d-flex">
+                            <img :src="post.post.avatar" alt="user avatar"
+                                 class="img img-fluid rounded-circle avatar me-3">
+                            <div>
+                                <h6 class="mb-0">{{ post.post.author }}</h6>
+                                <p class="mb-0">{{ post.post.created_at }}</p>
+                            </div>
+                        </div>
+                        <div class="dropdown">
+                            <a href="#btnOption"
+                               class="p-0 nav-link bg-light avatar-sm rounded-circle d-flex justify-content-center align-items-center"
+                               data-bs-toggle="dropdown" aria-expanded="false">
+                                <i class="fa-solid fa-ellipsis"></i>
+                            </a>
+                            <ul id="btnOption" class="px-2 py-2 dropdown-menu dropdown-menu-end me-sm-n3"
+                                aria-labelledby="btnNotification">
+                                <li>
+                                    <a class="dropdown-item d-flex align-items-center" href="#"
+                                       @click="this.deletePost">
+                                        <i class="fa-light fa-trash fs-5"></i>
+                                        <p class="ms-3 mb-0">Delete this post</p>
+                                    </a>
+                                </li>
+                            </ul>
                         </div>
                     </div>
                     <div>
@@ -278,8 +298,8 @@
                         <p v-if="post.comments.length === 0">This post don't hame any comment</p>
                         <div v-for="comment in post.comments" :key="comment.id">
                             <div class="d-flex mb-4">
-                                <img :src="comment.avatar" alt="user avatar-sm"
-                                     class="img img-fluid rounded-circle avatar me-3">
+                                <img :src="comment.avatar" alt="user avatar"
+                                     class="img img-fluid rounded-circle avatar-sm me-3">
                                 <div>
                                     <div class="bg-light p-2 mb-1" style="border-radius: 1rem;">
                                         <h6 class="mb-0 text-dark">{{ comment.author }}</h6>
@@ -290,6 +310,10 @@
                                 </div>
                             </div>
                         </div>
+                        <p v-if="post.comments.length > 0 && post.current_page < post.total_page" class="fw-bold"
+                           @click="loadMoreComment">
+                            Load more comment
+                        </p>
                     </div>
                 </div>
             </div>
@@ -325,9 +349,11 @@ export default {
             quiz: {},
             post: {
                 post: {},
-                comments: {}
+                comments: {},
+                total_page: 0,
+                current_page: 0,
             },
-            post_comment_page: 1,
+            selected_post_id: null,
         }
     },
     mounted() {
@@ -357,6 +383,12 @@ export default {
                         this.$root.showSnackbar('Post get successfully', 'success');
                         console.log(mutation.payload);
                         this.post = mutation.payload;
+                    } else if (this.type === 'load_more') {
+                        this.post.comments = this.post.comments.concat(mutation.payload.comments);
+                        this.post.current_page = mutation.payload.current_page;
+                    } else if (this.type === 'delete_post') {
+                        this.$root.showSnackbar('Post deleted successfully', 'success');
+                        location.reload();
                     }
                     break;
                 case 'schoolClass/failure':
@@ -429,9 +461,10 @@ export default {
             this.class_post_datatable.on("datatable.selectrow", (rowIndex, event) => {
                 this.view_post_modal.show();
                 this.type = 'get_post';
+                this.selected_post_id = this.class_info.posts[rowIndex].id;
                 this.$store.dispatch('schoolClass/getPostById', {
                     class_id: this.$route.params.id,
-                    post_id: this.class_info.posts[rowIndex].id,
+                    post_id: this.selected_post_id,
                     page: this.post_comment_page
                 });
             });
@@ -618,6 +651,21 @@ export default {
                 status: this.quiz.status,
             };
             this.$store.dispatch('schoolClass/updateQuiz', {id: this.$route.params.id, data: data});
+        },
+        loadMoreComment() {
+            this.type = 'load_more';
+            this.$store.dispatch('schoolClass/getPostById', {
+                class_id: this.$route.params.id,
+                post_id: this.selected_post_id,
+                page: this.post.current_page + 1,
+            });
+        },
+        deletePost() {
+            this.type = 'delete_post';
+            this.$store.dispatch('schoolClass/deletePost', {
+                class_id: this.$route.params.id,
+                post_id: this.selected_post_id,
+            });
         },
     }
 }

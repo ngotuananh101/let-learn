@@ -7,7 +7,8 @@ export const classService = {
     update,
     getQuizById,
     updateQuiz,
-    getPostById
+    getPostById,
+    deletePost
 }
 
 function index(slug) {
@@ -64,4 +65,13 @@ function getPostById(post_id, class_id, page) {
     };
 
     return fetch(`/api/school/classes/${class_id}/edit?post_id=${post_id}&type=post&page=${page}`, requestOptions).then(handleResponse);
+}
+
+function deletePost(post_id, class_id) {
+    const requestOptions = {
+        method: 'DELETE',
+        headers: authHeader()
+    };
+
+    return fetch(`/api/school/classes/${class_id}?post_id=${post_id}&type=delete_post`, requestOptions).then(handleResponse);
 }

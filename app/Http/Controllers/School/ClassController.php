@@ -70,7 +70,7 @@ class ClassController extends Controller
             if ($this->checkPermission($id)) {
                 $class = Classes::findOrFail($id);
                 return response()->json([
-                    'class' => $class->load(['member','quizzes','posts']),
+                    'class' => $class->load(['member', 'quizzes', 'posts']),
                 ], 200);
             } else {
                 return response()->json([
@@ -87,13 +87,13 @@ class ClassController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(Request $request,string $id)
+    public function edit(Request $request, string $id)
     {
         try {
             $request->validate([
                 'type' => 'required|string|in:quiz,post',
             ]);
-            switch ($request->input('type')){
+            switch ($request->input('type')) {
                 case 'quiz':
                     if ($this->checkPermission($id)) {
                         $request->validate([
@@ -103,7 +103,7 @@ class ClassController extends Controller
                         $quiz = $class->quizzes()->where('id', $request->quiz_id)->first();
                         if ($quiz) {
                             return response()->json([
-                                'quiz' => $quiz->load(['questions','answers']),
+                                'quiz' => $quiz->load(['questions', 'answers']),
                             ], 200);
                         } else {
                             return response()->json([
@@ -115,51 +115,52 @@ class ClassController extends Controller
                             'message' => 'You are not authorized to view this resource',
                         ], 403);
                     }
-                    case 'post':
-                        if ($this->checkPermission($id)) {
-                            $request->validate([
-                                'post_id' => 'required|string',
-                            ]);
-                            $class = Classes::findOrFail($id);
-                            $post = $class->posts()->where('id', $request->post_id)->firstOrFail();
-                            $post = [
-                                'id' => $post->id,
-                                'author' => $post->user->name,
-                                'avatar' => 'https://www.gravatar.com/avatar/' . md5($post->user->email) . '?s=200&d=mm',
-                                'title' => $post->title,
-                                'content' => $post->content,
-                                'vote' => $post->likes->count() ?? 0,
-                                'upvote' => $post->likes->where('like_status', 'like')->count() ?? 0,
-                                'downvote' => $post->likes->where('like_status', 'unlike')->count() ?? 0,
-                                'created_at' => Carbon::parse($post->created_at)->diffForHumans(),
-                            ];
-                            $comments = Comment::where('post_id', $request->post_id)->paginate(10);
-                            $comments = $comments->map(function ($comment) {
-                                return [
-                                    'id' => $comment->id,
-                                    'author' => $comment->user->name,
-                                    'avatar' => 'https://www.gravatar.com/avatar/' . md5($comment->user->email) . '?s=200&d=mm',
-                                    'upvote' => $comment->commentVote->where('vote_status', 'upvote')->count() ?? 0,
-                                    'downvote' => $comment->commentVote()->where('vote_status', 'downvote')->count() ?? 0,
-                                    'content' => $comment->comment,
-                                    'created_at' => Carbon::parse($comment->created_at)->diffForHumans(),
-                                ];
-                            });
-                            if ($post) {
-                                return response()->json([
-                                    'post' => $post,
-                                    'comments' => $comments,
-                                ], 200);
-                            } else {
-                                return response()->json([
-                                    'message' => 'Post not found',
-                                ], 404);
-                            }
+                case 'post':
+                    if ($this->checkPermission($id)) {
+                        $request->validate([
+                            'post_id' => 'required|string',
+                        ]);
+                        $class = Classes::findOrFail($id);
+                        $post = $class->posts()->where('id', $request->post_id)->firstOrFail();
+                        $post = [
+                            'id' => $post->id,
+                            'author' => $post->user->name,
+                            'avatar' => 'https://www.gravatar.com/avatar/' . md5($post->user->email) . '?s=200&d=mm',
+                            'title' => $post->title,
+                            'content' => $post->content,
+                            'vote' => $post->likes->count() ?? 0,
+                            'upvote' => $post->likes->where('like_status', 'like')->count() ?? 0,
+                            'downvote' => $post->likes->where('like_status', 'unlike')->count() ?? 0,
+                            'created_at' => Carbon::parse($post->created_at)->diffForHumans(),
+                        ];
+                        $comments = Comment::where('post_id', $request->post_id)->paginate(10);
+                        if ($post) {
+                            return response()->json([
+                                'post' => $post,
+                                'comments' => $comments->map(function ($comment) {
+                                    return [
+                                        'id' => $comment->id,
+                                        'author' => $comment->user->name,
+                                        'avatar' => 'https://www.gravatar.com/avatar/' . md5($comment->user->email) . '?s=200&d=mm',
+                                        'upvote' => $comment->commentVote->where('vote_status', 'upvote')->count() ?? 0,
+                                        'downvote' => $comment->commentVote()->where('vote_status', 'downvote')->count() ?? 0,
+                                        'content' => $comment->comment,
+                                        'created_at' => Carbon::parse($comment->created_at)->diffForHumans(),
+                                    ];
+                                }),
+                                'total_page' => $comments->lastPage(),
+                                'current_page' => $comments->currentPage(),
+                            ], 200);
                         } else {
                             return response()->json([
-                                'message' => 'You are not authorized to view this resource',
-                            ], 403);
+                                'message' => 'Post not found',
+                            ], 404);
                         }
+                    } else {
+                        return response()->json([
+                            'message' => 'You are not authorized to view this resource',
+                        ], 403);
+                    }
             }
         } catch (\Exception $e) {
             return response()->json([
@@ -177,7 +178,7 @@ class ClassController extends Controller
             $request->validate([
                 'type' => 'required|string|in:info,add_member,remove_member,update_quiz',
             ]);
-            switch ($request->input('type')){
+            switch ($request->input('type')) {
                 case 'info':
                     $request->validate([
                         'name' => 'required|string',
@@ -207,18 +208,18 @@ class ClassController extends Controller
                     ]);
                     if ($this->checkPermission($id)) {
                         $class = Classes::findOrFail($id);
-                        foreach ($request->emails as $email){
+                        foreach ($request->emails as $email) {
                             $user = User::where('email', $email)->first();
-                            if ($user){
+                            if ($user) {
                                 // check if user is already a member of the class
                                 if ($class->member->contains($user->id)) {
                                     return response()->json([
                                         'message' => 'User is already a member of the class',
                                     ], 400);
-                                }else{
+                                } else {
                                     $class->member()->attach($user->id);
                                 }
-                            }else{
+                            } else {
                                 $user = new User();
                                 $username = explode('@', $email);
                                 $user->username = $username[0];
@@ -246,7 +247,7 @@ class ClassController extends Controller
                     ]);
                     if ($this->checkPermission($id)) {
                         $class = Classes::findOrFail($id);
-                        foreach ($request->ids as $id){
+                        foreach ($request->ids as $id) {
                             $class->member()->detach($id);
                         }
                         return response()->json([
@@ -287,9 +288,41 @@ class ClassController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(string $id)
+    public function destroy(Request $request, string $id)
     {
-        //
+        try {
+            $request->validate([
+                'type' => 'required|string|in:delete_post',
+            ]);
+            switch ($request->input('type')) {
+                case 'delete_post':
+                    $request->validate([
+                        'post_id' => 'required|numeric|exists:posts,id',
+                    ]);
+                    if ($this->checkPermission($id)) {
+                        $class = Classes::findOrFail($id);
+                        $post = $class->posts()->where('id', $request->post_id)->first();
+                        if ($post) {
+                            $post->delete();
+                            return response()->json([
+                                'message' => 'Post deleted successfully',
+                            ], 200);
+                        } else {
+                            return response()->json([
+                                'message' => 'Post not found',
+                            ], 404);
+                        }
+                    } else {
+                        return response()->json([
+                            'message' => 'You are not authorized to view this resource',
+                        ], 403);
+                    }
+            }
+        } catch (\Exception $e) {
+            return response()->json([
+                'message' => $e->getMessage(),
+            ], 500);
+        }
     }
 
     /**
