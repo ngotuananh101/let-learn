@@ -14,6 +14,7 @@ export const homeService = {
     voteQuestion,
     updatePassword,
     postUpdate,
+    changeInfor
 
 };
 
@@ -52,6 +53,19 @@ function loadClassDetail(id, roleName) {
             return data.data;
         });
 }
+function changeInfor(data) {
+    const requestOptions = {
+        method: 'PUT',
+        headers: authHeader(),
+        body: JSON.stringify(data),
+    };
+    console.log(data);
+    return fetch(`/api/student/main/${data.id}?type=info`, requestOptions)
+        .then(handleResponse)
+        .then(data => {
+            return data.message;
+        });
+}
 function loadForumDetail(id) {
     const requestOptions = {
         method: 'GET',
@@ -72,17 +86,6 @@ function loadForum(page) {
         .then(handleResponse)
         .then(data => {
             return data.posts;
-        });
-}
-function loadLessonByUser() {
-    const requestOptions = {
-        method: 'GET',
-        headers: authHeader()
-    };
-    return fetch(`/api/student/main/17?type=lesson&page=1`, requestOptions)
-        .then(handleResponse)
-        .then(data => {
-            return data.data;
         });
 }
 function AddQuestionForum(data) {

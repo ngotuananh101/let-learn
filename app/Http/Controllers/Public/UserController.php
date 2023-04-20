@@ -117,6 +117,8 @@ class UserController extends Controller
             } else {
                 $schools = null;
                 $classes = null;
+                $member = null;
+                $count = null;
             }
             return response()->json([
                 // get random 6 lessons

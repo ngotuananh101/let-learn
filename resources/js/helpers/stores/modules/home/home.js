@@ -54,6 +54,18 @@ export default {
                     }
                 );
         },
+        changeInfor({ commit }, data) {
+            commit('request');
+            homeService.changeInfor(data)
+                .then(
+                    response => {
+                        commit('requestSuccess', response);
+                    },
+                    error => {
+                        commit('requestFailure', error);
+                    }
+                );
+        },
         getForumDetail({commit}, id) {
             commit('request');
             homeService.loadForumDetail(id)
