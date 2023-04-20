@@ -1,6 +1,7 @@
 import handleResponse from "../../other/handle-response";
 import authHeader from "../../other/auth-header";
 import readXlsxFile from "read-excel-file";
+import role from "../../stores/modules/admin/role";
 
 export const lessonService = {
     importExcelFile,
@@ -8,7 +9,21 @@ export const lessonService = {
     deleteLesson,
     getLessonById,
     updateLesson,
+    loadFlashCard
 };
+
+function loadFlashCard(id, roleName) {
+    const requestOptions = {
+        method: "POST",
+        headers: authHeader(),
+        body: JSON.stringify({ lesson_id: id }),
+    };
+    return fetch(`/api/${roleName}/main?type=detail_split`, requestOptions)
+        .then(handleResponse)
+        .then((data) => {
+            return data.data;
+        });
+}
 
 function importExcelFile(formData) {
     return new Promise((resolve, reject) => {
@@ -36,39 +51,40 @@ function importExcelFile(formData) {
 }
 
 function addLesson(lesson) {
+    console.log(lesson);
     const requestOptions = {
         method: "POST",
         headers: authHeader(),
         body: JSON.stringify(lesson),
     };
 
-    return fetch(`/api/student/lesson`, requestOptions)
+    return fetch(`/api/${lesson.roleName}/lesson`, requestOptions)
         .then(handleResponse)
         .then((lesson) => {
             return lesson;
         });
 }
 
-function deleteLesson(id) {
+function deleteLesson(id, roleName) {
     const requestOptions = {
         method: "DELETE",
         headers: authHeader(),
     };
 
-    return fetch(`/api/student/lesson/${id}`, requestOptions)
+    return fetch(`/api/${roleName}/lesson/${id}`, requestOptions)
         .then(handleResponse)
         .then((lesson) => {
             return lesson;
         });
 }
 
-function getLessonById(id) {
+function getLessonById(id, roleName) {
     const requestOptions = {
         method: 'GET',
         headers: authHeader()
     };
 
-    return fetch(`/api/student/lesson/${id}`, requestOptions)
+    return fetch(`/api/${roleName}/lesson/${id}`, requestOptions)
         .then(handleResponse)
         .then(lesson => {
             return lesson;
@@ -81,8 +97,8 @@ function updateLesson(lesson) {
         headers: authHeader(),
         body: JSON.stringify(lesson)
     };
-
-    return fetch(`/api/student/lesson/${lesson.id}`, requestOptions)
+console.log(lesson);
+    return fetch(`/api/${lesson.roleName}/lesson/${lesson.id}`, requestOptions)
         .then(handleResponse)
         .then(lesson => {
             return lesson;

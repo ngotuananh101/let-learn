@@ -48,11 +48,11 @@
                                     placeholder="yyyy-mm-dd 00:00:00" v-model="this.test.end_time" />
                             </div>
                         </div>
-                        <div class="col-md-2 col-6">
+                        <!-- <div class="col-md-2 col-6">
                             <button class="btn btn-primary w-100 mt-4" @click="import_test_modal.show">
                                 Import test
                             </button>
-                        </div>
+                        </div> -->
                         <div class="col-12">
                             <div v-for="(child, index) in cards">
                                 <component :is="child" :data="questions[index]" @remove="removeCard"></component>
@@ -76,7 +76,7 @@
         </div>
     </div>
 
-    <div class="modal fade" id="importModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
+    <!-- <div class="modal fade" id="importModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
         aria-labelledby="staticBackdropLabel" aria-hidden="true">
         <div class="modal-dialog modal-lg mt-lg-10">
             <div class="modal-content">
@@ -128,7 +128,7 @@
                 <h1>{{ answer_option }}</h1>
             </div>
         </div>
-    </div>
+    </div> -->
 </template>
 <script>
 import TestDetailCard from "../../../components/cards/test-detail-card.vue";
@@ -153,37 +153,43 @@ export default {
                 start_time: '',
                 end_time: '',
             },
-            import_test_modal: null,
-            importFile: true,
+            // import_test_modal: null,
+            // importFile: true,
             file: null,
             type: 'get',
-            questions: { answer_option: '' },
+            questions: {
+
+            },
+
+            answer_option: answer_option,
             cards: null,
             id: this.$route.params.id,
             is_multiple_choice: '1',
+            user: null,
         };
     },
     created() {
+        this.user = this.$store.getters['user/userData'].info;
         this.unsubscribe = this.$store.subscribe((mutation) => {
             if (mutation.type === 'learn/request') {
-                if (this.type === 'import') {
-                    this.$root.showSnackbar('Importing test...', 'info');
-                } else
-                    if (this.type === 'addTest') {
-                        this.$root.showSnackbar('Adding test...', 'info');
-                    }
+                // if (this.type === 'import') {
+                //     this.$root.showSnackbar('Importing test...', 'info');
+                // } else
+                if (this.type === 'addTest') {
+                    this.$root.showSnackbar('Adding test...', 'info');
+                }
             } else if (mutation.type === 'learn/requestSuccess') {
-                if (this.type === 'import') {
-                    this.$root.showSnackbar('Import test successfully', 'success');
-                    this.questions = mutation.payload;
-                    this.cards = markRaw(this.questions.map((detail, index) => {
-                        return TestDetailCard;
-                    }));
-                    this.import_test_modal.hide();
-                } else
-                    if (this.type === 'addTest') {
-                        this.$root.showSnackbar('Add test successfully', 'success');
-                    }
+                // if (this.type === 'import') {
+                //     this.$root.showSnackbar('Import test successfully', 'success');
+                //     this.questions = mutation.payload;
+                //     this.cards = markRaw(this.questions.map((detail, index) => {
+                //         return TestDetailCard;
+                //     }));
+                //     this.import_test_modal.hide();
+                // } else
+                if (this.type === 'addTest') {
+                    this.$root.showSnackbar('Add test successfully', 'success');
+                }
             } else if (mutation.type === 'learn/requestFailure') {
                 this.$root.showSnackbar(mutation.payload, 'danger');
             }
@@ -194,39 +200,36 @@ export default {
     },
     beforeUnmount() {
         this.unsubscribe();
-        this.import_test_modal.hide();
-        this.import_test_modal.dispose();
+        // this.import_test_modal.hide();
+        // this.import_test_modal.dispose();
     },
     methods: {
         init() {
-            const bootstrap = this.$store.state.config.bootstrap;
-            this.import_test_modal = new bootstrap.Modal(document.getElementById('importModal'), {
-                show: true,
-            });
-            this.import_test_modal._element.addEventListener('hidden.bs.modal', () => {
-                if (this.importFile) {
-                    this.file = null;
+            // const bootstrap = this.$store.state.config.bootstrap;
+            // this.import_test_modal = new bootstrap.Modal(document.getElementById('importModal'), {
+            //     show: true,
+            // });
+            // this.import_test_modal._element.addEventListener('hidden.bs.modal', () => {
+            //     if (this.importFile) {
+            //         this.file = null;
 
-                } else {
-                    document.getElementById('raw_data').value = '';
-                }
-            });
+            //     } else {
+            //         document.getElementById('raw_data').value = '';
+            //     }
+            // });
             // init 3 cards
             this.questions = [
                 {
                     index: 0,
                     question: '',
-                    correct_answer: '',
                 },
                 {
                     index: 1,
                     question: '',
-                    correct_answer: '',
                 },
                 {
                     index: 2,
                     question: '',
-                    correct_answer: '',
                 },
             ];
             this.cards = markRaw(this.questions.map((detail, index) => {
@@ -256,49 +259,49 @@ export default {
         changeFile(e) {
             this.file = e.target.files[0];
         },
-        import() {
-            this.type = 'import';
-            if (this.importFile) {
-                if (this.file === null) {
-                    this.$root.showSnackbar('Please select a file', 'danger');
-                    return;
-                }
-                const formData = new FormData();
-                formData.append('file', this.file);
-                this.$store.dispatch('test/importFile', formData);
-            } else {
-                this.$root.showSnackbar('Importing test...', 'info');
-                try {
-                    let raw_data = document.getElementById('raw_data').value;
-                    const question_separator = document.getElementById('betweenQuestionCorrectAnswer').value;
-                    let detail_separator = document.getElementById('betweenCard').value;
-                    // check detail_separator is regex
-                    if (detail_separator.startsWith('/') && detail_separator.endsWith('/')) {
-                        detail_separator = detail_separator.substring(1, detail_separator.length - 1);
-                    }
-                    let test_detail = raw_data.split(new RegExp(detail_separator, 'g'));
-                    this.questions = [];
-                    test_detail.forEach((detail, index) => {
-                        let question_correct_answer = detail.split(question_separator);
-                        if (question_correct_answer.length !== 2) {
-                            throw new Error('Invalid format');
-                        }
-                        this.questions.push({
-                            index: index,
-                            question: question_correct_answer[0],
-                            correct_answer: '',
-                        });
-                    });
-                    this.cards = markRaw(this.questions.map((detail, index) => {
-                        return TestDetailCard;
-                    }));
-                    this.import_test_modal.hide();
-                    this.$root.showSnackbar('Import test successfully', 'success');
-                } catch (e) {
-                    this.$root.showSnackbar('Import test failed', 'danger');
-                }
-            }
-        },
+        // import() {
+        //     this.type = 'import';
+        //     if (this.importFile) {
+        //         if (this.file === null) {
+        //             this.$root.showSnackbar('Please select a file', 'danger');
+        //             return;
+        //         }
+        //         const formData = new FormData();
+        //         formData.append('file', this.file);
+        //         this.$store.dispatch('test/importFile', formData);
+        //     } else {
+        //         this.$root.showSnackbar('Importing test...', 'info');
+        //         try {
+        //             let raw_data = document.getElementById('raw_data').value;
+        //             const question_separator = document.getElementById('betweenQuestionCorrectAnswer').value;
+        //             let detail_separator = document.getElementById('betweenCard').value;
+        //             // check detail_separator is regex
+        //             if (detail_separator.startsWith('/') && detail_separator.endsWith('/')) {
+        //                 detail_separator = detail_separator.substring(1, detail_separator.length - 1);
+        //             }
+        //             let test_detail = raw_data.split(new RegExp(detail_separator, 'g'));
+        //             this.questions = [];
+        //             test_detail.forEach((detail, index) => {
+        //                 let question_correct_answer = detail.split(question_separator);
+        //                 if (question_correct_answer.length !== 2) {
+        //                     throw new Error('Invalid format');
+        //                 }
+        //                 this.questions.push({
+        //                     index: index,
+        //                     question: question_correct_answer[0],
+        //                     correct_answer: '',
+        //                 });
+        //             });
+        //             this.cards = markRaw(this.questions.map((detail, index) => {
+        //                 return TestDetailCard;
+        //             }));
+        //             this.import_test_modal.hide();
+        //             this.$root.showSnackbar('Import test successfully', 'success');
+        //         } catch (e) {
+        //             this.$root.showSnackbar('Import test failed', 'danger');
+        //         }
+        //     }
+        // },
         addTest() {
             this.type = 'addTest';
             this.$store.dispatch('learn/addTest', {
@@ -310,6 +313,7 @@ export default {
                 score_reporting: this.score_reporting,
                 start_time: this.start_time,
                 end_time: this.end_time,
+                roleName: this.user.role.name,
             });
             // this.$router.push({ name: 'home.class', params: { id: this.id } });
         }

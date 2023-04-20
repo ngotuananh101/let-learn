@@ -84,6 +84,11 @@ const school = [
                                 path: '',
                                 name: 'school.class.index',
                                 component: () => import('../../../pages/school/class/index.vue'),
+                            },
+                            {
+                                path: ':id/edit',
+                                name: 'school.class.edit',
+                                component: () => import('../../../pages/school/class/edit.vue'),
                             }
                         ]
                     }

@@ -41,6 +41,17 @@ export default {
                 commit("failure", "File type not supported");
             }
         },
+        getFlashCard({ commit }, payload) {
+            commit("request");
+            lessonService.loadFlashCard(payload.id, payload.roleName).then(
+                (response) => {
+                    commit("success", response);
+                },
+                (error) => {
+                    commit("failure", error);
+                }
+            );
+        },
         addLesson({ commit }, lesson) {
             commit("request");
             lessonService.addLesson(lesson).then(
@@ -52,9 +63,9 @@ export default {
                 }
             );
         },
-        deleteLesson({ commit }, id) {
+        deleteLesson({ commit }, payload) {
             commit("request");
-            lessonService.deleteLesson(id).then(
+            lessonService.deleteLesson(payload.id, payload.roleName).then(
                 (lesson) => {
                     commit("success", lesson);
                 },
@@ -63,9 +74,9 @@ export default {
                 }
             );
         },
-        getLessonById({ commit }, id) {
+        getLessonById({ commit }, payload) {
             commit("request");
-            lessonService.getLessonById(id).then(
+            lessonService.getLessonById(payload.id, payload.roleName).then(
                 (lesson) => {
                     commit("success", lesson);
                 },

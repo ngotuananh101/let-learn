@@ -39,4 +39,10 @@ class Classes extends Model
     {
         return $this->hasMany(Quiz::class, 'class_id', 'id');
     }
+
+    //get post
+    public function posts(): HasMany
+    {
+        return $this->hasMany(Post::class, 'class_id', 'id');
+    }
 }

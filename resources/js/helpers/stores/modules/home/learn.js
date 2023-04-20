@@ -16,9 +16,10 @@ export default {
         },
     },
     actions: {
-        getFlashCard({ commit }, id) {
+        getFlashCard({ commit }, payload) {
             commit("request");
-            learnService.loadFlashCard(id).then(
+            console.log(payload);
+            learnService.loadFlashCard(payload.lesson_id, payload.roleName, payload.userId).then(
                 (response) => {
                     commit("requestSuccess", response);
                 },
@@ -27,9 +28,9 @@ export default {
                 }
             );
         },
-        getNews({ commit }) {
+        getNews({ commit }, id) {
             commit("request");
-            learnService.loadNew().then(
+            learnService.loadNew(id).then(
                 (response) => {
                     commit("requestSuccess", response);
                 },
@@ -50,6 +51,19 @@ export default {
                 }
             );
         },
+        relearn({ commit }, data) {
+            commit("request");
+            console.log(data.lesson_id);
+            console.log(data.user_id);
+            learnService.relearn(data).then(
+                (response) => {
+                    commit("requestSuccess", response);
+                },
+                (error) => {
+                    commit("requestFailure", error);
+                }
+            );
+        },
         getTest({ commit }, id) {
             commit("request");
             learnService.loadTest(id).then(
@@ -61,9 +75,9 @@ export default {
                 }
             );
         },
-        getSelfTest({ commit }, id) {
+        getSelfTest({ commit }, payload) {
             commit("request");
-            learnService.loadSelfTest(id).then(
+            learnService.loadSelfTest(payload.id, payload.roleName).then(
                 (response) => {
                     commit("requestSuccess", response);
                 },
@@ -85,6 +99,7 @@ export default {
         },
         addTest({ commit }, test) {
             commit("request");
+            console.log(test);
             learnService.addTest(test).then(
                 (test) => {
                     commit("requestSuccess", test);
@@ -102,9 +117,7 @@ export default {
                 "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
             ) {
                 try {
-                    let response = await learnService.importExcelFile(
-                        formData
-                    );
+                    let response = await learnService.importExcelFile(formData);
                     commit("requestSuccess", response);
                 } catch (error) {
                     commit("requestFailure", error);
@@ -113,29 +126,29 @@ export default {
                 commit("requestFailure", "File type not supported");
             }
         },
-        updateResult({commit}, data) {
+        updateResult({ commit }, data) {
             console.log(data);
-            return learnService.updateResult(data)
-                .then(data => {
+            return learnService.updateResult(data).then(
+                (data) => {
                     // console.log("data");
-                        return data;
-                    },
-                    error => {
-                        return null;
-                    }
-                );
+                    return data;
+                },
+                (error) => {
+                    return null;
+                }
+            );
         },
-        updateComment({commit}, data) {
+        updateComment({ commit }, data) {
             console.log(data);
-            return learnService.updateComment(data)
-                .then(data => {
-                        // console.log("data");
-                        return data;
-                    },
-                    error => {
-                        return null;
-                    }
-                );
+            return learnService.updateComment(data).then(
+                (data) => {
+                    // console.log("data");
+                    return data;
+                },
+                (error) => {
+                    return null;
+                }
+            );
         },
     },
     getters: {

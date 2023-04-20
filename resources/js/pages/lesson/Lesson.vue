@@ -26,7 +26,7 @@
         </div>
         <div class="col-md-5 col-12">
             <div class="row">
-                <h2>{{ data.lesson.name }}</h2>
+                <!-- <h2>{{ data.lesson.name }}</h2> -->
                 <div class="col-12 mb-3 row align-items-center justify-content-center">
                     <div class="col-2">
                         <img src="https://gcavocats.ca/wp-content/uploads/2018/09/man-avatar-icon-flat-vector-19152370-1.jpg"
@@ -42,15 +42,13 @@
                             <button class="btn btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown"
                                 aria-expanded="false"></button>
                             <ul class="dropdown-menu">
-                                <router-link :to="{ name: 'lesson.edit', params: { id: id } }">
-                                    <li><a class="dropdown-item" href="#">Edit</a></li>
-                                </router-link>
+                                <li><a class="dropdown-item" :href="'/lesson/' + this.id + '/edit'">Edit</a></li>
                                 <li><a class="dropdown-item" @click="deleteLesson">Delete</a></li>
                             </ul>
                         </div>
                     </div>
                     <div class="col-md-6 col-12">
-                        <router-link :to="{ name: 'home.flashcard', params: { id: id } }">
+                        <a :href="'/lesson/flashcard/' + this.id">
                             <div class="card">
                                 <div class="card-body p-3 row">
                                     <div class="col-8">
@@ -65,10 +63,10 @@
                                     </div>
                                 </div>
                             </div>
-                        </router-link>
+                        </a>
                     </div>
                     <div class="col-md-6 col-12">
-                        <router-link :to="{ name: 'home.learn', params: { id: id } }">
+                        <a :href="'/lesson/learn/' + this.id">
                             <div class="card">
                                 <div class="card-body p-3 row">
                                     <div class="col-8">
@@ -83,12 +81,11 @@
                                     </div>
                                 </div>
                             </div>
-                        </router-link>
+                        </a>
                     </div>
                     <div class="col-md-6 col-12 pt-3">
-                        <router-link :to="{ name: 'home.selftest', params: { id: id } }">
+                        <a :href="'/lesson/selftest/' + this.id">
                             <div class="card">
-                                <!-- :href="{/lesson/selftest/${id}}" -->
                                 <div class="card-body p-3 row">
                                     <div class="col-8">
                                         <h5 class="card-title mb-0">Test</h5>
@@ -102,7 +99,7 @@
                                     </div>
                                 </div>
                             </div>
-                        </router-link>
+                        </a>
                     </div>
                     <div class="col-md-6 col-12 pt-3">
                         <div class="card">
@@ -127,9 +124,10 @@
     <div class="mt-4">
         <!--show the lesson's description by lesson id -->
         <h5 class="mt-4">Description</h5>
-        <p>{{ data.lesson.description }}</p>
+        <!-- <p>{{ data.lesson.description }}</p> -->
     </div>
-    <h6>Relearn: {{ data.relearn.length }}</h6>
+    <h6 class="mt-3">Relearn:</h6>
+    <!-- <h6>Relearn: {{ data.relearns.length }}</h6> -->
     <div class="col-12" v-for="relearn in relearns">
         <div class="card mt-4">
             <div class="card-body">
@@ -138,12 +136,23 @@
             </div>
         </div>
     </div>
-    <h6>NotLearn: {{ data.notLearn.length }}</h6>
+    <h6 class="mt-3">NotLearn:</h6>
+    <!-- <h6>NotLearn: {{ data.notLearns.length }}</h6> -->
     <div class="col-12" v-for="notLearn in notLearns">
         <div class="card mt-4">
             <div class="card-body">
                 <p class="card-text text-success">{{ notLearn.term }}</p>
                 <p class="card-text">{{ notLearn.definition }}</p>
+            </div>
+        </div>
+    </div>
+    <h6 class="mt-3">Learned:</h6>
+    <!-- <h6>NotLearn: {{ data.learneds.length }}</h6> -->
+    <div class="col-12" v-for="learned in learneds">
+        <div class="card mt-4">
+            <div class="card-body">
+                <p class="card-text text-success">{{ learned.term }}</p>
+                <p class="card-text">{{ learned.definition }}</p>
             </div>
         </div>
     </div>
@@ -160,12 +169,13 @@ export default {
         return {
             id: this.$route.params.id,
             user: null,
-            data: null,
             currentCardIndex: 0,
             currentSide: "front",
             relearns: null,
             notLearns: null,
             type: null,
+            learneds: null,
+            lesson: null,
         };
     },
     title() {
@@ -176,30 +186,32 @@ export default {
     created() {
         this.user = this.$store.getters['user/userData'].info;
         this.unsubscribe = this.$store.subscribe((mutation) => {
-            if (mutation.type === "learn/request") {
-            } else if (mutation.type === "learn/requestSuccess") {
+            if (mutation.type === "lesson/request") {
+            } else if (mutation.type === "lesson/success") {
                 if (!this.type) {
                     this.data = mutation.payload;
-                    this.relearns = this.data.relearn = mutation.payload.relearn;
-                    this.notLearns = this.data.notLearn = mutation.payload.notLearn;
-                    document.getElementById("text").innerHTML = this.data.notLearn[this.currentCardIndex].definition;
+                    console.log(this.data);
+                    // this.lesson = this.data.lesson = mutation.payload.lesson;
+                    // this.relearns = this.data.relearn = mutation.payload.relearn;
+                    // this.notLearns = this.data.notLearn = mutation.payload.notLearn;
+                    // this.learneds = this.data.learned = mutation.payload.learned;
+                    // document.getElementById("text").innerHTML = this.data.notLearn[this.currentCardIndex].definition;
                 }
                 if (this.type === 'delete') {
                     this.$root.showSnackbar('Delete lesson successfully', 'success');
                     this.$router.push({ name: 'home.home' });
                 }
-            } else if (mutation.type === "learn/requestFailure") {
+            } else if (mutation.type === "lesson/failure") {
                 this.$root.showSnackbar(mutation.payload, 'danger');
             }
         });
-        this.$store.dispatch("learn/getFlashCard", this.id);
+        this.$store.dispatch("lesson/getFlashCard", { id: this.id, roleName: this.user.role.name });
     },
     methods: {
         updateTitle(title) {
             this.$emit("change-title", title);
         },
         nextCard() {
-            console.log(this.currentCardIndex);
             if (this.currentCardIndex < this.data.notLearn.length - 1) {
                 this.currentCardIndex++;
             } else {
@@ -230,7 +242,7 @@ export default {
         deleteLesson() {
             if (confirm('Are you sure?')) {
                 this.type = 'delete';
-                this.$store.dispatch('lesson/deleteLesson', this.id);
+                this.$store.dispatch('lesson/deleteLesson', { id: this.id, roleName: this.user.role.name });
             }
             this.$router.push({ name: 'home.home' });
         },
@@ -239,7 +251,7 @@ export default {
         cardsCount() { // add cardsCount computed property
             return {
                 currentCardIndex: this.currentCardIndex,
-                totalCards: this.data ? this.data.notLearn.length : 0
+                totalCards: this.data ? this.data.notLearn.length: 0
             };
         }
     }

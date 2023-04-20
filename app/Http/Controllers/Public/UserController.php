@@ -27,7 +27,7 @@ class UserController extends Controller
             //get info of auth user
             $user = auth()->user();
 
-            $lessons = $user->lessons->where('status', 'active')->take(6);
+            $lessons = Lesson::where('user_id', auth()->user()->id)->where('status', 'active')->paginate(6);
             $lessons = $lessons->map(function ($lesson) {
                 return [
                     'id' => $lesson->id,
@@ -161,7 +161,7 @@ class UserController extends Controller
                 case 'info':
                     //show all information of user
                     $user = $request->user();
-                    //check user is active 
+                    //check user is active
                     if ($user->status != 'active') {
                         return response()->json([
                             'status' => 'error',
@@ -177,14 +177,11 @@ class UserController extends Controller
                     break;
 
                 case 'lesson':
-                    $request->validate([
-                        'limit' => 'nullable|integer|between:1,100',
-                    ]);
-                    //show lesson by user id
-                    if ($request->limit) {
-                        $lessons = Lesson::where('user_id', $id)->where('status', 'active')->where('password', null)->limit($request->limit)->get();
-                    } else {
-                        $lessons = Lesson::where('user_id', $id)->where('status', 'active')->where('password', null)->get();
+                    //get pagination for lesson
+                    $lessons = Lesson::where('user_id', $id)->where('status', 'active')->where('password', null)->paginate(6);
+                    //check page is exist
+                    if ($request->page) {
+                        $page = $request->page;
                     }
 
                     $lessons = $lessons->map(function ($lessons) {
@@ -204,16 +201,9 @@ class UserController extends Controller
                     break;
 
                 case 'course':
-                    $request->validate([
-                        'limit' => 'nullable|integer|between:1,100',
-                    ]);
-                    //show course by user id
-                    if ($request->limit) {
-                        //where 
-                        $courses = Course::where('user_id', $id)->where('status', 'active')->where('password', null)->limit($request->limit)->get();
-                    } else {
-                        $courses = Course::where('user_id', $id)->where('status', 'active')->where('password', null)->get();
-                    }
+                    //get pagination for course
+                    $courses = Course::where('user_id', $id)->where('status', 'active')->where('password', null)->paginate(6);
+
                     $courses = $courses->map(function ($courses) {
                         return [
                             'id' => $courses->id,
@@ -472,6 +462,7 @@ class UserController extends Controller
                             'definition' => $notLearn->definition,
                         ];
                     });
+                    $learned = LessonDetail::where('lesson_id', $lesson_id)->whereIn('id', $learned)->get();
                     $lessonDetail = $lesson->details()->get();
                     //check user log is exist, if exist update accessed_at, else create new user log
                     if (UserLog::where('user_id', $request->user()->id)->where('lesson_id', $request->lesson_id)->exists()) {
@@ -491,6 +482,7 @@ class UserController extends Controller
                         'message' => 'Get lesson successfully!',
                         'data' => [
                             'lesson' => $lesson,
+                            'learned' => $learned,
                             'relearn' => $lessonDetails,
                             'notLearn' => $notLearn,
                         ]
@@ -531,7 +523,7 @@ class UserController extends Controller
                         'username' => 'required|string|unique:users',
                     ]);
                     //check auth user is owner user id
-                    if ($request->user()->id != $id) {
+                    if (auth()->user()->id != $id) {
                         return response()->json([
                             'status' => 'error',
                             'status_code' => 403,
@@ -539,7 +531,7 @@ class UserController extends Controller
                         ], 403);
                     }
                     //update username of user
-                    $user = $request->user();
+                    $user = auth()->user();
                     $user->username = $request->username;
                     $user->save();
                     return response()->json([
@@ -555,7 +547,7 @@ class UserController extends Controller
                         'password' => 'required|string|min:6|confirmed',
                     ]);
                     //check auth user is owner user id
-                    if ($request->user()->id != $id) {
+                    if (auth()->user()->id != $id) {
                         return response()->json([
                             'status' => 'error',
                             'status_code' => 403,
@@ -563,15 +555,23 @@ class UserController extends Controller
                         ], 403);
                     }
                     //check old password is correct
-                    if (!Hash::check($request->old_password, $request->user()->password)) {
+                    if (!Hash::check($request->old_password, auth()->user()->password)) {
                         return response()->json([
                             'status' => 'error',
                             'status_code' => 403,
                             'message' => 'Old password is incorrect'
                         ], 403);
                     }
+                    //check if old password is same new password
+                    if (Hash::check($request->password, auth()->user()->password)) {
+                        return response()->json([
+                            'status' => 'error',
+                            'status_code' => 403,
+                            'message' => 'New password is same old password'
+                        ], 403);
+                    }
                     //update password of user
-                    $user = $request->user();
+                    $user = auth()->user();
                     $user->password = bcrypt($request->password);
                     $user->save();
                     return response()->json([
@@ -612,14 +612,17 @@ class UserController extends Controller
                         } else if ($request->learned != null && $request->relearn == null) { //update only learned of user
                             //get id of learned lesson details
                             $learned = $learn ? explode(',', $learn->learned) : [];
+                            $relearn = $learn ? explode(',', $learn->relearn) : [];
                             //add new learned lesson detail to learned
                             $learned = array_merge($learned, $request->learned);
+                            $relearn = array_diff($relearn, $request->learned);
                             //remove duplicate learned
                             $learned = array_unique($learned);
                             //convert array to string
                             $learned = implode(',', $learned);
                             //update learned of user
                             $learn->learned = $learned;
+                            $learn->relearn = $relearn;
                             $learn->save();
                         } else {
                             //update learned and relearn of user
@@ -709,7 +712,7 @@ class UserController extends Controller
                     ], 200);
                     break;
                 case 'done':
-                    //request validate choice 
+                    //request validate choice
                     $request->validate([
                         'choice' => 'nullable|in:relearnall',
                         'lesson_id' => 'required|integer',

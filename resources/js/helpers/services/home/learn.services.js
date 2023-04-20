@@ -11,21 +11,21 @@ export const learnService = {
     addTest,
     importExcelFile,
     updateComment,
-    loadNew
+    loadNew,
+    relearn,
 };
 
-
-function loadFlashCard(id) {
+function loadFlashCard(lesson_id, roleName, userId) {
     const requestOptions = {
-        method: "POST",
+        method: "GET",
         headers: authHeader(),
-        body: JSON.stringify({ lesson_id: id }),
     };
-    return fetch(`/api/student/main?type=detail_split`, requestOptions)
+    console.log(lesson_id);
+    return fetch(`/api/${roleName}/main/${userId}?type=detail&lesson_id=${lesson_id}`, requestOptions)
         .then(handleResponse)
         .then((data) => {
-            console.log(data);
-            return data.data;
+            console.log(data.data.lessonDetail);
+            return data.data.lessonDetail;
         });
 }
 function loadLearn(id) {
@@ -57,7 +57,7 @@ function loadTest(id) {
             return data.data;
         });
 }
-function loadSelfTest(id) {
+function loadSelfTest(id, roleName) {
     const requestOptions = {
         method: "POST",
         headers: authHeader(),
@@ -69,10 +69,24 @@ function loadSelfTest(id) {
             mix_answers: 0,
         }),
     };
-    return fetch(`/api/student/main?type=test`, requestOptions)
+    return fetch(`/api/${roleName}/main?type=test`, requestOptions)
         .then(handleResponse)
         .then((data) => {
             return data.lesson_details;
+        });
+}
+function loadNew(id) {
+    const requestOptions = {
+        method: 'GET',
+        headers: authHeader(),
+        // body: JSON.stringify({class_id: id}),
+    };
+    console.log(id);
+    return fetch(`/api/forum/post/?class_id=${id}`, requestOptions)
+        .then(handleResponse)
+        .then(data => {
+            console.log(data.posts);
+            return data.posts;
         });
 }
 function sendTestResult(data) {
@@ -88,16 +102,18 @@ function sendTestResult(data) {
 }
 function updateResult(data) {
     const requestOptions = {
-        method: 'PUT',
+        method: "PUT",
         headers: authHeader(),
         body: JSON.stringify({
             lesson_id: data.lesson_id,
             learned: data.learned,
             relearn: data.relearn,
         }),
-
     };
-    return fetch(`/api/student/main/${data.user_id}/?type=learned`, requestOptions)
+    return fetch(
+        `/api/student/main/${data.user_id}/?type=learned`,
+        requestOptions
+    )
         .then(handleResponse)
         .then((data) => {
             console.log(data);
@@ -113,22 +129,24 @@ function addTest(test) {
         body: JSON.stringify(test),
     };
 
-    return fetch(`/api/teacher/quiz?type=quiz`, requestOptions)
+    return fetch(`/api/${test.roleName}/quiz?type=quiz`, requestOptions)
         .then(handleResponse)
         .then((test) => {
             return test;
         });
 }
-function loadNew() {
+function relearn(data) {
+    console.log(data);
     const requestOptions = {
-        method: 'GET',
-        headers: authHeader()
+        method: "PUT",
+        headers: authHeader(),
+        body: JSON.stringify(data),
     };
-    return fetch(`/api/forum/post/`, requestOptions)
+console.log(data.user_id);
+    return fetch(`/api/student/main/${data.user_id}/?type=done&choice=relearnall`, requestOptions)
         .then(handleResponse)
-        .then(data => {
-            console.log(data.posts);
-            return data.posts;
+        .then((data) => {
+            return data;
         });
 }
 
@@ -159,7 +177,7 @@ function importExcelFile(formData) {
 
 function updateComment(data) {
     const requestOptions = {
-        method: 'PUT',
+        method: "PUT",
         headers: authHeader(),
         body: JSON.stringify({
             comment_id: data.comment_id,
@@ -168,7 +186,7 @@ function updateComment(data) {
             votetype: data.votetype,
         }),
     };
-    return fetch(`/api/forum/post/1?type=comment`, requestOptions)
-        .then(handleResponse)
+    return fetch(`/api/forum/post/1?type=comment`, requestOptions).then(
+        handleResponse
+    );
 }
-

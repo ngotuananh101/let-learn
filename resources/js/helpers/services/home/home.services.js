@@ -12,7 +12,9 @@ export const homeService = {
     AddQuestionForum,
     voteComment,
     voteQuestion,
-    updatePassword
+    updatePassword,
+    postUpdate,
+
 };
 
 function loadHome() {
@@ -27,12 +29,12 @@ function loadHome() {
             return data;
         });
 };
-function loadUserInformation() {
+function loadUserInformation(page) {
     const requestOptions = {
         method: 'GET',
         headers: authHeader()
     };
-    return fetch(`/api/public/information`, requestOptions)
+    return fetch(`/api/public/information?page=${page}`, requestOptions)
         .then(handleResponse)
         .then(data => {
             console.log(data);
@@ -47,7 +49,6 @@ function loadClassDetail(id, roleName) {
     return fetch(`/api/${roleName}/quiz/${id}?type=all`, requestOptions)
         .then(handleResponse)
         .then(data => {
-            console.log(data.data);
             return data.data;
         });
 }
@@ -59,20 +60,29 @@ function loadForumDetail(id) {
     return fetch(`/api/forum/post/${id}`, requestOptions)
         .then(handleResponse)
         .then(data => {
-            console.log(data.data);
             return data.data;
         });
 }
-function loadForum() {
+function loadForum(page) {
     const requestOptions = {
         method: 'GET',
         headers: authHeader()
     };
-    return fetch(`/api/forum/post/`, requestOptions)
+    return fetch(`/api/forum/post/?page=${page}`, requestOptions)
         .then(handleResponse)
         .then(data => {
-            console.log(data.posts);
             return data.posts;
+        });
+}
+function loadLessonByUser() {
+    const requestOptions = {
+        method: 'GET',
+        headers: authHeader()
+    };
+    return fetch(`/api/student/main/17?type=lesson&page=1`, requestOptions)
+        .then(handleResponse)
+        .then(data => {
+            return data.data;
         });
 }
 function AddQuestionForum(data) {
@@ -116,6 +126,16 @@ function voteQuestion(data) {
         .then(handleResponse)
 }
 
+function postUpdate(data) {
+    const requestOptions = {
+        method: 'PUT',
+        headers: authHeader(),
+        body: JSON.stringify(data),
+    };
+    console.log(data);
+    return fetch(`/api/forum/post/27?type=post`, requestOptions)
+        .then(handleResponse)
+}
 function updatePassword(password) {
     console.log(password);
     const requestOptions = {
@@ -124,7 +144,7 @@ function updatePassword(password) {
         body: JSON.stringify(password)
     };
 
-    return fetch(`/api/user/main/${password.id}?type=password`, requestOptions)
+    return fetch(`/api/${password.roleName}/main/${password.id}?type=password`, requestOptions)
         .then(handleResponse)
         .then(password => {
             return password;

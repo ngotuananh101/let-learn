@@ -31,7 +31,7 @@ class PostController extends Controller
                     ], 403);
                 }
                 //show all posts have class_id
-                $posts = Post::where('class_id', $request->class_id)->where('status', 'active')->orderBy('created_at', 'desc')->get();
+                $posts = Post::where('class_id', $request->class_id)->where('status', 'active')->orderBy('created_at', 'desc')->paginate(6);
                 $posts = $posts->map(function ($post) {
                     return [
                         'id' => $post->id,
@@ -71,7 +71,7 @@ class PostController extends Controller
                 ], 200);
             } else {
                 //show all posts dont have class_id
-                $posts = Post::where('class_id', null)->where('status', 'active')->orderBy('created_at', 'desc')->get();
+                $posts = Post::where('class_id', null)->where('status', 'active')->orderBy('created_at', 'desc')->paginate(6);
                 $posts = $posts->map(function ($post) {
                     return [
                         'id' => $post->id,
@@ -253,6 +253,25 @@ class PostController extends Controller
             }
             //get title, content, tags, views, created_at
             $post = $post;
+            ////check user log is exist, if exist update accessed_at, else create new user log
+            if (UserLogPost::where('user_id', auth()->user()->id)->where('post_id', $id)->exists()) {
+                $userLogPost = UserLogPost::where('user_id', auth()->user()->id)->where('post_id', $id)->first();
+                $userLogPost->accessed_at = now();
+                $userLogPost->save();
+                // $post->views = $post->views + 1;
+                // //update only views of post, not update name, email, user_name
+                // $post->update(['views' => $post->views]);
+            } else {
+                $userLogPost = new UserLogPost();
+                $userLogPost->user_id = auth()->user()->id;
+                $userLogPost->post_id = $id;
+                $userLogPost->accessed_at = now();
+                $userLogPost->save();
+                //update post views
+                $post->views = $post->views + 1;
+                //update only views of post, not update name, email, user_name
+                $post->update(['views' => $post->views]);
+            }
             //add user_name, email, name to post
             $post['name'] = $post->user->name;
             $post['user_name'] = $post->user->name;
@@ -279,20 +298,7 @@ class PostController extends Controller
             } else {
                 $class = null;
             }
-            ////check user log is exist, if exist update accessed_at, else create new user log
-            if (UserLogPost::where('user_id', auth()->user()->id)->where('post_id', $id)->exists()) {
-                $userLogPost = UserLogPost::where('user_id', auth()->user()->id)->where('post_id', $id)->first();
-                $userLogPost->accessed_at = now();
-                $userLogPost->save();
-            } else {
-                $userLogPost = new UserLogPost();
-                $userLogPost->user_id = auth()->user()->id;
-                $userLogPost->post_id = $id;
-                $userLogPost->accessed_at = now();
-                $userLogPost->save();
-                //update post views
-                $post->views = $post->views + 1;
-            }
+            
             $data = [
                 'post' => $post->makeHidden(['user']),
                 'comments' => $comments,
