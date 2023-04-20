@@ -128,7 +128,7 @@ export default {
                 this.completed = true; // Set completed flag to true if there was an error fetching lesson details
             }
         });
-        this.$store.dispatch("learn/getLearn", this.id);
+        this.$store.dispatch("learn/getLearn", {id: this.id, roleName: this.user.role.name});
     },
     computed: {
         numCorrectAnswers() {
@@ -168,7 +168,8 @@ export default {
                         lesson_id: this.$route.params.id,
                         learned: correctAnswers,
                         relearn: incorrectAnswers,
-                        user_id: this.user.id
+                        user_id: this.user.id,
+                        roleName: this.user.role.name
                     }).then((res) => {
                         this.show_result = true;
                     });
