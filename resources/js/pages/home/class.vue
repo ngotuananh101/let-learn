@@ -270,6 +270,9 @@ export default {
             showDetails: false,
             newPostText: '',
             data: null,
+            results: null,
+            loading: false,
+            newComment: '',
         };
     },
     beforeMount() {
