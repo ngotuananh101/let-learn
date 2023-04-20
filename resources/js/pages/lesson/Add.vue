@@ -271,18 +271,22 @@ export default {
             }
         },
         addLesson() {
-            this.user = this.$store.getters['user/userData'].info;
-            console.log(this.user);
-            console.log("this.user");
-            this.type = 'add';
-            this.$store.dispatch('lesson/addLesson', {
-                name: this.lesson.name,
-                description: this.lesson.description,
-                password: this.lesson.password,
-                details: this.details,
-                roleName: this.user.role.name,
-            });
-            this.$router.push({ name: 'home.home' });
+            if (this.lesson.name === '' || this.lesson.description === '' || this.details.length === 0) {
+                this.$root.showSnackbar('Please fill all fields', 'danger');
+            } else {
+                this.user = this.$store.getters['user/userData'].info;
+                console.log(this.user);
+                console.log("this.user");
+                this.type = 'add';
+                this.$store.dispatch('lesson/addLesson', {
+                    name: this.lesson.name,
+                    description: this.lesson.description,
+                    password: this.lesson.password,
+                    details: this.details,
+                    roleName: this.user.role.name,
+                });
+                this.$router.push({ name: 'home.home' });
+            }
         }
     }
 };
