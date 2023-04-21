@@ -45,6 +45,9 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::resource('courses', 'App\Http\Controllers\School\CourseController');
         Route::resource('classes', 'App\Http\Controllers\School\ClassController');
     });
+    Route::group(['prefix' => 'classes'], function (){
+        Route::resource('{class_id}/posts', 'App\Http\Controllers\Classes\PostController');
+    });
     Route::group(['prefix' => 'public'], function () {
         Route::get('home', 'App\Http\Controllers\Public\HomeController@index');
         Route::get('information', 'App\Http\Controllers\Public\UserController@index');

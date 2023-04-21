@@ -81,11 +81,9 @@ function loadNew(id) {
         headers: authHeader(),
         // body: JSON.stringify({class_id: id}),
     };
-    console.log(id);
     return fetch(`/api/forum/post/?class_id=${id}`, requestOptions)
         .then(handleResponse)
         .then(data => {
-            console.log(data.posts);
             return data.posts;
         });
 }

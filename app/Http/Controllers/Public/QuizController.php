@@ -77,6 +77,7 @@ class QuizController extends Controller
                                 'id' => $user->user_id,
                                 'name' => User::find($user->user_id)->name,
                                 'role' => User::find($user->user_id)->role->name,
+                                'email' => User::find($user->user_id)->email,
                             ];
                         });
                         //count number of questions in each quiz
@@ -176,7 +177,7 @@ class QuizController extends Controller
                         break;
                 }
             } else if (auth()->user()->role->name == 'student') {
-                //check if value score_report of quiz is true               
+                //check if value score_report of quiz is true
                 switch ($request->type) {
                     case 'all':
                         $class = Classes::with('quizzes')->findOrFail($id);
@@ -415,7 +416,7 @@ class QuizController extends Controller
                     // Check if the request was successful
                     if ($response->getStatusCode() == 200) {
                         $data = $response->getData();
-                        //check input quantity 
+                        //check input quantity
                         // store data to new quiz
                         dd($data);
                         $quiz = Quiz::create([
@@ -545,7 +546,7 @@ class QuizController extends Controller
                         'answers.*.is_correct' => 'nullable|boolean',
                         'answers.*.points' => 'nullable|integer|',
                     ]);
-                    //check if 
+                    //check if
                     //check if user has already submitted the quiz
                     $quiz = Quiz::where('id', $request->quiz_id)->first();
                     $user_id_check = auth()->user()->id;
@@ -852,7 +853,7 @@ class QuizController extends Controller
                     ], 200);
                     break;
 
-                case 'grade': //grade (for not multiple choice question and return the total points) 
+                case 'grade': //grade (for not multiple choice question and return the total points)
                     $request->validate([
                         'user_id' => 'required|integer',
                         'answers' => 'required|array',

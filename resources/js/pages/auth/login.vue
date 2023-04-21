@@ -67,7 +67,7 @@ export default {
                 this.$root.showSnackbar('Logging in...', 'info');
             } else if (mutation.type === 'user/loginSuccess') {
                 this.$root.showSnackbar('Logged in successfully', 'success');
-                this.$router.push({ name: 'home' });
+                this.redirectToHomePage();
             } else if (mutation.type === 'user/loginFailure') {
                 this.$root.showSnackbar(mutation.payload, 'danger');
             }
@@ -90,6 +90,17 @@ export default {
                 }).catch((error) => {
                     this.$root.showSnackbar(error.message, 'danger');
                 });
+            }
+        },
+        redirectToHomePage() {
+            const user = this.$store.getters['user/userData'];
+            const permissions = user?.info?.role?.permissions;
+            if (permissions.filter(permission => (permission.name === 'admin.dashboard' || permission.name === 'admin.super')).length > 0) {
+                this.$router.push({ name: 'admin' });
+            }else if (permissions.filter(permission => (permission.name === 'manager.dashboard')).length > 0) {
+                this.$router.push({ name: 'school' });
+            } else {
+                this.$router.push({ name: 'home' });
             }
         },
     }
