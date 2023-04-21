@@ -5,6 +5,9 @@
                 Learn anything, anytime, anywhere
             </div>
         </div>
+        <button v-if="this.user.role.name === 'manager'" class="btn btn-primary mt-4" @click="dartboardManager()">DartBoard</button>
+        <button v-if="this.user.role.name === 'admin'" class="btn btn-primary mt-4" @click="dartboardAdmin()">DartBoard</button>
+        <button v-if="this.user.role.name === 'super'" class="btn btn-primary mt-4" @click="dartboardAdmin()">DartBoard</button>
     </div>
     <div class="mt-5">
         <div class="row">
@@ -236,6 +239,7 @@ export default {
     },
     created() {
         this.user = this.$store.getters['user/userData'].info;
+        console.log(this.user.role.name);
         this.unsubscribe = this.$store.subscribe((mutation) => {
             if (mutation.type === "home/request") {
             } else if (mutation.type === "home/requestSuccess") {
@@ -338,7 +342,14 @@ export default {
                 roleName: this.user.role.name,
             });
             location.reload();
-        }
+        },
+        dartboardManager() {
+            this.$router.push({ name: "school" });
+        },
+        dartboardAdmin(){
+            this.$router.push({ name: "admin.dashboard" });
+        },
+
     }
 };
 
