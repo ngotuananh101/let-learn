@@ -108,6 +108,7 @@ class UserController extends Controller
                         'password' => $user->password,
                     ]);
                 }
+//                dd($request->all());
                 $user->update($request->all());
                 return response()->json([
                     'message' => 'User updated successfully',

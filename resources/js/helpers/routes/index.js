@@ -27,7 +27,6 @@ router.beforeEach((to, from, next) => {
             const permissions = userData?.info?.role?.permissions;
             // check if user try to access admin page
             if (to.matched.some(route => route.meta?.requiresAdmin)) {
-                console.log('required admin');
                 // Check if user is admin
                 if (permissions.filter(permission => (permission.name === 'admin.dashboard' || permission.name === 'admin.super')).length > 0) {
                     next();
