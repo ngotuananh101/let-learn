@@ -58,7 +58,37 @@ class ClassController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        try {
+            $request->validate([
+                'school_slug' => 'required|string|exists:schools,slug',
+                'name' => 'required|string',
+                'start_date' => 'required|date',
+                'end_date' => 'required|date|after:start_date',
+            ]);
+            $user = auth()->user();
+            $school = School::where('slug', $request->school_slug)->firstOrFail();
+            // check if user is admin or super or user is the owner of the school
+            if ($user->role->name === 'admin' || $user->role->name === 'super' || $user->school_id === $school->id) {
+                Classes::create([
+                    'school_id' => $school->id,
+                    'name' => $request->name,
+                    'status' => 'active',
+                    'start_date' => Carbon::parse($request->start_date)->format('Y-m-d'),
+                    'end_date' => Carbon::parse($request->end_date)->format('Y-m-d'),
+                ]);
+                return response()->json([
+                    'message' => 'Class created successfully',
+                ], 200);
+            } else {
+                return response()->json([
+                    'message' => 'You are not authorized to view this resource',
+                ], 403);
+            }
+        } catch (\Exception $e) {
+            return response()->json([
+                'message' => $e->getMessage(),
+            ], 500);
+        }
     }
 
     /**
@@ -292,7 +322,7 @@ class ClassController extends Controller
     {
         try {
             $request->validate([
-                'type' => 'required|string|in:delete_post',
+                'type' => 'required|string|in:delete_post,delete_comment,delete_quiz,delete_class',
             ]);
             switch ($request->input('type')) {
                 case 'delete_post':
@@ -317,6 +347,70 @@ class ClassController extends Controller
                             'message' => 'You are not authorized to view this resource',
                         ], 403);
                     }
+                case 'delete_comment':
+                    $request->validate([
+                        'comment_id' => 'required|numeric|exists:comments,id',
+                        'post_id' => 'required|numeric|exists:posts,id',
+                    ]);
+                    if ($this->checkPermission($id)) {
+                        $class = Classes::findOrFail($id);
+                        $post = $class->posts()->where('id', $request->post_id)->first();
+                        if ($post) {
+                            $comment = $post->comments()->where('id', $request->comment_id)->first();
+                            if ($comment) {
+                                $comment->delete();
+                                return response()->json([
+                                    'message' => 'Comment deleted successfully',
+                                ], 200);
+                            } else {
+                                return response()->json([
+                                    'message' => 'Comment not found',
+                                ], 404);
+                            }
+                        } else {
+                            return response()->json([
+                                'message' => 'Post not found',
+                            ], 404);
+                        }
+                    } else {
+                        return response()->json([
+                            'message' => 'You are not authorized to view this resource',
+                        ], 403);
+                    }
+                case 'delete_quiz':
+                    $request->validate([
+                        'quiz_id' => 'required|numeric|exists:quizzes,id',
+                    ]);
+                    if ($this->checkPermission($id)) {
+                        $class = Classes::findOrFail($id);
+                        $quiz = $class->quizzes()->where('id', $request->quiz_id)->first();
+                        if ($quiz) {
+                            $quiz->delete();
+                            return response()->json([
+                                'message' => 'Quiz deleted successfully',
+                            ], 200);
+                        } else {
+                            return response()->json([
+                                'message' => 'Quiz not found',
+                            ], 404);
+                        }
+                    } else {
+                        return response()->json([
+                            'message' => 'You are not authorized to view this resource',
+                        ], 403);
+                    }
+                case 'delete_class':
+                    if ($this->checkPermission($id)) {
+                        $class = Classes::findOrFail($id);
+                        $class->delete();
+                        return response()->json([
+                            'message' => 'Class deleted successfully',
+                        ], 200);
+                    } else {
+                        return response()->json([
+                            'message' => 'You are not authorized to view this resource',
+                        ], 403);
+                    }
             }
         } catch (\Exception $e) {
             return response()->json([
@@ -336,7 +430,7 @@ class ClassController extends Controller
             return true;
         } else {
             $class = Classes::find($id);
-            if ($class->school_id === $user->school_id) {
+            if ($class && $class->school_id === $user->school_id) {
                 return true;
             } else {
                 return false;

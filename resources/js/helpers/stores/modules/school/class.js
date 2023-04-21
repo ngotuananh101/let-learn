@@ -95,6 +95,50 @@ export default {
                     commit('failure', error);
                 }
             );
+        },
+        deleteComment({commit}, data) {
+            commit('request');
+            classService.deleteComment(data.comment_id, data.post_id, data.class_id).then(
+                classes => {
+                    commit('success', classes);
+                },
+                error => {
+                    commit('failure', error);
+                }
+            );
+        },
+        deleteQuiz({commit}, data) {
+            commit('request');
+            classService.deleteQuiz(data.quiz_id, data.class_id).then(
+                classes => {
+                    commit('success', classes);
+                },
+                error => {
+                    commit('failure', error);
+                }
+            );
+        },
+        deleteClass({commit}, data) {
+            commit('request');
+            classService.deleteClass(data.id).then(
+                classes => {
+                    commit('success', classes);
+                },
+                error => {
+                    commit('failure', error);
+                }
+            );
+        },
+        store({commit}, data) {
+            commit('request');
+            classService.store(data).then(
+                classes => {
+                    commit('success', classes);
+                },
+                error => {
+                    commit('failure', error);
+                }
+            );
         }
     }
 }

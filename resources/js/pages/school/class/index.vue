@@ -11,7 +11,7 @@
                             </div>
                             <div class="my-auto mt-4 ms-auto mt-lg-0">
                                 <div class="my-auto ms-auto">
-                                    <button type="button" class="mx-1 mb-0 btn btn-outline-success btn-sm">
+                                    <button type="button" class="mx-1 mb-0 btn btn-outline-success btn-sm" @click="this.class_modal.show()">
                                         Add Class
                                         <i class="fa-regular fa-user-plus ms-2"></i>
                                     </button>
@@ -29,10 +29,10 @@
     <!-- Modal -->
     <div class="modal fade" id="classModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
          aria-labelledby="staticBackdropLabel" aria-hidden="true">
-        <div class="modal-dialog modal-fullscreen">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h1 class="modal-title fs-5" id="staticBackdropLabel">Class management</h1>
+                    <h1 class="modal-title fs-5" id="staticBackdropLabel">Add Class</h1>
                 </div>
                 <div class="modal-body">
                     <div class="row">
@@ -69,22 +69,12 @@
                                 v-model="class_info.end_date"
                             />
                         </div>
-                        <div class="col-md-6 col-12">
-                            <label class="form-label mt-3">Member</label>
-                            <div class="table-responsive">
-                                <table id="class_member_datatable" class="table table-flush"></table>
-                            </div>
-                        </div>
                     </div>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                    <button type="button" class="btn btn-warning"
-                            @click="this.updateUser">
-                        Update
-                    </button>
-                    <button type="button" class="btn btn-danger" @click="this.deleteUser">
-                        Delete
+                    <button type="button" class="btn btn-success" @click="this.addClass">
+                        Add
                     </button>
                 </div>
             </div>
@@ -121,13 +111,9 @@ export default {
                     if (this.type === 'get'){
                         this.classes = mutation.payload.classes;
                         this.init();
-                    }
-                    if (this.type === 'show'){
-                        this.class_member_datatable.data.data = [];
-                        this.class_info = mutation.payload.class;
-                        this.class_info.member ? this.class_info.member.map((member) => {
-                            this.class_member_datatable.rows.add([member.id, member.name, member.email, member.role_id === 5 ? 'Teacher' : 'Student']);
-                        }) : null;
+                    } else if (this.type === 'post'){
+                        this.$root.showSnackbar('Class added successfully', 'success');
+                        location.reload();
                     }
                     break;
                 case 'schoolClass/failure':
@@ -169,6 +155,15 @@ export default {
             });
             this.class_modal._element.addEventListener('hidden.bs.modal', () => {
 
+            });
+        },
+        addClass(){
+            this.type = 'post';
+            this.$store.dispatch('schoolClass/store', {
+                school_slug: this.$route.params.slug,
+                name: this.class_info.name,
+                start_date: this.class_info.start_date,
+                end_date: this.class_info.end_date,
             });
         }
     }

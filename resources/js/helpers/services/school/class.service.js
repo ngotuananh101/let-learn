@@ -8,7 +8,11 @@ export const classService = {
     getQuizById,
     updateQuiz,
     getPostById,
-    deletePost
+    deletePost,
+    deleteComment,
+    deleteQuiz,
+    deleteClass,
+    store
 }
 
 function index(slug) {
@@ -74,4 +78,41 @@ function deletePost(post_id, class_id) {
     };
 
     return fetch(`/api/school/classes/${class_id}?post_id=${post_id}&type=delete_post`, requestOptions).then(handleResponse);
+}
+
+function deleteComment(comment_id, post_id, class_id) {
+    const requestOptions = {
+        method: 'DELETE',
+        headers: authHeader()
+    };
+
+    return fetch(`/api/school/classes/${class_id}?post_id=${post_id}&comment_id=${comment_id}&type=delete_comment`, requestOptions).then(handleResponse);
+}
+
+function deleteQuiz(quiz_id, class_id) {
+    const requestOptions = {
+        method: 'DELETE',
+        headers: authHeader()
+    };
+
+    return fetch(`/api/school/classes/${class_id}?quiz_id=${quiz_id}&type=delete_quiz`, requestOptions).then(handleResponse);
+}
+
+function deleteClass(class_id) {
+    const requestOptions = {
+        method: 'DELETE',
+        headers: authHeader()
+    };
+
+    return fetch(`/api/school/classes/${class_id}?type=delete_class`, requestOptions).then(handleResponse);
+}
+
+function store(data) {
+    const requestOptions = {
+        method: 'POST',
+        headers: authHeader(),
+        body: JSON.stringify(data)
+    };
+
+    return fetch(`/api/school/classes`, requestOptions).then(handleResponse);
 }

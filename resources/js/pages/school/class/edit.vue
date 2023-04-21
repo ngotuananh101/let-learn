@@ -15,6 +15,10 @@
                                             @click="updateInfo">
                                         Update
                                     </button>
+                                    <button type="button" class="mx-1 mb-0 btn btn-outline-danger btn-sm"
+                                            @click="deleteClass">
+                                        Delete
+                                    </button>
                                 </div>
                             </div>
                         </div>
@@ -239,6 +243,10 @@
                     <button type="button" class="btn btn-success" @click="this.updateQuiz">
                         Update
                     </button>
+                    <button type="button" class="btn btn-danger" @click="this.deleteQuiz">
+                        Delete
+                    </button>
+
                 </div>
             </div>
         </div>
@@ -305,7 +313,7 @@
                                         <h6 class="mb-0 text-dark">{{ comment.author }}</h6>
                                         <p class="mb-0">{{ comment.content }}</p>
                                     </div>
-                                    <span class="me-lg-3 text-xs fw-bold">Delete</span>
+                                    <span class="me-lg-3 text-xs fw-bold" :data-id="comment.id" @click="deleteComment">Delete</span>
                                     <span class="text-xs">{{ comment.created_at }}</span>
                                 </div>
                             </div>
@@ -362,6 +370,7 @@ export default {
                 case 'schoolClass/request':
                     break;
                 case 'schoolClass/success':
+                    console.log(this.type);
                     if (this.type === 'get') {
                         this.class_info = mutation.payload.class;
                         this.init();
@@ -381,7 +390,6 @@ export default {
                         location.reload();
                     } else if (this.type === 'get_post') {
                         this.$root.showSnackbar('Post get successfully', 'success');
-                        console.log(mutation.payload);
                         this.post = mutation.payload;
                     } else if (this.type === 'load_more') {
                         this.post.comments = this.post.comments.concat(mutation.payload.comments);
@@ -389,6 +397,15 @@ export default {
                     } else if (this.type === 'delete_post') {
                         this.$root.showSnackbar('Post deleted successfully', 'success');
                         location.reload();
+                    } else if (this.type === 'delete_comment') {
+                        this.$root.showSnackbar('Comment deleted successfully', 'success');
+                        location.reload();
+                    } else if (this.type === 'delete_quiz') {
+                        this.$root.showSnackbar('Quiz deleted successfully', 'success');
+                        location.reload();
+                    } else if(this.type === 'delete_class'){
+                        this.$root.showSnackbar('Class deleted successfully', 'success');
+                        this.$router.push({name: 'school.class.index'});
                     }
                     break;
                 case 'schoolClass/failure':
@@ -478,6 +495,14 @@ export default {
             this.view_post_modal = new bootstrap.Modal(document.getElementById('viewPostModal'), {
                 keyboard: false
             });
+            this.view_post_modal._element.addEventListener('hide.bs.modal', () => {
+                this.post = {
+                    post: {},
+                    comments: {},
+                    total_page: 0,
+                    current_page: 0,
+                };
+            });
             this.choice_email = new Choices('#email', {
                 searchEnabled: true,
                 searchChoices: true,
@@ -485,6 +510,8 @@ export default {
                 itemSelectText: '',
                 removeItemButton: true,
                 allowHTML: true,
+                noResultsText: 'No results found',
+                delimiter: ',',
             });
         },
         updateInfo() {
@@ -522,32 +549,27 @@ export default {
             }
         },
         viewQuizPDF() {
-            let doc = new jsPDF();
+            const doc = new jsPDF();
             doc.setFont("Roboto-Regular");
             doc.setFontSize(20);
             doc.text(20, 20, this.quiz.name);
             doc.setFontSize(15);
-            doc.text(20, 30, 'Start time: ' + this.quiz.start_time);
-            doc.text(20, 35, 'End time: ' + this.quiz.end_time);
-            doc.text(20, 40, 'Status: ' + this.quiz.status);
-            doc.text(20, 45, 'Questions:' + this.quiz.questions.length);
+            doc.text(20, 30, `Start time: ${this.quiz.start_time}`);
+            doc.text(20, 35, `End time: ${this.quiz.end_time}`);
+            doc.text(20, 40, `Status: ${this.quiz.status}`);
+            doc.text(20, 45, `Questions: ${this.quiz.questions.length}`);
             doc.setFontSize(12);
             let y = 50;
-            this.quiz.questions.map((question, index) => {
-                // add page if needed
+            for (let i = 0; i < this.quiz.questions.length; i++) {
+                const question = this.quiz.questions[i];
                 if (y > 250) {
                     doc.addPage();
                     y = 20;
                 }
                 y += 10;
-                let text = "Q" + (index + 1) + '. ' + question.question + ' (' + question.points + ' point)';
+                const text = `Q${i + 1}. ${question.question} (${question.points} point)`;
                 doc.text(20, y, text);
                 y += 5;
-                if (y > 250) {
-                    doc.addPage();
-                    y = 20;
-                }
-                // check if question more than 1 line
                 if (doc.getTextWidth(question.question) > 180) {
                     y += 5;
                     if (y > 250) {
@@ -555,14 +577,10 @@ export default {
                         y = 20;
                     }
                 }
-                if (y > 250) {
-                    doc.addPage();
-                    y = 20;
-                }
-                let answer = JSON.parse(question.answer_option);
+                const answer = JSON.parse(question.answer_option);
                 if (answer) {
-                    answer.map((content) => {
-                        // if answer have more than 1 line
+                    for (let j = 0; j < answer.length; j++) {
+                        const content = answer[j];
                         if (doc.getTextWidth(content) > 180) {
                             y += 5;
                             if (y > 250) {
@@ -571,26 +589,25 @@ export default {
                             }
                         }
                         doc.text(20, y, content);
-                        // count line of answer
-                        let lines = content.split(/\r\n|\r|\n/).length
+                        const lines = content.split(/\r\n|\r|\n/).length;
                         y += 5 * lines;
                         if (y > 250) {
                             doc.addPage();
                             y = 20;
                         }
-                    });
+                    }
                 }
                 if (question.is_multiple_choice) {
-                    doc.text(20, y, 'Correct answer: ' + question.correct_answer);
-                    let lines = question.correct_answer.split(/\r\n|\r|\n/).length
+                    doc.text(20, y, `Correct answer: ${question.correct_answer}`);
+                    const lines = question.correct_answer.split(/\r\n|\r|\n/).length;
                     y += 5 * lines;
                     if (y > 250) {
                         doc.addPage();
                         y = 20;
                     }
                 }
-            });
-            doc.save(this.quiz.name + '.pdf');
+            }
+            doc.save(`${this.quiz.name}.pdf`);
         },
         exportQuizAnswer() {
             let answers = this.quiz.answers.map((answer) => [
@@ -652,6 +669,15 @@ export default {
             };
             this.$store.dispatch('schoolClass/updateQuiz', {id: this.$route.params.id, data: data});
         },
+        deleteQuiz() {
+            if (confirm('Are you sure you want to delete this quiz?')) {
+                this.type = 'delete_quiz';
+                this.$store.dispatch('schoolClass/deleteQuiz', {
+                    class_id: this.$route.params.id,
+                    quiz_id: this.quiz.id
+                });
+            }
+        },
         loadMoreComment() {
             this.type = 'load_more';
             this.$store.dispatch('schoolClass/getPostById', {
@@ -661,11 +687,30 @@ export default {
             });
         },
         deletePost() {
-            this.type = 'delete_post';
-            this.$store.dispatch('schoolClass/deletePost', {
-                class_id: this.$route.params.id,
-                post_id: this.selected_post_id,
-            });
+            if (confirm('Are you sure you want to delete this post?')) {
+                this.type = 'delete_post';
+                this.$store.dispatch('schoolClass/deletePost', {
+                    class_id: this.$route.params.id,
+                    post_id: this.selected_post_id,
+                });
+            }
+        },
+        deleteComment(e) {
+            let id = e.target.getAttribute('data-id');
+            if (confirm('Are you sure you want to delete this comment?')) {
+                this.type = 'delete_comment';
+                this.$store.dispatch('schoolClass/deleteComment', {
+                    class_id: this.$route.params.id,
+                    post_id: this.selected_post_id,
+                    comment_id: id,
+                });
+            }
+        },
+        deleteClass() {
+            if (confirm('Are you sure you want to delete this class?')) {
+                this.type = 'delete_class';
+                this.$store.dispatch('schoolClass/deleteClass', {id: this.$route.params.id});
+            }
         },
     }
 }
