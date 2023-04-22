@@ -42,16 +42,7 @@ class QuizController extends Controller
                 'type' => 'required|string|in:all,quiz,question,answer,export',
                 //'class_id' => 'required_if:type,all|nullable|integer|exists:classes,id',
             ]);
-            //check current time is between start time and end time. if not, return error
-            $now = date('Y-m-d H:i:s');
-            $quiz = Quiz::findOrFail($id);
-            if (auth()->user()->role->name == 'student' && ($now < $quiz->start_time || $now > $quiz->end_time) && ($request->type == 'export')) {
-                return response()->json([
-                    'status' => 'error',
-                    'status_code' => 400,
-                    'message' => 'Quiz is not active now'
-                ], 400);
-            }
+            
 
             if (auth()->user()->role->name == 'teacher') {
                 switch ($request->type) {
@@ -223,6 +214,16 @@ class QuizController extends Controller
                                 'status' => 'error',
                                 'status_code' => 400,
                                 'message' => 'Quiz is not exist or quiz is not active'
+                            ], 400);
+                        }
+                        //check current time is between start time and end time. if not, return error
+                        $now = date('Y-m-d H:i:s');
+                        $quiz = Quiz::findOrFail($id);
+                        if (($now < $quiz->start_time || $now > $quiz->end_time)) {
+                            return response()->json([
+                                'status' => 'error',
+                                'status_code' => 400,
+                                'message' => 'Quiz is not active now'
                             ], 400);
                         }
                         $count_questions = $quiz->questions->count();
