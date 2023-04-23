@@ -61,8 +61,15 @@
                                                 aria-labelledby="btnNotification">
                                                 <li>
                                                     <a class="dropdown-item d-flex align-items-center" href="#">
-                                                        <i class="fa-light fa-trash fs-5"></i>
-                                                        <p class="ms-3 mb-0" :data-id="post.id"
+                                                        <i class="fa-light fa-pen-to-square fs-6"></i>
+                                                        <p class="ms-1 mb-0" :data-id="post.id"
+                                                           @click="this.showFormUpdate">Update this post</p>
+                                                    </a>
+                                                </li>
+                                                <li>
+                                                    <a class="dropdown-item d-flex align-items-center" href="#">
+                                                        <i class="fa-light fa-trash fs-6"></i>
+                                                        <p class="ms-1 mb-0" :data-id="post.id"
                                                            @click="this.deletePost">Delete this post</p>
                                                     </a>
                                                 </li>
@@ -102,44 +109,43 @@
         <div class="tab-pane fade" id="profile" role="tabpanel">
             <div class="container pt-3 pb-5">
                 <h3 class="text-center">Exercises</h3>
-                <div v-if="quizzes" class="row mt-5">
-                    <div class="col-md-6 col-6 mt-3" v-for="(quiz, index) in quizzes" :key="index">
+                <div v-if="quizzes" class="row mt-2">
+                    <div class="col-md-4 col-12 mt-3" v-for="(quiz, index) in quizzes" :key="index">
                         <div class="card">
-                            <div class="card-header" style="color: black; font-weight: bold">
-                                {{ quiz.name }}
+                            <div class="card-header pb-0">
+                                <h5>{{ quiz.name }}</h5>
+                                <p class="mb-0">{{ quiz.description }}</p>
                             </div>
-                            <div class="card-body" style="color: black; font-weight: bold">
-                                <div class="row">
-                                    <div class="col-6">
-                                        <p>{{ quiz.description }}</p>
-                                        <p>Number of questions: {{ quiz.count_questions }}</p>
-                                        <p>Score reporting: {{ quiz.score_reporting }}</p>
-                                    </div>
-                                    <div class="col-6">
-                                        <p>Start time: {{ quiz.start_time }}</p>
-                                        <p>End time: {{ quiz.end_time }}</p>
-                                    </div>
-                                </div>
+                            <hr>
+                            <div class="card-body py-0">
+                                <p>Start: {{ quiz.start_time }}</p>
+                                <p>End: {{ quiz.end_time }}</p>
+                                <p class="mb-0">Questions: {{ quiz.count_questions }}</p>
+                                <p class="mb-0 mt-3 text-warning" v-if="quiz.status === 'pending'">Waiting manager approve</p>
                             </div>
-                            <div class="card-footer">
+                            <hr>
+                            <div class="card-footer pt-0">
                                 <div class="row">
-                                    <div class="col">
-                                        <button type="button" class="btn btn-primary" data-bs-toggle="modal"
-                                                v-if="this.user.role.name === 'teacher'"
-                                                :data-bs-target="'#exampleModal-' + index">
+                                    <div class="col-12" v-if="this.user.role.name === 'teacher'">
+                                        <button type="button" class="btn btn-primary mb-0">
                                             Result
                                         </button>
+                                        <router-link
+                                            :to="{name:'home.test.update', params: {id: this.$route.params.id, quiz_id: quiz.id}}"
+                                            class="btn btn-primary mb-0 ms-md-3"
+                                        >
+                                            Update quiz
+                                        </router-link>
                                     </div>
-                                    <div class="col">
-                                        <button v-if="!quiz.submited && this.user.role.name === 'student'"
+                                    <div class="col-12" v-if="this.user.role.name === 'student'">
+                                        <button v-if="!quiz.submitted"
                                                 type="button"
                                                 class="btn btn-primary">
-
                                             <router-link :to="'/lesson/test/' + quiz.id">
-                                                Start
+                                                Start quiz
                                             </router-link>
                                         </button>
-                                        <span v-if="quiz.submited && this.user.role.name === 'student'">Quiz already submitted</span>
+                                        <span v-else>Quiz already submitted</span>
                                     </div>
                                 </div>
                             </div>
@@ -241,6 +247,29 @@
             </div>
         </div>
     </div>
+    <div class="modal fade" id="updatePostModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
+         aria-labelledby="staticBackdropLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h1 class="modal-title fs-5" id="staticBackdropLabel">Update {{ update_post.title }}</h1>
+                    <i class="fa-duotone fa-circle-xmark fs-2" data-bs-dismiss="modal"></i>
+                </div>
+                <div class="modal-body">
+                    <div class="form-floating">
+                        <input type="text" class="form-control" v-model="update_post.title">
+                        <label for="postTitle">Title</label>
+                    </div>
+                    <div class="form-floating mt-2">
+                                    <textarea class="form-control" style="height: 10rem;"
+                                              v-model="update_post.content"></textarea>
+                        <label for="postContent">Question</label>
+                    </div>
+                    <button type="button" class="btn btn-primary m-0 mt-2" @click="updatePost">Update</button>
+                </div>
+            </div>
+        </div>
+    </div>
 </template>
 
 <script>
@@ -271,7 +300,12 @@ export default {
                 current_page: 1,
             },
             view_post_modal: null,
+            update_post_modal: null,
             new_post: {
+                title: '',
+                content: '',
+            },
+            update_post: {
                 title: '',
                 content: '',
             },
@@ -282,7 +316,6 @@ export default {
         this.unsubscribe = this.$store.subscribe((mutation) => {
             if (mutation.type === "home/request") {
             } else if (mutation.type === "home/requestSuccess") {
-                this.quizzes = mutation.payload.quizzes;
                 this.members = mutation.payload.members;
             } else if (mutation.type === "classPost/setPosts") {
                 this.posts_data = mutation.payload;
@@ -309,14 +342,22 @@ export default {
                 }, 100);
             } else if (mutation.type === "classPost/postDeleted") {
                 location.reload();
+            } else if (mutation.type === "classPost/postUpdated") {
+                location.reload();
+            } else if (mutation.type === "classQuiz/setQuiz") {
+                this.quizzes = mutation.payload.quizzes;
             }
         });
         this.$store.dispatch("classPost/getPostsByClassId", this.id);
+        this.$store.dispatch("classQuiz/getQuizByClassId", this.id);
         this.$store.dispatch("home/getClassDetail", {id: this.id, roleName: this.user.role.name});
     },
     mounted() {
         const bootstrap = this.$store.state.config.bootstrap;
         this.view_post_modal = new bootstrap.Modal(document.getElementById('viewPostModal'), {
+            keyboard: false
+        });
+        this.update_post_modal = new bootstrap.Modal(document.getElementById('updatePostModal'), {
             keyboard: false
         });
         this.view_post_modal._element.addEventListener('hidden.bs.modal', () => {
@@ -325,6 +366,12 @@ export default {
                 comments: null,
                 total_page: 0,
                 current_page: 1,
+            };
+        });
+        this.update_post_modal._element.addEventListener('hidden.bs.modal', () => {
+            this.update_post = {
+                title: '',
+                content: '',
             };
         });
     },
@@ -409,6 +456,24 @@ export default {
                 }
                 this.$store.dispatch("classPost/deletePost", data);
             }
+        },
+        showFormUpdate(event){
+            let post_id = event.target.getAttribute('data-id');
+            let post = this.posts_data.posts.find(post => post.id === parseInt(post_id));
+            this.update_post.title = post.title;
+            this.update_post.content = post.content;
+            this.update_post.id = post.id;
+            this.update_post_modal.show();
+        },
+        updatePost() {
+            let data = {
+                type: 'update_post',
+                title: this.update_post.title,
+                content: this.update_post.content,
+                class_id: this.id,
+                post_id: this.update_post.id
+            }
+            this.$store.dispatch("classPost/updatePost", data);
         },
     }
 }

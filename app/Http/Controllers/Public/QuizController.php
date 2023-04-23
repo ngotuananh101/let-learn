@@ -42,7 +42,16 @@ class QuizController extends Controller
                 'type' => 'required|string|in:all,quiz,question,answer,export',
                 //'class_id' => 'required_if:type,all|nullable|integer|exists:classes,id',
             ]);
-            
+            //check current time is between start time and end time. if not, return error
+            $now = date('Y-m-d H:i:s');
+            $quiz = Quiz::findOrFail($id);
+            if (auth()->user()->role->name == 'student' && ($now < $quiz->start_time || $now > $quiz->end_time) && ($request->type == 'export')) {
+                return response()->json([
+                    'status' => 'error',
+                    'status_code' => 400,
+                    'message' => 'Quiz is not active now'
+                ], 400);
+            }
 
             if (auth()->user()->role->name == 'teacher') {
                 switch ($request->type) {
@@ -68,7 +77,6 @@ class QuizController extends Controller
                                 'id' => $user->user_id,
                                 'name' => User::find($user->user_id)->name,
                                 'role' => User::find($user->user_id)->role->name,
-                                'email' => User::find($user->user_id)->email,
                             ];
                         });
                         //count number of questions in each quiz
@@ -168,7 +176,7 @@ class QuizController extends Controller
                         break;
                 }
             } else if (auth()->user()->role->name == 'student') {
-                //check if value score_report of quiz is true
+                //check if value score_report of quiz is true               
                 switch ($request->type) {
                     case 'all':
                         $class = Classes::with('quizzes')->findOrFail($id);
@@ -214,16 +222,6 @@ class QuizController extends Controller
                                 'status' => 'error',
                                 'status_code' => 400,
                                 'message' => 'Quiz is not exist or quiz is not active'
-                            ], 400);
-                        }
-                        //check current time is between start time and end time. if not, return error
-                        $now = date('Y-m-d H:i:s');
-                        $quiz = Quiz::findOrFail($id);
-                        if (($now < $quiz->start_time || $now > $quiz->end_time)) {
-                            return response()->json([
-                                'status' => 'error',
-                                'status_code' => 400,
-                                'message' => 'Quiz is not active now'
                             ], 400);
                         }
                         $count_questions = $quiz->questions->count();
@@ -417,7 +415,7 @@ class QuizController extends Controller
                     // Check if the request was successful
                     if ($response->getStatusCode() == 200) {
                         $data = $response->getData();
-                        //check input quantity
+                        //check input quantity 
                         // store data to new quiz
                         dd($data);
                         $quiz = Quiz::create([
@@ -547,7 +545,7 @@ class QuizController extends Controller
                         'answers.*.is_correct' => 'nullable|boolean',
                         'answers.*.points' => 'nullable|integer|',
                     ]);
-                    //check if
+                    //check if 
                     //check if user has already submitted the quiz
                     $quiz = Quiz::where('id', $request->quiz_id)->first();
                     $user_id_check = auth()->user()->id;
@@ -854,7 +852,7 @@ class QuizController extends Controller
                     ], 200);
                     break;
 
-                case 'grade': //grade (for not multiple choice question and return the total points)
+                case 'grade': //grade (for not multiple choice question and return the total points) 
                     $request->validate([
                         'user_id' => 'required|integer',
                         'answers' => 'required|array',

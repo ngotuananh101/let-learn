@@ -20,6 +20,7 @@ import lesson from "./modules/home/lesson";
 import learn from "./modules/home/learn";
 import course from "./modules/home/course";
 import classPost from "./modules/class/post";
+import classQuiz from "./modules/class/quiz";
 
 const store = createStore({
     modules: {
@@ -44,6 +45,7 @@ const store = createStore({
         schoolCourse,
         schoolClass,
         classPost,
+        classQuiz,
     },
 });
 

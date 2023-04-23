@@ -28,13 +28,19 @@ const home = [
             {
                 path: "class/:id",
                 name: "home.class",
-                component: () => import("../../../pages/home/class.vue"),
+                component: () => import("../../../pages/home/class/class.vue"),
             },
             {
-                path: "class/:id/test/add",
+                path: "class/:id/quiz/add",
                 name: "home.test.add",
                 component: () =>
-                    import("../../../pages/home/option/add_test.vue"),
+                    import("../../../pages/home/class/quiz/add_quiz.vue"),
+            },
+            {
+                path: "class/:id/quiz/:quiz_id",
+                name: "home.test.update",
+                component: () =>
+                    import("../../../pages/home/class/quiz/update_quiz.vue"),
             },
             {
                 path: "/lesson",

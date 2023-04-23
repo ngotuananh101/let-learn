@@ -22,7 +22,8 @@ export default {
         setMorePost(state, posts) {
             state.posts.posts = state.posts.posts.concat(posts.posts);
         },
-        postDeleted(state) {}
+        postDeleted(state) {},
+        postUpdated(state) {}
     },
     actions: {
         getPostsByClassId({commit}, classId) {
@@ -103,6 +104,18 @@ export default {
                 .then(
                     post => {
                         commit('postDeleted');
+                    },
+                    error => {
+                        commit('failure', error);
+                    }
+                );
+        },
+        updatePost({commit}, data) {
+            commit('request');
+            postService.updatePost(data)
+                .then(
+                    post => {
+                        commit('postUpdated');
                     },
                     error => {
                         commit('failure', error);
