@@ -44,7 +44,7 @@ class QuizController extends Controller
             ]);
             //check current time is between start time and end time. if not, return error
             $now = date('Y-m-d H:i:s');
-            $quiz = Quiz::findOrFail($id);
+            $quiz = Quiz::find($id);
             if (auth()->user()->role->name == 'student' && ($now < $quiz->start_time || $now > $quiz->end_time) && ($request->type == 'export')) {
                 return response()->json([
                     'status' => 'error',

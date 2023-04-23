@@ -137,7 +137,7 @@ class PostController extends Controller
     {
         try {
             $request->validate([
-                'type' => 'required|string|in:add_comment',
+                'type' => 'required|string|in:add_comment,update_post',
             ]);
             $class = Classes::where('id', $class_id)->firstOrFail();
             $post = $class->posts()->where('id', $id)->firstOrFail();
@@ -152,8 +152,23 @@ class PostController extends Controller
                 return response()->json([
                     'message' => 'Comment added successfully',
                 ], 200);
-            } else {
-                $post->comment_count = $post->comment_count - 1;
+            } else if($request->type == 'update_post'){
+                // check if user is author of this post
+                if($post->user_id != auth()->user()->id){
+                    return response()->json([
+                        'message' => 'You are not authorized to update this post',
+                    ], 403);
+                }
+                $request->validate([
+                    'title' => 'required|string',
+                    'content' => 'required|string',
+                ]);
+                $post->title = $request->input('title');
+                $post->content = $request->input('content');
+                $post->save();
+                return response()->json([
+                    'message' => 'Post updated successfully',
+                ], 200);
             }
         } catch (\Exception $e) {
             return response()->json([

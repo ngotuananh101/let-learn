@@ -63,6 +63,9 @@ class UserController extends Controller
                 $request->merge([
                     'password' => bcrypt($request->password),
                 ]);
+                $request->email_verified_at ?? $request->merge([
+                    'email_verified_at' => now(),
+                ]);
                 $user = User::create($request->all());
                 return response()->json([
                     'message' => 'User created successfully',

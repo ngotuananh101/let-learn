@@ -8,7 +8,8 @@ export const postService = {
     loadComments,
     addPost,
     deleteComment,
-    deletePost
+    deletePost,
+    updatePost
 }
 
 function getPostsByClassId(classId) {
@@ -89,6 +90,19 @@ function loadMorePost(url) {
 function deletePost(data) {
     const requestOptions = {
         method: 'DELETE',
+        headers: authHeader(),
+        body: JSON.stringify(data)
+    };
+    return fetch(`/api/classes/${data.class_id}/posts/${data.post_id}`, requestOptions)
+        .then(handleResponse)
+        .then(response => {
+            return response;
+        });
+}
+
+function updatePost(data) {
+    const requestOptions = {
+        method: 'PUT',
         headers: authHeader(),
         body: JSON.stringify(data)
     };
