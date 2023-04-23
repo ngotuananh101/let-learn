@@ -229,6 +229,12 @@ export default {
         },
         import() {
             this.type = 'import';
+            // put all current lesson details id to removed_ids
+            this.details.forEach((detail) => {
+                if (detail.id !== 0) {
+                    this.removed_ids.push(detail.id);
+                }
+            });
             if (this.importFile) {
                 if (this.file === null) {
                     this.$root.showSnackbar('Please select a file', 'danger');
@@ -256,6 +262,7 @@ export default {
                         }
                         this.details.push({
                             index: index,
+                            id: 0,
                             term: term_definition[0],
                             definition: term_definition[1],
                         });
@@ -271,7 +278,7 @@ export default {
             }
         },
         addLesson() {
-            if (this.lesson.name === '' || this.lesson.description === '' || this.details.length === 0) {
+            if (this.lesson.name === '' || this.lesson.description === '' || this.details.length === 0 || this.details[0].term === '' || this.details[0].definition === '') {
                 this.$root.showSnackbar('Please fill all fields', 'danger');
             } else {
                 this.user = this.$store.getters['user/userData'].info;
@@ -286,6 +293,7 @@ export default {
                     roleName: this.user.role.name,
                 });
                 this.$router.push({ name: 'home.home' });
+                this.$root.showSnackbar('Add lesson successfully', 'success');
             }
         }
     }
