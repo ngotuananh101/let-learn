@@ -121,7 +121,8 @@
                                 <p>Start: {{ quiz.start_time }}</p>
                                 <p>End: {{ quiz.end_time }}</p>
                                 <p class="mb-0">Questions: {{ quiz.count_questions }}</p>
-                                <p class="mb-0 mt-3 text-warning" v-if="quiz.status === 'pending'">Waiting manager approve</p>
+                                <p class="mb-0 mt-3 text-warning" v-if="quiz.status === 'pending'">Status: Waiting manager
+                                    approve</p>
                             </div>
                             <hr>
                             <div class="card-footer pt-0">
@@ -133,9 +134,17 @@
                                         <router-link
                                             :to="{name:'home.test.update', params: {id: this.$route.params.id, quiz_id: quiz.id}}"
                                             class="btn btn-primary mb-0 ms-md-3"
+                                            v-if="quiz.status === 'pending'"
                                         >
                                             Update quiz
                                         </router-link>
+                                        <button type="button"
+                                                class="btn btn-danger mb-0 ms-md-3"
+                                                :data-id="quiz.id"
+                                                @click="deleteQuiz"
+                                        >
+                                            Delete quiz
+                                        </button>
                                     </div>
                                     <div class="col-12" v-if="this.user.role.name === 'student'">
                                         <button v-if="!quiz.submitted"
@@ -165,31 +174,32 @@
         </div>
         <div class="tab-pane fade" id="contact" role="tabpanel">
             <div class="container pt-3">
-                <h3 class="text-center">Members</h3>
+                <h3 class="text-center">Class Members</h3>
                 <div class="row">
-                    <div class="col-12">
-                        <h4 class="pt-3">Teachers</h4>
-                        <div class="card my-4" v-for="(teacher, index) in teacherArray" :key="'teacher-' + teacher.id">
-                            <div class="card-body d-flex align-items-center">
-                                <div class="d-flex align-items-center">
-                                    <img :src="getAvatarByEmail(teacher.email)" class="me-2 rounded-circle" width="30"
-                                         height="30" alt="">
-                                    <span class="ms-2 me-auto">{{ teacher.name }}</span>
+                    <h4 class="pt-3">Teachers ( {{ teacherArray.length }} )</h4>
+                    <div class="col-md-4 col-12" v-for="(teacher, index) in teacherArray" :key="'teacher-' + teacher.id">
+                        <div class="card my-4">
+                            <div class="card-body d-flex align-items-center overflow-hidden">
+                                <img :src="teacher.avatar" class="me-2 rounded-circle" width="30"
+                                     height="30" alt="">
+                                <div>
+                                    <p class="ms-2 mb-0 fw-bold">{{ teacher.name }}</p>
+                                    <span class="ms-2 text-muted">{{ teacher.email }}</span>
                                 </div>
                             </div>
                         </div>
-                        <hr/>
-                        <h4 class="pt-3">Students</h4>
-                        <div class="my-4 pb-5">
-                            <div class="card mt-3" v-for="(student, index) in studentArray"
-                                 :key="'student-' + student.id">
-                                <div class="card-body d-flex align-items-center justify-content-between">
-                                    <div class="d-flex align-items-center">
-                                        <img :src="getAvatarByEmail(student.email)" class="me-2 rounded-circle"
-                                             width="30"
-                                             height="30" alt="">
-                                        <span class="ms-2 me-auto">{{ student.name }}</span>
-                                    </div>
+                    </div>
+                    <hr/>
+                    <h4 class="pt-3">Students ( {{ studentArray.length }} )</h4>
+                    <div class="col-md-4 col-12" v-for="(student, index) in studentArray"
+                         :key="'student-' + student.id">
+                        <div class="card mt-3">
+                            <div class="card-body d-flex align-items-center overflow-hidden">
+                                <img :src="student.avatar" class="me-2 rounded-circle" width="30"
+                                     height="30" alt="">
+                                <div>
+                                    <p class="ms-2 mb-0 fw-bold">{{ student.name }}</p>
+                                    <span class="ms-2 text-muted">{{ student.email }}</span>
                                 </div>
                             </div>
                         </div>
@@ -316,7 +326,8 @@ export default {
         this.unsubscribe = this.$store.subscribe((mutation) => {
             if (mutation.type === "home/request") {
             } else if (mutation.type === "home/requestSuccess") {
-                this.members = mutation.payload.members;
+                this.members = mutation.payload.data;
+                this.$setPageTitle(mutation.payload.class_name + " Classroom");
             } else if (mutation.type === "classPost/setPosts") {
                 this.posts_data = mutation.payload;
             } else if (mutation.type === "classPost/commentAdded") {
@@ -346,11 +357,15 @@ export default {
                 location.reload();
             } else if (mutation.type === "classQuiz/setQuiz") {
                 this.quizzes = mutation.payload.quizzes;
+            } else if (mutation.type === "classQuiz/quizDeleted") {
+                location.reload();
+            }else if (mutation.type === "classQuiz/failure") {
+                this.$root.showSnackbar(mutation.payload, "danger");
             }
         });
         this.$store.dispatch("classPost/getPostsByClassId", this.id);
         this.$store.dispatch("classQuiz/getQuizByClassId", this.id);
-        this.$store.dispatch("home/getClassDetail", {id: this.id, roleName: this.user.role.name});
+        this.$store.dispatch("home/getClassDetail", {id: this.id});
     },
     mounted() {
         const bootstrap = this.$store.state.config.bootstrap;
@@ -457,7 +472,7 @@ export default {
                 this.$store.dispatch("classPost/deletePost", data);
             }
         },
-        showFormUpdate(event){
+        showFormUpdate(event) {
             let post_id = event.target.getAttribute('data-id');
             let post = this.posts_data.posts.find(post => post.id === parseInt(post_id));
             this.update_post.title = post.title;
@@ -474,6 +489,17 @@ export default {
                 post_id: this.update_post.id
             }
             this.$store.dispatch("classPost/updatePost", data);
+        },
+        deleteQuiz(event) {
+            if (confirm('Are you sure you want to delete this quiz?')) {
+                let quiz_id = event.target.getAttribute('data-id');
+                let data = {
+                    type: 'delete_quiz',
+                    quiz_id: quiz_id,
+                    class_id: this.id
+                }
+                this.$store.dispatch("classQuiz/deleteQuiz", data);
+            }
         },
     }
 }

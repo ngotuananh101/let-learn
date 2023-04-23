@@ -43,7 +43,7 @@ export default {
         },
         getClassDetail({ commit }, payload) {
             commit('request');
-            homeService.loadClassDetail(payload.id, payload.roleName)
+            homeService.loadClassDetail(payload.id)
                 .then(
                     response => {
                         commit('requestSuccess', response);

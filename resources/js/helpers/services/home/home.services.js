@@ -42,15 +42,15 @@ function loadUserInformation(page) {
             return data;
         });
 }
-function loadClassDetail(id, roleName) {
+function loadClassDetail(class_id) {
     const requestOptions = {
         method: 'GET',
         headers: authHeader(),
     };
-    return fetch(`/api/${roleName}/quiz/${id}?type=all`, requestOptions)
+    return fetch(`/api/classes/${class_id}/members`, requestOptions)
         .then(handleResponse)
         .then(data => {
-            return data.data;
+            return data;
         });
 }
 function changeInfor(data) {

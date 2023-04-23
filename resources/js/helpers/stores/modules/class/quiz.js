@@ -16,7 +16,8 @@ export default {
         setQuiz(state, quizzes) {
             state.quizzes = quizzes;
         },
-        quizUpdated(state) {}
+        quizUpdated(state) {},
+        quizDeleted(state) {}
     },
     actions: {
         addQuiz({commit}, data) {
@@ -61,6 +62,18 @@ export default {
                 .then(
                     res => {
                         commit('quizUpdated');
+                    },
+                    error => {
+                        commit('failure', error);
+                    }
+                );
+        },
+        deleteQuiz({commit}, data) {
+            commit('request');
+            quizService.deleteQuiz(data)
+                .then(
+                    res => {
+                        commit('quizDeleted');
                     },
                     error => {
                         commit('failure', error);

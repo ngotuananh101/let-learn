@@ -5,7 +5,8 @@ export const quizService = {
     addQuiz,
     getQuizByClassId,
     getQuizById,
-    updateQuiz
+    updateQuiz,
+    deleteQuiz
 }
 
 function addQuiz(data) {
@@ -50,6 +51,18 @@ function updateQuiz(data) {
         method: 'PUT',
         headers: authHeader(),
         body: JSON.stringify(data)
+    };
+    return fetch(`/api/classes/${data.class_id}/quizzes/${data.quiz_id}`, requestOptions)
+        .then(handleResponse)
+        .then(response => {
+            return response;
+        });
+}
+
+function deleteQuiz(data) {
+    const requestOptions = {
+        method: 'DELETE',
+        headers: authHeader()
     };
     return fetch(`/api/classes/${data.class_id}/quizzes/${data.quiz_id}`, requestOptions)
         .then(handleResponse)
