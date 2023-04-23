@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Answer;
 use App\Models\Quiz;
 use Carbon\Carbon;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
 class QuizController extends Controller
@@ -188,8 +189,8 @@ class QuizController extends Controller
             $user = auth()->user();
             $class = $user->classes()->where('class_id', $class_id)->firstOrFail();
             $quiz = $class->quizzes()->where('id', $id)->firstOrFail();
-            // only update if quiz do not have any submissions and user is the teacher
-            if(Answer::where('quiz_id', $quiz->id)->exists() || $user->role->name !== 'teacher') {
+            // only update if quiz do not have any submissions and user is the teacher or quiz status is pending
+            if(Answer::where('quiz_id', $quiz->id)->exists() || $user->role->name !== 'teacher' || $quiz->status !== 'pending') {
                 return response()->json([
                     'message' => 'Quiz cannot be updated',
                 ], 400);
@@ -234,8 +235,26 @@ class QuizController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(string $id)
+    public function destroy(string $class_id, string $id): JsonResponse
     {
-        //
+        try {
+            $user = auth()->user();
+            $class = $user->classes()->where('class_id', $class_id)->firstOrFail();
+            $quiz = $class->quizzes()->where('id', $id)->firstOrFail();
+            // only delete if user is the teacher
+            if($user->role->name !== 'teacher') {
+                return response()->json([
+                    'message' => 'Quiz cannot be deleted',
+                ], 400);
+            }
+            $quiz->delete();
+            return response()->json([
+                'message' => 'Quiz deleted successfully',
+            ], 200);
+        } catch (\Exception $e) {
+            return response()->json([
+                'message' => $e->getMessage(),
+            ], 500);
+        }
     }
 }
