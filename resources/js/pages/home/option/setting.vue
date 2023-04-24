@@ -119,6 +119,7 @@ export default {
         changeInfo() {
             this.type = 'update';
             let data = {
+                role: this.user.role.name,
                 name: this.user.name,
                 date_of_birth: this.user.date_of_birth,
                 id: this.user.id,
