@@ -121,15 +121,19 @@
                                 <p>Start: {{ quiz.start_time }}</p>
                                 <p>End: {{ quiz.end_time }}</p>
                                 <p class="mb-0">Questions: {{ quiz.count_questions }}</p>
-                                <p class="mb-0 mt-3 text-warning" v-if="quiz.status === 'pending'">Status: Waiting manager
+                                <p class="mb-0 mt-3 text-warning" v-if="quiz.status === 'pending'">Status: Waiting
+                                    manager
                                     approve</p>
                             </div>
                             <hr>
                             <div class="card-footer pt-0">
                                 <div class="row">
                                     <div class="col-12" v-if="this.user.role.name === 'teacher'">
-                                        <button type="button" class="btn btn-primary mb-0">
-                                            Result
+                                        <button type="button" class="btn btn-primary mb-0"
+                                                @click="exportResultToExcel(quiz.id)"
+                                                v-if="quiz.status !== 'pending'"
+                                        >
+                                            Report
                                         </button>
                                         <router-link
                                             :to="{name:'home.test.update', params: {id: this.$route.params.id, quiz_id: quiz.id}}"
@@ -177,7 +181,8 @@
                 <h3 class="text-center">Class Members</h3>
                 <div class="row">
                     <h4 class="pt-3">Teachers ( {{ teacherArray.length }} )</h4>
-                    <div class="col-md-4 col-12" v-for="(teacher, index) in teacherArray" :key="'teacher-' + teacher.id">
+                    <div class="col-md-4 col-12" v-for="(teacher, index) in teacherArray"
+                         :key="'teacher-' + teacher.id">
                         <div class="card my-4">
                             <div class="card-body d-flex align-items-center overflow-hidden">
                                 <img :src="teacher.avatar" class="me-2 rounded-circle" width="30"
@@ -284,6 +289,8 @@
 
 <script>
 import {MD5} from "md5-js-tools";
+import writeXlsxFile from 'write-excel-file';
+import {saveAs} from 'file-saver';
 
 export default {
     data() {
@@ -359,7 +366,7 @@ export default {
                 this.quizzes = mutation.payload.quizzes;
             } else if (mutation.type === "classQuiz/quizDeleted") {
                 location.reload();
-            }else if (mutation.type === "classQuiz/failure") {
+            } else if (mutation.type === "classQuiz/failure") {
                 this.$root.showSnackbar(mutation.payload, "danger");
             }
         });
@@ -500,6 +507,145 @@ export default {
                 }
                 this.$store.dispatch("classQuiz/deleteQuiz", data);
             }
+        },
+        async exportResultToExcel(quiz_id) {
+            const quizInfoSchema = [
+                {
+                    column: 'Type',
+                    type: String,
+                    value: (quiz) => quiz.type
+                },
+                {
+                    column: 'Value',
+                    type: String,
+                    value: (quiz) => quiz.value
+                },
+            ];
+            const questionSchema = [
+                {
+                    column: "ID",
+                    type: Number,
+                    value: (question) => question.id
+                },
+                {
+                    column: "Question",
+                    type: String,
+                    value: (question) => question.question,
+                    wrap: true
+                },
+                {
+                    column: "Type",
+                    type: String,
+                    value: (question) => question.is_multiple_choice ? 'Multiple Choice' : 'Easy'
+                },
+                {
+                    column: "Correct Answer",
+                    type: String,
+                    value: (question) => question.correct_answer
+                },
+                {
+                    column: "Score",
+                    type: Number,
+                    value: (question) => question.score
+                }
+            ];
+            const answerSchema = [
+                {
+                    column: "Question",
+                    type: String,
+                    value: (answer) => answer.question
+                },
+                {
+                    column: "Answer",
+                    type: String,
+                    value: (answer) => answer.answer
+                },
+                {
+                    column: "Correct",
+                    type: String,
+                    value: (answer) => answer.is_correct ? 'Yes' : 'No'
+                },
+                {
+                    column: "Score",
+                    type: Number,
+                    value: (answer) => answer.score
+                },
+                {
+                    column: "Max Score",
+                    type: Number,
+                    value: (answer) => answer.max_score
+                }
+            ];
+            this.$store.dispatch("classQuiz/viewReport", {
+                type: 'report',
+                quiz_id: quiz_id,
+                class_id: this.id
+            }).then(
+                response => {
+                    let quiz = response.quiz;
+                    // map key and value to object
+                    quiz = Object.keys(quiz).map(key => {
+                        return {
+                            type: key,
+                            value: quiz[key] + ''
+                        }
+                    });
+                    const questions = response.questions;
+                    const students = response.students;
+                    const studentAnswers = response.studentAnswers;
+                    let data = [quiz, questions];
+                    let schema = [quizInfoSchema, questionSchema];
+                    let sheets = ['Quiz info', 'Questions'];
+                    // create one workbook per student
+                    students.forEach(student => {
+                        sheets.push(student.email);
+                        schema.push(answerSchema);
+                        let answer = studentAnswers.find(answer => answer.user_id === student.id);
+                        if(answer) {
+                            let ans_data = [];
+                            let answer_text = JSON.parse(answer.answer_text);
+                            questions.forEach(question => {
+                                let ans = answer_text.find(ans => ans.question_id === question.id);
+                                if(ans) {
+                                    ans_data.push({
+                                        question: question.question,
+                                        answer: ans.answer,
+                                        is_correct: ans.is_correct,
+                                        score: ans.points,
+                                        max_score: question.score
+                                    });
+                                } else {
+                                    ans_data.push({
+                                        question: question.question,
+                                        answer: '',
+                                        is_correct: false,
+                                        score: 0,
+                                        max_score: question.score
+                                    });
+                                }
+                            });
+                            data.push(ans_data);
+                        } else {
+                            let ans_data = [];
+                            questions.forEach(question => {
+                                ans_data.push({
+                                    question: question.question,
+                                    answer: 'Not answer',
+                                    is_correct: false,
+                                    score: 0,
+                                    max_score: question.score
+                                });
+                            });
+                            data.push(ans_data);
+                        }
+                    });
+                    writeXlsxFile(data, {
+                        schema: schema,
+                        sheets: sheets,
+                        fileName: "file.xlsx",
+                        wrap: true
+                    });
+                });
         },
     }
 }

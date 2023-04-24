@@ -6,7 +6,8 @@ export const quizService = {
     getQuizByClassId,
     getQuizById,
     updateQuiz,
-    deleteQuiz
+    deleteQuiz,
+    viewReport
 }
 
 function addQuiz(data) {
@@ -65,6 +66,18 @@ function deleteQuiz(data) {
         headers: authHeader()
     };
     return fetch(`/api/classes/${data.class_id}/quizzes/${data.quiz_id}`, requestOptions)
+        .then(handleResponse)
+        .then(response => {
+            return response;
+        });
+}
+
+function viewReport(data) {
+    const requestOptions = {
+        method: 'GET',
+        headers: authHeader()
+    };
+    return fetch(`/api/classes/${data.class_id}/quizzes/${data.quiz_id}?type=report`, requestOptions)
         .then(handleResponse)
         .then(response => {
             return response;

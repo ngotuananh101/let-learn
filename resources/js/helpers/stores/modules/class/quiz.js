@@ -79,6 +79,18 @@ export default {
                         commit('failure', error);
                     }
                 );
+        },
+        viewReport({commit}, data) {
+            commit('request');
+            return quizService.viewReport(data)
+                .then(
+                    res => {
+                        return res;
+                    },
+                    error => {
+                        commit('failure', error);
+                    }
+                );
         }
     }
 }
