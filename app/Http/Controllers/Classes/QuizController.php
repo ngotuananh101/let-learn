@@ -14,7 +14,7 @@ class QuizController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index($classId)
+    public function index($classId): JsonResponse
     {
         try {
             $user = auth()->user();
@@ -58,7 +58,7 @@ class QuizController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(Request $request): JsonResponse
     {
         try {
             $request->validate([
@@ -115,40 +115,78 @@ class QuizController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(string $class_id, string $id)
+    public function show(Request $request, string $class_id, string $id): JsonResponse
     {
         try {
+            $request->validate([
+                'type' => 'nullable|string|in:report',
+            ]);
             $user = auth()->user();
             $class = $user->classes()->where('class_id', $class_id)->firstOrFail();
             $quiz = $class->quizzes()->where('id', $id)->firstOrFail();
-            $questions = $quiz->questions;
-            return response()->json([
-                'quiz' => [
-                    'id' => $quiz->id,
-                    'name' => $quiz->name,
-                    'description' => $quiz->description,
-                    'start_time' => $quiz->start_time,
-                    'end_time' => $quiz->end_time,
-                ],
-                'questions' => $questions->map(function ($question) {
-                    $answers = $question->answer_option ? json_decode($question->answer_option) : [];
-                    if($question->is_multiple_choice) {
-                        $answers = array_map(function ($answer) use ($question) {
+            if ($request->input('type')) {
+                if ($request->input('type') == 'report') {
+                    $questions = $quiz->questions;
+                    $students = $class->member()->where('role_id', 6)->get();
+                    return response()->json([
+                        'quiz' => [
+                            'id' => $quiz->id,
+                            'name' => $quiz->name,
+                            'description' => $quiz->description,
+                            'start_time' => $quiz->start_time,
+                            'end_time' => $quiz->end_time,
+                            'status' => $quiz->status,
+                        ],
+                        'questions' => $questions->map(function ($question) {
+                            $answers = $question->answer_option ? json_decode($question->answer_option) : [];
                             return [
-                                'answer' => $answer,
-                                'correct' => $answer === $question->correct_answer,
+                                'id' => $question->id,
+                                'question' => $question->question . ' [ ' . implode(', ', $answers) . ' ]',
+                                'score' => $question->points,
+                                'correct_answer' => $question->correct_answer,
+                                'is_multiple_choice' => $question->is_multiple_choice,
                             ];
-                        }, $answers);
-                    }
-                    return [
-                        'id' => $question->id,
-                        'question' => $question->question,
-                        'is_multiple_choice' => (bool)$question->is_multiple_choice,
-                        'score' => $question->points,
-                        'answers' => $answers,
-                    ];
-                }),
-            ], 200);
+                        }),
+                        'students' => $students->map(function ($student){
+                            return [
+                                'id' => $student->id,
+                                'name' => $student->name,
+                                'email' => $student->email,
+                            ];
+                        }),
+                        'studentAnswers' => $quiz->answers
+                    ]);
+                }
+            } else {
+                $questions = $quiz->questions;
+                return response()->json([
+                    'quiz' => [
+                        'id' => $quiz->id,
+                        'name' => $quiz->name,
+                        'description' => $quiz->description,
+                        'start_time' => $quiz->start_time,
+                        'end_time' => $quiz->end_time,
+                    ],
+                    'questions' => $questions->map(function ($question) {
+                        $answers = $question->answer_option ? json_decode($question->answer_option) : [];
+                        if ($question->is_multiple_choice) {
+                            $answers = array_map(function ($answer) use ($question) {
+                                return [
+                                    'answer' => $answer,
+                                    'correct' => $answer === $question->correct_answer,
+                                ];
+                            }, $answers);
+                        }
+                        return [
+                            'id' => $question->id,
+                            'question' => $question->question,
+                            'is_multiple_choice' => (bool)$question->is_multiple_choice,
+                            'score' => $question->points,
+                            'answers' => $answers,
+                        ];
+                    }),
+                ], 200);
+            }
         } catch (\Exception $e) {
             return response()->json([
                 'message' => $e->getMessage(),
@@ -157,17 +195,24 @@ class QuizController extends Controller
     }
 
     /**
-     * Show the form for editing the specified resource.
+     * Use this method to show report of quiz
      */
-    public function edit(string $id)
+    public function edit(string $class_id, string $id)
     {
-        //
+        try {
+
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'message' => $e->getMessage(),
+            ], 500);
+        }
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $class_id, string $id)
+    public function update(Request $request, string $class_id, string $id): JsonResponse
     {
         try {
             $request->validate([
@@ -190,7 +235,7 @@ class QuizController extends Controller
             $class = $user->classes()->where('class_id', $class_id)->firstOrFail();
             $quiz = $class->quizzes()->where('id', $id)->firstOrFail();
             // only update if quiz do not have any submissions and user is the teacher or quiz status is pending
-            if(Answer::where('quiz_id', $quiz->id)->exists() || $user->role->name !== 'teacher' || $quiz->status !== 'pending') {
+            if (Answer::where('quiz_id', $quiz->id)->exists() || $user->role->name !== 'teacher' || $quiz->status !== 'pending') {
                 return response()->json([
                     'message' => 'Quiz cannot be updated',
                 ], 400);
@@ -203,7 +248,7 @@ class QuizController extends Controller
                 'end_time' => Carbon::parse($request->end_time),
             ]);
             // delete questions
-            if($request->deleted_questions) {
+            if ($request->deleted_questions) {
                 $quiz->questions()->whereIn('id', $request->deleted_questions)->delete();
             }
             // update questions
@@ -225,6 +270,9 @@ class QuizController extends Controller
                     'answer_option' => $question['is_multiple_choice'] ? json_encode($answerOptions, JSON_UNESCAPED_UNICODE) : "",
                 ]);
             }
+            return response()->json([
+                'message' => 'Quiz updated successfully',
+            ], 200);
         } catch (\Exception $e) {
             return response()->json([
                 'message' => $e->getMessage(),
@@ -242,7 +290,7 @@ class QuizController extends Controller
             $class = $user->classes()->where('class_id', $class_id)->firstOrFail();
             $quiz = $class->quizzes()->where('id', $id)->firstOrFail();
             // only delete if user is the teacher
-            if($user->role->name !== 'teacher') {
+            if ($user->role->name !== 'teacher') {
                 return response()->json([
                     'message' => 'Quiz cannot be deleted',
                 ], 400);
