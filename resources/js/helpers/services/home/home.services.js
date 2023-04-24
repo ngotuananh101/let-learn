@@ -60,7 +60,7 @@ function changeInfor(data) {
         body: JSON.stringify(data),
     };
     console.log(data);
-    return fetch(`/api/student/main/${data.id}?type=info`, requestOptions)
+    return fetch(`/api/${data.role}/main/${data.id}?type=info`, requestOptions)
         .then(handleResponse)
         .then(data => {
             return data.message;
