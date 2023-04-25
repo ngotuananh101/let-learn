@@ -85,7 +85,9 @@ export default {
         });
         this.$store.dispatch("home/getForum");
     },
-
+    beforeUnmount() {
+        this.unsubscribe();
+    },
     methods: {
         onSubmit() {
             const title = document.getElementById("questionTitle").value;

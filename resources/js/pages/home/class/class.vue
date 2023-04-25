@@ -1,4 +1,5 @@
 <template>
+    <h2 class="mt-3 text-center">Class Information</h2>
     <ul class="nav nav-tabs pt-3" id="myTab" role="tablist">
         <li class="nav-item" role="presentation">
             <button class="nav-link active" id="home-tab" data-bs-toggle="tab" data-bs-target="#home" type="button"
@@ -121,34 +122,50 @@
                                 <p>Start: {{ quiz.start_time }}</p>
                                 <p>End: {{ quiz.end_time }}</p>
                                 <p class="mb-0">Questions: {{ quiz.count_questions }}</p>
-                                <p class="mb-0 mt-3 text-warning" v-if="quiz.status === 'pending'">Status: Waiting
-                                    manager
-                                    approve</p>
+                                <p class="mb-0 mt-3">
+                                    Status:
+                                    <span v-if="quiz.status === 'pending'" class="text-warning">Pending</span>
+                                    <span v-else-if="quiz.status === 'active'" class="text-success">Active</span>
+                                    <span v-else class="text-danger">Expired</span>
+                                </p>
                             </div>
                             <hr>
-                            <div class="card-footer pt-0">
+                            <div class="card-footer py-0">
                                 <div class="row">
                                     <div class="col-12" v-if="this.user.role.name === 'teacher'">
-                                        <button type="button" class="btn btn-primary mb-0"
-                                                @click="exportResultToExcel(quiz.id)"
-                                                v-if="quiz.status !== 'pending'"
-                                        >
-                                            Report
-                                        </button>
-                                        <router-link
-                                            :to="{name:'home.test.update', params: {id: this.$route.params.id, quiz_id: quiz.id}}"
-                                            class="btn btn-primary mb-0 ms-md-3"
-                                            v-if="quiz.status === 'pending'"
-                                        >
-                                            Update quiz
-                                        </router-link>
-                                        <button type="button"
-                                                class="btn btn-danger mb-0 ms-md-3"
-                                                :data-id="quiz.id"
-                                                @click="deleteQuiz"
-                                        >
-                                            Delete quiz
-                                        </button>
+                                        <div class="row">
+                                            <div class="col-md-6 col-12" v-if="quiz.status !== 'pending'">
+                                                <button type="button" class="btn btn-primary w-100"
+                                                        @click="exportResultToExcel(quiz.id)"
+                                                >
+                                                    View Report
+                                                </button>
+                                            </div>
+                                            <div class="col-md-6 col-12" v-if="quiz.status !== 'pending'">
+                                                <button type="button" class="btn btn-primary w-100"
+                                                        @click="exportResultToExcel(quiz.id)"
+                                                >
+                                                    Update mark
+                                                </button>
+                                            </div>
+                                            <div class="col-md-6 col-12" v-if="quiz.status === 'pending'">
+                                                <router-link
+                                                    :to="{name:'home.test.update', params: {id: this.$route.params.id, quiz_id: quiz.id}}"
+                                                    class="btn btn-primary w-100"
+                                                >
+                                                    Update quiz
+                                                </router-link>
+                                            </div>
+                                            <div class="col-md-6 col-12">
+                                                <button type="button"
+                                                        class="btn btn-danger w-100"
+                                                        :data-id="quiz.id"
+                                                        @click="deleteQuiz"
+                                                >
+                                                    Delete quiz
+                                                </button>
+                                            </div>
+                                        </div>
                                     </div>
                                     <div class="col-12" v-if="this.user.role.name === 'student'">
                                         <button v-if="!quiz.submitted"
@@ -290,7 +307,6 @@
 <script>
 import {MD5} from "md5-js-tools";
 import writeXlsxFile from 'write-excel-file';
-import {saveAs} from 'file-saver';
 
 export default {
     data() {
@@ -601,12 +617,12 @@ export default {
                         sheets.push(student.email);
                         schema.push(answerSchema);
                         let answer = studentAnswers.find(answer => answer.user_id === student.id);
-                        if(answer) {
+                        if (answer) {
                             let ans_data = [];
                             let answer_text = JSON.parse(answer.answer_text);
                             questions.forEach(question => {
                                 let ans = answer_text.find(ans => ans.question_id === question.id);
-                                if(ans) {
+                                if (ans) {
                                     ans_data.push({
                                         question: question.question,
                                         answer: ans.answer,
