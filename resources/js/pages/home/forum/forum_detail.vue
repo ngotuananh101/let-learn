@@ -106,7 +106,9 @@ export default {
         });
         this.$store.dispatch("home/getForumDetail", this.$route.params.id);
     },
-
+    beforeUnmount() {
+        this.unsubscribe();
+    },
     methods: {
         submitComment() {
             if (!this.newComment) return;

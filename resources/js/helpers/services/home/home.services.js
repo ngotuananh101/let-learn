@@ -59,7 +59,6 @@ function changeInfor(data) {
         headers: authHeader(),
         body: JSON.stringify(data),
     };
-    console.log(data);
     return fetch(`/api/student/main/${data.id}?type=info`, requestOptions)
         .then(handleResponse)
         .then(data => {

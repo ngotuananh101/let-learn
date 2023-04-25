@@ -106,7 +106,6 @@ export default {
     },
     created() {
         this.user = this.$store.getters['user/userData'].info;
-        console.log(this.user);
     },
     methods: {
         darkMode() {
@@ -127,10 +126,10 @@ export default {
                 alert('Please fill in all the fields');
             }
             this.$store.dispatch('home/changeInfor', data);
-            console.log(data);
-            //logout
-            this.logout();
-            location.reload();
+            // console.log(data);
+            // //logout
+            // this.logout();
+            // location.reload();
         },
         logout() {
             this.$store.dispatch('user/logout');
