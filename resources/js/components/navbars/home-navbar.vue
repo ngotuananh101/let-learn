@@ -45,6 +45,7 @@
                             type="text"
                             class="form-control"
                             :placeholder="'Type here to search...'"
+                            @change="search"
                         />
                     </div>
                 </div>
@@ -158,6 +159,15 @@ export default {
                 this.$store.state.darkMode = true;
                 this.sidebar("bg-default");
                 activateDarkMode();
+            }
+        },
+        search(e) {
+            // check is in search page
+            if (this.$route.name !== 'home.search') {
+                this.$router.push({name: 'home.search', params: {query: e.target.value}});
+            }else{
+                this.$router.push({name: 'home.search', params: {query: e.target.value}});
+                this.$store.dispatch('home/search', e.target.value);
             }
         },
     },
