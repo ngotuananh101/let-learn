@@ -3,7 +3,7 @@ const home = [
         path: "/",
         name: "home",
         component: () => import("../../../layouts/home.vue"),
-        redirect: { name: "home.home" },
+        redirect: {name: "home.home"},
         meta: {
             requiresAuth: true,
         },
@@ -12,6 +12,11 @@ const home = [
                 path: "",
                 name: "home.home",
                 component: () => import("../../../pages/home/home.vue"),
+            },
+            {
+                path: "search/:query",
+                name: "home.search",
+                component: () => import("../../../pages/home/search.vue"),
             },
             {
                 path: "profile",
@@ -28,13 +33,19 @@ const home = [
             {
                 path: "class/:id",
                 name: "home.class",
-                component: () => import("../../../pages/home/class.vue"),
+                component: () => import("../../../pages/home/class/class.vue"),
             },
             {
-                path: "class/:id/test/add",
+                path: "class/:id/quiz/add",
                 name: "home.test.add",
                 component: () =>
-                    import("../../../pages/home/option/add_test.vue"),
+                    import("../../../pages/home/class/quiz/add_quiz.vue"),
+            },
+            {
+                path: "class/:id/quiz/:quiz_id",
+                name: "home.test.update",
+                component: () =>
+                    import("../../../pages/home/class/quiz/update_quiz.vue"),
             },
             {
                 path: "/lesson",
@@ -100,12 +111,10 @@ const home = [
                             import("../../../pages/home/forum/forum.vue"),
                     },
                     {
-                        path: "forum_detail/:id",
-                        name: "forum.forum_detail",
+                        path: "post/:id",
+                        name: "forum.post",
                         component: () =>
-                            import(
-                                "../../../pages/home/forum/forum_detail.vue"
-                                ),
+                            import("../../../pages/home/forum/forum_detail.vue"),
                     },
                 ]
             },

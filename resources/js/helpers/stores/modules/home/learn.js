@@ -40,9 +40,9 @@ export default {
             );
         },
 
-        getLearn({ commit }, id) {
+        getLearn({ commit }, data) {
             commit("request");
-            learnService.loadLearn(id).then(
+            learnService.loadLearn(data).then(
                 (response) => {
                     commit("requestSuccess", response);
                 },

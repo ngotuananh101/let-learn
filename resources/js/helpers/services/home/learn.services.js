@@ -28,19 +28,19 @@ function loadFlashCard(lesson_id, roleName, userId) {
             return data.data.lessonDetail;
         });
 }
-function loadLearn(id) {
+function loadLearn(data) {
     const requestOptions = {
         method: "POST",
         headers: authHeader(),
         body: JSON.stringify({
-            lesson_id: id,
+            lesson_id: data.id,
             quantity: 8,
             reverse: 1,
             mix_details: 0,
             mix_answers: 0,
         }),
     };
-    return fetch(`/api/student/main?type=test`, requestOptions)
+    return fetch(`/api/${data.roleName}/main?type=test`, requestOptions)
         .then(handleResponse)
         .then((data) => {
             return data.lesson_details;
@@ -81,11 +81,9 @@ function loadNew(id) {
         headers: authHeader(),
         // body: JSON.stringify({class_id: id}),
     };
-    console.log(id);
     return fetch(`/api/forum/post/?class_id=${id}`, requestOptions)
         .then(handleResponse)
         .then(data => {
-            console.log(data.posts);
             return data.posts;
         });
 }
@@ -111,7 +109,7 @@ function updateResult(data) {
         }),
     };
     return fetch(
-        `/api/student/main/${data.user_id}/?type=learned`,
+        `/api/${data.roleName}/main/${data.user_id}/?type=learned`,
         requestOptions
     )
         .then(handleResponse)

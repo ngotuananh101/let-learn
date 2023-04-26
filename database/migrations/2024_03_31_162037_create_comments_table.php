@@ -13,12 +13,13 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('comment_votes', function (Blueprint $table) {
+        Schema::create('comments', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('user_id')->constrained();
-            $table->foreignId('post_id')->constrained();
-            $table->foreignId('comment_id')->constrained();
-            $table->enum('vote_status', ['upvote', 'downvote', 'nonvote'])->default('nonvote');
+            $table->foreignId('user_id')->constrained()->onDelete('cascade');
+            $table->foreignId('post_id')->constrained()->onDelete('cascade');
+            $table->text('comment');
+            $table->enum('status', ['active', 'pending', 'inactive'])->default('active');
+            $table->integer('votes')->default(0);
             $table->timestamps();
         });
     }
@@ -30,6 +31,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('comment_votes');
+        Schema::dropIfExists('comments');
     }
 };

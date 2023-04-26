@@ -9,7 +9,7 @@ export const lessonService = {
     deleteLesson,
     getLessonById,
     updateLesson,
-    loadFlashCard
+    loadFlashCard,
 };
 
 function loadFlashCard(id, roleName) {
@@ -80,27 +80,27 @@ function deleteLesson(id, roleName) {
 
 function getLessonById(id, roleName) {
     const requestOptions = {
-        method: 'GET',
-        headers: authHeader()
+        method: "GET",
+        headers: authHeader(),
     };
 
     return fetch(`/api/${roleName}/lesson/${id}`, requestOptions)
         .then(handleResponse)
-        .then(lesson => {
+        .then((lesson) => {
             return lesson;
         });
 }
 
 function updateLesson(lesson) {
     const requestOptions = {
-        method: 'PUT',
+        method: "PUT",
         headers: authHeader(),
-        body: JSON.stringify(lesson)
+        body: JSON.stringify(lesson),
     };
-console.log(lesson);
+    console.log(lesson);
     return fetch(`/api/${lesson.roleName}/lesson/${lesson.id}`, requestOptions)
         .then(handleResponse)
-        .then(lesson => {
+        .then((lesson) => {
             return lesson;
         });
 }

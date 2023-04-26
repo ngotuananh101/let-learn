@@ -4,8 +4,15 @@ const school = [
     {
         path: '/school',
         name: 'school',
+        meta: {
+            requiresAuth: true,
+            requiresManage: true,
+        },
         redirect: () => {
             const userData = store.getters['user/userData'];
+            if(!userData){
+                return {name: 'auth.login'};
+            }
             if (!userData.info.school && !userData.info.role.permissions.filter(permission => (permission.name === 'admin.dashboard' || permission.name === 'admin.super')).length > 0) {
                 return {name: 'home'};
             }
@@ -94,11 +101,7 @@ const school = [
                     }
                 ],
             }
-        ],
-        meta: {
-            requiresAuth: true,
-            requiresManage: true,
-        }
+        ]
     }
 ]
 

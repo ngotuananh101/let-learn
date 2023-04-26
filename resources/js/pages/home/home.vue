@@ -5,12 +5,15 @@
                 Learn anything, anytime, anywhere
             </div>
         </div>
+        <button v-if="this.user.role.name === 'manager'" class="btn btn-primary mt-4" @click="dartboardManager()">DartBoard</button>
+        <button v-if="this.user.role.name === 'admin'" class="btn btn-primary mt-4" @click="dartboardAdmin()">DartBoard</button>
+        <button v-if="this.user.role.name === 'super'" class="btn btn-primary mt-4" @click="dartboardAdmin()">DartBoard</button>
     </div>
     <div class="mt-5">
         <div class="row">
             <h3>Lesson</h3>
             <div class="col-lg-4 col-md-6 col-12" v-for="lesson in lessons" :key="lesson.id">
-                    <a :href="'/lesson/'+ lesson.id">
+                <a :href="'/lesson/' + lesson.id">
                     <div class="card mt-4">
                         <div class="card-body">
                             <p class="card-text text-primary">Title: {{ lesson.name }}</p>
@@ -24,7 +27,7 @@
         <div class="row mt-5">
             <h3>Course</h3>
             <div class="col-lg-4 col-md-6 col-12" v-for="course in courses" :key="course.id">
-                <a :href="'/course/'+ course.id">
+                <a :href="'/course/' + course.id">
                     <div class="card mt-4">
                         <div class="card-body">
                             <p class="card-text text-primary">Title: {{ course.name }}</p>
@@ -38,7 +41,7 @@
         <div class="row mt-5">
             <h3>Other Lessons</h3>
             <div class="col-lg-4 col-md-6 col-12" v-for="other_lessons in other_lesson" :key="other_lessons.id">
-                <a :href="'/lesson/'+ other_lessons.id">
+                <a :href="'/lesson/' + other_lessons.id">
                     <div class="card mt-4">
                         <div class="card-body">
                             <p class="card-text text-primary">Title: {{ other_lessons.name }}</p>
@@ -52,7 +55,7 @@
         <div class="row mb-5 mt-5">
             <h3>Other Courses</h3>
             <div class="col-lg-4 col-md-6 col-12" v-for="other_courses in other_course" :key="other_courses.id">
-                <a :href="'/course/'+ other_courses.id">
+                <a :href="'/course/' + other_courses.id">
                     <div class="card mt-4">
                         <div class="card-body">
                             <p class="card-text text-primary">Title: {{ other_courses.name }}</p>
@@ -236,6 +239,7 @@ export default {
     },
     created() {
         this.user = this.$store.getters['user/userData'].info;
+        console.log(this.user.role.name);
         this.unsubscribe = this.$store.subscribe((mutation) => {
             if (mutation.type === "home/request") {
             } else if (mutation.type === "home/requestSuccess") {
@@ -257,8 +261,6 @@ export default {
             }
         });
         this.$store.dispatch("home/getHome");
-        // this.user = JSON.parse(localStorage.getItem("user"));
-        // console.log(this.user);
     },
     beforeUnmount() {
         this.unsubscribe();
@@ -331,14 +333,26 @@ export default {
             }
         },
         addCourse() {
-            this.type = 'add';
-            this.$store.dispatch('course/addCourse', {
-                name: this.course.name,
-                description: this.course.description,
-                roleName: this.user.role.name,
-            });
-            location.reload();
-        }
+            if (this.course.name === '' || this.course.description === '') {
+                alert('Please fill all fields');
+            } else {
+                this.type = 'add';
+                this.$store.dispatch('course/addCourse', {
+                    name: this.course.name,
+                    description: this.course.description,
+                    roleName: this.user.role.name,
+                });
+                location.reload();
+                this.$root.showSnackbar('Add course successfully', 'success');
+            }
+        },
+
+        dartboardManager() {
+            this.$router.push({ name: "school" });
+        },
+        dartboardAdmin() {
+            this.$router.push({ name: "admin.dashboard" });
+        },
     }
 };
 

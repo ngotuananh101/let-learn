@@ -27,7 +27,6 @@ router.beforeEach((to, from, next) => {
             const permissions = userData?.info?.role?.permissions;
             // check if user try to access admin page
             if (to.matched.some(route => route.meta?.requiresAdmin)) {
-                console.log('required admin');
                 // Check if user is admin
                 if (permissions.filter(permission => (permission.name === 'admin.dashboard' || permission.name === 'admin.super')).length > 0) {
                     next();
@@ -36,7 +35,7 @@ router.beforeEach((to, from, next) => {
                 }
             } else if (to.matched.some(route => route.meta?.requiresManage)) {
                 // Check if user is manager
-                if (permissions.filter(permission => (permission.name === 'admin.dashboard' || permission.name === 'admin.super' || permission.name === 'manager.dashboard')).length > 0) {
+                if (permissions.filter(permission => (permission.name === 'admin.super' || permission.name === 'manager.dashboard')).length > 0) {
                     if (permissions.filter(permission => (permission.name === 'admin.dashboard' || permission.name === 'admin.super')).length > 0){
                         next();
                     }else if (permissions.filter(permission => (permission.name === 'manager.dashboard')).length > 0 && userData.info.school.slug === to.params.slug) {

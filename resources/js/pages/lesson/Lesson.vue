@@ -1,3 +1,37 @@
+Skip to content
+Search or jump to…
+Pull requests
+Issues
+Codespaces
+Marketplace
+Explore
+
+@tuanff
+ngotuananh101
+/
+let-learn
+Private
+Fork your own copy of ngotuananh101/let-learn
+Code
+Issues
+Pull requests
+1
+Actions
+Projects
+Wiki
+Security
+Insights
+Beta Try the new code view
+let-learn/resources/js/pages/lesson/Lesson.vue
+@TuanNQ31
+TuanNQ31 Fix bug
+Latest commit 5f7d32a yesterday
+ History
+ 3 contributors
+@TuanNQ31@hailongvu@tuanff
+274 lines (270 sloc)  11.8 KB
+
+
 <template>
     <div class="row mt-3">
         <div class="col-md-7 col-12">
@@ -191,11 +225,11 @@ export default {
                 if (!this.type) {
                     this.data = mutation.payload;
                     console.log(this.data);
-                    // this.lesson = this.data.lesson = mutation.payload.lesson;
-                    // this.relearns = this.data.relearn = mutation.payload.relearn;
-                    // this.notLearns = this.data.notLearn = mutation.payload.notLearn;
-                    // this.learneds = this.data.learned = mutation.payload.learned;
-                    // document.getElementById("text").innerHTML = this.data.notLearn[this.currentCardIndex].definition;
+                    this.lesson = this.data.lesson = mutation.payload.lesson;
+                    this.relearns = this.data.relearn = mutation.payload.relearn;
+                    this.notLearns = this.data.notLearn = mutation.payload.notLearn;
+                    this.learneds = this.data.learned = mutation.payload.learned;
+                    document.getElementById("text").innerHTML = this.data.notLearn[this.currentCardIndex].definition;
                 }
                 if (this.type === 'delete') {
                     this.$root.showSnackbar('Delete lesson successfully', 'success');
@@ -263,11 +297,9 @@ export default {
     transition: all 0.3s;
     transform-style: preserve-3d;
 }
-
 .rotate {
     transform: rotateY(360deg);
 }
-
 .card-text {
     white-space: pre-line;
 }

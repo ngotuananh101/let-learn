@@ -117,6 +117,8 @@ class UserController extends Controller
             } else {
                 $schools = null;
                 $classes = null;
+                $member = null;
+                $count = null;
             }
             return response()->json([
                 // get random 6 lessons
@@ -509,9 +511,9 @@ class UserController extends Controller
      *
      * @param \Illuminate\Http\Request $request
      * @param int $id
-     * @return \Illuminate\Http\Response
+     * @return JsonResponse
      */
-    public function update(Request $request, $id)
+    public function update(Request $request, $id): JsonResponse
     {
         try {
             $request->validate([

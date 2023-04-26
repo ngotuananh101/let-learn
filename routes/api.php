@@ -45,12 +45,19 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::resource('courses', 'App\Http\Controllers\School\CourseController');
         Route::resource('classes', 'App\Http\Controllers\School\ClassController');
     });
+    Route::group(['prefix' => 'classes'], function (){
+        Route::resource('{class_id}/posts', 'App\Http\Controllers\Classes\PostController');
+        Route::resource('{class_id}/quizzes', 'App\Http\Controllers\Classes\QuizController');
+        Route::get('{class_id}/members', 'App\Http\Controllers\Classes\MemberController@getMember');
+    });
     Route::group(['prefix' => 'public'], function () {
         Route::get('home', 'App\Http\Controllers\Public\HomeController@index');
         Route::get('information', 'App\Http\Controllers\Public\UserController@index');
+        Route::get('search', 'App\Http\Controllers\Public\SearchController@index');
     });
     Route::group(['prefix' => 'forum'], function () {
         Route::resource('post', 'App\Http\Controllers\Public\PostController');
+        Route::resource('post/{post_id}/comment', 'App\Http\Controllers\Public\CommentController');
     });
     Route::group(['middleware' => ['permission:user.default'], 'prefix' => 'user'], function () {
         Route::resource('user', 'App\Http\Controllers\Public\UserController')->except(['index']);

@@ -6,21 +6,19 @@
         </div>
         <div class="col-10">
             <div class="card">
-                <h5 style="padding-left: 10px; padding-top: 10px;">Update your email address</h5>
+                <h5 style="padding-left: 10px; padding-top: 10px;">Change information</h5>
                 <div class="card-body">
                     <div class="form-group">
-                        <label for="new-email">New Email Address</label>
-                        <input type="text" id="new-email" name="new-email" class="form-control"
-                            placeholder="Enter new email">
+                        <label for="name">Name:</label>
+                        <input type="text" id="new-name" name="new-name" class="form-control" placeholder="Enter name" v-model="user.name">
                     </div>
 
                     <div class="form-group">
-                        <label for="learn-password">Learn Password</label>
-                        <input type="password" id="learn-password" name="learn-password" class="form-control"
-                            placeholder="Enter Learn password">
+                        <label for="date-birth">Date of Birth:</label>
+                        <input type="date" id="date-birth" name="date-birth" class="form-control" placeholder="Enter date of birth" v-model="user.date_of_birth">
                     </div>
 
-                    <button type="submit" class="btn btn-primary">Submit</button>
+                    <button type="submit" class="btn btn-primary" @click="changeInfo()">Submit</button>
                 </div>
             </div>
         </div>
@@ -35,19 +33,20 @@
                 <div class="card-body">
                     <div class="form-group">
                         <label for="new-email">Current PassWord</label>
-                        <input type="text" id="new-email" name="new-email" class="form-control" placeholder="Enter password"
-                            v-model="this.password.old_password">
+                        <input type="text" id="new-email" name="new-email" class="form-control"
+                               placeholder="Enter password"
+                               v-model="this.password.old_password">
                     </div>
 
                     <div class="form-group">
                         <label for="learn-password">New Password</label>
                         <input type="password" id="learn-password" name="learn-password" class="form-control"
-                            placeholder="Enter new password" v-model="this.password.password">
+                               placeholder="Enter new password" v-model="this.password.password">
                     </div>
                     <div class="form-group">
                         <label for="learn-password">Re-New Password</label>
                         <input type="password" id="learn-password" name="learn-password" class="form-control"
-                            placeholder="Enter re-new password" v-model="this.password.password_confirmation">
+                               placeholder="Enter re-new password" v-model="this.password.password_confirmation">
                     </div>
 
                     <button type="submit" class="btn btn-primary" @click="updatePassword">Submit</button>
@@ -55,7 +54,7 @@
             </div>
         </div>
     </div>
-    <div class="row mt-5">
+    <div class="row mt-5 pb-5">
         <div class="col-2 d-flex justify-content-end align-items-center">
             <i class="fa-solid fa-moon-cloud fs-1"></i>
         </div>
@@ -68,7 +67,7 @@
                     </label>
                     <div class="form-check form-switch mx-2">
                         <input class="form-check-input" type="checkbox" v-model="$store.state.darkMode"
-                            @change="darkMode" />
+                               @change="darkMode"/>
                     </div>
                     <label class="form-check-label" for="rememberMe">
                         Dark
@@ -80,8 +79,9 @@
 </template>
 
 <script>
-import { mapState, mapMutations, mapActions } from "vuex";
-import { activateDarkMode, deactivateDarkMode } from "@/helpers/other/dark-mode";
+import { mapState } from 'vuex';
+import {activateDarkMode, deactivateDarkMode} from "@/helpers/other/dark-mode";
+
 export default {
     name: "setting",
     data() {
@@ -93,6 +93,8 @@ export default {
             },
             id: this.$route.params.id,
             user: null,
+            type: null,
+            success: false,
         };
     },
     computed: {
@@ -104,15 +106,34 @@ export default {
     },
     created() {
         this.user = this.$store.getters['user/userData'].info;
-        console.log(this.user);
     },
     methods: {
         darkMode() {
-            if (this.$store.state.darưkMode) {
+            if (this.$store.state.darkMode) {
                 activateDarkMode(); // disable dark mode using the helper function
             } else {
                 deactivateDarkMode(); // enable dark mode using the helper function
             }
+        },
+        changeInfo() {
+            this.type = 'update';
+            let data = {
+                role: this.user.role.name,
+                name: this.user.name,
+                date_of_birth: this.user.date_of_birth,
+                id: this.user.id,
+            };
+            if(data.name === "" || data.date_of_birth === ""){
+                alert('Please fill in all the fields');
+            }
+            this.$store.dispatch('home/changeInfor', data);
+            // console.log(data);
+            // //logout
+            // this.logout();
+            // location.reload();
+        },
+        logout() {
+            this.$store.dispatch('user/logout');
         },
         updatePassword() {
             this.type = 'update';
@@ -123,13 +144,13 @@ export default {
                 id: this.user.id,
                 roleName: this.user.role.name,
             };
-            if (data.password == "" || data.password_confirmation == "" || data.old_password == "") {
+            if (data.password === "" || data.password_confirmation === "" || data.old_password === "") {
                 alert('Please fill in all the fields');
-            } else if (data.old_password == data.password || data.old_password == data.password_confirmation) {
+            } else if (data.old_password === data.password || data.old_password === data.password_confirmation) {
                 alert('The new password cannot be the same as the old password');
-            } else if (data.password != data.password_confirmation) {
+            } else if (data.password !== data.password_confirmation) {
                 alert('The new password does not match the re-new password');
-            } else if (data.password == data.password_confirmation && data.old_password != data.password && data.old_password != data.password_confirmation) {
+            } else if (data.password === data.password_confirmation && data.old_password !== data.password && data.old_password !== data.password_confirmation) {
                 this.$store.dispatch('home/updatePassword', data);
                 console.log(data);
                 //push to login page

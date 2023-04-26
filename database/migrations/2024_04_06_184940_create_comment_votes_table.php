@@ -13,11 +13,12 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('post_likes', function (Blueprint $table) {
+        Schema::create('comment_votes', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('user_id')->constrained();
-            $table->foreignId('post_id')->constrained();
-            $table->enum('like_status', ['like', 'unlike'])->default('unlike');
+            $table->foreignId('user_id')->constrained()->onDelete('cascade');
+            $table->foreignId('post_id')->constrained()->onDelete('cascade');
+            $table->foreignId('comment_id')->constrained()->onDelete('cascade');
+            $table->enum('vote_status', ['upvote', 'downvote', 'nonvote'])->default('nonvote');
             $table->timestamps();
         });
     }
@@ -29,6 +30,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('post_likes');
+        Schema::dropIfExists('comment_votes');
     }
 };
