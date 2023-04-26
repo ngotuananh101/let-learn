@@ -15,6 +15,7 @@ export default {
         requestFailure(state, error) {
             state.status = {};
         },
+        search(state, data) {},
     },
     actions: {
         getHome({commit}) {
@@ -65,93 +66,6 @@ export default {
                     }
                 );
         },
-        getForumDetail({commit}, id) {
-            commit('request');
-            homeService.loadForumDetail(id)
-                .then(
-                    response => {
-                        commit('requestSuccess', response);
-                    },
-                    error => {
-                        commit('requestFailure', error);
-                    }
-                );
-        },
-        getForum({commit}, page) {
-            commit('request');
-            console.log(page);
-            homeService.loadForum(page)
-                .then(
-                    response => {
-                        commit('requestSuccess', response);
-                    },
-                    error => {
-                        commit('requestFailure', error);
-                    }
-                );
-        },
-        addQuestionForum({commit}, data) {
-            commit('request');
-            homeService.AddQuestionForum(data)
-                .then(
-                    response => {
-                        commit('requestSuccess', response);
-                    },
-                    error => {
-                        commit('requestFailure', error);
-                    }
-                );
-        },
-        commentForum({commit}, data) {
-            commit('request');
-            homeService.commentForum(data)
-                .then(
-                    response => {
-                        commit('requestSuccess', response);
-                    },
-                    error => {
-                        commit('requestFailure', error);
-                    }
-                );
-        },
-
-        voteComment({commit}, data) {
-            commit('request');
-            homeService.voteComment(data)
-                .then(
-                    response => {
-                        commit('requestSuccess', response);
-                    },
-                    error => {
-                        commit('requestFailure', error);
-                    }
-                );
-        },
-        voteQuestion({commit}, data) {
-            commit('request');
-            homeService.voteQuestion(data)
-                .then(
-                    response => {
-                        commit('requestSuccess', response);
-                    },
-                    error => {
-                        commit('requestFailure', error);
-                    }
-                );
-        },
-        updatePost({commit}, data) {
-            commit('request');
-            homeService.postUpdate(data)
-                .then(
-                    response => {
-                        commit('requestSuccess', response);
-                    },
-                    error => {
-                        commit('requestFailure', error);
-                    }
-                );
-        },
-
         updatePassword({ commit }, password){
             console.log(password);
             commit("request");
@@ -164,6 +78,18 @@ export default {
                 }
             );
         },
+        search({ commit }, query) {
+            commit('request');
+            homeService.search(query)
+                .then(
+                    response => {
+                        commit('search', response);
+                    },
+                    error => {
+                        commit('requestFailure', error);
+                    }
+                );
+        }
 
     },
     getters: {

@@ -91,6 +91,18 @@ export default {
                         commit('failure', error);
                     }
                 );
+        },
+        updateScore({commit}, data) {
+            commit('request');
+            return quizService.updateScore(data)
+                .then(
+                    res => {
+                        commit('quizUpdated');
+                    },
+                    error => {
+                        commit('failure', error);
+                    }
+                );
         }
     }
 }

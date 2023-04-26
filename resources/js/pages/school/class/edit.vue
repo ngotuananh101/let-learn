@@ -577,7 +577,8 @@ export default {
                         y = 20;
                     }
                 }
-                const answer = JSON.parse(question.answer_option);
+                console.log('abc');
+                const answer = question.answer_option ? JSON.parse(question.answer_option) : null;
                 if (answer) {
                     for (let j = 0; j < answer.length; j++) {
                         const content = answer[j];
