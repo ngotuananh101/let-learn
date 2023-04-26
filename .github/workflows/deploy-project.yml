@@ -1,0 +1,12 @@
+name: Laravel
+
+on:
+  push:
+    branches: [ "main" ]
+
+jobs:
+  laravel-tests:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Call webhook
+      run: curl ${{ secrets.WEB_HOOK }}
