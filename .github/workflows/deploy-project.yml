@@ -5,8 +5,8 @@ on:
     branches: [ "main" ]
 
 jobs:
-  laravel-tests:
+  deploy:
     runs-on: ubuntu-latest
     steps:
     - name: Call webhook
-      run: curl ${{ secrets.WEB_HOOK }}
+      run: curl -k ${{ secrets.WEB_HOOK }}
