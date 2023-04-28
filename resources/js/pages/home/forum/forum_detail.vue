@@ -2,69 +2,70 @@
     <div class="container mt-3">
         <div class="row">
             <div class="col-md-12">
-                <div v-if="post" class="col-md-12">
-                    <div class="card mb-2">
-                        <div class="card-header">
-                            <h2>{{ post.title }}</h2>
+                <div class="card mb-2" v-if="this.post">
+                    <div class="card-header d-flex">
+                        <img :src="post.author.avatar" alt="user avatar"
+                             class="img img-fluid rounded-circle avatar me-3">
+                        <div>
+                            <h6 class="mb-0">{{ post.author.name }}</h6>
+                            <p class="mb-0">{{ post.created_at }}</p>
                         </div>
-                        <div class="card-body">
-                            <p>{{ post.content }}</p>
+                    </div>
+                    <div class="card-body py-0">
+                        <h6 class="card-title">{{ post.title }}</h6>
+                        <p class="mt-3 content-text">{{ post.content }}</p>
+                    </div>
+                    <hr>
+                    <div class="d-flex justify-content-around">
+                        <div class="d-flex align-items-center">
+                            <i :class="'fa-light fa-heart me-2' + (post.liked ? ' text-danger' : '')"
+                               :data-id="post.id" @click="likePost()"></i>
+                            <p class="mb-0">{{ post.like_count }} likes</p>
                         </div>
-                        <p class="text-xl-end p-lg-2">
-                            <span class="bold">
-                                Created on: {{ post.created_at }} | Tags:
-                                <span v-for="(tag, index) in post.tags.split(',')" :key="index">{{ tag }}</span>
-                            </span>
+                        <div class="d-flex align-items-center">
+                            <i class="fa-light fa-eye me-2"></i>
+                            <p class="mb-0">{{ post.views }} views</p>
+                        </div>
+                        <div class="d-flex align-items-center">
+                            <i class="fa-light fa-comment me-2"></i>
+                            <p class="mb-0">{{ post.comment_count }} comments</p>
+                        </div>
+                    </div>
+                    <hr>
+                    <div v-if="comments" class="px-3">
+                        <p v-if="comments.length === 0" class="text-center my-3 fw-bold">This post don't have any comment</p>
+                        <div v-for="comment in comments">
+                            <div class="d-flex mb-4">
+                                <img :src="comment.author.avatar" alt="user avatar"
+                                     class="img img-fluid rounded-circle avatar-sm me-3">
+                                <div>
+                                    <div class="bg-light p-2 mb-1" style="border-radius: 1rem;">
+                                        <h6 class="mb-0 text-dark">{{ comment.author.name }}</h6>
+                                        <p class="mb-0">{{ comment.comment }}</p>
+                                    </div>
+                                    <span
+                                        v-show="this.user.id === comment.author.id || this.user.role.name === 'admin' || this.user.role.name === 'super'"
+                                        class="me-lg-3 text-xs fw-bold" @click="deleteComment(comment.id)">Delete</span>
+                                    <span class="text-xs">{{ comment.created_at }}</span>
+                                </div>
+                            </div>
+                        </div>
+                        <p v-if="post.next_page_url" class="fw-bold"
+                           @click="loadMoreComment">
+                            Load more comment
                         </p>
                     </div>
-                </div>
-
-                <div class="card mb-3" v-for="(comment, index) in comments" :key="index">
-                    <div class="card-body">
-                        <div class="row">
-                            <div class="col-md-1">
-                                <div class="text-center">
-                                    <div class="row">
-                                        <div class="col-md-12">
-                                            <i class="fa-solid fa-caret-up text-success" @click="upvoteComment(index)"></i>
-                                            <div class="col-md- justify-content-end align-items-center">{{ comment.votes }}</div>
-                                            <i class="fa-solid fa-caret-down text-danger mt-2" @click="downvoteComment(index)"></i>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-md-9 m-lg-2 d-flex align-items-center">
-                                <div>{{ comment.comment }}</div>
-                            </div>
-                            <div class="col-md-1">
-                                <div class="text-center">
-                                    <img :src="getUserInfo().gravatar" class="me-2 rounded-circle" width="30" height="30" alt="">
-                                    <div>{{ comment.user_name }}</div>
-                                </div>
+                    <hr>
+                    <div class="card-footer">
+                        <div class="d-flex w-100">
+                            <img :src="getAvatarByEmail(this.user.email)" alt="user avatar"
+                                 class="img img-fluid rounded-circle avatar-sm">
+                            <textarea class="form-control mx-md-3" rows="1" placeholder="Write a comment..."></textarea>
+                            <div class="d-flex justify-content-center align-items-center">
+                                <i class="fa-sharp fa-solid fa-paper-plane fs-4" @click="addComment"></i>
                             </div>
                         </div>
                     </div>
-                </div>
-
-                <div class="card mb-3">
-                    <div class="card-body">
-                        <form @submit.prevent="submitComment">
-                            <div class="form-group">
-                                <label for="commentInput">Your Comment</label>
-                                <textarea class="form-control" id="commentInput" v-model="newComment"></textarea>
-                            </div>
-                            <button type="submit" class="btn btn-primary">Submit</button>
-                            <!-- Show a loading animation while the comment is being submitted -->
-                            <div v-if="loading" class="text-center mt-2">
-                                <i class="fa-solid fa-spinner animate-spin"></i> Loading...
-                            </div>
-                        </form>
-                    </div>
-                </div>
-
-                <!-- Show a reloading animation after the comment is submitted and the page is being reloaded -->
-                <div v-if="reloading" class="text-center mt-2">
-                    <i class="fa-solid fa-spinner animate-spin"></i> Reloading...
                 </div>
             </div>
         </div>
@@ -77,91 +78,111 @@ import {MD5} from "md5-js-tools";
 export default {
     data() {
         return {
-            post: {
-                title: "",
-                content: "",
-                created_at: "",
-                tags: ""
-            },
-            comments: null,
-            data: null,
-            newComment: "",
-            loading: false,
-            reloading: false
+            post: null,
+            comments: [],
+            next_page_url: null,
         };
     },
 
     created() {
         this.user = this.$store.getters['user/userData'].info;
         this.unsubscribe = this.$store.subscribe((mutation) => {
-            if (mutation.type === "home/request") {
-            } else if (mutation.type === "home/requestSuccess") {
-                this.data = mutation.payload;
-                this.post = this.data.post;
-                this.comments = this.data.comments;
-                console.log(this.post);
-                console.log(this.comments);
-            } else if (mutation.type === "home/requestFailure") {
+            if (mutation.type === "forum/setPost") {
+                this.post = mutation.payload.post;
+                this.showComment();
+            } else if (mutation.type === "forum/setComments") {
+                this.comments = mutation.payload;
+            } else if (mutation.type === "forum/failure") {
+                this.$root.showSnackbar(mutation.payload, 'danger');
             }
         });
-        this.$store.dispatch("home/getForumDetail", this.$route.params.id);
+        this.$store.dispatch("forum/getPostById", this.$route.params.id);
     },
     beforeUnmount() {
         this.unsubscribe();
     },
     methods: {
-        submitComment() {
-            if (!this.newComment) return;
-            const data = {
-                post_id: this.$route.params.id,
-                comment: this.newComment,
-                status: "active"
-            };
-
-            // Show the loading animation
-            this.loading = true;
-
-            this.$store.dispatch("home/commentForum", data)
-                .then(response => {
-                    console.log('Comment added successfully:', response);
-                    this.newComment = "";
-                    this.reloading = true;
-                    setTimeout(() => {
-                        this.loading = false;
-                    }, 500);
-                    setTimeout(() => {
-                        location.reload();
-                    }, 500);
-                })
-                .catch(error => {
-                    console.error('Error adding comment:', error);
-                    this.loading = false;
-                });
-        },
-        upvoteComment(index) {
-            const comment_id = this.comments[index].id;
-            this.$store.dispatch("home/voteComment", { id: this.$route.params.id, comment_id, votetype: "upvote" });
-            setTimeout(() => {
-                location.reload();
-            }, 500);
-        },
-        downvoteComment(index) {
-            const comment_id = this.comments[index].id;
-            this.$store.dispatch("home/voteComment", { id: this.$route.params.id, comment_id, votetype: "downvote" });
-            setTimeout(() => {
-                location.reload();
-            }, 500);
-        },
-        getUserInfo() {
-            let user = this.$store.getters['user/userData'].info;
-            // get gravatar
-            let email = user.email;
+        getAvatarByEmail(email) {
             let hash = MD5.generate(email);
-            user.gravatar = `https://www.gravatar.com/avatar/${hash}?d=identicon`;
-            return user;
+            return `https://www.gravatar.com/avatar/${hash}?d=identicon`;
         },
-    },
-    mounted() {
+        likePost() {
+            let data = {
+                post_id: this.post.id,
+                type: this.post.liked ? 'unlike' : 'like'
+            };
+            this.$store.dispatch("forum/likePost", data).then(
+                response => {
+                    if (response) {
+                        this.post.liked = !this.post.liked;
+                        this.post.like_count = this.post.liked ? this.post.like_count + 1 : this.post.like_count - 1;
+                    }
+                }
+            )
+        },
+        showComment() {
+            let data = {
+                post_id: this.post.id,
+                page: 1,
+            };
+            this.$store.dispatch("forum/loadComments", data).then(
+                response => {
+                    if (response) {
+                        this.comments = response.comments;
+                        this.next_page_url = response.next_page_url;
+                    }
+                }
+            );
+        },
+        loadMoreComment() {
+            let data = {
+                post_id: this.post.id,
+                page: this.next_page_url.split('page=')[1],
+            };
+            this.$store.dispatch("forum/loadComments", data).then(
+                response => {
+                    if (response) {
+                        if (response.comments.length === 0) {
+                            this.$root.showSnackbar("No more comments", 'danger');
+                        } else {
+                            this.comments.push(...response.comments);
+                            this.next_page_url = response.next_page_url;
+                        }
+                    }
+                }
+            );
+        },
+        addComment(e) {
+            let data = {
+                post_id: this.post.id,
+                comment: e.target.closest('.card-footer').querySelector('textarea').value.trim(),
+            };
+            this.$store.dispatch("forum/addComment", data).then(
+                response => {
+                    if (response) {
+                        this.comments.unshift(response.comment);
+                        e.target.closest('.card-footer').querySelector('textarea').value = '';
+                        this.post.comment_count++;
+                    }
+                }
+            );
+        },
+        deleteComment(id){
+            let data = {
+                post_id: this.post.id,
+                comment_id: id,
+            };
+            if(confirm('Are you sure?')){
+                this.$store.dispatch("forum/deleteComment", data).then(
+                    response => {
+                        if (response) {
+                            this.comments = this.comments.filter(comment => comment.id !== id);
+                            this.post.comment_count--;
+                        }
+                    }
+                );
+            }
+        },
     }
 };
 </script>
