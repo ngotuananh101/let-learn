@@ -147,7 +147,7 @@ class QuizController extends Controller
                                 'is_multiple_choice' => $question->is_multiple_choice,
                             ];
                         }),
-                        'students' => $students->map(function ($student){
+                        'students' => $students->map(function ($student) {
                             return [
                                 'id' => $student->id,
                                 'name' => $student->name,
@@ -216,63 +216,91 @@ class QuizController extends Controller
     {
         try {
             $request->validate([
-                'name' => 'required|string',
-                'description' => 'required|string',
-                'class_id' => 'required|integer|exists:classes,id',
-                'start_time' => 'required|date',
-                'end_time' => 'required|date|after:start_time',
-                'questions' => 'required|array',
-                'questions.*.question' => 'required|string',
-                'questions.*.is_multiple_choice' => 'required|boolean',
-                'questions.*.score' => 'required|integer',
-                'questions.*.answers' => 'nullable|array',
-                'questions.*.answers.*.answer' => 'nullable|string',
-                'questions.*.answers.*.correct' => 'nullable|boolean',
-                'deleted_questions' => 'nullable|array',
+                'type' => 'nullable|string|in:update_score',
             ]);
-
-            $user = auth()->user();
-            $class = $user->classes()->where('class_id', $class_id)->firstOrFail();
-            $quiz = $class->quizzes()->where('id', $id)->firstOrFail();
-            // only update if quiz do not have any submissions and user is the teacher or quiz status is pending
-            if (Answer::where('quiz_id', $quiz->id)->exists() || $user->role->name !== 'teacher' || $quiz->status !== 'pending') {
-                return response()->json([
-                    'message' => 'Quiz cannot be updated',
-                ], 400);
-            }
-            // update quiz info
-            $quiz->update([
-                'name' => $request->name,
-                'description' => $request->description,
-                'start_time' => Carbon::parse($request->start_time),
-                'end_time' => Carbon::parse($request->end_time),
-            ]);
-            // delete questions
-            if ($request->deleted_questions) {
-                $quiz->questions()->whereIn('id', $request->deleted_questions)->delete();
-            }
-            // update questions
-            foreach ($request->questions as $question) {
-                $correctAnswer = array_filter($question['answers'], function ($answer) {
-                    return $answer['correct'];
-                });
-                $correctAnswer = array_values($correctAnswer)[0] ?? null;
-                $answerOptions = array_map(function ($answer) {
-                    return $answer['answer'];
-                }, $question['answers']);
-                $quiz->questions()->updateOrCreate([
-                    'id' => $question['id'],
-                ], [
-                    'is_multiple_choice' => $question['is_multiple_choice'],
-                    'question' => $question['question'],
-                    'points' => $question['score'],
-                    'correct_answer' => $question['is_multiple_choice'] ? $correctAnswer['answer'] : "",
-                    'answer_option' => $question['is_multiple_choice'] ? json_encode($answerOptions, JSON_UNESCAPED_UNICODE) : "",
+            if (!$request->input('type')) {
+                $request->validate([
+                    'name' => 'required|string',
+                    'description' => 'required|string',
+                    'class_id' => 'required|integer|exists:classes,id',
+                    'start_time' => 'required|date',
+                    'end_time' => 'required|date|after:start_time',
+                    'questions' => 'required|array',
+                    'questions.*.question' => 'required|string',
+                    'questions.*.is_multiple_choice' => 'required|boolean',
+                    'questions.*.score' => 'required|integer',
+                    'questions.*.answers' => 'nullable|array',
+                    'questions.*.answers.*.answer' => 'nullable|string',
+                    'questions.*.answers.*.correct' => 'nullable|boolean',
+                    'deleted_questions' => 'nullable|array',
                 ]);
+
+                $user = auth()->user();
+                $class = $user->classes()->where('class_id', $class_id)->firstOrFail();
+                $quiz = $class->quizzes()->where('id', $id)->firstOrFail();
+                // only update if quiz do not have any submissions and user is the teacher or quiz status is pending
+                if (Answer::where('quiz_id', $quiz->id)->exists() || $user->role->name !== 'teacher' || $quiz->status !== 'pending') {
+                    return response()->json([
+                        'message' => 'Quiz cannot be updated',
+                    ], 400);
+                }
+                // update quiz info
+                $quiz->update([
+                    'name' => $request->name,
+                    'description' => $request->description,
+                    'start_time' => Carbon::parse($request->start_time),
+                    'end_time' => Carbon::parse($request->end_time),
+                ]);
+                // delete questions
+                if ($request->deleted_questions) {
+                    $quiz->questions()->whereIn('id', $request->deleted_questions)->delete();
+                }
+                // update questions
+                foreach ($request->questions as $question) {
+                    $correctAnswer = array_filter($question['answers'], function ($answer) {
+                        return $answer['correct'];
+                    });
+                    $correctAnswer = array_values($correctAnswer)[0] ?? null;
+                    $answerOptions = array_map(function ($answer) {
+                        return $answer['answer'];
+                    }, $question['answers']);
+                    $quiz->questions()->updateOrCreate([
+                        'id' => $question['id'],
+                    ], [
+                        'is_multiple_choice' => $question['is_multiple_choice'],
+                        'question' => $question['question'],
+                        'points' => $question['score'],
+                        'correct_answer' => $question['is_multiple_choice'] ? $correctAnswer['answer'] : "",
+                        'answer_option' => $question['is_multiple_choice'] ? json_encode($answerOptions, JSON_UNESCAPED_UNICODE) : "",
+                    ]);
+                }
+                return response()->json([
+                    'message' => 'Quiz updated successfully',
+                ], 200);
             }
-            return response()->json([
-                'message' => 'Quiz updated successfully',
-            ], 200);
+            else {
+                if ($request->input('type') === 'update_score') {
+                    $request->validate([
+                        'user_id' => 'required|integer|exists:users,id',
+                        'quiz_id' => 'required|integer|exists:quizzes,id',
+                        'answer_text' => 'required|string',
+                    ]);
+                    $user = auth()->user();
+                    // only update if user is the teacher
+                    if ($user->role->name !== 'teacher') {
+                        return response()->json([
+                            'message' => 'Quiz cannot be updated',
+                        ], 400);
+                    }
+                    $answer = Answer::where('user_id', $request->user_id)->where('quiz_id', $request->quiz_id)->firstOrFail();
+                    $answer->update([
+                        'answer_text' => $request->answer_text,
+                    ]);
+                    return response()->json([
+                        'message' => 'Quiz updated successfully',
+                    ], 200);
+                }
+            }
         } catch (\Exception $e) {
             return response()->json([
                 'message' => $e->getMessage(),

@@ -143,9 +143,9 @@
                                             </div>
                                             <div class="col-md-6 col-12" v-if="quiz.status !== 'pending'">
                                                 <button type="button" class="btn btn-primary w-100"
-                                                        @click="exportResultToExcel(quiz.id)"
+                                                        @click="showFormViewScore(quiz.id)"
                                                 >
-                                                    Update mark
+                                                    View Score
                                                 </button>
                                             </div>
                                             <div class="col-md-6 col-12" v-if="quiz.status === 'pending'">
@@ -245,7 +245,7 @@
                     </div>
                     <hr>
                     <div v-if="post.comments">
-                        <p v-if="post.comments.length === 0">This post don't hame any comment</p>
+                        <p v-if="post.comments.length === 0">This post don't have any comment</p>
                         <div v-for="comment in post.comments">
                             <div class="d-flex mb-4">
                                 <img :src="comment.author.avatar" alt="user avatar"
@@ -302,11 +302,53 @@
             </div>
         </div>
     </div>
+    <div class="modal fade" id="viewScoreModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
+         aria-labelledby="staticBackdropLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-fullscreen">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h1 class="modal-title fs-5" id="staticBackdropLabel">Score report for {{ quiz_info ? quiz_info.quiz.name : "" }}</h1>
+                    <i class="fa-duotone fa-circle-xmark fs-2" data-bs-dismiss="modal"></i>
+                </div>
+                <table class="table table-responsive" id="viewScoreTable"></table>
+            </div>
+        </div>
+    </div>
+    <div class="modal fade" id="updateScoreModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
+         aria-labelledby="staticBackdropLabel" aria-hidden="true" style="background: rgba(0,0,0,0.6)">
+        <div class="modal-dialog modal-dialog-centered modal-xl modal-dialog-scrollable">
+            <div class="modal-content shadow">
+                <div class="modal-header">
+                    <h1 class="modal-title fs-5" id="updateScoreTitle"></h1>
+                    <i class="fa-duotone fa-circle-xmark fs-2" data-bs-dismiss="modal"></i>
+                </div>
+                <div class="modal-body">
+                    <table class="table table-responsive">
+                        <thead>
+                        <tr>
+                            <th scope="col">Question</th>
+                            <th scope="col">Type</th>
+                            <th scope="col">Answer</th>
+                            <th scope="col">Is Correct</th>
+                            <th scope="col">Score</th>
+                        </tr>
+                        </thead>
+                        <tbody id="updateScoreTable_body">
+                        </tbody>
+                    </table>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" @click="updateScore">Update</button>
+                </div>
+            </div>
+        </div>
+    </div>
 </template>
 
 <script>
 import {MD5} from "md5-js-tools";
 import writeXlsxFile from 'write-excel-file';
+import {DataTable, makeEditable} from 'simple-datatables';
 
 export default {
     data() {
@@ -334,6 +376,9 @@ export default {
             },
             view_post_modal: null,
             update_post_modal: null,
+            view_score_modal: null,
+            view_score_table: null,
+            update_score_modal: null,
             new_post: {
                 title: '',
                 content: '',
@@ -342,48 +387,54 @@ export default {
                 title: '',
                 content: '',
             },
+            quiz_info: null,
+            selected_student_id: null,
         };
     },
     created() {
         this.user = this.$store.getters['user/userData'].info;
         this.unsubscribe = this.$store.subscribe((mutation) => {
-            if (mutation.type === "home/request") {
-            } else if (mutation.type === "home/requestSuccess") {
-                this.members = mutation.payload.data;
-                this.$setPageTitle(mutation.payload.class_name + " Classroom");
-            } else if (mutation.type === "classPost/setPosts") {
-                this.posts_data = mutation.payload;
-            } else if (mutation.type === "classPost/commentAdded") {
-                location.reload();
-            } else if (mutation.type === "classPost/commentLoaded") {
-                this.post.comments ? this.post.comments = this.post.comments.concat(mutation.payload.comments) : this.post.comments = mutation.payload.comments;
-                this.post.total_page = mutation.payload.total_page;
-                this.post.current_page = mutation.payload.current_page;
-            } else if (mutation.type === "classPost/commentDeleted") {
-                location.reload();
-            } else if (mutation.type === "classPost/postAdded") {
-                location.reload();
-            } else if (mutation.type === "classPost/failure") {
-                this.$root.showSnackbar(mutation.payload, "danger");
-            } else if (mutation.type === "classPost/commentDeleted") {
-                location.reload();
-            } else if (mutation.type === "classPost/setMorePost") {
-                this.posts_data.posts = this.posts_data.posts.concat(mutation.payload.posts);
-                this.posts_data.next_page_url = mutation.payload.next_page_url;
-                this.posts_data.prev_page_url = mutation.payload.prev_page_url;
-                setTimeout(() => {
-                    window.scrollTo(0, document.body.scrollHeight);
-                }, 100);
-            } else if (mutation.type === "classPost/postDeleted") {
-                location.reload();
-            } else if (mutation.type === "classPost/postUpdated") {
-                location.reload();
-            } else if (mutation.type === "classQuiz/setQuiz") {
-                this.quizzes = mutation.payload.quizzes;
-            } else if (mutation.type === "classQuiz/quizDeleted") {
-                location.reload();
-            } else if (mutation.type === "classQuiz/failure") {
-                this.$root.showSnackbar(mutation.payload, "danger");
+            switch (mutation.type) {
+                case "home/requestSuccess":
+                    this.members = mutation.payload.data;
+                    this.$setPageTitle(mutation.payload.class_name + " Classroom");
+                    break;
+                case "classPost/setPosts":
+                    this.posts_data = mutation.payload;
+                    break;
+                case "classPost/commentAdded":
+                case "classPost/commentDeleted":
+                case "classPost/postAdded":
+                case "classPost/postDeleted":
+                case "classPost/postUpdated":
+                    location.reload();
+                    break;
+                case "classPost/commentLoaded":
+                    this.post.comments ? this.post.comments = this.post.comments.concat(mutation.payload.comments) : this.post.comments = mutation.payload.comments;
+                    this.post.total_page = mutation.payload.total_page;
+                    this.post.current_page = mutation.payload.current_page;
+                    break;
+                case "classPost/setMorePost":
+                    this.posts_data.posts = this.posts_data.posts.concat(mutation.payload.posts);
+                    this.posts_data.next_page_url = mutation.payload.next_page_url;
+                    this.posts_data.prev_page_url = mutation.payload.prev_page_url;
+                    setTimeout(() => {
+                        window.scrollTo(0, document.body.scrollHeight);
+                    }, 100);
+                    break;
+                case "classPost/failure":
+                case "classQuiz/failure":
+                    this.$root.showSnackbar(mutation.payload, "danger");
+                    break;
+                case "classQuiz/setQuiz":
+                    this.quizzes = mutation.payload.quizzes;
+                    break;
+                case "classQuiz/quizDeleted":
+                case "classQuiz/quizUpdated":
+                    location.reload();
+                    break;
+                default:
+                    break;
             }
         });
         this.$store.dispatch("classPost/getPostsByClassId", this.id);
@@ -412,6 +463,29 @@ export default {
                 content: '',
             };
         });
+        this.view_score_modal = new bootstrap.Modal(document.getElementById('viewScoreModal'), {
+            keyboard: false
+        });
+        this.view_score_modal._element.addEventListener('hidden.bs.modal', () => {
+            this.view_score_table.destroy();
+        });
+        this.view_score_table = new DataTable('#viewScoreTable');
+        this.view_score_table.on("datatable.selectrow", (rowIndex, event) => {
+            event.preventDefault();
+            if(isNaN(rowIndex)) {}
+            else{
+                // check if user click to button update
+                let target = event.target;
+                let check = target.classList.contains('update-score-btn') && !target.classList.contains('disabled');
+                if(check){
+                    let student_id = this.quiz_info.students[rowIndex].id;
+                    this.showFormUpdateScore(student_id);
+                }
+            }
+        });
+        this.update_score_modal = new bootstrap.Modal(document.getElementById('updateScoreModal'), {
+            keyboard: false
+        });
     },
     beforeUnmount() {
         this.unsubscribe();
@@ -424,7 +498,6 @@ export default {
             return this.members ? this.members.filter(member => member.role === "student") : [];
         }
     },
-
     methods: {
         getAvatarByEmail(email) {
             let hash = MD5.generate(email);
@@ -658,11 +731,160 @@ export default {
                     writeXlsxFile(data, {
                         schema: schema,
                         sheets: sheets,
-                        fileName: "file.xlsx",
-                        wrap: true
+                        fileName: response.quiz.name + ' report.xlsx',
                     });
                 });
         },
+        showFormViewScore(quiz_id) {
+            this.$store.dispatch("classQuiz/viewReport", {
+                type: 'report',
+                quiz_id: quiz_id,
+                class_id: this.id
+            }).then(
+                response => {
+                    // check view_score_table is destroyed
+                    if (!this.view_score_table.initialized) {
+                        this.view_score_table.init();
+                    }
+                    this.quiz_info = response;
+                    const questions = response.questions;
+                    const students = response.students;
+                    const studentAnswers = response.studentAnswers;
+                    let table_data = {};
+                    table_data.headings = ['ID', 'Name', 'Email'].concat(questions.map((question, index) => 'Question ' + (index + 1)));
+                    table_data.headings.push('Total');
+                    table_data.headings.push('Action');
+                    table_data.data = [];
+                    students.forEach(student => {
+                        let answer = studentAnswers.find(answer => answer.user_id === student.id);
+                        let row = [student.id, student.name, student.email];
+                        if (answer) {
+                            let ans_data = [];
+                            let answer_text = JSON.parse(answer.answer_text);
+                            let total = 0;
+                            let max_score = 0;
+                            questions.forEach(question => {
+                                let ans = answer_text.find(ans => ans.question_id === question.id);
+                                if (ans) {
+                                    total += ans.points;
+                                    max_score += question.score;
+                                    ans_data.push({
+                                        question: question.question,
+                                        answer: ans.answer,
+                                        is_correct: ans.is_correct,
+                                        score: ans.points,
+                                        max_score: question.score
+                                    });
+                                } else {
+                                    ans_data.push({
+                                        question: question.question,
+                                        answer: '',
+                                        is_correct: false,
+                                        score: 0,
+                                        max_score: question.score
+                                    });
+                                }
+                            });
+                            row = row.concat(ans_data.map(ans => ans.score));
+                            row.push(total + '/' + max_score + ' (' + (total / max_score * 100).toFixed(2) + '%)');
+                            row.push('<button class="btn btn-primary btn-sm update-score-btn" data-id=' + student.id +'>Update</button>');
+                        } else {
+                            let ans_data = [];
+                            let total = 0;
+                            let max_score = 0;
+                            questions.forEach(question => {
+                                ans_data.push({
+                                    question: question.question,
+                                    answer: 'Not answer',
+                                    is_correct: false,
+                                    score: 0,
+                                    max_score: question.score
+                                });
+                                max_score += question.score;
+                            });
+                            row = row.concat(ans_data.map(ans => ans.score));
+                            row.push(total + '/' + max_score + ' (' + (total / max_score * 100).toFixed(2) + '%)');
+                            row.push('<button class="btn btn-primary btn-sm disabled" data-id=' + student.id +'>Update</button>');
+                        }
+                        table_data.data.push(row);
+                    });
+                    this.view_score_table.insert(table_data);
+                    this.view_score_modal.show();
+                }
+            );
+        },
+        showFormUpdateScore(student_id){
+            let student = this.quiz_info.students.find(student => student.id === student_id);
+            let answer = this.quiz_info.studentAnswers.find(answer => answer.user_id === student_id);
+            let answer_text = JSON.parse(answer.answer_text);
+            let questions = this.quiz_info.questions;
+            let table_body = document.getElementById('updateScoreTable_body');
+            table_body.innerHTML = '';
+            questions.forEach(question => {
+                let ans = answer_text.find(ans => ans.question_id === question.id);
+                let row = document.createElement('tr');
+                let question_td = document.createElement('td');
+                question_td.innerHTML = question.question.split('[')[0].trim();
+                let type_td = document.createElement('td');
+                type_td.innerHTML = question.is_multiple_choice ? 'Multiple choice' : 'Short answer';
+                let answer_td = document.createElement('td');
+                answer_td.innerHTML = ans.answer ?? 'Not answer';
+                let is_correct_td = document.createElement('td');
+                let score_td = document.createElement('td');
+                if(question.is_multiple_choice){
+                    is_correct_td.innerHTML = ans.is_correct ? 'Correct' : 'Incorrect';
+                    score_td.innerHTML = ans.points;
+                } else {
+                    is_correct_td.innerHTML = 'N/A';
+                    let score_input = document.createElement('input');
+                    score_input.type = 'number';
+                    score_input.className = 'form-control';
+                    score_input.value = ans.points;
+                    score_input.min = 0;
+                    score_input.max = question.score;
+                    score_input.setAttribute('data-id', question.id);
+                    score_td.appendChild(score_input);
+                }
+                row.appendChild(question_td);
+                row.appendChild(type_td);
+                row.appendChild(answer_td);
+                row.appendChild(is_correct_td);
+                row.appendChild(score_td);
+                table_body.appendChild(row);
+            });
+            document.getElementById('updateScoreTitle').innerHTML = "Score of " + student.name;
+            this.selected_student_id = student_id;
+            this.update_score_modal.show();
+        },
+        updateScore(){
+            let score = 0;
+            let max_score = 0;
+            let questions = this.quiz_info.questions;
+            let answer_text = JSON.parse(this.quiz_info.studentAnswers.find(answer => answer.user_id === this.selected_student_id).answer_text);
+            let table_body = document.getElementById('updateScoreTable_body');
+            let inputs = table_body.querySelectorAll('input');
+            inputs.forEach(input => {
+                let question = questions.find(question => question.id === parseInt(input.getAttribute('data-id')));
+                let ans = answer_text.find(ans => ans.question_id === question.id);
+                ans.points = parseInt(input.value);
+                score += ans.points;
+                max_score += question.score;
+            });
+            let data = {
+                user_id: this.selected_student_id,
+                quiz_id: this.quiz_info.quiz.id,
+                answer_text: JSON.stringify(answer_text),
+                type: 'update_score',
+                class_id: this.id,
+            };
+            this.$store.dispatch('classQuiz/updateScore', data);
+        }
     }
 }
 </script>
+<style>
+.datatable-wrapper {
+    width: 100%;
+    overflow-x: auto;
+}
+</style>
