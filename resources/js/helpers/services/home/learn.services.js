@@ -35,7 +35,7 @@ function loadLearn(data) {
         body: JSON.stringify({
             lesson_id: data.id,
             quantity: 8,
-            reverse: 1,
+            reverse: 0,
             mix_details: 0,
             mix_answers: 0,
         }),
@@ -64,7 +64,7 @@ function loadSelfTest(id, roleName) {
         body: JSON.stringify({
             lesson_id: id,
             quantity: 20,
-            reverse: 1,
+            reverse: 0,
             mix_details: 0,
             mix_answers: 0,
         }),

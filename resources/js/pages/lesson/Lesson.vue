@@ -1,37 +1,3 @@
-Skip to content
-Search or jump to…
-Pull requests
-Issues
-Codespaces
-Marketplace
-Explore
-
-@tuanff
-ngotuananh101
-/
-let-learn
-Private
-Fork your own copy of ngotuananh101/let-learn
-Code
-Issues
-Pull requests
-1
-Actions
-Projects
-Wiki
-Security
-Insights
-Beta Try the new code view
-let-learn/resources/js/pages/lesson/Lesson.vue
-@TuanNQ31
-TuanNQ31 Fix bug
-Latest commit 5f7d32a yesterday
- History
- 3 contributors
-@TuanNQ31@hailongvu@tuanff
-274 lines (270 sloc)  11.8 KB
-
-
 <template>
     <div class="row mt-3">
         <div class="col-md-7 col-12">
@@ -40,8 +6,7 @@ Latest commit 5f7d32a yesterday
                     <div class="card-header">
                         <div class="d-flex justify-content-between align-items-center">
                             <div>
-                                <h6 class="card-subtitle text-muted">{{ cardsCount.currentCardIndex + 1 }} /
-                                    {{ cardsCount.totalCards }}</h6>
+                                <h6 class="card-subtitle text-muted">{{cardsCount}}</h6>
                             </div>
                         </div>
                     </div>
@@ -160,7 +125,7 @@ Latest commit 5f7d32a yesterday
         <h5 class="mt-4">Description</h5>
         <!-- <p>{{ data.lesson.description }}</p> -->
     </div>
-    <h6 class="mt-3">Relearn:</h6>
+    <h6 class="mt-3" v-if="relearn">Relearn:</h6>
     <!-- <h6>Relearn: {{ data.relearns.length }}</h6> -->
     <div class="col-12" v-for="relearn in relearns">
         <div class="card mt-4">
@@ -170,7 +135,7 @@ Latest commit 5f7d32a yesterday
             </div>
         </div>
     </div>
-    <h6 class="mt-3">NotLearn:</h6>
+    <h6 class="mt-3" v-if="notLearn">NotLearn:</h6>
     <!-- <h6>NotLearn: {{ data.notLearns.length }}</h6> -->
     <div class="col-12" v-for="notLearn in notLearns">
         <div class="card mt-4">
@@ -180,7 +145,7 @@ Latest commit 5f7d32a yesterday
             </div>
         </div>
     </div>
-    <h6 class="mt-3">Learned:</h6>
+    <h6 class="mt-3" v-if="learned">Learned:</h6>
     <!-- <h6>NotLearn: {{ data.learneds.length }}</h6> -->
     <div class="col-12" v-for="learned in learneds">
         <div class="card mt-4">
@@ -210,6 +175,10 @@ export default {
             type: null,
             learneds: null,
             lesson: null,
+            data: null,
+            card: null,
+
+            unsubscribe: null,
         };
     },
     title() {
@@ -224,12 +193,12 @@ export default {
             } else if (mutation.type === "lesson/success") {
                 if (!this.type) {
                     this.data = mutation.payload;
-                    console.log(this.data);
                     this.lesson = this.data.lesson = mutation.payload.lesson;
                     this.relearns = this.data.relearn = mutation.payload.relearn;
                     this.notLearns = this.data.notLearn = mutation.payload.notLearn;
                     this.learneds = this.data.learned = mutation.payload.learned;
-                    document.getElementById("text").innerHTML = this.data.notLearn[this.currentCardIndex].definition;
+                    this.card =this.data.notLearn ?? this.data.learned ?? this.data.relearn;
+                    document.getElementById("text").innerHTML = this.card[this.currentCardIndex].term;
                 }
                 if (this.type === 'delete') {
                     this.$root.showSnackbar('Delete lesson successfully', 'success');
@@ -241,6 +210,9 @@ export default {
         });
         this.$store.dispatch("lesson/getFlashCard", { id: this.id, roleName: this.user.role.name });
     },
+    beforeUnmount() {
+        this.unsubscribe();
+    },
     methods: {
         updateTitle(title) {
             this.$emit("change-title", title);
@@ -251,7 +223,7 @@ export default {
             } else {
                 this.currentCardIndex = 0;
             }
-            document.getElementById("text").innerHTML = this.data.notLearn[this.currentCardIndex].definition;
+            document.getElementById("text").innerHTML = this.card[this.currentCardIndex].term;
         },
         previousCard() {
             if (this.currentCardIndex > 0) {
@@ -259,17 +231,17 @@ export default {
             } else {
                 this.currentCardIndex = this.data.notLearn.length - 1;
             }
-            document.getElementById("text").innerHTML = this.data.notLearn[this.currentCardIndex].definition;
+            document.getElementById("text").innerHTML = this.card[this.currentCardIndex].term;
         },
         rotateCard(e) {
             let card = document.getElementById("card");
             if (this.currentSide === "front") {
                 card.classList.add("rotate");
-                document.getElementById("text").innerHTML = this.data.notLearn[this.currentCardIndex].term;
+                document.getElementById("text").innerHTML = this.card[this.currentCardIndex].definition;
                 this.currentSide = "back";
             } else {
                 card.classList.remove("rotate");
-                document.getElementById("text").innerHTML = this.data.notLearn[this.currentCardIndex].definition;
+                document.getElementById("text").innerHTML = this.card[this.currentCardIndex].term;
                 this.currentSide = "front";
             }
         },
@@ -283,10 +255,7 @@ export default {
     },
     computed: {
         cardsCount() { // add cardsCount computed property
-            return {
-                currentCardIndex: this.currentCardIndex,
-                totalCards: this.data ? this.data.notLearn.length: 0
-            };
+            return `${this.currentCardIndex + 1}/${this.card ? this.card.length : 0}`;
         }
     }
 }
