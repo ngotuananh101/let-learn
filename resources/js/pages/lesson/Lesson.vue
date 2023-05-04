@@ -217,7 +217,7 @@ export default {
             this.$emit("change-title", title);
         },
         nextCard() {
-            if (this.currentCardIndex < this.data.notLearn.length - 1) {
+            if (this.currentCardIndex < this.card.length - 1) {
                 this.currentCardIndex++;
             } else {
                 this.currentCardIndex = 0;
@@ -228,7 +228,7 @@ export default {
             if (this.currentCardIndex > 0) {
                 this.currentCardIndex--;
             } else {
-                this.currentCardIndex = this.data.notLearn.length - 1;
+                this.currentCardIndex = this.card.length - 1;
             }
             document.getElementById("text").innerHTML = this.card[this.currentCardIndex].term;
         },

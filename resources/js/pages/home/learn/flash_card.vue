@@ -14,7 +14,7 @@
         </div>
         <div class="card-body" style="height: 50vh; max-height: 70vh;" @click="rotateCard">
             <div class="h-100 d-flex justify-content-center align-items-center">
-                <p class="card-text fs-4" id="text" v-text="currentSide === 'front' ? data[currentCardIndex].definition : data[currentCardIndex].term"></p>
+                <p class="card-text fs-4" id="text" v-text="currentSide === 'front' ? data[currentCardIndex].term : data[currentCardIndex].definition"></p>
             </div>
         </div>
         <h5 class="card-footer"></h5>
@@ -50,7 +50,7 @@ export default {
                 this.data = mutation.payload;
                 console.log(this.data);
                 if(this.data.length > 0){
-                    this.currentCard = this.data[0].definition;
+                    this.currentCard = this.data[0].term;
                 }
             } else if (mutation.type === "learn/requestFailure") {
             }
@@ -70,7 +70,7 @@ export default {
                 this.currentCardIndex = 0;
                 this.$emit("change-progress", 0);
             }
-            this.currentCard = this.currentSide === 'front' ? this.data[this.currentCardIndex].definition : this.data[this.currentCardIndex].term;
+            this.currentCard = this.currentSide === 'front' ? this.data[this.currentCardIndex].term : this.data[this.currentCardIndex].definition;
         },
         previousCard() {
             if (this.data && this.currentCardIndex > 0) {
@@ -79,7 +79,7 @@ export default {
             } else {
                 this.currentCardIndex = this.data.length - 1;
             }
-            this.currentCard = this.currentSide === 'front' ? this.data[this.currentCardIndex].definition : this.data[this.currentCardIndex].term;
+            this.currentCard = this.currentSide === 'front' ? this.data[this.currentCardIndex].term : this.data[this.currentCardIndex].definition;
         },
         toggleSettings() { // add toggleSettings method
             this.showSettings = !this.showSettings;
