@@ -215,8 +215,6 @@ export default {
             location.reload();
         },
         relearn() {
-            console.log('relearn');
-            console.log(this.user.id);
             this.$store.dispatch('learn/relearn', {
                 lesson_id: this.$route.params.id,
                 user_id: this.user.id

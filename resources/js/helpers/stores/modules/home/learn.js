@@ -53,8 +53,6 @@ export default {
         },
         relearn({ commit }, data) {
             commit("request");
-            console.log(data.lesson_id);
-            console.log(data.user_id);
             learnService.relearn(data).then(
                 (response) => {
                     commit("requestSuccess", response);

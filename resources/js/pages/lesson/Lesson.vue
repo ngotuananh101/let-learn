@@ -121,11 +121,9 @@
         </div>
     </div>
     <div class="mt-4">
-        <!--show the lesson's description by lesson id -->
         <h5 class="mt-4">Description</h5>
-        <!-- <p>{{ data.lesson.description }}</p> -->
     </div>
-    <h6 class="mt-3" v-if="relearn">Relearn:</h6>
+    <h6 class="mt-3" v-if="relearns">Relearn:</h6>
     <!-- <h6>Relearn: {{ data.relearns.length }}</h6> -->
     <div class="col-12" v-for="relearn in relearns">
         <div class="card mt-4">
@@ -135,7 +133,7 @@
             </div>
         </div>
     </div>
-    <h6 class="mt-3" v-if="notLearn">NotLearn:</h6>
+    <h6 class="mt-3" v-if="notLearns">NotLearn:</h6>
     <!-- <h6>NotLearn: {{ data.notLearns.length }}</h6> -->
     <div class="col-12" v-for="notLearn in notLearns">
         <div class="card mt-4">
@@ -145,8 +143,7 @@
             </div>
         </div>
     </div>
-    <h6 class="mt-3" v-if="learned">Learned:</h6>
-    <!-- <h6>NotLearn: {{ data.learneds.length }}</h6> -->
+    <h6 class="mt-3" v-if="learneds">Learned:</h6>
     <div class="col-12" v-for="learned in learneds">
         <div class="card mt-4">
             <div class="card-body">
@@ -177,7 +174,6 @@ export default {
             lesson: null,
             data: null,
             card: null,
-
             unsubscribe: null,
         };
     },
@@ -192,12 +188,15 @@ export default {
             if (mutation.type === "lesson/request") {
             } else if (mutation.type === "lesson/success") {
                 if (!this.type) {
-                    this.data = mutation.payload;
-                    this.lesson = this.data.lesson = mutation.payload.lesson;
-                    this.relearns = this.data.relearn = mutation.payload.relearn;
-                    this.notLearns = this.data.notLearn = mutation.payload.notLearn;
-                    this.learneds = this.data.learned = mutation.payload.learned;
-                    this.card =this.data.notLearn ?? this.data.learned ?? this.data.relearn;
+                    this.lesson = mutation.payload.lesson;
+                    this.relearns = mutation.payload.relearn;
+                    this.notLearns = mutation.payload.notLearn;
+                    this.learneds = mutation.payload.learned;
+                    if(this.notLearns && this.notLearns.length > 0){
+                        this.card = this.notLearns;
+                    } else {
+                        this.card = this.learneds;
+                    }
                     document.getElementById("text").innerHTML = this.card[this.currentCardIndex].term;
                 }
                 if (this.type === 'delete') {
