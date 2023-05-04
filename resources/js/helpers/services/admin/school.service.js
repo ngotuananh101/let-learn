@@ -14,7 +14,7 @@ function getSchoolList() {
         method: 'GET',
         headers: authHeader()
     };
-    return fetch(`Manager`, requestOptions)
+    return fetch(`/api/admin/school`, requestOptions)
         .then(handleResponse)
 }
 
